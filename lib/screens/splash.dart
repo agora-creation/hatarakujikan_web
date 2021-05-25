@@ -23,6 +23,13 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Center(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 150.0,
+                  height: 150.0,
+                ),
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -30,7 +37,7 @@ class SplashScreen extends StatelessWidget {
                   Text('for WEB', style: kSubTitleTextStyle),
                 ],
               ),
-              SizedBox(height: 32.0),
+              SizedBox(height: 24.0),
               Loading(color: Colors.white),
             ],
           ),
