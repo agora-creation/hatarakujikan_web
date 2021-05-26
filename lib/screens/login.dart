@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/screens/group_select.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field.dart';
+import 'package:hatarakujikan_web/widgets/error_message.dart';
+import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/round_background_button.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final groupProvider = Provider.of<GroupProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -21,64 +29,83 @@ class LoginScreen extends StatelessWidget {
               ],
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 150.0,
-                  height: 150.0,
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('はたらくじかん', style: kTitleTextStyle),
-                  Text('for WEB', style: kSubTitleTextStyle),
-                ],
-              ),
-              SizedBox(height: 24.0),
-              Container(
-                width: 350.0,
-                child: Column(
+          child: groupProvider.status == Status.Authenticating
+              ? Loading(color: Colors.white)
+              : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CustomTextFormField(
-                      controller: null,
-                      obscureText: false,
-                      textInputType: TextInputType.emailAddress,
-                      maxLines: 1,
-                      labelText: 'メールアドレス',
-                      labelColor: Colors.white,
-                      prefixIconData: Icons.email,
-                      suffixIconData: null,
-                      onTap: null,
+                    Center(
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 150.0,
+                        height: 150.0,
+                      ),
                     ),
-                    SizedBox(height: 16.0),
-                    CustomTextFormField(
-                      controller: null,
-                      obscureText: true,
-                      textInputType: null,
-                      maxLines: 1,
-                      labelText: 'パスワード',
-                      labelColor: Colors.white,
-                      prefixIconData: Icons.lock,
-                      suffixIconData: null,
-                      onTap: null,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('はたらくじかん', style: kTitleTextStyle),
+                        Text('for WEB', style: kSubTitleTextStyle),
+                      ],
                     ),
                     SizedBox(height: 24.0),
-                    RoundBackgroundButton(
-                      labelText: 'ログイン',
-                      labelColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      onPressed: () {},
+                    Container(
+                      width: 350.0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomTextFormField(
+                            controller: groupProvider.email,
+                            obscureText: false,
+                            textInputType: TextInputType.emailAddress,
+                            maxLines: 1,
+                            labelText: 'メールアドレス',
+                            labelColor: Colors.white,
+                            prefixIconData: Icons.email,
+                            suffixIconData: null,
+                            onTap: null,
+                          ),
+                          SizedBox(height: 16.0),
+                          CustomTextFormField(
+                            controller: groupProvider.password,
+                            obscureText: true,
+                            textInputType: null,
+                            maxLines: 1,
+                            labelText: 'パスワード',
+                            labelColor: Colors.white,
+                            prefixIconData: Icons.lock,
+                            suffixIconData: null,
+                            onTap: null,
+                          ),
+                          SizedBox(height: 24.0),
+                          RoundBackgroundButton(
+                            labelText: 'ログイン',
+                            labelColor: Colors.white,
+                            backgroundColor: Colors.blue,
+                            onPressed: () async {
+                              if (!await groupProvider.signIn()) {
+                                showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => ErrorMessage(
+                                    message:
+                                        'ログインに失敗しました。メールアドレスもしくはパスワードが間違っている可能性があります。',
+                                  ),
+                                );
+                                return;
+                              }
+                              groupProvider.clearController();
+                              overlayScreen(
+                                context,
+                                GroupSelect(groupProvider: groupProvider),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
