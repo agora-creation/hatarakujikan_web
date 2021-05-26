@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
@@ -10,11 +11,12 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   if (FirebaseAuth.instance.currentUser == null) {
     await Future.any([
       FirebaseAuth.instance.userChanges().firstWhere((e) => e != null),
-      Future.delayed(Duration(milliseconds: 3000)),
+      Future.delayed(Duration(milliseconds: 2000)),
     ]);
   }
   runApp(MyApp());
@@ -49,6 +51,7 @@ class SplashController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    print(groupProvider.status);
     switch (groupProvider.status) {
       case Status.Uninitialized:
         return SplashScreen();

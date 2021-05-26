@@ -7,11 +7,12 @@ class HomeScreen extends StatelessWidget {
     return AdminScaffold(
       backgroundColor: Color(0xFFFEFFFA),
       appBar: AppBar(
-        title: Text('テスト株式会社'),
+        title: Text('テスト株式会社', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.orange,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       sideBar: SideBar(
-        items: const [
+        items: [
           MenuItem(
             title: 'Dashboard',
             route: '/',
@@ -57,7 +58,7 @@ class HomeScreen extends StatelessWidget {
           color: Color(0xff444444),
           child: Center(
             child: Text(
-              'header',
+              '管理者メニュー',
               style: TextStyle(
                 color: Colors.white,
               ),
