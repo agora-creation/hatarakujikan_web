@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/home.dart';
+import 'package:hatarakujikan_web/screens/apply_holiday.dart';
+import 'package:hatarakujikan_web/screens/apply_overtime.dart';
+import 'package:hatarakujikan_web/screens/apply_work.dart';
+import 'package:hatarakujikan_web/screens/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
+import 'package:hatarakujikan_web/screens/user.dart';
+import 'package:hatarakujikan_web/screens/work.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -42,6 +47,14 @@ class MyApp extends StatelessWidget {
         title: 'はたらくじかんforWEB',
         theme: theme(),
         home: SplashController(),
+        routes: {
+          ApplyHolidayScreen.id: (context) => ApplyHolidayScreen(),
+          ApplyOvertimeScreen.id: (context) => ApplyOvertimeScreen(),
+          ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
+          GroupScreen.id: (context) => GroupScreen(),
+          UserScreen.id: (context) => UserScreen(),
+          WorkScreen.id: (context) => WorkScreen(),
+        },
       ),
     );
   }
@@ -51,7 +64,6 @@ class SplashController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    print(groupProvider.status);
     switch (groupProvider.status) {
       case Status.Uninitialized:
         return SplashScreen();
@@ -63,7 +75,7 @@ class SplashController extends StatelessWidget {
           groupProvider.signOut();
           return LoginScreen();
         }
-        return HomeScreen();
+        return WorkScreen();
       default:
         return LoginScreen();
     }

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
-import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/group.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
@@ -23,7 +22,6 @@ class GroupProvider with ChangeNotifier {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool isHidden = false;
-  UserModel selectUser;
 
   GroupProvider.initialize() : _auth = FirebaseAuth.instance {
     _auth.authStateChanges().listen(_onStateChanged);
@@ -38,16 +36,6 @@ class GroupProvider with ChangeNotifier {
     _groups.clear();
     _group = group;
     await setPrefs(group.id);
-    notifyListeners();
-  }
-
-  void setUser(UserModel user) {
-    selectUser = user;
-    notifyListeners();
-  }
-
-  void clearUser() {
-    selectUser = null;
     notifyListeners();
   }
 

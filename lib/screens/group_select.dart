@@ -3,7 +3,7 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/home.dart';
+import 'package:hatarakujikan_web/screens/work.dart';
 
 class GroupSelect extends StatelessWidget {
   final GroupProvider groupProvider;
@@ -33,7 +33,7 @@ class GroupSelect extends StatelessWidget {
         ],
       ),
       body: ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         itemCount: groupProvider.groups.length,
         itemBuilder: (_, index) {
           GroupModel _group = groupProvider.groups[index];
@@ -45,7 +45,7 @@ class GroupSelect extends StatelessWidget {
               onTap: () async {
                 groupProvider.setGroup(_group);
                 Navigator.of(context, rootNavigator: true).pop();
-                changeScreen(context, HomeScreen());
+                changeScreen(context, WorkScreen());
               },
             ),
           );
