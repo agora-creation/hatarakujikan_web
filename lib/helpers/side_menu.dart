@@ -18,7 +18,7 @@ const List<MenuItem> kSideMenu = [
     icon: Icons.question_answer,
     children: [
       MenuItem(
-        title: '勤怠記録修正申請',
+        title: '記録修正申請',
         route: ApplyWorkScreen.id,
         icon: Icons.chevron_right,
       ),
