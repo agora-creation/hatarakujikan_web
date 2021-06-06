@@ -6,37 +6,34 @@ class WorkModel {
   String _id;
   String _groupId;
   String _userId;
-  DateTime _startedAt;
-  double _startedLat;
-  double _startedLon;
-  DateTime _endedAt;
-  double _endedLat;
-  double _endedLon;
+  DateTime startedAt;
+  double startedLat;
+  double startedLon;
+  DateTime endedAt;
+  double endedLat;
+  double endedLon;
   List<BreaksModel> breaks;
+  String _deviceId;
   DateTime _createdAt;
 
   String get id => _id;
   String get groupId => _groupId;
   String get userId => _userId;
-  DateTime get startedAt => _startedAt;
-  double get startedLat => _startedLat;
-  double get startedLon => _startedLon;
-  DateTime get endedAt => _endedAt;
-  double get endedLat => _endedLat;
-  double get endedLon => _endedLon;
+  String get deviceId => _deviceId;
   DateTime get createdAt => _createdAt;
 
   WorkModel.fromSnapshot(DocumentSnapshot snapshot) {
     _id = snapshot.data()['id'];
     _groupId = snapshot.data()['groupId'];
     _userId = snapshot.data()['userId'];
-    _startedAt = snapshot.data()['startedAt'].toDate();
-    _startedLat = snapshot.data()['startedLat'];
-    _startedLon = snapshot.data()['startedLon'];
-    _endedAt = snapshot.data()['endedAt'].toDate();
-    _endedLat = snapshot.data()['endedLat'];
-    _endedLon = snapshot.data()['endedLon'];
+    startedAt = snapshot.data()['startedAt'].toDate();
+    startedLat = snapshot.data()['startedLat'];
+    startedLon = snapshot.data()['startedLon'];
+    endedAt = snapshot.data()['endedAt'].toDate();
+    endedLat = snapshot.data()['endedLat'];
+    endedLon = snapshot.data()['endedLon'];
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
+    _deviceId = snapshot.data()['deviceId'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 
@@ -52,7 +49,7 @@ class WorkModel {
     String _result = '00:00';
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     // 出勤時間と退勤時間の差を求める
-    Duration _diff = _endedAt.difference(_startedAt);
+    Duration _diff = endedAt.difference(startedAt);
     String _minutes = twoDigits(_diff.inMinutes.remainder(60));
     String _workTime = '${twoDigits(_diff.inHours)}:$_minutes';
     // 休憩の合計時間を求める

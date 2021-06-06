@@ -5,6 +5,7 @@ class UserModel {
   String _name;
   String _email;
   String _password;
+  String _workPassword;
   int _workLv;
   String _lastWorkId;
   String _lastBreakId;
@@ -16,6 +17,7 @@ class UserModel {
   String get name => _name;
   String get email => _email;
   String get password => _password;
+  String get workPassword => _workPassword;
   int get workLv => _workLv;
   String get lastWorkId => _lastWorkId;
   String get lastBreakId => _lastBreakId;
@@ -27,6 +29,7 @@ class UserModel {
     _name = snapshot.data()['name'];
     _email = snapshot.data()['email'];
     _password = snapshot.data()['password'];
+    _workPassword = snapshot.data()['workPassword'];
     _workLv = snapshot.data()['workLv'] ?? 0;
     _lastWorkId = snapshot.data()['lastWorkId'];
     _lastBreakId = snapshot.data()['lastBreakId'];
