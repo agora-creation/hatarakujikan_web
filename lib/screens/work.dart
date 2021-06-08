@@ -42,40 +42,37 @@ class _WorkTableState extends State<WorkTable> {
       columnWidthMode: ColumnWidthMode.fill,
       columns: <GridColumn>[
         GridTextColumn(
-          columnName: 'id',
-          label: Container(
-            padding: EdgeInsets.all(16.0),
-            alignment: Alignment.center,
-            child: Text(
-              'ID',
-            ),
-          ),
-        ),
-        GridTextColumn(
-          columnName: 'name',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text('Name'),
-          ),
-        ),
-        GridTextColumn(
-          columnName: 'designation',
+          columnName: 'days',
           label: Container(
             padding: EdgeInsets.all(8.0),
             alignment: Alignment.center,
             child: Text(
-              'Designation',
-              overflow: TextOverflow.ellipsis,
+              '日付',
             ),
           ),
         ),
         GridTextColumn(
-          columnName: 'salary',
+          columnName: 'status',
           label: Container(
             padding: EdgeInsets.all(8.0),
             alignment: Alignment.center,
-            child: Text('Salary'),
+            child: Text('勤務状況'),
+          ),
+        ),
+        GridTextColumn(
+          columnName: 'start',
+          label: Container(
+            padding: EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text('出勤時間'),
+          ),
+        ),
+        GridTextColumn(
+          columnName: 'end',
+          label: Container(
+            padding: EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text('退勤時間'),
           ),
         ),
       ],

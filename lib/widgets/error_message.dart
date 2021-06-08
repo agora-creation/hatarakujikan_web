@@ -17,7 +17,7 @@ class ErrorMessage extends StatelessWidget {
             child: Icon(
               Icons.report_problem,
               color: Colors.red,
-              size: 64.0,
+              size: 48.0,
             ),
           ),
           SizedBox(height: 24.0),
