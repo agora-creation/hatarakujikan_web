@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/grid_column_label.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -14,7 +17,35 @@ class WorkScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: WorkTable(),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '勤務の管理',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(),
+                CustomTextIconButton(
+                  onPressed: () {},
+                  backgroundColor: Colors.green,
+                  iconData: Icons.file_download,
+                  labelText: 'CSVダウンロード',
+                ),
+              ],
+            ),
+            SizedBox(height: 8.0),
+            Expanded(
+              child: WorkTable(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -25,104 +56,100 @@ class WorkTable extends StatefulWidget {
 }
 
 class _WorkTableState extends State<WorkTable> {
-  List<Employee> employees = <Employee>[];
-  EmployeeDataSource employeeDataSource;
+  DateTime selectMonth = DateTime.now();
+  List<DateTime> days = [];
+  WorkDataSource workDataSource;
+
+  void _generateDays() async {
+    days.clear();
+    var _dateMap = DateMachineUtil.getMonthDate(selectMonth, 0);
+    DateTime _startAt = DateTime.parse('${_dateMap['start']}');
+    DateTime _endAt = DateTime.parse('${_dateMap['end']}');
+    for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {
+      days.add(_startAt.add(Duration(days: i)));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    employees = getEmployeeData();
-    employeeDataSource = EmployeeDataSource(employeeData: employees);
+    _generateDays();
+    workDataSource = WorkDataSource(days);
   }
 
   @override
   Widget build(BuildContext context) {
     return SfDataGrid(
-      source: employeeDataSource,
+      source: workDataSource,
       columnWidthMode: ColumnWidthMode.fill,
-      columns: <GridColumn>[
+      columns: [
         GridTextColumn(
           columnName: 'days',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              '日付',
-            ),
-          ),
+          label: GridColumnLabel(labelText: '日付'),
         ),
         GridTextColumn(
           columnName: 'status',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text('勤務状況'),
-          ),
+          label: GridColumnLabel(labelText: '勤務状況'),
         ),
         GridTextColumn(
           columnName: 'start',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text('出勤時間'),
-          ),
+          label: GridColumnLabel(labelText: '出勤時間'),
         ),
         GridTextColumn(
           columnName: 'end',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text('退勤時間'),
-          ),
+          label: GridColumnLabel(labelText: '退勤時間'),
+        ),
+        GridTextColumn(
+          columnName: 'breaks',
+          label: GridColumnLabel(labelText: '休憩時間'),
+        ),
+        GridTextColumn(
+          columnName: 'work',
+          label: GridColumnLabel(labelText: '勤務時間'),
         ),
       ],
     );
   }
-
-  List<Employee> getEmployeeData() {
-    return [
-      Employee(10001, 'James', 'Project Lead', 20000),
-      Employee(10002, 'Kathryn', 'Manager', 30000),
-      Employee(10003, 'Lara', 'Developer', 15000),
-      Employee(10004, 'Michael', 'Designer', 15000),
-      Employee(10005, 'Martin', 'Developer', 15000),
-      Employee(10006, 'Newberry', 'Developer', 15000),
-      Employee(10007, 'Balnc', 'Developer', 15000),
-      Employee(10008, 'Perry', 'Developer', 15000),
-      Employee(10009, 'Gable', 'Developer', 15000),
-      Employee(10010, 'Grimes', 'Developer', 15000)
-    ];
-  }
 }
 
-class EmployeeDataSource extends DataGridSource {
-  EmployeeDataSource({@required List<Employee> employeeData}) {
-    _employeeData = employeeData
-        .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell<int>(
-                columnName: 'id',
-                value: e.id,
-              ),
-              DataGridCell<String>(
-                columnName: 'name',
-                value: e.name,
-              ),
-              DataGridCell<String>(
-                columnName: 'designation',
-                value: e.designation,
-              ),
-              DataGridCell<int>(
-                columnName: 'salary',
-                value: e.salary,
-              ),
-            ]))
+class WorkDataSource extends DataGridSource {
+  WorkDataSource(List<DateTime> days) {
+    dataGridRows = days
+        .map<DataGridRow>((e) => DataGridRow(
+              cells: [
+                DataGridCell<String>(
+                  columnName: 'days',
+                  value: '02/01',
+                ),
+                DataGridCell<String>(
+                  columnName: 'status',
+                  value: '通常勤務',
+                ),
+                DataGridCell<String>(
+                  columnName: 'start',
+                  value: '00:00',
+                ),
+                DataGridCell<String>(
+                  columnName: 'end',
+                  value: '00:00',
+                ),
+                DataGridCell<String>(
+                  columnName: 'breaks',
+                  value: '00:00',
+                ),
+                DataGridCell<String>(
+                  columnName: 'work',
+                  value: '00:00',
+                ),
+              ],
+            ))
         .toList();
   }
 
-  List<DataGridRow> _employeeData = [];
+  List<DataGridRow> dataGridRows = [];
 
   @override
-  List<DataGridRow> get rows => _employeeData;
+  List<DataGridRow> get rows => dataGridRows;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
@@ -135,12 +162,4 @@ class EmployeeDataSource extends DataGridSource {
       );
     }).toList());
   }
-}
-
-class Employee {
-  Employee(this.id, this.name, this.designation, this.salary);
-  final int id;
-  final String name;
-  final String designation;
-  final int salary;
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-class CustomTextButton extends StatelessWidget {
+class CustomTextIconButton extends StatelessWidget {
+  final IconData iconData;
   final String labelText;
   final Color backgroundColor;
   final Function onPressed;
 
-  CustomTextButton({
+  CustomTextIconButton({
+    this.iconData,
     this.labelText,
     this.backgroundColor,
     this.onPressed,
@@ -13,9 +15,10 @@ class CustomTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return TextButton.icon(
       onPressed: onPressed,
-      child: Text(
+      icon: Icon(iconData, color: Colors.white),
+      label: Text(
         labelText,
         style: TextStyle(
           color: Colors.white,

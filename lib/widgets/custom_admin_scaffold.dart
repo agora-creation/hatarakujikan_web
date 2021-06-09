@@ -104,15 +104,15 @@ class SignOutDialog extends StatelessWidget {
             child: Icon(
               Icons.exit_to_app,
               color: Colors.blue,
-              size: 48.0,
+              size: 32.0,
             ),
           ),
-          SizedBox(height: 24.0),
+          SizedBox(height: 16.0),
           Text(
             'ログアウトします。よろしいですか？',
-            style: TextStyle(fontSize: 20.0),
+            style: TextStyle(fontSize: 16.0),
           ),
-          SizedBox(height: 24.0),
+          SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

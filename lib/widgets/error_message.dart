@@ -4,7 +4,7 @@ import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 class ErrorMessage extends StatelessWidget {
   final String message;
 
-  ErrorMessage({this.message});
+  ErrorMessage(this.message);
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +17,15 @@ class ErrorMessage extends StatelessWidget {
             child: Icon(
               Icons.report_problem,
               color: Colors.red,
-              size: 48.0,
+              size: 32.0,
             ),
           ),
-          SizedBox(height: 24.0),
+          SizedBox(height: 16.0),
           Text(
             message,
-            style: TextStyle(fontSize: 20.0),
+            style: TextStyle(fontSize: 16.0),
           ),
-          SizedBox(height: 24.0),
+          SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
