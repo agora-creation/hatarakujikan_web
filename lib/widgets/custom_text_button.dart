@@ -24,7 +24,7 @@ class CustomTextButton extends StatelessWidget {
       ),
       style: TextButton.styleFrom(
         backgroundColor: backgroundColor,
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
       ),
     );
   }

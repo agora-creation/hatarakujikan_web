@@ -76,9 +76,9 @@ class CustomAdminScaffold extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              margin: EdgeInsets.all(10.0),
-              padding: EdgeInsets.all(0.0),
-              constraints: BoxConstraints(maxHeight: 750.0),
+              margin: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(16.0),
+              constraints: BoxConstraints(maxHeight: 800.0),
               child: body,
             ),
           ],
