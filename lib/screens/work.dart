@@ -4,6 +4,7 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_work_head_list_tile.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -87,6 +88,7 @@ class _WorkScreenState extends State<WorkScreen> {
             ],
           ),
           SizedBox(height: 8.0),
+          CustomWorkHeadListTile(),
           Expanded(
             child: ListView.builder(
               itemCount: days.length,
@@ -95,8 +97,27 @@ class _WorkScreenState extends State<WorkScreen> {
                   decoration: kBottomBorderDecoration,
                   child: ListTile(
                     leading: Text(
-                        '${DateFormat('dd (E)', 'ja').format(days[index])}'),
-                    title: Text('なにか'),
+                      '${DateFormat('dd (E)', 'ja').format(days[index])}',
+                      style: TextStyle(color: Colors.black54, fontSize: 16.0),
+                    ),
+                    title: ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Chip(
+                            label: Text('休み'),
+                          ),
+                          Text('00:00'),
+                          Text('00:00'),
+                          Text('00:00'),
+                          Text('00:00'),
+                          Text('00:00'),
+                          Text('00:00'),
+                          Text('00:00'),
+                        ],
+                      ),
+                      onTap: () {},
+                    ),
                   ),
                 );
               },
