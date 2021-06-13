@@ -1,11 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/user.dart';
+import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_head_list_tile.dart';
+import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
+import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:intl/intl.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 
 class WorkScreen extends StatefulWidget {
@@ -17,6 +23,7 @@ class WorkScreen extends StatefulWidget {
 
 class _WorkScreenState extends State<WorkScreen> {
   DateTime selectMonth = DateTime.now();
+  UserModel selectUser;
   List<DateTime> days = [];
 
   void _generateDays() async {
@@ -29,6 +36,10 @@ class _WorkScreenState extends State<WorkScreen> {
     }
   }
 
+  void changeUser(UserModel user) {
+    setState(() => selectUser = user);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +49,19 @@ class _WorkScreenState extends State<WorkScreen> {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
+            '${DateFormat(formatY_M_D).format(days.first)} 00:00:00.000')
+        .millisecondsSinceEpoch);
+    Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
+            '${DateFormat(formatY_M_D).format(days.last)} 23:59:59.999')
+        .millisecondsSinceEpoch);
+    Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+        .collection('work')
+        .where('groupId', isEqualTo: groupProvider.group?.id)
+        .where('userId', isEqualTo: selectUser?.id ?? 'error')
+        .orderBy('startedAt', descending: false)
+        .startAt([_startAt]).endAt([_endAt]).snapshots();
+    List<WorkModel> works = [];
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -54,10 +78,22 @@ class _WorkScreenState extends State<WorkScreen> {
               Row(
                 children: [
                   CustomTextIconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var selected = await showMonthPicker(
+                        context: context,
+                        initialDate: selectMonth,
+                        firstDate: DateTime(DateTime.now().year - 1),
+                        lastDate: DateTime(DateTime.now().year + 1),
+                      );
+                      if (selected == null) return;
+                      setState(() {
+                        selectMonth = selected;
+                        _generateDays();
+                      });
+                    },
                     backgroundColor: Colors.lightBlueAccent,
                     iconData: Icons.calendar_today,
-                    labelText: '2021年06月',
+                    labelText: '${DateFormat(formatYM).format(selectMonth)}',
                   ),
                   SizedBox(width: 4.0),
                   CustomTextIconButton(
@@ -90,35 +126,32 @@ class _WorkScreenState extends State<WorkScreen> {
           SizedBox(height: 8.0),
           CustomWorkHeadListTile(),
           Expanded(
-            child: ListView.builder(
-              itemCount: days.length,
-              itemBuilder: (_, index) {
-                return Container(
-                  decoration: kBottomBorderDecoration,
-                  child: ListTile(
-                    leading: Text(
-                      '${DateFormat('dd (E)', 'ja').format(days[index])}',
-                      style: TextStyle(color: Colors.black54, fontSize: 16.0),
-                    ),
-                    title: ListTile(
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Chip(
-                            label: Text('休み'),
-                          ),
-                          Text('00:00'),
-                          Text('00:00'),
-                          Text('00:00'),
-                          Text('00:00'),
-                          Text('00:00'),
-                          Text('00:00'),
-                          Text('00:00'),
-                        ],
-                      ),
-                      onTap: () {},
-                    ),
-                  ),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _stream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Loading(color: Colors.orange);
+                }
+                works.clear();
+                for (DocumentSnapshot work in snapshot.data.docs) {
+                  works.add(WorkModel.fromSnapshot(work));
+                }
+                return ListView.builder(
+                  itemCount: days.length,
+                  itemBuilder: (_, index) {
+                    List<WorkModel> _dayWorks = [];
+                    for (WorkModel _work in works) {
+                      if (days[index] ==
+                          DateTime.parse(DateFormat(formatY_M_D)
+                              .format(_work.startedAt))) {
+                        _dayWorks.add(_work);
+                      }
+                    }
+                    return CustomWorkListTile(
+                      day: days[index],
+                      works: _dayWorks,
+                    );
+                  },
                 );
               },
             ),
