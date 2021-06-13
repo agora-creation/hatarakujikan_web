@@ -49,7 +49,6 @@ class _WorkScreenState extends State<WorkScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ScrollController _scrollController = ScrollController();
     final groupProvider = Provider.of<GroupProvider>(context);
     Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
             '${DateFormat(formatY_M_D).format(days.first)} 00:00:00.000')
@@ -104,58 +103,7 @@ class _WorkScreenState extends State<WorkScreen> {
                       showDialog(
                         barrierDismissible: false,
                         context: context,
-                        builder: (_) => AlertDialog(
-                          content: Container(
-                            width: 450.0,
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: [
-                                Container(
-                                  height: 350.0,
-                                  child: Scrollbar(
-                                    isAlwaysShown: true,
-                                    controller: _scrollController,
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: ScrollPhysics(),
-                                      controller: _scrollController,
-                                      itemCount: test.length,
-                                      itemBuilder: (_, index) {
-                                        return Container(
-                                          decoration: kBottomBorderDecoration,
-                                          child: RadioListTile(
-                                            title: Text('${test[index]}'),
-                                            value: test,
-                                            groupValue: 'a',
-                                            activeColor: Colors.blue,
-                                            onChanged: (value) {},
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 16.0),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomTextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      backgroundColor: Colors.grey,
-                                      labelText: 'キャンセル',
-                                    ),
-                                    CustomTextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      backgroundColor: Colors.blue,
-                                      labelText: 'OK',
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        builder: (_) => SelectUserDialog(test: test),
                       );
                     },
                     backgroundColor: Colors.lightBlueAccent,
@@ -218,6 +166,72 @@ class _WorkScreenState extends State<WorkScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SelectUserDialog extends StatelessWidget {
+  final List<String> test;
+
+  SelectUserDialog({@required this.test});
+
+  @override
+  Widget build(BuildContext context) {
+    final ScrollController _scrollController = ScrollController();
+
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Divider(height: 0.0),
+            Container(
+              height: 350.0,
+              child: Scrollbar(
+                isAlwaysShown: true,
+                controller: _scrollController,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  controller: _scrollController,
+                  itemCount: test.length,
+                  itemBuilder: (_, index) {
+                    return Container(
+                      decoration: kBottomBorderDecoration,
+                      child: RadioListTile(
+                        title: Text('${test[index]}'),
+                        value: test,
+                        groupValue: 'a',
+                        activeColor: Colors.blue,
+                        onChanged: (value) {},
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Divider(height: 0.0),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  backgroundColor: Colors.grey,
+                  labelText: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  backgroundColor: Colors.blue,
+                  labelText: 'OK',
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
