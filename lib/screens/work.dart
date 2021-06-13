@@ -6,6 +6,7 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_head_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
@@ -48,6 +49,7 @@ class _WorkScreenState extends State<WorkScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController _scrollController = ScrollController();
     final groupProvider = Provider.of<GroupProvider>(context);
     Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
             '${DateFormat(formatY_M_D).format(days.first)} 00:00:00.000')
@@ -62,6 +64,7 @@ class _WorkScreenState extends State<WorkScreen> {
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     List<WorkModel> works = [];
+    List<String> test = ['a', 'b', 'c', 'd', 'f', 'g', 'h', 'i', 'j'];
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -97,10 +100,68 @@ class _WorkScreenState extends State<WorkScreen> {
                   ),
                   SizedBox(width: 4.0),
                   CustomTextIconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          content: Container(
+                            width: 450.0,
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: [
+                                Container(
+                                  height: 350.0,
+                                  child: Scrollbar(
+                                    isAlwaysShown: true,
+                                    controller: _scrollController,
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: ScrollPhysics(),
+                                      controller: _scrollController,
+                                      itemCount: test.length,
+                                      itemBuilder: (_, index) {
+                                        return Container(
+                                          decoration: kBottomBorderDecoration,
+                                          child: RadioListTile(
+                                            title: Text('${test[index]}'),
+                                            value: test,
+                                            groupValue: 'a',
+                                            activeColor: Colors.blue,
+                                            onChanged: (value) {},
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 16.0),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomTextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      backgroundColor: Colors.grey,
+                                      labelText: 'キャンセル',
+                                    ),
+                                    CustomTextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      backgroundColor: Colors.blue,
+                                      labelText: 'OK',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                     backgroundColor: Colors.lightBlueAccent,
-                    iconData: Icons.group,
-                    labelText: '指定なし',
+                    iconData: Icons.person,
+                    labelText:
+                        selectUser != null ? '${selectUser?.name}' : '指定なし',
                   ),
                 ],
               ),
