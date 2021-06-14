@@ -7,6 +7,9 @@ class UserProvider with ChangeNotifier {
 
   Future<List<UserModel>> selectList({String groupId}) async {
     List<UserModel> _users = [];
+    await _userService.selectList(groupId: groupId).then((value) {
+      _users = value;
+    });
     return _users;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/screens/apply_work_table.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:provider/provider.dart';
 
@@ -13,9 +14,7 @@ class ApplyWorkScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: Center(
-        child: Text('勤怠記録修正申請'),
-      ),
+      body: ApplyWorkTable(),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/screens/apply_holiday.dart';
 import 'package:hatarakujikan_web/screens/apply_overtime.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: GroupProvider.initialize()),
+        ChangeNotifierProvider.value(value: UserProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

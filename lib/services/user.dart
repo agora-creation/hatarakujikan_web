@@ -27,4 +27,19 @@ class UserService {
         await _firebaseFirestore.collection(_collection).doc(userId).get();
     return UserModel.fromSnapshot(snapshot);
   }
+
+  Future<List<UserModel>> selectList({String groupId}) async {
+    List<UserModel> _users = [];
+    await _firebaseFirestore
+        .collection(_collection)
+        .where('groups', arrayContains: groupId)
+        .orderBy('name', descending: false)
+        .get()
+        .then((value) {
+      for (DocumentSnapshot _user in value.docs) {
+        _users.add(UserModel.fromSnapshot(_user));
+      }
+    });
+    return _users;
+  }
 }

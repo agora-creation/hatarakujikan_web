@@ -3,7 +3,7 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/work.dart';
+import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 
 class GroupSelect extends StatefulWidget {
@@ -25,7 +25,7 @@ class _GroupSelectState extends State<GroupSelect> {
       widget.groupProvider.setGroup(widget.groupProvider.groups.first);
       setState(() => _isLoading = false);
       Navigator.of(context, rootNavigator: true).pop();
-      changeScreen(context, WorkScreen());
+      changeScreen(context, UserScreen());
     }
     setState(() => _isLoading = false);
   }
@@ -75,7 +75,7 @@ class _GroupSelectState extends State<GroupSelect> {
                       widget.groupProvider.setGroup(_group);
                       setState(() => _isLoading = false);
                       Navigator.of(context, rootNavigator: true).pop();
-                      changeScreen(context, WorkScreen());
+                      changeScreen(context, UserScreen());
                     },
                   ),
                 );
