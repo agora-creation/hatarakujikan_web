@@ -14,7 +14,10 @@ class UserScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: UserTable(),
+      body: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        child: UserTable(groupProvider: groupProvider),
+      ),
     );
   }
 }
