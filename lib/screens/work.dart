@@ -16,12 +16,9 @@ class WorkScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: WorkScreen.id,
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: WorkTable(
-          groupProvider: groupProvider,
-          userProvider: userProvider,
-        ),
+      body: WorkTable(
+        groupProvider: groupProvider,
+        userProvider: userProvider,
       ),
     );
   }

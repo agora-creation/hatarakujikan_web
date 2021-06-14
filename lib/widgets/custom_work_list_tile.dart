@@ -45,7 +45,7 @@ class CustomWorkListTile extends StatelessWidget {
                             ? Text('00:00')
                             : Text('---:---'),
                         _work.startedAt != _work.endedAt
-                            ? Text('00:00')
+                            ? Text('${_work.workTime()}')
                             : Text('---:---'),
                         _work.startedAt != _work.endedAt
                             ? Text('00:00')
@@ -58,7 +58,15 @@ class CustomWorkListTile extends StatelessWidget {
                             : Text('---:---'),
                       ],
                     ),
-                    onTap: _work.startedAt != _work.endedAt ? () {} : null,
+                    onTap: _work.startedAt != _work.endedAt
+                        ? () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => Container(),
+                            );
+                          }
+                        : null,
                   );
                 },
               )
