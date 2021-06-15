@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class RoundBackgroundButton extends StatelessWidget {
-  final String labelText;
-  final Color labelColor;
+  final String label;
+  final Color color;
   final Color backgroundColor;
   final Function onPressed;
 
   RoundBackgroundButton({
-    this.labelText,
-    this.labelColor,
+    this.label,
+    this.color,
     this.backgroundColor,
     this.onPressed,
   });
@@ -20,9 +20,9 @@ class RoundBackgroundButton extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         child: Text(
-          labelText,
+          label,
           style: TextStyle(
-            color: labelColor,
+            color: color,
             fontSize: 16.0,
           ),
         ),

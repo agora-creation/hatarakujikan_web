@@ -68,8 +68,6 @@ class _GroupSelectState extends State<GroupSelect> {
                 return Container(
                   decoration: kBottomBorderDecoration,
                   child: ListTile(
-                    title: Text('${_group.name}'),
-                    trailing: Icon(Icons.chevron_right),
                     onTap: () async {
                       setState(() => _isLoading = true);
                       widget.groupProvider.setGroup(_group);
@@ -77,6 +75,8 @@ class _GroupSelectState extends State<GroupSelect> {
                       Navigator.of(context, rootNavigator: true).pop();
                       changeScreen(context, WorkScreen());
                     },
+                    title: Text('${_group.name}'),
+                    trailing: Icon(Icons.chevron_right),
                   ),
                 );
               },

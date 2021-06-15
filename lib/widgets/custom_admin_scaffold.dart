@@ -76,7 +76,8 @@ class CustomAdminScaffold extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.all(24.0),
+              margin: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(16.0),
               constraints: BoxConstraints(maxHeight: 850.0),
               child: body,
             ),
@@ -117,8 +118,8 @@ class SignOutDialog extends StatelessWidget {
             children: [
               CustomTextButton(
                 onPressed: () => Navigator.pop(context),
-                backgroundColor: Colors.grey,
-                labelText: 'キャンセル',
+                color: Colors.grey,
+                label: 'キャンセル',
               ),
               CustomTextButton(
                 onPressed: () {
@@ -126,8 +127,8 @@ class SignOutDialog extends StatelessWidget {
                   Navigator.pop(context);
                   changeScreen(context, LoginScreen());
                 },
-                backgroundColor: Colors.blue,
-                labelText: 'はい',
+                color: Colors.blue,
+                label: 'はい',
               ),
             ],
           ),

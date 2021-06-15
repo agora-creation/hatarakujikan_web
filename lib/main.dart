@@ -6,8 +6,6 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
-import 'package:hatarakujikan_web/screens/apply_holiday.dart';
-import 'package:hatarakujikan_web/screens/apply_overtime.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
@@ -52,8 +50,6 @@ class MyApp extends StatelessWidget {
         theme: theme(),
         home: SplashController(),
         routes: {
-          ApplyHolidayScreen.id: (context) => ApplyHolidayScreen(),
-          ApplyOvertimeScreen.id: (context) => ApplyOvertimeScreen(),
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
           GroupScreen.id: (context) => GroupScreen(),
           UserScreen.id: (context) => UserScreen(),

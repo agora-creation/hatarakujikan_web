@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
-import 'package:hatarakujikan_web/screens/apply_holiday.dart';
-import 'package:hatarakujikan_web/screens/apply_overtime.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
@@ -20,16 +18,6 @@ const List<MenuItem> kSideMenu = [
       MenuItem(
         title: '記録修正申請',
         route: ApplyWorkScreen.id,
-        icon: Icons.chevron_right,
-      ),
-      MenuItem(
-        title: '休暇申請',
-        route: ApplyHolidayScreen.id,
-        icon: Icons.chevron_right,
-      ),
-      MenuItem(
-        title: '残業申請',
-        route: ApplyOvertimeScreen.id,
         icon: Icons.chevron_right,
       ),
     ],

@@ -13,13 +13,11 @@ class WorkModel {
   double endedLat;
   double endedLon;
   List<BreaksModel> breaks;
-  String _deviceId;
   DateTime _createdAt;
 
   String get id => _id;
   String get groupId => _groupId;
   String get userId => _userId;
-  String get deviceId => _deviceId;
   DateTime get createdAt => _createdAt;
 
   WorkModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -33,7 +31,6 @@ class WorkModel {
     endedLat = snapshot.data()['endedLat'];
     endedLon = snapshot.data()['endedLon'];
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
-    _deviceId = snapshot.data()['deviceId'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 

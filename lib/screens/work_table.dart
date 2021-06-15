@@ -6,6 +6,7 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_head_list_tile.dart';
@@ -17,10 +18,12 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 class WorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
   final UserProvider userProvider;
+  final WorkProvider workProvider;
 
   WorkTable({
     @required this.groupProvider,
     @required this.userProvider,
+    @required this.workProvider,
   });
 
   @override
@@ -28,6 +31,8 @@ class WorkTable extends StatefulWidget {
 }
 
 class _WorkTableState extends State<WorkTable> {
+  DateTime _firstDate = DateTime(DateTime.now().year - 1);
+  DateTime _lastDate = DateTime(DateTime.now().year + 1);
   DateTime selectMonth = DateTime.now();
   UserModel selectUser;
   List<UserModel> users = [];
@@ -65,10 +70,10 @@ class _WorkTableState extends State<WorkTable> {
   @override
   Widget build(BuildContext context) {
     Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-            '${DateFormat(formatY_M_D).format(days.first)} 00:00:00.000')
+            '${DateFormat('yyyy-MM-dd').format(days.first)} 00:00:00.000')
         .millisecondsSinceEpoch);
     Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-            '${DateFormat(formatY_M_D).format(days.last)} 23:59:59.999')
+            '${DateFormat('yyyy-MM-dd').format(days.last)} 23:59:59.999')
         .millisecondsSinceEpoch);
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
         .collection('work')
@@ -100,8 +105,8 @@ class _WorkTableState extends State<WorkTable> {
                     var selected = await showMonthPicker(
                       context: context,
                       initialDate: selectMonth,
-                      firstDate: DateTime(DateTime.now().year - 1),
-                      lastDate: DateTime(DateTime.now().year + 1),
+                      firstDate: _firstDate,
+                      lastDate: _lastDate,
                     );
                     if (selected == null) return;
                     setState(() {
@@ -109,9 +114,9 @@ class _WorkTableState extends State<WorkTable> {
                       _generateDays();
                     });
                   },
-                  backgroundColor: Colors.lightBlueAccent,
+                  color: Colors.lightBlueAccent,
                   iconData: Icons.today,
-                  labelText: '${DateFormat(formatYM).format(selectMonth)}',
+                  label: '${DateFormat('yyyy年MM月').format(selectMonth)}',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
@@ -126,10 +131,9 @@ class _WorkTableState extends State<WorkTable> {
                       ),
                     );
                   },
-                  backgroundColor: Colors.lightBlueAccent,
+                  color: Colors.lightBlueAccent,
                   iconData: Icons.person,
-                  labelText:
-                      selectUser != null ? '${selectUser?.name}' : '指定なし',
+                  label: selectUser?.name ?? '指定なし',
                 ),
               ],
             ),
@@ -137,23 +141,23 @@ class _WorkTableState extends State<WorkTable> {
               children: [
                 CustomTextIconButton(
                   onPressed: () {},
-                  backgroundColor: Colors.green,
+                  color: Colors.green,
                   iconData: Icons.file_download,
-                  labelText: 'CSV出力',
+                  label: 'CSV出力',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
                   onPressed: () {},
-                  backgroundColor: Colors.redAccent,
+                  color: Colors.redAccent,
                   iconData: Icons.file_download,
-                  labelText: 'PDF出力',
+                  label: 'PDF出力',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
                   onPressed: () {},
-                  backgroundColor: Colors.blue,
+                  color: Colors.blue,
                   iconData: Icons.post_add,
-                  labelText: '新規登録',
+                  label: '新規登録',
                 ),
               ],
             ),
@@ -177,9 +181,9 @@ class _WorkTableState extends State<WorkTable> {
                 itemBuilder: (_, index) {
                   List<WorkModel> _dayWorks = [];
                   for (WorkModel _work in works) {
-                    if (days[index] ==
-                        DateTime.parse(
-                            DateFormat(formatY_M_D).format(_work.startedAt))) {
+                    String _startedAt =
+                        '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+                    if (days[index] == DateTime.parse(_startedAt)) {
                       _dayWorks.add(_work);
                     }
                   }
@@ -256,13 +260,13 @@ class SelectUserDialog extends StatelessWidget {
               children: [
                 CustomTextButton(
                   onPressed: () => Navigator.pop(context),
-                  backgroundColor: Colors.grey,
-                  labelText: 'キャンセル',
+                  color: Colors.grey,
+                  label: 'キャンセル',
                 ),
                 CustomTextButton(
                   onPressed: () => Navigator.pop(context),
-                  backgroundColor: Colors.blue,
-                  labelText: 'OK',
+                  color: Colors.blue,
+                  label: 'OK',
                 ),
               ],
             ),

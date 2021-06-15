@@ -5,10 +5,10 @@ class CustomTextFormField extends StatelessWidget {
   final bool obscureText;
   final TextInputType textInputType;
   final int maxLines;
-  final String labelText;
-  final Color labelColor;
-  final IconData prefixIconData;
-  final IconData suffixIconData;
+  final String label;
+  final Color color;
+  final IconData prefix;
+  final IconData suffix;
   final Function onTap;
 
   CustomTextFormField({
@@ -16,10 +16,10 @@ class CustomTextFormField extends StatelessWidget {
     this.obscureText,
     this.textInputType,
     this.maxLines,
-    this.labelText,
-    this.labelColor,
-    this.prefixIconData,
-    this.suffixIconData,
+    this.label,
+    this.color,
+    this.prefix,
+    this.suffix,
     this.onTap,
   });
 
@@ -31,23 +31,23 @@ class CustomTextFormField extends StatelessWidget {
       keyboardType: textInputType,
       maxLines: maxLines,
       style: TextStyle(
-        color: labelColor,
+        color: color,
         fontSize: 14.0,
       ),
-      cursorColor: labelColor,
+      cursorColor: color,
       decoration: InputDecoration(
-        labelText: labelText,
+        labelText: label,
         prefixIcon: Icon(
-          prefixIconData,
+          prefix,
           size: 18.0,
-          color: labelColor,
+          color: color,
         ),
         suffixIcon: GestureDetector(
           onTap: onTap,
           child: Icon(
-            suffixIconData,
+            suffix,
             size: 18.0,
-            color: labelColor,
+            color: color,
           ),
         ),
         filled: true,
@@ -57,10 +57,10 @@ class CustomTextFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.0),
-          borderSide: BorderSide(color: labelColor),
+          borderSide: BorderSide(color: color),
         ),
-        labelStyle: TextStyle(color: labelColor),
-        focusColor: labelColor,
+        labelStyle: TextStyle(color: color),
+        focusColor: color,
       ),
     );
   }

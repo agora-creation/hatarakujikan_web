@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomDateButton extends StatelessWidget {
-  final String labelText;
+  final String label;
   final Function onPressed;
 
   CustomDateButton({
-    this.labelText,
+    this.label,
     this.onPressed,
   });
 
@@ -15,7 +15,7 @@ class CustomDateButton extends StatelessWidget {
       onPressed: onPressed,
       icon: Icon(Icons.today, color: Colors.black54, size: 16.0),
       label: Text(
-        labelText,
+        label,
         style: TextStyle(
           color: Colors.black54,
           fontSize: 16.0,
