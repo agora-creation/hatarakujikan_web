@@ -110,7 +110,7 @@ class _WorkTableState extends State<WorkTable> {
                     });
                   },
                   backgroundColor: Colors.lightBlueAccent,
-                  iconData: Icons.calendar_today,
+                  iconData: Icons.today,
                   labelText: '${DateFormat(formatYM).format(selectMonth)}',
                 ),
                 SizedBox(width: 4.0),
@@ -147,6 +147,13 @@ class _WorkTableState extends State<WorkTable> {
                   backgroundColor: Colors.redAccent,
                   iconData: Icons.file_download,
                   labelText: 'PDF出力',
+                ),
+                SizedBox(width: 4.0),
+                CustomTextIconButton(
+                  onPressed: () {},
+                  backgroundColor: Colors.blue,
+                  iconData: Icons.post_add,
+                  labelText: '新規登録',
                 ),
               ],
             ),

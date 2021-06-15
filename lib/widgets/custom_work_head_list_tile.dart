@@ -37,15 +37,15 @@ class CustomWorkHeadListTile extends StatelessWidget {
               ),
               Text(
                 '法定内時間',
-                style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                style: TextStyle(color: Colors.black54, fontSize: 16.0),
               ),
               Text(
                 '法定外時間',
-                style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                style: TextStyle(color: Colors.black54, fontSize: 16.0),
               ),
               Text(
                 '深夜時間',
-                style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                style: TextStyle(color: Colors.black54, fontSize: 16.0),
               ),
             ],
           ),

@@ -6,6 +6,15 @@ class WorkService {
   String _collection = 'work';
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
+  String id() {
+    String _id = _firebaseFirestore.collection(_collection).doc().id;
+    return _id;
+  }
+
+  void create(Map<String, dynamic> values) {
+    _firebaseFirestore.collection(_collection).doc(values['id']).set(values);
+  }
+
   void update(Map<String, dynamic> values) {
     _firebaseFirestore.collection(_collection).doc(values['id']).update(values);
   }
