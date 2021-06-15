@@ -8,13 +8,14 @@ import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class CustomWorkListTile extends StatelessWidget {
+  final WorkProvider workProvider;
   final DateTime day;
   final List<WorkModel> works;
 
   CustomWorkListTile({
+    this.workProvider,
     this.day,
     this.works,
   });
@@ -117,7 +118,10 @@ class CustomWorkListTile extends StatelessWidget {
                             showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => WorkDetailsDialog(work: _work),
+                              builder: (_) => WorkDetailsDialog(
+                                workProvider: workProvider,
+                                work: _work,
+                              ),
                             );
                           }
                         : null,
@@ -131,9 +135,13 @@ class CustomWorkListTile extends StatelessWidget {
 }
 
 class WorkDetailsDialog extends StatefulWidget {
+  final WorkProvider workProvider;
   final WorkModel work;
 
-  WorkDetailsDialog({@required this.work});
+  WorkDetailsDialog({
+    @required this.workProvider,
+    @required this.work,
+  });
 
   @override
   _WorkDetailsDialogState createState() => _WorkDetailsDialogState();
@@ -156,8 +164,6 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final workProvider = Provider.of<WorkProvider>(context);
-
     return AlertDialog(
       content: Container(
         width: 450.0,
@@ -446,7 +452,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    if (!await workProvider.update(work: work)) {
+                    if (!await widget.workProvider.update(work: work)) {
                       return;
                     }
                     Navigator.pop(context);

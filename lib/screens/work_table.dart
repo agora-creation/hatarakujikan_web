@@ -7,8 +7,11 @@ import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_head_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
@@ -154,7 +157,15 @@ class _WorkTableState extends State<WorkTable> {
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => AddWorkDialog(
+                        workProvider: widget.workProvider,
+                      ),
+                    );
+                  },
                   color: Colors.blue,
                   iconData: Icons.post_add,
                   label: '新規登録',
@@ -188,6 +199,7 @@ class _WorkTableState extends State<WorkTable> {
                     }
                   }
                   return CustomWorkListTile(
+                    workProvider: widget.workProvider,
                     day: days[index],
                     works: _dayWorks,
                   );
@@ -267,6 +279,176 @@ class SelectUserDialog extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   color: Colors.blue,
                   label: 'OK',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AddWorkDialog extends StatefulWidget {
+  final WorkProvider workProvider;
+
+  AddWorkDialog({@required this.workProvider});
+
+  @override
+  _AddWorkDialogState createState() => _AddWorkDialogState();
+}
+
+class _AddWorkDialogState extends State<AddWorkDialog> {
+  DateTime _firstDate = DateTime.now().subtract(Duration(days: 365));
+  DateTime _lastDate = DateTime.now().add(Duration(days: 365));
+  DateTime _startedAt = DateTime.now();
+  DateTime _endedAt = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              '記録したい日時を入力し、最後に「登録する」ボタンを押してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            CustomIconLabel(
+              icon: Icon(Icons.person, color: Colors.black54),
+              label: 'スタッフ',
+            ),
+            SizedBox(height: 8.0),
+            CustomIconLabel(
+              icon: Icon(Icons.run_circle, color: Colors.blue),
+              label: '出勤時間',
+            ),
+            SizedBox(height: 4.0),
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: CustomDateButton(
+                    onPressed: () async {
+                      DateTime _selected = await showDatePicker(
+                        context: context,
+                        initialDate: _startedAt,
+                        firstDate: _firstDate,
+                        lastDate: _lastDate,
+                      );
+                      if (_selected != null) {
+                        String _date =
+                            '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                        String _time =
+                            '${DateFormat('HH:mm').format(_startedAt)}:00.000';
+                        DateTime _dateTime = DateTime.parse('$_date $_time');
+                        setState(() => _startedAt = _dateTime);
+                      }
+                    },
+                    label: '${DateFormat('yyyy/MM/dd').format(_startedAt)}',
+                  ),
+                ),
+                SizedBox(width: 4.0),
+                Expanded(
+                  flex: 2,
+                  child: CustomTimeButton(
+                    onPressed: () async {
+                      String _hour = '${DateFormat('H').format(_startedAt)}';
+                      String _minute = '${DateFormat('m').format(_startedAt)}';
+                      TimeOfDay _selected = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay(
+                          hour: int.parse(_hour),
+                          minute: int.parse(_minute),
+                        ),
+                      );
+                      if (_selected != null) {
+                        String _date =
+                            '${DateFormat('yyyy-MM-dd').format(_startedAt)}';
+                        String _time = '${_selected.format(context)}:00.000';
+                        DateTime _dateTime = DateTime.parse('$_date $_time');
+                        setState(() => _startedAt = _dateTime);
+                      }
+                    },
+                    label: '${DateFormat('HH:mm').format(_startedAt)}',
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.0),
+            CustomIconLabel(
+              icon: Icon(Icons.run_circle, color: Colors.red),
+              label: '退勤時間',
+            ),
+            SizedBox(height: 4.0),
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: CustomDateButton(
+                    onPressed: () async {
+                      DateTime _selected = await showDatePicker(
+                        context: context,
+                        initialDate: _endedAt,
+                        firstDate: _firstDate,
+                        lastDate: _lastDate,
+                      );
+                      if (_selected != null) {
+                        String _date =
+                            '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                        String _time =
+                            '${DateFormat('HH:mm').format(_endedAt)}:00.000';
+                        DateTime _dateTime = DateTime.parse('$_date $_time');
+                        setState(() => _endedAt = _dateTime);
+                      }
+                    },
+                    label: '${DateFormat('yyyy/MM/dd').format(_endedAt)}',
+                  ),
+                ),
+                SizedBox(width: 4.0),
+                Expanded(
+                  flex: 2,
+                  child: CustomTimeButton(
+                    onPressed: () async {
+                      String _hour = '${DateFormat('H').format(_endedAt)}';
+                      String _minute = '${DateFormat('m').format(_endedAt)}';
+                      TimeOfDay _selected = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay(
+                          hour: int.parse(_hour),
+                          minute: int.parse(_minute),
+                        ),
+                      );
+                      if (_selected != null) {
+                        String _date =
+                            '${DateFormat('yyyy-MM-dd').format(_endedAt)}';
+                        String _time = '${_selected.format(context)}:00.000';
+                        DateTime _dateTime = DateTime.parse('$_date $_time');
+                        setState(() => _endedAt = _dateTime);
+                      }
+                    },
+                    label: '${DateFormat('HH:mm').format(_endedAt)}',
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.blue,
+                  label: '登録する',
                 ),
               ],
             ),
