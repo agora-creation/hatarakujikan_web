@@ -34,6 +34,15 @@ const BoxDecoration kBottomBorderDecoration = BoxDecoration(
   ),
 );
 
+const BoxDecoration kTopBorderDecoration = BoxDecoration(
+  border: Border(
+    top: BorderSide(
+      width: 1.0,
+      color: Color(0xFFE0E0E0),
+    ),
+  ),
+);
+
 const TextStyle kTitleTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 32.0,

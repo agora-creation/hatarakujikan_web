@@ -14,7 +14,7 @@ class GroupScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: GroupPanel(),
+      body: GroupPanel(groupProvider: groupProvider),
     );
   }
 }

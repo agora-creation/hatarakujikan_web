@@ -175,6 +175,10 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
               '修正したい日時に変更し、最後に「OK」ボタンを押してください。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
+            Text(
+              'この記録を削除したい場合は、「削除」ボタンを押してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
             SizedBox(height: 16.0),
             CustomIconLabel(
               icon: Icon(Icons.run_circle, color: Colors.blue),
@@ -450,15 +454,28 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                   color: Colors.grey,
                   label: 'キャンセル',
                 ),
-                CustomTextButton(
-                  onPressed: () async {
-                    if (!await widget.workProvider.update(work: work)) {
-                      return;
-                    }
-                    Navigator.pop(context);
-                  },
-                  color: Colors.blue,
-                  label: 'OK',
+                Row(
+                  children: [
+                    CustomTextButton(
+                      onPressed: () {
+                        widget.workProvider.delete(work: work);
+                        Navigator.pop(context);
+                      },
+                      color: Colors.red,
+                      label: '削除',
+                    ),
+                    SizedBox(width: 4.0),
+                    CustomTextButton(
+                      onPressed: () async {
+                        if (!await widget.workProvider.update(work: work)) {
+                          return;
+                        }
+                        Navigator.pop(context);
+                      },
+                      color: Colors.blue,
+                      label: 'OK',
+                    ),
+                  ],
                 ),
               ],
             ),
