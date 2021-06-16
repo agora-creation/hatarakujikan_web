@@ -104,4 +104,26 @@ class GroupProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<bool> update({
+    String id,
+    String name,
+    int usersNum,
+    bool qrSecurity,
+    bool areaSecurity,
+  }) async {
+    try {
+      _groupService.update({
+        'id': id,
+        'name': name,
+        'usersNum': usersNum,
+        'qrSecurity': qrSecurity,
+        'areaSecurity': areaSecurity,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
 }

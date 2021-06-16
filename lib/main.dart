@@ -21,7 +21,7 @@ Future<void> main() async {
   if (FirebaseAuth.instance.currentUser == null) {
     await Future.any([
       FirebaseAuth.instance.userChanges().firstWhere((e) => e != null),
-      Future.delayed(Duration(milliseconds: 2000)),
+      Future.delayed(Duration(milliseconds: 3000)),
     ]);
   }
   runApp(MyApp());

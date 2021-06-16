@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
-import 'package:hatarakujikan_web/widgets/custom_text_form_field.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
 class GroupPanel extends StatefulWidget {
@@ -15,7 +14,26 @@ class GroupPanel extends StatefulWidget {
 }
 
 class _GroupPanelState extends State<GroupPanel> {
+  TextEditingController name = TextEditingController();
   List<int> usersNumList = [10, 30, 50, 100];
+  int usersNum;
+  bool qrSecurity;
+  bool areaSecurity;
+
+  void _init() async {
+    setState(() {
+      name.text = widget.groupProvider.group?.name;
+      usersNum = widget.groupProvider.group?.usersNum;
+      qrSecurity = widget.groupProvider.group?.qrSecurity;
+      areaSecurity = widget.groupProvider.group?.areaSecurity;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +54,18 @@ class _GroupPanelState extends State<GroupPanel> {
           children: [
             Container(),
             CustomTextIconButton(
-              onPressed: () {},
+              onPressed: () async {
+                if (!await widget.groupProvider.update(
+                  id: widget.groupProvider.group?.id,
+                  name: name.text.trim(),
+                  usersNum: usersNum,
+                  qrSecurity: qrSecurity,
+                  areaSecurity: areaSecurity,
+                )) {
+                  return;
+                }
+                setState(() {});
+              },
               color: Colors.blue,
               iconData: Icons.save,
               label: '設定を保存',
@@ -54,53 +83,73 @@ class _GroupPanelState extends State<GroupPanel> {
               Divider(),
               Row(
                 children: [
-                  TextFormField(
-                    controller: null,
-                    style: TextStyle(fontSize: 14.0),
-                    decoration: InputDecoration(
-                      labelText: '会社/組織名',
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('会社/組織名', style: TextStyle(fontSize: 14.0)),
+                        TextFormField(
+                          controller: name,
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  DropdownButton<int>(
-                    isExpanded: true,
-                    value: 10,
-                    onChanged: (value) {},
-                    items: usersNumList.map((value) {
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text('$value人以下'),
-                      );
-                    }).toList(),
+                  SizedBox(width: 4.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('人数', style: TextStyle(fontSize: 14.0)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black38),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: usersNum,
+                            onChanged: (value) {
+                              setState(() => usersNum = value);
+                            },
+                            items: usersNumList.map((value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(
+                                  '$value人以下',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
-              CustomIconLabel(
-                icon: Icon(Icons.group, color: Colors.black54),
-                label: '人数 (○人以下)',
-              ),
-              DropdownButton<int>(
-                isExpanded: true,
-                value: 10,
-                onChanged: (value) {},
-                items: usersNumList.map((value) {
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text('$value人以下'),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 24.0),
               CustomIconLabel(
                 icon: Icon(Icons.security, color: Colors.black54),
                 label: '記録セキュリティ',
               ),
-              SizedBox(height: 8.0),
+              Divider(),
               Row(
                 children: [
                   Checkbox(
-                    value: false,
-                    onChanged: (value) {},
+                    value: qrSecurity,
+                    onChanged: (value) {
+                      setState(() => qrSecurity = value);
+                    },
                     activeColor: Colors.blue,
                   ),
                   Text(
@@ -113,8 +162,10 @@ class _GroupPanelState extends State<GroupPanel> {
               Row(
                 children: [
                   Checkbox(
-                    value: false,
-                    onChanged: (value) {},
+                    value: areaSecurity,
+                    onChanged: (value) {
+                      setState(() => areaSecurity = value);
+                    },
                     activeColor: Colors.blue,
                   ),
                   Text(
@@ -123,78 +174,12 @@ class _GroupPanelState extends State<GroupPanel> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 24.0),
               CustomIconLabel(
                 icon: Icon(Icons.access_time, color: Colors.black54),
                 label: '時間のまるめ',
               ),
-              SizedBox(height: 8.0),
-              CustomTextFormField(
-                controller: null,
-                obscureText: false,
-                textInputType: TextInputType.name,
-                maxLines: 1,
-                label: '出勤時間',
-                color: Colors.black54,
-                prefix: Icons.access_time,
-                suffix: null,
-                onTap: null,
-              ),
-              CustomTextFormField(
-                controller: null,
-                obscureText: false,
-                textInputType: TextInputType.name,
-                maxLines: 1,
-                label: '退勤時間',
-                color: Colors.black54,
-                prefix: Icons.access_time,
-                suffix: null,
-                onTap: null,
-              ),
-              CustomTextFormField(
-                controller: null,
-                obscureText: false,
-                textInputType: TextInputType.name,
-                maxLines: 1,
-                label: '休憩開始時間',
-                color: Colors.black54,
-                prefix: Icons.access_time,
-                suffix: null,
-                onTap: null,
-              ),
-              CustomTextFormField(
-                controller: null,
-                obscureText: false,
-                textInputType: TextInputType.name,
-                maxLines: 1,
-                label: '休憩終了時間',
-                color: Colors.black54,
-                prefix: Icons.access_time,
-                suffix: null,
-                onTap: null,
-              ),
-              CustomTextFormField(
-                controller: null,
-                obscureText: false,
-                textInputType: TextInputType.name,
-                maxLines: 1,
-                label: '勤務時間',
-                color: Colors.black54,
-                prefix: Icons.access_time,
-                suffix: null,
-                onTap: null,
-              ),
-              CustomTextFormField(
-                controller: null,
-                obscureText: false,
-                textInputType: TextInputType.name,
-                maxLines: 1,
-                label: '法定時間',
-                color: Colors.black54,
-                prefix: Icons.access_time,
-                suffix: null,
-                onTap: null,
-              ),
+              Divider(),
             ],
           ),
         ),
