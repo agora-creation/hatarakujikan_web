@@ -7,7 +7,6 @@ class CustomWorkFooterListTile extends StatelessWidget {
     return Container(
       decoration: kTopBorderDecoration,
       child: ListTile(
-        tileColor: Colors.orange.shade50,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

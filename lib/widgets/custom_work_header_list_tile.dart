@@ -7,7 +7,6 @@ class CustomWorkHeaderListTile extends StatelessWidget {
     return Container(
       decoration: kBottomBorderDecoration,
       child: ListTile(
-        tileColor: Colors.orange.shade50,
         leading: Text(
           '日付',
           style: TextStyle(

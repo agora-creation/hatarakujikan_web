@@ -10,6 +10,7 @@ class ApplyWorkModel {
   DateTime _endedAt;
   List<BreaksModel> breaks;
   String _reason;
+  bool _approval;
   DateTime _createdAt;
 
   String get id => _id;
@@ -19,6 +20,7 @@ class ApplyWorkModel {
   DateTime get startedAt => _startedAt;
   DateTime get endedAt => _endedAt;
   String get reason => _reason;
+  bool get approval => _approval;
   DateTime get createdAt => _createdAt;
 
   ApplyWorkModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -30,6 +32,7 @@ class ApplyWorkModel {
     _endedAt = snapshot.data()['endedAt'].toDate();
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
     _reason = snapshot.data()['reason'];
+    _approval = snapshot.data()['approval'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 
