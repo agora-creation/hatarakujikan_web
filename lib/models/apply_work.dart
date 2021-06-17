@@ -6,6 +6,7 @@ class ApplyWorkModel {
   String _workId;
   String _groupId;
   String _userId;
+  String _userName;
   DateTime _startedAt;
   DateTime _endedAt;
   List<BreaksModel> breaks;
@@ -17,6 +18,7 @@ class ApplyWorkModel {
   String get workId => _workId;
   String get groupId => _groupId;
   String get userId => _userId;
+  String get userName => _userName;
   DateTime get startedAt => _startedAt;
   DateTime get endedAt => _endedAt;
   String get reason => _reason;
@@ -28,6 +30,7 @@ class ApplyWorkModel {
     _workId = snapshot.data()['workId'];
     _groupId = snapshot.data()['groupId'];
     _userId = snapshot.data()['userId'];
+    _userName = snapshot.data()['userName'];
     _startedAt = snapshot.data()['startedAt'].toDate();
     _endedAt = snapshot.data()['endedAt'].toDate();
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];

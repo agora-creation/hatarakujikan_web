@@ -30,4 +30,8 @@ class ApplyWorkProvider with ChangeNotifier {
       return false;
     }
   }
+
+  void delete({ApplyWorkModel applyWork}) {
+    _applyWorkService.delete({'id': applyWork.id});
+  }
 }
