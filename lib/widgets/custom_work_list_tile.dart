@@ -45,7 +45,7 @@ class CustomWorkListTile extends StatelessWidget {
                   }
                   String _breakTime = '---:---';
                   if (_work.startedAt != _work.endedAt) {
-                    _breakTime = '00:00';
+                    _breakTime = '${_work.breakTime()}';
                   }
                   String _workTime = '---:---';
                   if (_work.startedAt != _work.endedAt) {

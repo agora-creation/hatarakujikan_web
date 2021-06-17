@@ -42,6 +42,16 @@ class WorkModel {
     return converted;
   }
 
+  String breakTime() {
+    String _result = '00:00';
+    if (breaks.length > 0) {
+      for (BreaksModel _break in breaks) {
+        _result = addTime(_result, _break.breakTime());
+      }
+    }
+    return _result;
+  }
+
   String workTime() {
     String _result = '00:00';
     String twoDigits(int n) => n.toString().padLeft(2, '0');

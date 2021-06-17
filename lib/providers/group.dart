@@ -111,6 +111,19 @@ class GroupProvider with ChangeNotifier {
     int usersNum,
     bool qrSecurity,
     bool areaSecurity,
+    String roundStartType,
+    int roundStartNum,
+    String roundEndType,
+    int roundEndNum,
+    String roundBreakStartType,
+    int roundBreakStartNum,
+    String roundBreakEndType,
+    int roundBreakEndNum,
+    String roundWorkType,
+    int roundWorkNum,
+    int legal,
+    String nightStart,
+    String nightEnd,
   }) async {
     try {
       _groupService.update({
@@ -119,6 +132,19 @@ class GroupProvider with ChangeNotifier {
         'usersNum': usersNum,
         'qrSecurity': qrSecurity,
         'areaSecurity': areaSecurity,
+        'roundStartType': roundStartType,
+        'roundStartNum': roundStartNum,
+        'roundEndType': roundEndType,
+        'roundEndNum': roundEndNum,
+        'roundBreakStartType': roundBreakStartType,
+        'roundBreakStartNum': roundBreakStartNum,
+        'roundBreakEndType': roundBreakEndType,
+        'roundBreakEndNum': roundBreakEndNum,
+        'roundWorkType': roundWorkType,
+        'roundWorkNum': roundWorkNum,
+        'legal': legal,
+        'nightStart': nightStart,
+        'nightEnd': nightEnd,
       });
       return true;
     } catch (e) {
