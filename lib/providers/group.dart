@@ -109,6 +109,7 @@ class GroupProvider with ChangeNotifier {
     String id,
     String name,
     int usersNum,
+    String positions,
     bool qrSecurity,
     bool areaSecurity,
     String roundStartType,
@@ -126,10 +127,16 @@ class GroupProvider with ChangeNotifier {
     String nightEnd,
   }) async {
     try {
+      List<String> _positions = [];
+      List<String> _tmp = positions.split(',') ?? [];
+      for (String _position in _tmp) {
+        _positions.add(_position);
+      }
       _groupService.update({
         'id': id,
         'name': name,
         'usersNum': usersNum,
+        'positions': _positions,
         'qrSecurity': qrSecurity,
         'areaSecurity': areaSecurity,
         'roundStartType': roundStartType,

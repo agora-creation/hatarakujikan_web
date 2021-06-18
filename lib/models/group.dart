@@ -5,6 +5,7 @@ class GroupModel {
   String _name;
   String _adminUserId;
   int _usersNum;
+  List<String> positions;
   bool _qrSecurity;
   bool _areaSecurity;
   double _areaLat;
@@ -52,6 +53,7 @@ class GroupModel {
     _name = snapshot.data()['name'];
     _adminUserId = snapshot.data()['adminUserId'];
     _usersNum = snapshot.data()['usersNum'];
+    positions = _convertPositions(snapshot.data()['positions']) ?? [];
     _qrSecurity = snapshot.data()['qrSecurity'];
     _areaSecurity = snapshot.data()['areaSecurity'];
     _areaLat = snapshot.data()['areaLat'];
@@ -70,5 +72,13 @@ class GroupModel {
     _nightStart = snapshot.data()['nightStart'];
     _nightEnd = snapshot.data()['nightEnd'];
     _createdAt = snapshot.data()['createdAt'].toDate();
+  }
+
+  List<String> _convertPositions(List positions) {
+    List<String> converted = [];
+    for (String data in positions) {
+      converted.add(data);
+    }
+    return converted;
   }
 }

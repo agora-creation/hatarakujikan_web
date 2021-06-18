@@ -16,6 +16,8 @@ class WorkProvider with ChangeNotifier {
     DateTime breakStartedAt,
     DateTime breakEndedAt,
   }) async {
+    if (groupId == '') return false;
+    if (userId == '') return false;
     try {
       String _id = _workService.id();
       List<Map> _breaks = [];

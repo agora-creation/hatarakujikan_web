@@ -17,6 +17,7 @@ class _GroupPanelState extends State<GroupPanel> {
   TextEditingController name = TextEditingController();
   List<int> usersNumList = [10, 30, 50, 100];
   int usersNum;
+  TextEditingController positions = TextEditingController();
   bool qrSecurity;
   bool areaSecurity;
   List<String> roundTypeList = ['切捨', '切上'];
@@ -40,6 +41,12 @@ class _GroupPanelState extends State<GroupPanel> {
     setState(() {
       name.text = widget.groupProvider.group?.name;
       usersNum = widget.groupProvider.group?.usersNum;
+      String tmp = '';
+      for (String _position in widget.groupProvider.group?.positions) {
+        if (tmp != '') tmp += ',';
+        tmp += _position;
+      }
+      positions.text = tmp;
       qrSecurity = widget.groupProvider.group?.qrSecurity;
       areaSecurity = widget.groupProvider.group?.areaSecurity;
       roundStartType = widget.groupProvider.group?.roundStartType;
@@ -88,6 +95,7 @@ class _GroupPanelState extends State<GroupPanel> {
                   id: widget.groupProvider.group?.id,
                   name: name.text.trim(),
                   usersNum: usersNum,
+                  positions: positions.text.trim(),
                   qrSecurity: qrSecurity,
                   areaSecurity: areaSecurity,
                   roundStartType: roundStartType,
@@ -724,6 +732,25 @@ class _GroupPanelState extends State<GroupPanel> {
                     ),
                   ),
                 ],
+              ),
+              SizedBox(height: 16.0),
+              Container(
+                decoration: kBottomBorderDecoration,
+                child: CustomIconLabel(
+                  icon: Icon(Icons.list_alt, color: Colors.black54),
+                  label: '雇用形態 (カンマ区切りで入力してください)',
+                ),
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                controller: positions,
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 14.0,
+                ),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
               ),
             ],
           ),
