@@ -25,11 +25,11 @@ class WorkModel {
     _groupId = snapshot.data()['groupId'];
     _userId = snapshot.data()['userId'];
     startedAt = snapshot.data()['startedAt'].toDate();
-    startedLat = snapshot.data()['startedLat'];
-    startedLon = snapshot.data()['startedLon'];
+    startedLat = snapshot.data()['startedLat'].toDouble();
+    startedLon = snapshot.data()['startedLon'].toDouble();
     endedAt = snapshot.data()['endedAt'].toDate();
-    endedLat = snapshot.data()['endedLat'];
-    endedLon = snapshot.data()['endedLon'];
+    endedLat = snapshot.data()['endedLat'].toDouble();
+    endedLon = snapshot.data()['endedLon'].toDouble();
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }

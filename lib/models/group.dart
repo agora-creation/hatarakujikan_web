@@ -56,8 +56,8 @@ class GroupModel {
     positions = _convertPositions(snapshot.data()['positions']) ?? [];
     _qrSecurity = snapshot.data()['qrSecurity'];
     _areaSecurity = snapshot.data()['areaSecurity'];
-    _areaLat = snapshot.data()['areaLat'];
-    _areaLon = snapshot.data()['areaLon'];
+    _areaLat = snapshot.data()['areaLat'].toDouble();
+    _areaLon = snapshot.data()['areaLon'].toDouble();
     _roundStartType = snapshot.data()['roundStartType'];
     _roundStartNum = snapshot.data()['roundStartNum'];
     _roundEndType = snapshot.data()['roundEndType'];

@@ -12,11 +12,11 @@ class BreaksModel {
   BreaksModel.fromMap(Map data) {
     _id = data['id'];
     startedAt = data['startedAt'].toDate();
-    startedLat = data['startedLat'];
-    startedLon = data['startedLon'];
+    startedLat = data['startedLat'].toDouble();
+    startedLon = data['startedLon'].toDouble();
     endedAt = data['endedAt'].toDate();
-    endedLat = data['endedLat'];
-    endedLon = data['endedLon'];
+    endedLat = data['endedLat'].toDouble();
+    endedLon = data['endedLon'].toDouble();
   }
 
   Map toMap() => {
