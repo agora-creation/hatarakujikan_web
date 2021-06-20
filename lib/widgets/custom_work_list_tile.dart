@@ -37,14 +37,6 @@ class CustomWorkListTile extends StatelessWidget {
                 itemCount: works.length,
                 itemBuilder: (_, index) {
                   WorkModel _work = works[index];
-                  final dateTime = DateTime.now();
-                  final timeOffset1 = dateTime.subtract(Duration(minutes: 5));
-                  final timeOffset2 = dateTime.add(Duration(minutes: 5));
-                  print(timeOffset1);
-                  print(timeOffset2);
-
-                  String _startTime =
-                      '${DateFormat('HH:mm').format(_work.startedAt)}';
                   String _endTime = '---:---';
                   if (_work.startedAt != _work.endedAt) {
                     _endTime = '${DateFormat('HH:mm').format(_work.endedAt)}';
@@ -69,7 +61,7 @@ class CustomWorkListTile extends StatelessWidget {
                           label: Text('通常勤務', style: TextStyle(fontSize: 12.0)),
                         ),
                         Text(
-                          _startTime,
+                          _work.startTime('切捨', 15),
                           style: TextStyle(
                             color: Colors.black87,
                             fontSize: 16.0,
