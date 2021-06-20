@@ -27,6 +27,7 @@ dependencies:
   qr_flutter: ^4.0.0
   flutter_admin_scaffold: ^1.0.0
   data_table_2: ^2.0.3
+  date_time_format: ^2.0.1
   intl: ^0.16.1
 dependency_overrides:
   intl: ^0.17.0-nullsafety.2

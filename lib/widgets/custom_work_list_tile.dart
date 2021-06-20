@@ -37,6 +37,12 @@ class CustomWorkListTile extends StatelessWidget {
                 itemCount: works.length,
                 itemBuilder: (_, index) {
                   WorkModel _work = works[index];
+                  final dateTime = DateTime.now();
+                  final timeOffset1 = dateTime.subtract(Duration(minutes: 5));
+                  final timeOffset2 = dateTime.add(Duration(minutes: 5));
+                  print(timeOffset1);
+                  print(timeOffset2);
+
                   String _startTime =
                       '${DateFormat('HH:mm').format(_work.startedAt)}';
                   String _endTime = '---:---';
