@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class GroupPanel extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -81,7 +84,7 @@ class _GroupPanelState extends State<GroupPanel> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          '会社/組織に関する各種設定を行います。セキュリティに関する設定や、時間に関する設定がございます。',
+          '会社/組織に関する各種設定を行います。セキュリティに関する設定や、時間に関する設定ができます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -89,39 +92,50 @@ class _GroupPanelState extends State<GroupPanel> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(),
-            CustomTextIconButton(
-              onPressed: () async {
-                if (!await widget.groupProvider.update(
-                  id: widget.groupProvider.group?.id,
-                  name: name.text.trim(),
-                  usersNum: usersNum,
-                  positions: positions.text.trim(),
-                  qrSecurity: qrSecurity,
-                  areaSecurity: areaSecurity,
-                  roundStartType: roundStartType,
-                  roundStartNum: roundStartNum,
-                  roundEndType: roundEndType,
-                  roundEndNum: roundEndNum,
-                  roundBreakStartType: roundBreakStartType,
-                  roundBreakStartNum: roundBreakStartNum,
-                  roundBreakEndType: roundBreakEndType,
-                  roundBreakEndNum: roundBreakEndNum,
-                  roundWorkType: roundWorkType,
-                  roundWorkNum: roundWorkNum,
-                  legal: legal,
-                  nightStart: nightStart,
-                  nightEnd: nightEnd,
-                )) {
-                  return;
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('設定の保存が完了しました')),
-                );
-                widget.groupProvider.reloadGroupModel();
-              },
-              color: Colors.blue,
-              iconData: Icons.save,
-              label: '設定を保存',
+            Row(
+              children: [
+                CustomTextIconButton(
+                  onPressed: () => _createQR(widget.groupProvider.group),
+                  color: Colors.redAccent,
+                  iconData: Icons.qr_code,
+                  label: 'QRコードを出力',
+                ),
+                SizedBox(width: 4.0),
+                CustomTextIconButton(
+                  onPressed: () async {
+                    if (!await widget.groupProvider.update(
+                      id: widget.groupProvider.group?.id,
+                      name: name.text.trim(),
+                      usersNum: usersNum,
+                      positions: positions.text.trim(),
+                      qrSecurity: qrSecurity,
+                      areaSecurity: areaSecurity,
+                      roundStartType: roundStartType,
+                      roundStartNum: roundStartNum,
+                      roundEndType: roundEndType,
+                      roundEndNum: roundEndNum,
+                      roundBreakStartType: roundBreakStartType,
+                      roundBreakStartNum: roundBreakStartNum,
+                      roundBreakEndType: roundBreakEndType,
+                      roundBreakEndNum: roundBreakEndNum,
+                      roundWorkType: roundWorkType,
+                      roundWorkNum: roundWorkNum,
+                      legal: legal,
+                      nightStart: nightStart,
+                      nightEnd: nightEnd,
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('設定の保存が完了しました')),
+                    );
+                    widget.groupProvider.reloadGroupModel();
+                  },
+                  color: Colors.blue,
+                  iconData: Icons.save,
+                  label: '設定を保存',
+                ),
+              ],
             ),
           ],
         ),
@@ -758,4 +772,24 @@ class _GroupPanelState extends State<GroupPanel> {
       ],
     );
   }
+}
+
+Future<void> _createQR(GroupModel group) async {
+  PdfDocument document = PdfDocument();
+  PdfPage page = document.pages.add();
+  Size pageSize = page.getClientSize();
+  page.graphics.drawRectangle(
+    bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
+    pen: PdfPen(PdfColor(142, 170, 219, 255)),
+  );
+
+  page.graphics.drawString(
+    '${group.name}',
+    PdfCjkStandardFont(PdfCjkFontFamily.hanyangSystemsGothicMedium, 30),
+  );
+
+  List<int> bytes = document.save();
+  document.dispose();
+
+  await saveAndLaunchFile(bytes, 'qr.pdf');
 }

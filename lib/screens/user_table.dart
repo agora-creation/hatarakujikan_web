@@ -41,7 +41,7 @@ class _UserTableState extends State<UserTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフの情報を一覧表示します。アプリから登録するか、ここで登録できます。',
+          'スタッフの情報を一覧表示します。アプリから登録するか、この画面で登録できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -84,6 +84,7 @@ class _UserTableState extends State<UserTable> {
                   DataColumn2(label: Text('名前'), size: ColumnSize.S),
                   DataColumn2(label: Text('雇用形態'), size: ColumnSize.S),
                   DataColumn2(label: Text('スマートフォン利用状況'), size: ColumnSize.L),
+                  DataColumn2(label: Text('管理者権限'), size: ColumnSize.L),
                   DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
                   DataColumn(label: Text('作成日時')),
                 ],
@@ -106,8 +107,31 @@ class _UserTableState extends State<UserTable> {
                       DataCell(Text('${users[index].name}')),
                       DataCell(Text('${users[index].position}')),
                       users[index].smartphone
-                          ? DataCell(Text('○'))
-                          : DataCell(Text('')),
+                          ? DataCell(
+                              Icon(
+                                Icons.smartphone,
+                                color: Colors.blue,
+                              ),
+                            )
+                          : DataCell(
+                              Icon(
+                                Icons.smartphone,
+                                color: Colors.transparent,
+                              ),
+                            ),
+                      users[index].id == widget.groupProvider.group?.adminUserId
+                          ? DataCell(
+                              Icon(
+                                Icons.admin_panel_settings,
+                                color: Colors.red,
+                              ),
+                            )
+                          : DataCell(
+                              Icon(
+                                Icons.admin_panel_settings,
+                                color: Colors.transparent,
+                              ),
+                            ),
                       DataCell(Text('${users[index].recordPassword}')),
                       DataCell(
                         Text(
@@ -394,7 +418,7 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
               decoration: kBottomBorderDecoration,
               child: ListTile(
                 leading: Text('スマートフォン利用'),
-                title: widget.user.smartphone ? Text('○') : Text(''),
+                title: widget.user.smartphone ? Text('利用中') : Text(''),
               ),
             ),
             widget.user.smartphone
