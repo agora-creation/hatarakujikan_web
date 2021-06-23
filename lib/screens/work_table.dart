@@ -1,11 +1,9 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -152,11 +150,11 @@ class _WorkTableState extends State<WorkTable> {
                     showDialog(
                       barrierDismissible: false,
                       context: context,
-                      builder: (_) => CSVDialog(
+                      builder: (_) => CsvDialog(
                         workProvider: widget.workProvider,
+                        group: widget.groupProvider.group,
                         selectMonth: selectMonth,
                         users: users,
-                        selectUser: selectUser,
                       ),
                     );
                   },
@@ -249,7 +247,6 @@ class _WorkTableState extends State<WorkTable> {
                 // 勤務日数
                 _count['${DateFormat('yyyy-MM-dd').format(_work?.startedAt)}'] =
                     '';
-                _workCount = _count.length;
                 // 勤務時間
                 _workTime = addTime(_workTime, _work?.workTime());
                 // 法定内時間/法定外時間
@@ -269,6 +266,7 @@ class _WorkTableState extends State<WorkTable> {
                 _nightTime = addTime(_nightTime, _nightList.last);
               }
             }
+            _workCount = _count.length;
             return CustomWorkFooterListTile(
               workCount: _workCount,
               workTime: _workTime,
@@ -359,35 +357,55 @@ class SelectUserDialog extends StatelessWidget {
   }
 }
 
-class CSVDialog extends StatefulWidget {
+class CsvDialog extends StatefulWidget {
   final WorkProvider workProvider;
+  final GroupModel group;
   final DateTime selectMonth;
   final List<UserModel> users;
-  final UserModel selectUser;
 
-  CSVDialog({
+  CsvDialog({
     @required this.workProvider,
+    @required this.group,
     @required this.selectMonth,
     @required this.users,
-    @required this.selectUser,
   });
 
   @override
-  _CSVDialogState createState() => _CSVDialogState();
+  _CsvDialogState createState() => _CsvDialogState();
 }
 
-class _CSVDialogState extends State<CSVDialog> {
+class _CsvDialogState extends State<CsvDialog> {
   DateTime _firstDate = DateTime(DateTime.now().year - 1);
   DateTime _lastDate = DateTime(DateTime.now().year + 1);
-  DateTime selectMonth;
-  List<UserModel> users = [];
-  UserModel selectUser;
+  List<DateTime> days = [];
+  DateTime selectMonth = DateTime.now();
+  Map userData = {};
+  Map countData = {};
+  Map time1Data = {};
+  Map time2Data = {};
+
+  void _generateDays() async {
+    days.clear();
+    var _dateMap = DateMachineUtil.getMonthDate(selectMonth, 0);
+    DateTime _startAt = DateTime.parse('${_dateMap['start']}');
+    DateTime _endAt = DateTime.parse('${_dateMap['end']}');
+    for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {
+      days.add(_startAt.add(Duration(days: i)));
+    }
+  }
 
   void _init() async {
     setState(() {
       selectMonth = widget.selectMonth;
-      users = widget.users;
-      selectUser = widget.selectUser;
+      for (UserModel _user in widget.users) {
+        Map _data = {};
+        _data['recordPassword'] = _user.recordPassword;
+        _data['name'] = _user.name;
+        userData['${_user.id}'] = _data;
+        countData['${_user.id}'] = 0;
+        time1Data['${_user.id}'] = '00:00';
+        time2Data['${_user.id}'] = '00:00';
+      }
     });
   }
 
@@ -395,6 +413,7 @@ class _CSVDialogState extends State<CSVDialog> {
   void initState() {
     super.initState();
     _init();
+    _generateDays();
   }
 
   @override
@@ -425,28 +444,12 @@ class _CSVDialogState extends State<CSVDialog> {
                   lastDate: _lastDate,
                 );
                 if (selected == null) return;
-                setState(() => selectMonth = selected);
+                setState(() {
+                  selectMonth = selected;
+                  _generateDays();
+                });
               },
               label: '${DateFormat('yyyy年MM月').format(selectMonth)}',
-            ),
-            SizedBox(height: 8.0),
-            CustomIconLabel(
-              icon: Icon(Icons.person, color: Colors.black54),
-              label: 'スタッフ',
-            ),
-            DropdownButton<UserModel>(
-              isExpanded: true,
-              hint: Text('選択してください'),
-              value: selectUser,
-              onChanged: (value) {
-                setState(() => selectUser = value);
-              },
-              items: users.map((value) {
-                return DropdownMenuItem<UserModel>(
-                  value: value,
-                  child: Text('${value.name}'),
-                );
-              }).toList(),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -458,28 +461,48 @@ class _CSVDialogState extends State<CSVDialog> {
                   label: 'キャンセル',
                 ),
                 CustomTextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     List<List<dynamic>> rows = [];
-                    List<dynamic> row = [];
-                    row.add('社員番号');
-                    row.add('社員名');
-                    row.add('平日出勤');
-                    row.add('出勤時間');
-                    row.add('支給項目2');
-                    rows.add(row);
-                    for (int i = 0; i < users.length; i++) {
-                      List<dynamic> _row = [];
-                      _row.add('${users[i].name}');
-                      _row.add('${users[i].recordPassword}');
-                      _row.add('');
-                      _row.add('');
-                      _row.add('');
-                      rows.add(_row);
+                    List<dynamic> _row = [];
+                    _row.add('社員番号');
+                    _row.add('社員名');
+                    _row.add('平日出勤');
+                    _row.add('出勤時間');
+                    _row.add('支給項目2');
+                    rows.add(_row);
+                    List<WorkModel> _works = [];
+                    await widget.workProvider
+                        .selectListAllUser(
+                      groupId: widget.group.id,
+                      startAt: days.first,
+                      endAt: days.last,
+                    )
+                        .then((value) {
+                      _works = value;
+                    });
+                    for (WorkModel _work in _works) {
+                      if (_work.startedAt != _work.endedAt) {
+                        countData['${_work.userId}']++;
+                        time1Data['${_work.userId}'] = addTime(
+                            time1Data['${_work.userId}'], _work.workTime());
+                        List<String> _legalList = legalList(
+                          workTime: _work.workTime(),
+                          legal: widget.group.legal,
+                        );
+                        time2Data['${_work.userId}'] = addTime(
+                            time2Data['${_work.userId}'], _legalList.first);
+                      }
                     }
-                    String csv = const ListToCsvConverter().convert(rows);
-                    AnchorElement(href: 'data:text/plain;charset=utf-8,$csv')
-                      ..setAttribute('download', 'work.csv')
-                      ..click();
+                    userData.forEach((key, value) {
+                      List<dynamic> _row = [];
+                      _row.add('${value['recordPassword']}');
+                      _row.add('${value['name']}');
+                      _row.add('${countData[key]}');
+                      _row.add('${time1Data[key]}');
+                      _row.add('${time2Data[key]}');
+                      rows.add(_row);
+                    });
+                    await csvDownload(rows: rows, fileName: 'work.csv');
                     return;
                   },
                   color: Colors.green,

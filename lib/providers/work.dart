@@ -76,13 +76,15 @@ class WorkProvider with ChangeNotifier {
     _workService.delete({'id': work?.id});
   }
 
-  Future<List<WorkModel>> selectList(
-      {String groupId, String userId, DateTime startAt, DateTime endAt}) async {
+  Future<List<WorkModel>> selectListAllUser({
+    String groupId,
+    DateTime startAt,
+    DateTime endAt,
+  }) async {
     List<WorkModel> _works = [];
     await _workService
-        .selectList(
+        .selectListAllUser(
       groupId: groupId,
-      userId: userId,
       startAt: startAt,
       endAt: endAt,
     )
