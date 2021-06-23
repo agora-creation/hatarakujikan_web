@@ -17,7 +17,11 @@ class CustomTextIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
       onPressed: onPressed,
-      icon: Icon(iconData, color: Colors.white, size: 18.0),
+      icon: Icon(
+        iconData,
+        color: Colors.white,
+        size: 18.0,
+      ),
       label: Text(
         label,
         style: TextStyle(

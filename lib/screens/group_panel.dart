@@ -98,7 +98,7 @@ class _GroupPanelState extends State<GroupPanel> {
                   onPressed: () => _createQR(widget.groupProvider.group),
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
-                  label: 'QRコードを出力',
+                  label: 'QRコード出力',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(

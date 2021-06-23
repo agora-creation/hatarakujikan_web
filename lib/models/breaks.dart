@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class BreaksModel {
   String _id;
   DateTime startedAt;
@@ -28,6 +30,18 @@ class BreaksModel {
         'endedLat': endedLat,
         'endedLon': endedLon,
       };
+
+  String startTime() {
+    String _result = '00:00';
+    _result = '${DateFormat('HH:mm').format(startedAt)}';
+    return _result;
+  }
+
+  String endTime() {
+    String _result = '00:00';
+    _result = '${DateFormat('HH:mm').format(endedAt)}';
+    return _result;
+  }
 
   String breakTime() {
     String twoDigits(int n) => n.toString().padLeft(2, '0');

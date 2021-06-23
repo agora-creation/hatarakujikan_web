@@ -1,6 +1,10 @@
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
@@ -144,7 +148,18 @@ class _WorkTableState extends State<WorkTable> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => CSVDialog(
+                        workProvider: widget.workProvider,
+                        selectMonth: selectMonth,
+                        users: users,
+                        selectUser: selectUser,
+                      ),
+                    );
+                  },
                   color: Colors.green,
                   iconData: Icons.file_download,
                   label: 'CSV出力',
@@ -206,13 +221,63 @@ class _WorkTableState extends State<WorkTable> {
                     workProvider: widget.workProvider,
                     day: days[index],
                     works: _dayWorks,
+                    group: widget.groupProvider.group,
                   );
                 },
               );
             },
           ),
         ),
-        CustomWorkFooterListTile(),
+        StreamBuilder<QuerySnapshot>(
+          stream: _stream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Container();
+            }
+            Map _count = {};
+            int _workCount = 0;
+            String _workTime = '00:00';
+            String _legalTime = '00:00';
+            String _nonLegalTime = '00:00';
+            String _nightTime = '00:00';
+            List<WorkModel> _worksTmp = [];
+            for (DocumentSnapshot _workTmp in snapshot.data.docs) {
+              _worksTmp.add(WorkModel.fromSnapshot(_workTmp));
+            }
+            for (WorkModel _work in _worksTmp) {
+              if (_work?.startedAt != _work?.endedAt) {
+                // 勤務日数
+                _count['${DateFormat('yyyy-MM-dd').format(_work?.startedAt)}'] =
+                    '';
+                _workCount = _count.length;
+                // 勤務時間
+                _workTime = addTime(_workTime, _work?.workTime());
+                // 法定内時間/法定外時間
+                List<String> _legalList = legalList(
+                  workTime: _work?.workTime(),
+                  legal: widget.groupProvider.group?.legal,
+                );
+                _legalTime = addTime(_legalTime, _legalList.first);
+                _nonLegalTime = addTime(_nonLegalTime, _legalList.last);
+                // 深夜時間
+                List<String> _nightList = nightList(
+                  startedAt: _work?.startedAt,
+                  endedAt: _work?.endedAt,
+                  nightStart: widget.groupProvider.group?.nightStart,
+                  nightEnd: widget.groupProvider.group?.nightEnd,
+                );
+                _nightTime = addTime(_nightTime, _nightList.last);
+              }
+            }
+            return CustomWorkFooterListTile(
+              workCount: _workCount,
+              workTime: _workTime,
+              legalTime: _legalTime,
+              nonLegalTime: _nonLegalTime,
+              nightTime: _nightTime,
+            );
+          },
+        ),
       ],
     );
   }
@@ -284,6 +349,133 @@ class SelectUserDialog extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   color: Colors.blue,
                   label: 'OK',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CSVDialog extends StatefulWidget {
+  final WorkProvider workProvider;
+  final DateTime selectMonth;
+  final List<UserModel> users;
+  final UserModel selectUser;
+
+  CSVDialog({
+    @required this.workProvider,
+    @required this.selectMonth,
+    @required this.users,
+    @required this.selectUser,
+  });
+
+  @override
+  _CSVDialogState createState() => _CSVDialogState();
+}
+
+class _CSVDialogState extends State<CSVDialog> {
+  DateTime _firstDate = DateTime(DateTime.now().year - 1);
+  DateTime _lastDate = DateTime(DateTime.now().year + 1);
+  DateTime selectMonth;
+  List<UserModel> users = [];
+  UserModel selectUser;
+
+  void _init() async {
+    setState(() {
+      selectMonth = widget.selectMonth;
+      users = widget.users;
+      selectUser = widget.selectUser;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            CustomIconLabel(
+              icon: Icon(Icons.today, color: Colors.black54),
+              label: '年月',
+            ),
+            SizedBox(height: 4.0),
+            CustomDateButton(
+              onPressed: () async {
+                var selected = await showMonthPicker(
+                  context: context,
+                  initialDate: selectMonth,
+                  firstDate: _firstDate,
+                  lastDate: _lastDate,
+                );
+                if (selected == null) return;
+                setState(() => selectMonth = selected);
+              },
+              label: '${DateFormat('yyyy年MM月').format(selectMonth)}',
+            ),
+            SizedBox(height: 8.0),
+            CustomIconLabel(
+              icon: Icon(Icons.person, color: Colors.black54),
+              label: 'スタッフ',
+            ),
+            DropdownButton<UserModel>(
+              isExpanded: true,
+              hint: Text('選択してください'),
+              value: selectUser,
+              onChanged: (value) {
+                setState(() => selectUser = value);
+              },
+              items: users.map((value) {
+                return DropdownMenuItem<UserModel>(
+                  value: value,
+                  child: Text('${value.name}'),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () {
+                    List<List<dynamic>> _rows = [];
+                    List<dynamic> _row = [];
+                    _row.add('社員番号');
+                    _row.add('社員名');
+                    _row.add('平日出勤');
+                    _row.add('出勤時間');
+                    _row.add('支給項目2');
+                    _rows.add(_row);
+                    String _csv = const ListToCsvConverter().convert(_rows);
+                    String encodeFileContents = Uri.encodeComponent(_csv);
+                    AnchorElement(href: 'data:text,$encodeFileContents')
+                      ..setAttribute('download', 'work.csv')
+                      ..click();
+                    return;
+                  },
+                  color: Colors.green,
+                  label: '出力する',
                 ),
               ],
             ),

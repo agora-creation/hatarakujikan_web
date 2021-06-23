@@ -73,6 +73,22 @@ class WorkProvider with ChangeNotifier {
   }
 
   void delete({WorkModel work}) {
-    _workService.delete({'id': work.id});
+    _workService.delete({'id': work?.id});
+  }
+
+  Future<List<WorkModel>> selectList(
+      {String groupId, String userId, DateTime startAt, DateTime endAt}) async {
+    List<WorkModel> _works = [];
+    await _workService
+        .selectList(
+      groupId: groupId,
+      userId: userId,
+      startAt: startAt,
+      endAt: endAt,
+    )
+        .then((value) {
+      _works = value;
+    });
+    return _works;
   }
 }

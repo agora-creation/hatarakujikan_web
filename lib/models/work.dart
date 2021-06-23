@@ -43,15 +43,15 @@ class WorkModel {
     return converted;
   }
 
-  String startTime(String type, int num) {
+  String startTime() {
     String _result = '00:00';
-    DateTime _offset;
-    if (type == '切捨') {
-      _offset = startedAt.subtract(Duration(minutes: num));
-    } else if (type == '切上') {
-      _offset = startedAt.add(Duration(minutes: num));
-    }
-    _result = '${DateFormat('HH:mm').format(_offset)}';
+    _result = '${DateFormat('HH:mm').format(startedAt)}';
+    return _result;
+  }
+
+  String endTime() {
+    String _result = '00:00';
+    _result = '${DateFormat('HH:mm').format(endedAt)}';
     return _result;
   }
 

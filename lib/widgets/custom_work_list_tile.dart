@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
@@ -13,11 +15,13 @@ class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
   final DateTime day;
   final List<WorkModel> works;
+  final GroupModel group;
 
   CustomWorkListTile({
     this.workProvider,
     this.day,
     this.works,
+    this.group,
   });
 
   @override
@@ -37,22 +41,31 @@ class CustomWorkListTile extends StatelessWidget {
                 itemCount: works.length,
                 itemBuilder: (_, index) {
                   WorkModel _work = works[index];
+                  String _startTime = _work.startTime();
                   String _endTime = '---:---';
-                  if (_work.startedAt != _work.endedAt) {
-                    _endTime = '${DateFormat('HH:mm').format(_work.endedAt)}';
-                  }
                   String _breakTime = '---:---';
-                  if (_work.startedAt != _work.endedAt) {
-                    _breakTime = '${_work.breakTime()}';
-                  }
                   String _workTime = '---:---';
-                  if (_work.startedAt != _work.endedAt) {
-                    _workTime = '${_work.workTime()}';
-                  }
                   String _legalTime = '---:---';
                   String _nonLegalTime = '---:---';
                   String _nightTime = '---:---';
-
+                  if (_work.startedAt != _work.endedAt) {
+                    _endTime = _work.endTime();
+                    _breakTime = _work.breakTime();
+                    _workTime = _work.workTime();
+                    List<String> _legalList = legalList(
+                      workTime: _work.workTime(),
+                      legal: group.legal,
+                    );
+                    _legalTime = _legalList.first;
+                    _nonLegalTime = _legalList.last;
+                    List<String> _nightList = nightList(
+                      startedAt: _work.startedAt,
+                      endedAt: _work.endedAt,
+                      nightStart: group.nightStart,
+                      nightEnd: group.nightEnd,
+                    );
+                    _nightTime = _nightList.last;
+                  }
                   return ListTile(
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,7 +74,7 @@ class CustomWorkListTile extends StatelessWidget {
                           label: Text('通常勤務', style: TextStyle(fontSize: 12.0)),
                         ),
                         Text(
-                          _work.startTime('切捨', 15),
+                          _startTime,
                           style: TextStyle(
                             color: Colors.black87,
                             fontSize: 16.0,

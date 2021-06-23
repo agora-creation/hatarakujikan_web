@@ -60,7 +60,7 @@ class UserProvider with ChangeNotifier {
   }
 
   void delete({UserModel user}) {
-    _userService.delete({'id': user.id});
+    _userService.delete({'id': user?.id});
   }
 
   Future<List<UserModel>> selectList({String groupId}) async {

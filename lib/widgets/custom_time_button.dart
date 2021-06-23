@@ -13,7 +13,11 @@ class CustomTimeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
       onPressed: onPressed,
-      icon: Icon(Icons.access_time, color: Colors.black54, size: 16.0),
+      icon: Icon(
+        Icons.access_time,
+        color: Colors.black54,
+        size: 16.0,
+      ),
       label: Text(
         label,
         style: TextStyle(

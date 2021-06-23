@@ -81,12 +81,11 @@ class _UserTableState extends State<UserTable> {
               }
               return DataTable2(
                 columns: [
-                  DataColumn2(label: Text('名前'), size: ColumnSize.S),
-                  DataColumn2(label: Text('雇用形態'), size: ColumnSize.S),
-                  DataColumn2(label: Text('スマートフォン利用状況'), size: ColumnSize.L),
-                  DataColumn2(label: Text('管理者権限'), size: ColumnSize.L),
+                  DataColumn(label: Text('名前')),
+                  DataColumn(label: Text('雇用形態')),
                   DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
-                  DataColumn(label: Text('作成日時')),
+                  DataColumn(label: Text('スマホ利用状況')),
+                  DataColumn(label: Text('管理者権限')),
                 ],
                 rows: List<DataRow>.generate(
                   users.length,
@@ -106,6 +105,7 @@ class _UserTableState extends State<UserTable> {
                     cells: [
                       DataCell(Text('${users[index].name}')),
                       DataCell(Text('${users[index].position}')),
+                      DataCell(Text('${users[index].recordPassword}')),
                       users[index].smartphone
                           ? DataCell(
                               Icon(
@@ -132,12 +132,6 @@ class _UserTableState extends State<UserTable> {
                                 color: Colors.transparent,
                               ),
                             ),
-                      DataCell(Text('${users[index].recordPassword}')),
-                      DataCell(
-                        Text(
-                          '${DateFormat('yyyy/MM/dd HH:mm').format(users[index].createdAt)}',
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -417,7 +411,7 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
             Container(
               decoration: kBottomBorderDecoration,
               child: ListTile(
-                leading: Text('スマートフォン利用'),
+                leading: Text('スマホ利用状況'),
                 title: widget.user.smartphone ? Text('利用中') : Text(''),
               ),
             ),
@@ -441,14 +435,20 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
                 ),
                 Row(
                   children: [
-                    CustomTextButton(
-                      onPressed: () {
-                        widget.userProvider.delete(user: widget.user);
-                        Navigator.pop(context);
-                      },
-                      color: Colors.red,
-                      label: '削除する',
-                    ),
+                    widget.user.smartphone
+                        ? CustomTextButton(
+                            onPressed: null,
+                            color: Colors.grey,
+                            label: '削除する',
+                          )
+                        : CustomTextButton(
+                            onPressed: () {
+                              widget.userProvider.delete(user: widget.user);
+                              Navigator.pop(context);
+                            },
+                            color: Colors.red,
+                            label: '削除する',
+                          ),
                     SizedBox(width: 4.0),
                     CustomTextButton(
                       onPressed: () async {
