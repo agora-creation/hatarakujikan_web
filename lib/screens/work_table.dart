@@ -459,17 +459,25 @@ class _CSVDialogState extends State<CSVDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () {
-                    List<List<dynamic>> _rows = [];
-                    List<dynamic> _row = [];
-                    _row.add('社員番号');
-                    _row.add('社員名');
-                    _row.add('平日出勤');
-                    _row.add('出勤時間');
-                    _row.add('支給項目2');
-                    _rows.add(_row);
-                    String _csv = const ListToCsvConverter().convert(_rows);
-                    String encodeFileContents = Uri.encodeComponent(_csv);
-                    AnchorElement(href: 'data:text,$encodeFileContents')
+                    List<List<dynamic>> rows = [];
+                    List<dynamic> row = [];
+                    row.add('社員番号');
+                    row.add('社員名');
+                    row.add('平日出勤');
+                    row.add('出勤時間');
+                    row.add('支給項目2');
+                    rows.add(row);
+                    for (int i = 0; i < users.length; i++) {
+                      List<dynamic> _row = [];
+                      _row.add('${users[i].name}');
+                      _row.add('${users[i].recordPassword}');
+                      _row.add('');
+                      _row.add('');
+                      _row.add('');
+                      rows.add(_row);
+                    }
+                    String csv = const ListToCsvConverter().convert(rows);
+                    AnchorElement(href: 'data:text/plain;charset=utf-8,$csv')
                       ..setAttribute('download', 'work.csv')
                       ..click();
                     return;
