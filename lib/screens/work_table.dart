@@ -164,7 +164,18 @@ class _WorkTableState extends State<WorkTable> {
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => PdfDialog(
+                        workProvider: widget.workProvider,
+                        group: widget.groupProvider.group,
+                        selectMonth: selectMonth,
+                        users: users,
+                      ),
+                    );
+                  },
                   color: Colors.redAccent,
                   iconData: Icons.file_download,
                   label: 'PDF出力',
@@ -379,10 +390,6 @@ class _CsvDialogState extends State<CsvDialog> {
   DateTime _lastDate = DateTime(DateTime.now().year + 1);
   List<DateTime> days = [];
   DateTime selectMonth = DateTime.now();
-  Map userData = {};
-  Map countData = {};
-  Map time1Data = {};
-  Map time2Data = {};
 
   void _generateDays() async {
     days.clear();
@@ -397,15 +404,6 @@ class _CsvDialogState extends State<CsvDialog> {
   void _init() async {
     setState(() {
       selectMonth = widget.selectMonth;
-      for (UserModel _user in widget.users) {
-        Map _data = {};
-        _data['recordPassword'] = _user.recordPassword;
-        _data['name'] = _user.name;
-        userData['${_user.id}'] = _data;
-        countData['${_user.id}'] = 0;
-        time1Data['${_user.id}'] = '00:00';
-        time2Data['${_user.id}'] = '00:00';
-      }
     });
   }
 
@@ -470,42 +468,116 @@ class _CsvDialogState extends State<CsvDialog> {
                     _row.add('出勤時間');
                     _row.add('支給項目2');
                     rows.add(_row);
-                    List<WorkModel> _works = [];
-                    await widget.workProvider
-                        .selectListAllUser(
-                      groupId: widget.group.id,
-                      startAt: days.first,
-                      endAt: days.last,
-                    )
-                        .then((value) {
-                      _works = value;
-                    });
-                    for (WorkModel _work in _works) {
-                      if (_work.startedAt != _work.endedAt) {
-                        countData['${_work.userId}']++;
-                        time1Data['${_work.userId}'] = addTime(
-                            time1Data['${_work.userId}'], _work.workTime());
-                        List<String> _legalList = legalList(
-                          workTime: _work.workTime(),
-                          legal: widget.group.legal,
-                        );
-                        time2Data['${_work.userId}'] = addTime(
-                            time2Data['${_work.userId}'], _legalList.first);
-                      }
-                    }
-                    userData.forEach((key, value) {
+                    for (UserModel _user in widget.users) {
                       List<dynamic> _row = [];
-                      _row.add('${value['recordPassword']}');
-                      _row.add('${value['name']}');
-                      _row.add('${countData[key]}');
-                      _row.add('${time1Data[key]}');
-                      _row.add('${time2Data[key]}');
+                      _row.add('${_user.recordPassword}');
+                      _row.add('${_user.name}');
+                      List<WorkModel> _works = [];
+                      await widget.workProvider
+                          .selectList(
+                        groupId: widget.group.id,
+                        userId: _user.id,
+                        startAt: days.first,
+                        endAt: days.last,
+                      )
+                          .then((value) {
+                        _works = value;
+                      });
+                      Map _count = {};
+                      String _workTime = '00:00';
+                      String _legalTime = '00:00';
+                      String _nightTime = '00:00';
+                      for (WorkModel _work in _works) {
+                        if (_work.startedAt != _work.endedAt) {
+                          // 勤務日数
+                          _count['${DateFormat('yyyy-MM-dd').format(_work.startedAt)}'] =
+                              '';
+                          // 勤務時間
+                          _workTime = addTime(_workTime, _work.workTime());
+                          // 法定内時間
+                          List<String> _legalList = legalList(
+                            workTime: _work.workTime(),
+                            legal: widget.group.legal,
+                          );
+                          _legalTime = addTime(_legalTime, _legalList.first);
+                          // 深夜時間
+                          List<String> _nightList = nightList(
+                            startedAt: _work.startedAt,
+                            endedAt: _work.endedAt,
+                            nightStart: widget.group.nightStart,
+                            nightEnd: widget.group.nightEnd,
+                          );
+                          _nightTime = addTime(_nightTime, _nightList.last);
+                        }
+                      }
+                      _row.add('${_count.length}');
+                      if (_user.position == '正社員') {
+                        _row.add('$_workTime');
+                        _row.add('00:00');
+                      } else {
+                        _row.add('$_legalTime');
+                        _row.add('$_nightTime');
+                      }
                       rows.add(_row);
-                    });
+                    }
                     await csvDownload(rows: rows, fileName: 'work.csv');
                     return;
                   },
                   color: Colors.green,
+                  label: '出力する',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PdfDialog extends StatefulWidget {
+  final WorkProvider workProvider;
+  final GroupModel group;
+  final DateTime selectMonth;
+  final List<UserModel> users;
+
+  PdfDialog({
+    @required this.workProvider,
+    @required this.group,
+    @required this.selectMonth,
+    @required this.users,
+  });
+
+  @override
+  _PdfDialogState createState() => _PdfDialogState();
+}
+
+class _PdfDialogState extends State<PdfDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () async {},
+                  color: Colors.redAccent,
                   label: '出力する',
                 ),
               ],

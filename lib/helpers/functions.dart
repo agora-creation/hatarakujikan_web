@@ -187,7 +187,7 @@ List<String> nightList({
 
 Future<void> csvDownload({List<List<dynamic>> rows, String fileName}) async {
   String csv = const ListToCsvConverter().convert(rows);
-  AnchorElement(href: 'data:text/plain;charset=utf-8,$csv')
+  AnchorElement(href: 'data:application/octet-stream;charset=Shift_JIS,$csv')
     ..setAttribute('download', fileName)
     ..click();
 }

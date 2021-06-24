@@ -29,8 +29,9 @@ class WorkService {
     return WorkModel.fromSnapshot(snapshot);
   }
 
-  Future<List<WorkModel>> selectListAllUser({
+  Future<List<WorkModel>> selectList({
     String groupId,
+    String userId,
     DateTime startAt,
     DateTime endAt,
   }) async {
@@ -44,6 +45,7 @@ class WorkService {
     await _firebaseFirestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)
+        .where('userId', isEqualTo: userId)
         .orderBy('startedAt', descending: false)
         .startAt([_startAt])
         .endAt([_endAt])
