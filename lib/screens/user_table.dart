@@ -49,21 +49,32 @@ class _UserTableState extends State<UserTable> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(),
-            CustomTextIconButton(
-              onPressed: () {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (_) => AddUserDialog(
-                    userProvider: widget.userProvider,
-                    groupId: widget.groupProvider.group?.id,
-                    positions: widget.groupProvider.group?.positions ?? [],
-                  ),
-                );
-              },
-              color: Colors.blue,
-              iconData: Icons.add,
-              label: '新規登録',
+            Row(
+              children: [
+                CustomTextIconButton(
+                  onPressed: () {},
+                  color: Colors.cyan,
+                  iconData: Icons.smartphone,
+                  label: '勤怠データ移行',
+                ),
+                SizedBox(width: 4.0),
+                CustomTextIconButton(
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => AddUserDialog(
+                        userProvider: widget.userProvider,
+                        groupId: widget.groupProvider.group?.id,
+                        positions: widget.groupProvider.group?.positions ?? [],
+                      ),
+                    );
+                  },
+                  color: Colors.blue,
+                  iconData: Icons.add,
+                  label: '新規登録',
+                ),
+              ],
             ),
           ],
         ),

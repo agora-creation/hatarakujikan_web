@@ -20,6 +20,7 @@ import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class WorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -553,6 +554,34 @@ class PdfDialog extends StatefulWidget {
 }
 
 class _PdfDialogState extends State<PdfDialog> {
+  DateTime _firstDate = DateTime(DateTime.now().year - 1);
+  DateTime _lastDate = DateTime(DateTime.now().year + 1);
+  List<DateTime> days = [];
+  DateTime selectMonth = DateTime.now();
+
+  void _generateDays() async {
+    days.clear();
+    var _dateMap = DateMachineUtil.getMonthDate(selectMonth, 0);
+    DateTime _startAt = DateTime.parse('${_dateMap['start']}');
+    DateTime _endAt = DateTime.parse('${_dateMap['end']}');
+    for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {
+      days.add(_startAt.add(Duration(days: i)));
+    }
+  }
+
+  void _init() async {
+    setState(() {
+      selectMonth = widget.selectMonth;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+    _generateDays();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -567,6 +596,28 @@ class _PdfDialogState extends State<PdfDialog> {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
+            CustomIconLabel(
+              icon: Icon(Icons.today, color: Colors.black54),
+              label: '年月',
+            ),
+            SizedBox(height: 4.0),
+            CustomDateButton(
+              onPressed: () async {
+                var selected = await showMonthPicker(
+                  context: context,
+                  initialDate: selectMonth,
+                  firstDate: _firstDate,
+                  lastDate: _lastDate,
+                );
+                if (selected == null) return;
+                setState(() {
+                  selectMonth = selected;
+                  _generateDays();
+                });
+              },
+              label: '${DateFormat('yyyy年MM月').format(selectMonth)}',
+            ),
+            SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -576,7 +627,59 @@ class _PdfDialogState extends State<PdfDialog> {
                   label: 'キャンセル',
                 ),
                 CustomTextButton(
-                  onPressed: () async {},
+                  onPressed: () async {
+                    PdfDocument document = PdfDocument();
+                    PdfPage page = document.pages.add();
+                    Size pageSize = page.getClientSize();
+
+                    page.graphics.drawRectangle(
+                      bounds:
+                          Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
+                    );
+                    PdfGrid grid = PdfGrid();
+                    grid.columns.add(count: 5);
+                    PdfGridRow headerRow = grid.headers.add(1)[0];
+                    headerRow.style.backgroundBrush = PdfSolidBrush(
+                      PdfColor(100, 100, 100),
+                    );
+                    headerRow.style.textBrush = PdfBrushes.black;
+                    headerRow.cells[0].value = '日付';
+                    headerRow.cells[1].value = '勤務状況';
+                    headerRow.cells[2].value = '出勤時間';
+                    headerRow.cells[3].value = '退勤時間';
+                    headerRow.cells[4].value = '休憩時間';
+                    headerRow.cells[5].value = '勤務時間';
+                    headerRow.cells[6].value = '法定内時間';
+                    headerRow.cells[7].value = '法定外時間';
+                    headerRow.cells[8].value = '深夜時間';
+                    PdfGridRow row = grid.rows.add();
+                    row.cells[0].value = '01(月)';
+                    row.cells[1].value = '';
+                    row.cells[2].value = '00:00';
+                    row.cells[3].value = '00:00';
+                    row.cells[4].value = '00:00';
+                    row.cells[5].value = '00:00';
+                    row.cells[6].value = '00:00';
+                    row.cells[7].value = '00:00';
+                    row.cells[8].value = '00:00';
+                    for (int i = 0; i < headerRow.cells.count; i++) {
+                      headerRow.cells[i].style.cellPadding =
+                          PdfPaddings(left: 3, right: 3, top: 3, bottom: 3);
+                    }
+                    for (int i = 0; i < grid.rows.count; i++) {
+                      PdfGridRow row = grid.rows[i];
+                      for (int j = 0; j < row.cells.count; j++) {
+                        PdfGridCell cell = row.cells[j];
+                        cell.style.cellPadding =
+                            PdfPaddings(left: 3, right: 3, top: 3, bottom: 3);
+                      }
+                    }
+
+                    List<int> bytes = document.save();
+                    document.dispose();
+                    await saveAndLaunchFile(bytes, 'work.pdf');
+                    return;
+                  },
                   color: Colors.redAccent,
                   label: '出力する',
                 ),
