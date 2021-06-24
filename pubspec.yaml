@@ -28,7 +28,8 @@ dependencies:
   flutter_admin_scaffold: ^1.0.0
   data_table_2: ^2.0.3
   csv: ^5.0.0
-  syncfusion_flutter_pdf: ^19.1.69-beta
+  pdf: ^3.4.2
+  universal_html: ^2.0.8
   intl: ^0.16.1
 dependency_overrides:
   intl: ^0.17.0-nullsafety.2
@@ -42,6 +43,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/fonts/
 
   fonts:
     - family: NotoSansJP

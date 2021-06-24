@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
@@ -93,7 +94,10 @@ class _GroupPanelState extends State<GroupPanel> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await qrPdf(group: widget.groupProvider.group);
+                    return;
+                  },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
                   label: 'QRコード出力',
