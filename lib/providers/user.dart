@@ -70,4 +70,18 @@ class UserProvider with ChangeNotifier {
     });
     return _users;
   }
+
+  Future<List<UserModel>> selectListSP(
+      {String groupId, bool smartphone}) async {
+    List<UserModel> _users = [];
+    await _userService
+        .selectListSP(
+      groupId: groupId,
+      smartphone: smartphone,
+    )
+        .then((value) {
+      _users = value;
+    });
+    return _users;
+  }
 }

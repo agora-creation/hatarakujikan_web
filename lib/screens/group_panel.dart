@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
-import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_link_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class GroupPanel extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -96,7 +93,7 @@ class _GroupPanelState extends State<GroupPanel> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () => _createQR(widget.groupProvider.group),
+                  onPressed: () {},
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
                   label: 'QRコード出力',
@@ -782,24 +779,4 @@ class _GroupPanelState extends State<GroupPanel> {
       ],
     );
   }
-}
-
-Future<void> _createQR(GroupModel group) async {
-  PdfDocument document = PdfDocument();
-  PdfPage page = document.pages.add();
-  Size pageSize = page.getClientSize();
-  page.graphics.drawRectangle(
-    bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
-    pen: PdfPen(PdfColor(142, 170, 219, 255)),
-  );
-
-  page.graphics.drawString(
-    '${group.name}',
-    PdfCjkStandardFont(PdfCjkFontFamily.hanyangSystemsGothicMedium, 30),
-  );
-
-  List<int> bytes = document.save();
-  document.dispose();
-
-  await saveAndLaunchFile(bytes, 'qr.pdf');
 }

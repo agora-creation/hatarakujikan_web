@@ -5,6 +5,8 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
@@ -13,10 +15,12 @@ import 'package:intl/intl.dart';
 class UserTable extends StatefulWidget {
   final GroupProvider groupProvider;
   final UserProvider userProvider;
+  final WorkProvider workProvider;
 
   UserTable({
     @required this.groupProvider,
     @required this.userProvider,
+    @required this.workProvider,
   });
 
   @override
@@ -52,7 +56,36 @@ class _UserTableState extends State<UserTable> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    List<UserModel> befUsers = [];
+                    List<UserModel> aftUsers = [];
+                    widget.userProvider
+                        .selectListSP(
+                      groupId: widget.groupProvider.group?.id,
+                      smartphone: false,
+                    )
+                        .then((value) {
+                      befUsers = value;
+                    });
+                    widget.userProvider
+                        .selectListSP(
+                      groupId: widget.groupProvider.group?.id,
+                      smartphone: true,
+                    )
+                        .then((value) {
+                      aftUsers = value;
+                    });
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => MigrationDialog(
+                        befUsers: befUsers,
+                        aftUsers: aftUsers,
+                        workProvider: widget.workProvider,
+                        groupId: widget.groupProvider.group?.id,
+                      ),
+                    );
+                  },
                   color: Colors.cyan,
                   iconData: Icons.smartphone,
                   label: '勤怠データ移行',
@@ -151,6 +184,136 @@ class _UserTableState extends State<UserTable> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class MigrationDialog extends StatefulWidget {
+  final List<UserModel> befUsers;
+  final List<UserModel> aftUsers;
+  final WorkProvider workProvider;
+  final String groupId;
+
+  MigrationDialog({
+    @required this.befUsers,
+    @required this.aftUsers,
+    @required this.workProvider,
+    @required this.groupId,
+  });
+
+  @override
+  _MigrationDialogState createState() => _MigrationDialogState();
+}
+
+class _MigrationDialogState extends State<MigrationDialog> {
+  List<UserModel> befUsers;
+  List<UserModel> aftUsers;
+  UserModel selectBefUser;
+  UserModel selectAftUser;
+
+  void _init() async {
+    setState(() {
+      befUsers = widget.befUsers;
+      aftUsers = widget.aftUsers;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              '「移行元」と「移行先」を選択し、最後に「移行する」ボタンを押してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            CustomIconLabel(
+              icon: Icon(Icons.person, color: Colors.black54),
+              label: '移行元(スマホ利用していないスタッフ)',
+            ),
+            DropdownButton<UserModel>(
+              isExpanded: true,
+              hint: Text('選択してください'),
+              value: selectBefUser,
+              onChanged: (value) {
+                setState(() => selectBefUser = value);
+              },
+              items: befUsers.map((value) {
+                return DropdownMenuItem<UserModel>(
+                  value: value,
+                  child: Text('${value.name}'),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 8.0),
+            Center(
+              child: Icon(
+                Icons.arrow_downward,
+                color: Colors.cyan,
+                size: 24.0,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            CustomIconLabel(
+              icon: Icon(Icons.person, color: Colors.black54),
+              label: '移行先(スマホ利用しているスタッフ)',
+            ),
+            DropdownButton<UserModel>(
+              isExpanded: true,
+              hint: Text('選択してください'),
+              value: selectAftUser,
+              onChanged: (value) {
+                setState(() => selectAftUser = value);
+              },
+              items: aftUsers.map((value) {
+                return DropdownMenuItem<UserModel>(
+                  value: value,
+                  child: Text('${value.name}'),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () async {
+                    if (!await widget.workProvider.migration(
+                      groupId: widget.groupId,
+                      befUser: selectBefUser,
+                      aftUser: selectAftUser,
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('勤務データの移行が完了しました')),
+                    );
+                    Navigator.pop(context);
+                  },
+                  color: Colors.cyan,
+                  label: '移行する',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

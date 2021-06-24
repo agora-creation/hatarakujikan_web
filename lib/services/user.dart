@@ -42,4 +42,23 @@ class UserService {
     });
     return _users;
   }
+
+  Future<List<UserModel>> selectListSP({
+    String groupId,
+    bool smartphone,
+  }) async {
+    List<UserModel> _users = [];
+    await _firebaseFirestore
+        .collection(_collection)
+        .where('groups', arrayContains: groupId)
+        .where('smartphone', isEqualTo: smartphone)
+        .orderBy('name', descending: false)
+        .get()
+        .then((value) {
+      for (DocumentSnapshot _user in value.docs) {
+        _users.add(UserModel.fromSnapshot(_user));
+      }
+    });
+    return _users;
+  }
 }

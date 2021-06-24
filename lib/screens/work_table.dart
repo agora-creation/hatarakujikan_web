@@ -628,52 +628,19 @@ class _PdfDialogState extends State<PdfDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
+                    print('1');
                     PdfDocument document = PdfDocument();
                     PdfPage page = document.pages.add();
                     Size pageSize = page.getClientSize();
-
                     page.graphics.drawRectangle(
                       bounds:
                           Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
                     );
-                    PdfGrid grid = PdfGrid();
-                    grid.columns.add(count: 5);
-                    PdfGridRow headerRow = grid.headers.add(1)[0];
-                    headerRow.style.backgroundBrush = PdfSolidBrush(
-                      PdfColor(100, 100, 100),
-                    );
-                    headerRow.style.textBrush = PdfBrushes.black;
-                    headerRow.cells[0].value = '日付';
-                    headerRow.cells[1].value = '勤務状況';
-                    headerRow.cells[2].value = '出勤時間';
-                    headerRow.cells[3].value = '退勤時間';
-                    headerRow.cells[4].value = '休憩時間';
-                    headerRow.cells[5].value = '勤務時間';
-                    headerRow.cells[6].value = '法定内時間';
-                    headerRow.cells[7].value = '法定外時間';
-                    headerRow.cells[8].value = '深夜時間';
-                    PdfGridRow row = grid.rows.add();
-                    row.cells[0].value = '01(月)';
-                    row.cells[1].value = '';
-                    row.cells[2].value = '00:00';
-                    row.cells[3].value = '00:00';
-                    row.cells[4].value = '00:00';
-                    row.cells[5].value = '00:00';
-                    row.cells[6].value = '00:00';
-                    row.cells[7].value = '00:00';
-                    row.cells[8].value = '00:00';
-                    for (int i = 0; i < headerRow.cells.count; i++) {
-                      headerRow.cells[i].style.cellPadding =
-                          PdfPaddings(left: 3, right: 3, top: 3, bottom: 3);
-                    }
-                    for (int i = 0; i < grid.rows.count; i++) {
-                      PdfGridRow row = grid.rows[i];
-                      for (int j = 0; j < row.cells.count; j++) {
-                        PdfGridCell cell = row.cells[j];
-                        cell.style.cellPadding =
-                            PdfPaddings(left: 3, right: 3, top: 3, bottom: 3);
-                      }
-                    }
+                    print('2');
+                    PdfGrid grid = _getGrid();
+                    print('3');
+                    PdfLayoutResult result = _drawHeader(page, pageSize, grid);
+                    print('4');
 
                     List<int> bytes = document.save();
                     document.dispose();
@@ -1066,4 +1033,44 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
       ),
     );
   }
+}
+
+PdfLayoutResult _drawHeader(PdfPage page, Size pageSize, PdfGrid grid) {
+  PdfFont _font =
+      PdfCjkStandardFont(PdfCjkFontFamily.hanyangSystemsGothicMedium, 10);
+  page.graphics.drawString('年月', _font);
+  String _text = '年月: 2021年06月　スタッフ: 島村裕太';
+  return PdfTextElement(text: _text, font: _font).draw(page: page);
+}
+
+PdfGrid _getGrid() {
+  PdfGrid grid = PdfGrid();
+  grid.columns.add(count: 9);
+  PdfGridRow headerRow = grid.headers.add(1)[0];
+  headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(100, 100, 100));
+  headerRow.style.textBrush = PdfBrushes.black;
+  headerRow.cells[0].value = '日付';
+  headerRow.cells[1].value = '勤務状況';
+  headerRow.cells[2].value = '出勤時間';
+  headerRow.cells[3].value = '退勤時間';
+  headerRow.cells[4].value = '休憩時間';
+  headerRow.cells[5].value = '勤務時間';
+  headerRow.cells[6].value = '法定内時間';
+  headerRow.cells[7].value = '法定外時間';
+  headerRow.cells[8].value = '深夜時間';
+
+  // データ
+  for (int i = 0; i < headerRow.cells.count; i++) {
+    headerRow.cells[i].style.cellPadding =
+        PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
+  }
+  for (int i = 0; i < grid.rows.count; i++) {
+    PdfGridRow row = grid.rows[i];
+    for (int j = 0; j < row.cells.count; j++) {
+      PdfGridCell cell = row.cells[j];
+      cell.style.cellPadding =
+          PdfPaddings(left: 5, right: 5, top: 5, bottom: 5);
+    }
+  }
+  return grid;
 }
