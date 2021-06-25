@@ -462,27 +462,42 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    CustomTextButton(
-                      onPressed: () {
-                        applyWorkProvider.delete(applyWork: applyWork);
-                        Navigator.pop(context);
-                      },
-                      color: Colors.red,
-                      label: '却下する',
-                    ),
+                    applyWork.approval
+                        ? CustomTextButton(
+                            onPressed: () {
+                              applyWorkProvider.delete(applyWork: applyWork);
+                              Navigator.pop(context);
+                            },
+                            color: Colors.red,
+                            label: '削除する',
+                          )
+                        : CustomTextButton(
+                            onPressed: () {
+                              applyWorkProvider.delete(applyWork: applyWork);
+                              Navigator.pop(context);
+                            },
+                            color: Colors.red,
+                            label: '却下する',
+                          ),
                     SizedBox(width: 4.0),
-                    CustomTextButton(
-                      onPressed: () async {
-                        if (!await applyWorkProvider.update(
-                          applyWork: applyWork,
-                        )) {
-                          return;
-                        }
-                        Navigator.pop(context);
-                      },
-                      color: Colors.blue,
-                      label: '承認する',
-                    ),
+                    applyWork.approval
+                        ? CustomTextButton(
+                            onPressed: null,
+                            color: Colors.grey,
+                            label: '承認する',
+                          )
+                        : CustomTextButton(
+                            onPressed: () async {
+                              if (!await applyWorkProvider.update(
+                                applyWork: applyWork,
+                              )) {
+                                return;
+                              }
+                              Navigator.pop(context);
+                            },
+                            color: Colors.blue,
+                            label: '承認する',
+                          ),
                   ],
                 ),
               ],

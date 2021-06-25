@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
-import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/services/work.dart';
 
@@ -75,19 +74,6 @@ class WorkProvider with ChangeNotifier {
 
   void delete({WorkModel work}) {
     _workService.delete({'id': work?.id});
-  }
-
-  Future<bool> migration({
-    String groupId,
-    UserModel befUser,
-    UserModel aftUser,
-  }) async {
-    try {
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return false;
-    }
   }
 
   Future<List<WorkModel>> selectList({

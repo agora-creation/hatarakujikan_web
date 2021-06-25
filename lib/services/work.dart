@@ -19,6 +19,20 @@ class WorkService {
     _firebaseFirestore.collection(_collection).doc(values['id']).update(values);
   }
 
+  Future<void> updateMigration(String befUserId, String aftUserId) async {
+    await _firebaseFirestore
+        .collection(_collection)
+        .where('userId', isEqualTo: befUserId)
+        .get()
+        .then((value) {
+      for (DocumentSnapshot _work in value.docs) {
+        _firebaseFirestore.collection(_collection).doc(_work.id).update({
+          'userId': aftUserId,
+        });
+      }
+    });
+  }
+
   void delete(Map<String, dynamic> values) {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }

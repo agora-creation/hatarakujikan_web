@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/user.dart';
+import 'package:hatarakujikan_web/services/work.dart';
 
 class UserProvider with ChangeNotifier {
   UserService _userService = UserService();
+  WorkService _workService = WorkService();
 
   Future<bool> create({
     String name,
@@ -61,6 +63,29 @@ class UserProvider with ChangeNotifier {
 
   void delete({UserModel user}) {
     _userService.delete({'id': user?.id});
+  }
+
+  Future<bool> migration({
+    String groupId,
+    UserModel befUser,
+    UserModel aftUser,
+  }) async {
+    if (groupId == '') return false;
+    if (befUser == null) return false;
+    if (aftUser == null) return false;
+    try {
+      _userService.update({
+        'id': aftUser?.id,
+        'recordPassword': befUser?.recordPassword,
+        'position': befUser?.position,
+      });
+      await _workService.updateMigration(befUser?.id, aftUser?.id);
+      _userService.delete({'id': befUser?.id});
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   Future<List<UserModel>> selectList({String groupId}) async {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -20,9 +21,6 @@ import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:universal_html/html.dart' as html;
 
 class WorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -630,23 +628,7 @@ class _PdfDialogState extends State<PdfDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    final pdf = pw.Document();
-
-                    pdf.addPage(
-                      pw.Page(
-                        pageFormat: PdfPageFormat.a4,
-                        build: (pw.Context context) => pw.Center(
-                          child: pw.Text('Hello World!'),
-                        ),
-                      ),
-                    );
-
-                    final bytes = await pdf.save();
-                    final blob = html.Blob([bytes], 'application/pdf');
-                    final url = html.Url.createObjectUrlFromBlob(blob);
-                    html.window.open(url, '_blank');
-                    html.Url.revokeObjectUrl(url);
-                    return;
+                    await workPdf();
                   },
                   color: Colors.redAccent,
                   label: '出力する',

@@ -96,7 +96,6 @@ class _GroupPanelState extends State<GroupPanel> {
                 CustomTextIconButton(
                   onPressed: () async {
                     await qrPdf(group: widget.groupProvider.group);
-                    return;
                   },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
@@ -768,12 +767,12 @@ class _GroupPanelState extends State<GroupPanel> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 24.0),
+              SizedBox(height: 40.0),
               Center(
                 child: CustomLinkButton(
                   onTap: () {},
                   color: Colors.red,
-                  label: 'この会社/組織を削除する',
+                  label: 'この会社/組織を削除申請する',
                 ),
               ),
               SizedBox(height: 24.0),
