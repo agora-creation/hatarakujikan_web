@@ -1,15 +1,24 @@
 import 'package:flutter/services.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
+import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 
-Future<void> workPdf({DateTime month, UserModel user}) async {
+Future<void> workPdf({
+  WorkProvider workProvider,
+  GroupModel group,
+  DateTime month,
+  UserModel user,
+}) async {
   if (user == null) return;
   List<DateTime> days = [];
+  List<WorkModel> works = [];
   days.clear();
   var _dateMap = DateMachineUtil.getMonthDate(month, 0);
   DateTime _startAt = DateTime.parse('${_dateMap['start']}');
@@ -17,6 +26,16 @@ Future<void> workPdf({DateTime month, UserModel user}) async {
   for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {
     days.add(_startAt.add(Duration(days: i)));
   }
+  await workProvider
+      .selectList(
+    groupId: group.id,
+    userId: user.id,
+    startAt: days.first,
+    endAt: days.last,
+  )
+      .then((value) {
+    works = value;
+  });
 
   final pdf = pw.Document();
   final font = await rootBundle.load('assets/fonts/GenShinGothic-Regular.ttf');
@@ -24,6 +43,12 @@ Future<void> workPdf({DateTime month, UserModel user}) async {
 
   final pw.TextStyle _headerStyle = pw.TextStyle(font: ttf, fontSize: 10.0);
   final pw.TextStyle _listStyle = pw.TextStyle(font: ttf, fontSize: 8.0);
+
+  Map _count = {};
+  String _totalWorkTime = '00:00';
+  String _totalLegalTime = '00:00';
+  String _totalNonLegalTime = '00:00';
+  String _totalNightTime = '00:00';
 
   List<pw.TableRow> _buildRows() {
     List<pw.TableRow> _result = [];
@@ -71,51 +96,141 @@ Future<void> workPdf({DateTime month, UserModel user}) async {
       ),
     );
     for (int i = 0; i < days.length; i++) {
-      _result.add(
-        pw.TableRow(
-          children: [
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text(
-                '${DateFormat('dd (E)', 'ja').format(days[i])}',
-                style: _listStyle,
+      List<WorkModel> dayWorks = [];
+      for (WorkModel _work in works) {
+        String _startedAt =
+            '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+        if (days[i] == DateTime.parse(_startedAt)) {
+          dayWorks.add(_work);
+        }
+      }
+      String _dayText = '${DateFormat('dd (E)', 'ja').format(days[i])}';
+      if (dayWorks.length > 0) {
+        for (int j = 0; j < dayWorks.length; j++) {
+          String _startTime = dayWorks[j].startTime();
+          String _endTime = '---:---';
+          String _breakTime = '---:---';
+          String _workTime = '---:---';
+          String _legalTime = '---:---';
+          String _nonLegalTime = '---:---';
+          String _nightTime = '---:---';
+          if (dayWorks[j].startedAt != dayWorks[j].endedAt) {
+            _endTime = dayWorks[j].endTime();
+            _breakTime = dayWorks[j].breakTime();
+            _workTime = dayWorks[j].workTime();
+            List<String> _legalList = legalList(
+              workTime: dayWorks[j].workTime(),
+              legal: group.legal,
+            );
+            _legalTime = _legalList.first;
+            _nonLegalTime = _legalList.last;
+            List<String> _nightList = nightList(
+              startedAt: dayWorks[j].startedAt,
+              endedAt: dayWorks[j].endedAt,
+              nightStart: group.nightStart,
+              nightEnd: group.nightEnd,
+            );
+            _nightTime = _nightList.last;
+            _count['${DateFormat('yyyy-MM-dd').format(dayWorks[j].startedAt)}'] =
+                '';
+            _totalWorkTime = addTime(_totalWorkTime, dayWorks[j].workTime());
+            _totalLegalTime = addTime(_totalLegalTime, _legalList.first);
+            _totalNonLegalTime = addTime(_totalNonLegalTime, _legalList.last);
+            _totalNightTime = addTime(_totalNightTime, _nightList.last);
+          }
+          _result.add(
+            pw.TableRow(
+              children: [
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(
+                    _dayText,
+                    style: _listStyle,
+                  ),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text('通常勤務', style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_startTime, style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_endTime, style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_breakTime, style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_workTime, style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_legalTime, style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_nonLegalTime, style: _listStyle),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(5.0),
+                  child: pw.Text(_nightTime, style: _listStyle),
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        _result.add(
+          pw.TableRow(
+            children: [
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text(
+                  _dayText,
+                  style: _listStyle,
+                ),
               ),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('通常勤務', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-            pw.Padding(
-              padding: pw.EdgeInsets.all(5.0),
-              child: pw.Text('00:00', style: _listStyle),
-            ),
-          ],
-        ),
-      );
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(5.0),
+                child: pw.Text('', style: _listStyle),
+              ),
+            ],
+          ),
+        );
+      }
     }
     return _result;
   }
@@ -146,23 +261,28 @@ Future<void> workPdf({DateTime month, UserModel user}) async {
                 children: [
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5.0),
-                    child: pw.Text('総勤務日数 [0日]', style: _listStyle),
+                    child:
+                        pw.Text('総勤務日数 [${_count.length}日]', style: _listStyle),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5.0),
-                    child: pw.Text('総勤務時間 [00:00]', style: _listStyle),
+                    child:
+                        pw.Text('総勤務時間 [$_totalWorkTime]', style: _listStyle),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5.0),
-                    child: pw.Text('総法定内時間 [00:00]', style: _listStyle),
+                    child:
+                        pw.Text('総法定内時間 [$_totalLegalTime]', style: _listStyle),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5.0),
-                    child: pw.Text('総法定外時間 [00:00]', style: _listStyle),
+                    child: pw.Text('総法定外時間 [$_totalNonLegalTime]',
+                        style: _listStyle),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5.0),
-                    child: pw.Text('総深夜時間 [00:00]', style: _listStyle),
+                    child:
+                        pw.Text('総深夜時間 [$_totalNightTime]', style: _listStyle),
                   ),
                 ],
               ),

@@ -174,6 +174,7 @@ class _WorkTableState extends State<WorkTable> {
                         group: widget.groupProvider.group,
                         selectMonth: selectMonth,
                         users: users,
+                        selectUser: selectUser,
                       ),
                     );
                   },
@@ -653,7 +654,12 @@ class _PdfDialogState extends State<PdfDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    await workPdf(month: selectMonth, user: selectUser);
+                    await workPdf(
+                      workProvider: widget.workProvider,
+                      group: widget.group,
+                      month: selectMonth,
+                      user: selectUser,
+                    );
                   },
                   color: Colors.redAccent,
                   label: '出力する',
