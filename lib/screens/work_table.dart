@@ -541,12 +541,14 @@ class PdfDialog extends StatefulWidget {
   final GroupModel group;
   final DateTime selectMonth;
   final List<UserModel> users;
+  final UserModel selectUser;
 
   PdfDialog({
     @required this.workProvider,
     @required this.group,
     @required this.selectMonth,
     @required this.users,
+    @required this.selectUser,
   });
 
   @override
@@ -558,6 +560,8 @@ class _PdfDialogState extends State<PdfDialog> {
   DateTime _lastDate = DateTime(DateTime.now().year + 1);
   List<DateTime> days = [];
   DateTime selectMonth = DateTime.now();
+  List<UserModel> users = [];
+  UserModel selectUser;
 
   void _generateDays() async {
     days.clear();
@@ -572,6 +576,8 @@ class _PdfDialogState extends State<PdfDialog> {
   void _init() async {
     setState(() {
       selectMonth = widget.selectMonth;
+      users = widget.users;
+      selectUser = widget.selectUser;
     });
   }
 
@@ -617,6 +623,25 @@ class _PdfDialogState extends State<PdfDialog> {
               },
               label: '${DateFormat('yyyy年MM月').format(selectMonth)}',
             ),
+            SizedBox(height: 8.0),
+            CustomIconLabel(
+              icon: Icon(Icons.person, color: Colors.black54),
+              label: 'スタッフ',
+            ),
+            DropdownButton<UserModel>(
+              isExpanded: true,
+              hint: Text('選択してください'),
+              value: selectUser,
+              onChanged: (value) {
+                setState(() => selectUser = value);
+              },
+              items: users.map((value) {
+                return DropdownMenuItem<UserModel>(
+                  value: value,
+                  child: Text('${value.name}'),
+                );
+              }).toList(),
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -628,7 +653,7 @@ class _PdfDialogState extends State<PdfDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    await workPdf();
+                    await workPdf(month: selectMonth, user: selectUser);
                   },
                   color: Colors.redAccent,
                   label: '出力する',
