@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:intl/intl.dart';
 
 class WorkModel {
@@ -47,26 +48,34 @@ class WorkModel {
     return converted;
   }
 
-  String startTime() {
-    String _result = '00:00';
-    _result = '${DateFormat('HH:mm').format(startedAt)}';
-    return _result;
+  String startTime(GroupModel group) {
+    String _time = '${DateFormat('HH:mm').format(startedAt)}';
+    if (group.roundStartType == '切捨') {
+      _time = roundDownTime(_time, group.roundStartNum);
+    } else if (group.roundStartType == '切上') {
+      _time = roundUpTime(_time, group.roundStartNum);
+    }
+    return _time;
   }
 
-  String endTime() {
-    String _result = '00:00';
-    _result = '${DateFormat('HH:mm').format(endedAt)}';
-    return _result;
+  String endTime(GroupModel group) {
+    String _time = '${DateFormat('HH:mm').format(endedAt)}';
+    if (group.roundEndType == '切捨') {
+      _time = roundDownTime(_time, group.roundEndNum);
+    } else if (group.roundEndType == '切上') {
+      _time = roundUpTime(_time, group.roundEndNum);
+    }
+    return _time;
   }
 
-  String breakTime() {
-    String _result = '00:00';
+  String breakTime(GroupModel group) {
+    String _time = '00:00';
     if (breaks.length > 0) {
       for (BreaksModel _break in breaks) {
-        _result = addTime(_result, _break.breakTime());
+        _time = addTime(_time, _break.breakTime());
       }
     }
-    return _result;
+    return _time;
   }
 
   String workTime() {

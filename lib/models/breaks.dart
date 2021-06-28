@@ -1,3 +1,5 @@
+import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:intl/intl.dart';
 
 class BreaksModel {
@@ -37,19 +39,31 @@ class BreaksModel {
         'endedDev': endedDev,
       };
 
-  String startTime() {
-    String _result = '00:00';
-    _result = '${DateFormat('HH:mm').format(startedAt)}';
-    return _result;
+  String startTime(GroupModel group) {
+    String _time = '${DateFormat('HH:mm').format(startedAt)}';
+    if (group.roundBreakStartType == '切捨') {
+      _time = roundDownTime(_time, group.roundBreakStartNum);
+    } else if (group.roundBreakStartType == '切上') {
+      _time = roundUpTime(_time, group.roundBreakStartNum);
+    }
+    return _time;
   }
 
-  String endTime() {
-    String _result = '00:00';
-    _result = '${DateFormat('HH:mm').format(endedAt)}';
-    return _result;
+  String endTime(GroupModel group) {
+    String _time = '${DateFormat('HH:mm').format(endedAt)}';
+    if (group.roundBreakEndType == '切捨') {
+      _time = roundDownTime(_time, group.roundBreakEndNum);
+    } else if (group.roundBreakEndType == '切上') {
+      _time = roundUpTime(_time, group.roundBreakEndNum);
+    }
+    return _time;
   }
 
-  String breakTime() {
+  String breakTime(GroupModel group) {
+    String _dateS = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _timeS = '${startTime(group)}:00.000';
+    DateTime _startedAt = DateTime.parse('$_dateS $_timeS');
+
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     // 休憩開始時間と休憩終了時間の差を求める
     Duration _diff = endedAt.difference(startedAt);
