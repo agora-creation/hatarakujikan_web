@@ -1,9 +1,6 @@
 import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html';
 import 'dart:math';
 
-import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -182,11 +179,4 @@ List<String> nightList({
   String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
   String _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
   return [_dayTime, _nightTime];
-}
-
-Future<void> csvDownload({List<List<dynamic>> rows, String fileName}) async {
-  String csv = const ListToCsvConverter().convert(rows);
-  AnchorElement(href: 'data:application/octet-stream;charset=Shift_JIS,$csv')
-    ..setAttribute('download', fileName)
-    ..click();
 }

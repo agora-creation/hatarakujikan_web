@@ -34,7 +34,7 @@ class ApplyWorkModel {
     _startedAt = snapshot.data()['startedAt'].toDate();
     _endedAt = snapshot.data()['endedAt'].toDate();
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
-    _reason = snapshot.data()['reason'];
+    _reason = snapshot.data()['reason'] ?? '';
     _approval = snapshot.data()['approval'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }

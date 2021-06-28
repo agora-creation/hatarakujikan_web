@@ -10,9 +10,11 @@ class WorkModel {
   DateTime startedAt;
   double startedLat;
   double startedLon;
+  String startedDev;
   DateTime endedAt;
   double endedLat;
   double endedLon;
+  String endedDev;
   List<BreaksModel> breaks;
   DateTime _createdAt;
 
@@ -28,9 +30,11 @@ class WorkModel {
     startedAt = snapshot.data()['startedAt'].toDate();
     startedLat = snapshot.data()['startedLat'].toDouble();
     startedLon = snapshot.data()['startedLon'].toDouble();
+    startedDev = snapshot.data()['startedDev'] ?? '';
     endedAt = snapshot.data()['endedAt'].toDate();
     endedLat = snapshot.data()['endedLat'].toDouble();
     endedLon = snapshot.data()['endedLon'].toDouble();
+    endedDev = snapshot.data()['endedDev'] ?? '';
     breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
