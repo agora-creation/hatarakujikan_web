@@ -107,7 +107,7 @@ Future<void> workPdf({
       String _dayText = '${DateFormat('dd (E)', 'ja').format(days[i])}';
       if (dayWorks.length > 0) {
         for (int j = 0; j < dayWorks.length; j++) {
-          String _startTime = dayWorks[j].startTime();
+          String _startTime = dayWorks[j].startTime(group);
           String _endTime = '---:---';
           String _breakTime = '---:---';
           String _workTime = '---:---';
@@ -115,11 +115,11 @@ Future<void> workPdf({
           String _nonLegalTime = '---:---';
           String _nightTime = '---:---';
           if (dayWorks[j].startedAt != dayWorks[j].endedAt) {
-            _endTime = dayWorks[j].endTime();
-            _breakTime = dayWorks[j].breakTime();
-            _workTime = dayWorks[j].workTime();
+            _endTime = dayWorks[j].endTime(group);
+            _breakTime = dayWorks[j].breakTime(group);
+            _workTime = dayWorks[j].workTime(group);
             List<String> _legalList = legalList(
-              workTime: dayWorks[j].workTime(),
+              workTime: dayWorks[j].workTime(group),
               legal: group.legal,
             );
             _legalTime = _legalList.first;
@@ -133,7 +133,8 @@ Future<void> workPdf({
             _nightTime = _nightList.last;
             _count['${DateFormat('yyyy-MM-dd').format(dayWorks[j].startedAt)}'] =
                 '';
-            _totalWorkTime = addTime(_totalWorkTime, dayWorks[j].workTime());
+            _totalWorkTime =
+                addTime(_totalWorkTime, dayWorks[j].workTime(group));
             _totalLegalTime = addTime(_totalLegalTime, _legalList.first);
             _totalNonLegalTime = addTime(_totalNonLegalTime, _legalList.last);
             _totalNightTime = addTime(_totalNightTime, _nightList.last);

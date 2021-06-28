@@ -55,10 +55,10 @@ Future<void> workCsv({
       if (_work.startedAt != _work.endedAt) {
         _count['${DateFormat('yyyy-MM-dd').format(_work.startedAt)}'] = '';
         // 勤務時間
-        _workTime = addTime(_workTime, _work.workTime());
+        _workTime = addTime(_workTime, _work.workTime(group));
         // 法定内時間
         List<String> _legalList = legalList(
-          workTime: _work.workTime(),
+          workTime: _work.workTime(group),
           legal: group.legal,
         );
         _legalTime = addTime(_legalTime, _legalList.first);

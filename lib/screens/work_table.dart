@@ -262,10 +262,11 @@ class _WorkTableState extends State<WorkTable> {
                 _count['${DateFormat('yyyy-MM-dd').format(_work?.startedAt)}'] =
                     '';
                 // 勤務時間
-                _workTime = addTime(_workTime, _work?.workTime());
+                _workTime = addTime(
+                    _workTime, _work?.workTime(widget.groupProvider.group));
                 // 法定内時間/法定外時間
                 List<String> _legalList = legalList(
-                  workTime: _work?.workTime(),
+                  workTime: _work?.workTime(widget.groupProvider.group),
                   legal: widget.groupProvider.group?.legal,
                 );
                 _legalTime = addTime(_legalTime, _legalList.first);

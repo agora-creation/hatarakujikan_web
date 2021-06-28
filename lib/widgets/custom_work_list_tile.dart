@@ -41,7 +41,7 @@ class CustomWorkListTile extends StatelessWidget {
                 itemCount: works.length,
                 itemBuilder: (_, index) {
                   WorkModel _work = works[index];
-                  String _startTime = _work.startTime();
+                  String _startTime = _work.startTime(group);
                   String _endTime = '---:---';
                   String _breakTime = '---:---';
                   String _workTime = '---:---';
@@ -49,11 +49,11 @@ class CustomWorkListTile extends StatelessWidget {
                   String _nonLegalTime = '---:---';
                   String _nightTime = '---:---';
                   if (_work.startedAt != _work.endedAt) {
-                    _endTime = _work.endTime();
-                    _breakTime = _work.breakTime();
-                    _workTime = _work.workTime();
+                    _endTime = _work.endTime(group);
+                    _breakTime = _work.breakTime(group);
+                    _workTime = _work.workTime(group);
                     List<String> _legalList = legalList(
-                      workTime: _work.workTime(),
+                      workTime: _work.workTime(group),
                       legal: group.legal,
                     );
                     _legalTime = _legalList.first;
@@ -249,6 +249,10 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                 ),
               ],
             ),
+            Text(
+              '記録端末: ${work.startedDev}',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
             SizedBox(height: 8.0),
             work.breaks.length > 0
                 ? ListView.builder(
@@ -258,6 +262,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                     itemBuilder: (_, index) {
                       BreaksModel _breaks = work.breaks[index];
                       return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CustomIconLabel(
                             icon: Icon(Icons.run_circle, color: Colors.orange),
@@ -323,6 +328,11 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                                 ),
                               ),
                             ],
+                          ),
+                          Text(
+                            '記録端末: ${_breaks.startedDev}',
+                            style: TextStyle(
+                                color: Colors.black54, fontSize: 14.0),
                           ),
                           SizedBox(height: 8.0),
                           CustomIconLabel(
@@ -393,6 +403,11 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                               ),
                             ],
                           ),
+                          Text(
+                            '記録端末: ${_breaks.endedDev}',
+                            style: TextStyle(
+                                color: Colors.black54, fontSize: 14.0),
+                          ),
                         ],
                       );
                     },
@@ -455,6 +470,10 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                   ),
                 ),
               ],
+            ),
+            Text(
+              '記録端末: ${work.endedDev}',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
             Row(

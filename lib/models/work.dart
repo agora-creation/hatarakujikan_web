@@ -72,28 +72,33 @@ class WorkModel {
     String _time = '00:00';
     if (breaks.length > 0) {
       for (BreaksModel _break in breaks) {
-        _time = addTime(_time, _break.breakTime());
+        _time = addTime(_time, _break.breakTime(group));
       }
     }
     return _time;
   }
 
-  String workTime() {
-    String _result = '00:00';
+  String workTime(GroupModel group) {
+    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedTime = '${startTime(group)}:00.000';
+    DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
+    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedTime = '${endTime(group)}:00.000';
+    DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     // 出勤時間と退勤時間の差を求める
-    Duration _diff = endedAt.difference(startedAt);
+    Duration _diff = _endedAt.difference(_startedAt);
     String _minutes = twoDigits(_diff.inMinutes.remainder(60));
     String _workTime = '${twoDigits(_diff.inHours)}:$_minutes';
     // 休憩の合計時間を求める
     String _breaksTime = '00:00';
     if (breaks.length > 0) {
       for (BreaksModel _break in breaks) {
-        _breaksTime = addTime(_breaksTime, _break.breakTime());
+        _breaksTime = addTime(_breaksTime, _break.breakTime(group));
       }
     }
     // 勤務時間と休憩の合計時間の差を求める
-    _result = subTime(_workTime, _breaksTime);
-    return _result;
+    _workTime = subTime(_workTime, _breaksTime);
+    return _workTime;
   }
 }
