@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: GroupProvider.initialize()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: WorkProvider()),
+        ChangeNotifierProvider.value(value: WorkStateProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

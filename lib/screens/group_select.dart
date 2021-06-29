@@ -22,7 +22,7 @@ class _GroupSelectState extends State<GroupSelect> {
     setState(() => _isLoading = true);
     await Future.delayed(Duration(seconds: 2));
     if (widget.groupProvider.groups.length == 1) {
-      widget.groupProvider.setGroup(widget.groupProvider.groups.first);
+      await widget.groupProvider.setGroup(widget.groupProvider.groups.first);
       setState(() => _isLoading = false);
       Navigator.of(context, rootNavigator: true).pop();
       changeScreen(context, WorkScreen());
@@ -70,7 +70,7 @@ class _GroupSelectState extends State<GroupSelect> {
                   child: ListTile(
                     onTap: () async {
                       setState(() => _isLoading = true);
-                      widget.groupProvider.setGroup(_group);
+                      await widget.groupProvider.setGroup(_group);
                       setState(() => _isLoading = false);
                       Navigator.of(context, rootNavigator: true).pop();
                       changeScreen(context, WorkScreen());

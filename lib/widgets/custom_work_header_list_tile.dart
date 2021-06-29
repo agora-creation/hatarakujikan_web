@@ -15,16 +15,16 @@ class CustomWorkHeaderListTile extends StatelessWidget {
           ),
         ),
         title: ListTile(
+          leading: Text(
+            '勤務状況',
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 15.0,
+            ),
+          ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '勤務状況',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 15.0,
-                ),
-              ),
               Text(
                 '出勤時間',
                 style: TextStyle(

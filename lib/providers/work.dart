@@ -28,9 +28,11 @@ class WorkProvider with ChangeNotifier {
           'startedAt': breakStartedAt,
           'startedLat': 0.0,
           'startedLon': 0.0,
+          'startedDev': '管理画面',
           'endedAt': breakEndedAt,
           'endedLat': 0.0,
           'endedLon': 0.0,
+          'endedDev': '管理画面',
         });
       }
       _workService.create({
@@ -40,9 +42,11 @@ class WorkProvider with ChangeNotifier {
         'startedAt': startedAt,
         'startedLat': 0.0,
         'startedLon': 0.0,
+        'startedDev': '管理画面',
         'endedAt': endedAt,
         'endedLat': 0.0,
         'endedLon': 0.0,
+        'endedDev': '管理画面',
         'breaks': _breaks,
         'createdAt': DateTime.now(),
       });

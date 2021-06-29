@@ -32,7 +32,7 @@ class GroupProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setGroup(GroupModel group) async {
+  Future<void> setGroup(GroupModel group) async {
     _groups.clear();
     _group = group;
     await setPrefs(group.id);

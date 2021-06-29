@@ -4,6 +4,7 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/models/work_state.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
@@ -15,12 +16,14 @@ class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
   final DateTime day;
   final List<WorkModel> works;
+  final WorkStateModel workState;
   final GroupModel group;
 
   CustomWorkListTile({
     this.workProvider,
     this.day,
     this.works,
+    this.workState,
     this.group,
   });
 
@@ -31,7 +34,10 @@ class CustomWorkListTile extends StatelessWidget {
       child: ListTile(
         leading: Text(
           '${DateFormat('dd (E)', 'ja').format(day)}',
-          style: TextStyle(color: Colors.black54, fontSize: 16.0),
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 15.0,
+          ),
         ),
         title: works.length > 0
             ? ListView.separated(
@@ -67,59 +73,60 @@ class CustomWorkListTile extends StatelessWidget {
                     _nightTime = _nightList.last;
                   }
                   return ListTile(
+                    leading: Chip(
+                      backgroundColor: Colors.grey.shade300,
+                      label: Text('通常勤務', style: TextStyle(fontSize: 12.0)),
+                    ),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Chip(
-                          label: Text('通常勤務', style: TextStyle(fontSize: 12.0)),
-                        ),
                         Text(
                           _startTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                         Text(
                           _endTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                         Text(
                           _breakTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                         Text(
                           _workTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                         Text(
                           _legalTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                         Text(
                           _nonLegalTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                         Text(
                           _nightTime,
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16.0,
+                            fontSize: 15.0,
                           ),
                         ),
                       ],
@@ -139,7 +146,78 @@ class CustomWorkListTile extends StatelessWidget {
                   );
                 },
               )
-            : Container(),
+            : workState != null
+                ? ListTile(
+                    leading: Chip(
+                      backgroundColor: workState.state == '欠勤'
+                          ? Colors.red.shade300
+                          : workState.state == '特別休暇'
+                              ? Colors.green.shade300
+                              : workState.state == '有給休暇'
+                                  ? Colors.teal.shade300
+                                  : Colors.transparent,
+                      label: Text(
+                        '${workState.state}',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        Text(
+                          '',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: null,
+                  )
+                : Container(),
       ),
     );
   }
@@ -183,11 +261,11 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              '修正したい日時に変更し、最後に「OK」ボタンを押してください。',
+              '修正したい日時に変更し、最後に「修正する」ボタンを押してください。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             Text(
-              'この記録を削除したい場合は、「削除」ボタンを押してください。',
+              'この記録を削除したい場合は、「削除する」ボタンを押してください。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
@@ -492,7 +570,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                         Navigator.pop(context);
                       },
                       color: Colors.red,
-                      label: '削除',
+                      label: '削除する',
                     ),
                     SizedBox(width: 4.0),
                     CustomTextButton(
@@ -503,7 +581,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                         Navigator.pop(context);
                       },
                       color: Colors.blue,
-                      label: 'OK',
+                      label: '修正する',
                     ),
                   ],
                 ),
