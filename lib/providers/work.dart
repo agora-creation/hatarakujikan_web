@@ -48,6 +48,7 @@ class WorkProvider with ChangeNotifier {
         'endedLon': 0.0,
         'endedDev': '管理画面',
         'breaks': _breaks,
+        'state': '通常勤務',
         'createdAt': DateTime.now(),
       });
       return true;

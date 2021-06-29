@@ -87,7 +87,8 @@ class CustomWorkListTile extends StatelessWidget {
                   return ListTile(
                     leading: Chip(
                       backgroundColor: _chipColor,
-                      label: Text('通常勤務', style: TextStyle(fontSize: 12.0)),
+                      label: Text('${_work.state}',
+                          style: TextStyle(fontSize: 12.0)),
                     ),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,13 +290,13 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
               alignment: Alignment.centerLeft,
               child: Chip(
                 backgroundColor: Colors.grey.shade300,
-                label: Text('通常勤務'),
+                label: Text('${work.state}'),
               ),
             ),
             SizedBox(height: 8.0),
             CustomIconLabel(
               icon: Icon(Icons.run_circle, color: Colors.blue),
-              label: '出勤時間',
+              label: '出勤日時',
             ),
             SizedBox(height: 4.0),
             Row(
@@ -368,7 +369,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                         children: [
                           CustomIconLabel(
                             icon: Icon(Icons.run_circle, color: Colors.orange),
-                            label: '休憩開始時間',
+                            label: '休憩開始日時',
                           ),
                           SizedBox(height: 4.0),
                           Row(
@@ -442,7 +443,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                               Icons.run_circle_outlined,
                               color: Colors.orange,
                             ),
-                            label: '休憩終了時間',
+                            label: '休憩終了日時',
                           ),
                           SizedBox(height: 4.0),
                           Row(
@@ -518,7 +519,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
             SizedBox(height: 8.0),
             CustomIconLabel(
               icon: Icon(Icons.run_circle, color: Colors.red),
-              label: '退勤時間',
+              label: '退勤日時',
             ),
             SizedBox(height: 4.0),
             Row(

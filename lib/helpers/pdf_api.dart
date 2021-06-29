@@ -173,7 +173,7 @@ Future<void> workPdf({
                 ),
                 pw.Padding(
                   padding: pw.EdgeInsets.all(5.0),
-                  child: pw.Text('通常勤務', style: _listStyle),
+                  child: pw.Text('${dayWorks[j].state}', style: _listStyle),
                 ),
                 pw.Padding(
                   padding: pw.EdgeInsets.all(5.0),
@@ -226,11 +226,16 @@ Future<void> workPdf({
                   style: _listStyle,
                 ),
               ),
-              pw.Container(
-                padding: pw.EdgeInsets.all(5.0),
-                color: _stateColor,
-                child: pw.Text(dayWorkState?.state ?? '', style: _listStyle),
-              ),
+              dayWorkState == null
+                  ? pw.Padding(
+                      padding: pw.EdgeInsets.all(5.0),
+                      child: pw.Text('', style: _listStyle),
+                    )
+                  : pw.Container(
+                      padding: pw.EdgeInsets.all(5.0),
+                      color: _stateColor,
+                      child: pw.Text(dayWorkState?.state, style: _listStyle),
+                    ),
               pw.Padding(
                 padding: pw.EdgeInsets.all(5.0),
                 child: pw.Text('', style: _listStyle),
