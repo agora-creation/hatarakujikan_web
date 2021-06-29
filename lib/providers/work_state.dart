@@ -36,4 +36,24 @@ class WorkStateProvider with ChangeNotifier {
   void delete({WorkStateModel workState}) {
     _workStateService.delete({'id': workState?.id});
   }
+
+  Future<List<WorkStateModel>> selectList({
+    String groupId,
+    String userId,
+    DateTime startAt,
+    DateTime endAt,
+  }) async {
+    List<WorkStateModel> _workStates = [];
+    await _workStateService
+        .selectList(
+      groupId: groupId,
+      userId: userId,
+      startAt: startAt,
+      endAt: endAt,
+    )
+        .then((value) {
+      _workStates = value;
+    });
+    return _workStates;
+  }
 }

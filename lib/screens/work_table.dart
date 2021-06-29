@@ -184,6 +184,7 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => PdfDialog(
                         workProvider: widget.workProvider,
+                        workStateProvider: widget.workStateProvider,
                         group: widget.groupProvider.group,
                         selectMonth: selectMonth,
                         users: users,
@@ -511,6 +512,7 @@ class _CsvDialogState extends State<CsvDialog> {
 
 class PdfDialog extends StatefulWidget {
   final WorkProvider workProvider;
+  final WorkStateProvider workStateProvider;
   final GroupModel group;
   final DateTime selectMonth;
   final List<UserModel> users;
@@ -518,6 +520,7 @@ class PdfDialog extends StatefulWidget {
 
   PdfDialog({
     @required this.workProvider,
+    @required this.workStateProvider,
     @required this.group,
     @required this.selectMonth,
     @required this.users,
@@ -636,6 +639,7 @@ class _PdfDialogState extends State<PdfDialog> {
                   onPressed: () async {
                     await workPdf(
                       workProvider: widget.workProvider,
+                      workStateProvider: widget.workStateProvider,
                       group: widget.group,
                       month: selectMonth,
                       user: selectUser,

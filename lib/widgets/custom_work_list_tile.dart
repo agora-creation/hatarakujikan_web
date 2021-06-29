@@ -29,6 +29,15 @@ class CustomWorkListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color _chipColor = Colors.grey.shade300;
+    if (workState?.state == '欠勤') {
+      _chipColor = Colors.red.shade300;
+    } else if (workState?.state == '特別休暇') {
+      _chipColor = Colors.green.shade300;
+    } else if (workState?.state == '有給休暇') {
+      _chipColor = Colors.teal.shade300;
+    }
+
     return Container(
       decoration: kBottomBorderDecoration,
       child: ListTile(
@@ -74,7 +83,7 @@ class CustomWorkListTile extends StatelessWidget {
                   }
                   return ListTile(
                     leading: Chip(
-                      backgroundColor: Colors.grey.shade300,
+                      backgroundColor: _chipColor,
                       label: Text('通常勤務', style: TextStyle(fontSize: 12.0)),
                     ),
                     title: Row(
@@ -149,13 +158,7 @@ class CustomWorkListTile extends StatelessWidget {
             : workState != null
                 ? ListTile(
                     leading: Chip(
-                      backgroundColor: workState.state == '欠勤'
-                          ? Colors.red.shade300
-                          : workState.state == '特別休暇'
-                              ? Colors.green.shade300
-                              : workState.state == '有給休暇'
-                                  ? Colors.teal.shade300
-                                  : Colors.transparent,
+                      backgroundColor: _chipColor,
                       label: Text(
                         '${workState.state}',
                         style: TextStyle(fontSize: 12.0),

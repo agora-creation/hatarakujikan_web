@@ -4,7 +4,9 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/models/work_state.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -12,6 +14,7 @@ import 'package:universal_html/html.dart' as html;
 
 Future<void> workPdf({
   WorkProvider workProvider,
+  WorkStateProvider workStateProvider,
   GroupModel group,
   DateTime month,
   UserModel user,
@@ -35,6 +38,17 @@ Future<void> workPdf({
   )
       .then((value) {
     works = value;
+  });
+  List<WorkStateModel> workStates = [];
+  await workStateProvider
+      .selectList(
+    groupId: group.id,
+    userId: user.id,
+    startAt: days.first,
+    endAt: days.last,
+  )
+      .then((value) {
+    workStates = value;
   });
 
   final pdf = pw.Document();
@@ -102,6 +116,14 @@ Future<void> workPdf({
             '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
         if (days[i] == DateTime.parse(_startedAt)) {
           dayWorks.add(_work);
+        }
+      }
+      WorkStateModel dayWorkState;
+      for (WorkStateModel _workState in workStates) {
+        String _startedAt =
+            '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
+        if (days[i] == DateTime.parse(_startedAt)) {
+          dayWorkState = _workState;
         }
       }
       String _dayText = '${DateFormat('dd (E)', 'ja').format(days[i])}';
@@ -198,7 +220,7 @@ Future<void> workPdf({
               ),
               pw.Padding(
                 padding: pw.EdgeInsets.all(5.0),
-                child: pw.Text('', style: _listStyle),
+                child: pw.Text(dayWorkState?.state ?? '', style: _listStyle),
               ),
               pw.Padding(
                 padding: pw.EdgeInsets.all(5.0),
