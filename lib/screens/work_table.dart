@@ -257,6 +257,7 @@ class _WorkTableState extends State<WorkTable> {
                   }
                   return CustomWorkListTile(
                     workProvider: widget.workProvider,
+                    workStateProvider: widget.workStateProvider,
                     day: days[index],
                     works: _dayWorks,
                     workState: _dayWorkState,

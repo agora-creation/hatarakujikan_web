@@ -208,6 +208,14 @@ Future<void> workPdf({
           );
         }
       } else {
+        PdfColor _stateColor = PdfColors.white;
+        if (dayWorkState?.state == '欠勤') {
+          _stateColor = PdfColors.red100;
+        } else if (dayWorkState?.state == '特別休暇') {
+          _stateColor = PdfColors.green100;
+        } else if (dayWorkState?.state == '有給休暇') {
+          _stateColor = PdfColors.teal100;
+        }
         _result.add(
           pw.TableRow(
             children: [
@@ -218,8 +226,9 @@ Future<void> workPdf({
                   style: _listStyle,
                 ),
               ),
-              pw.Padding(
+              pw.Container(
                 padding: pw.EdgeInsets.all(5.0),
+                color: _stateColor,
                 child: pw.Text(dayWorkState?.state ?? '', style: _listStyle),
               ),
               pw.Padding(

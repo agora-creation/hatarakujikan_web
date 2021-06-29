@@ -6,6 +6,7 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_state.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
@@ -14,6 +15,7 @@ import 'package:intl/intl.dart';
 
 class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
+  final WorkStateProvider workStateProvider;
   final DateTime day;
   final List<WorkModel> works;
   final WorkStateModel workState;
@@ -21,6 +23,7 @@ class CustomWorkListTile extends StatelessWidget {
 
   CustomWorkListTile({
     this.workProvider,
+    this.workStateProvider,
     this.day,
     this.works,
     this.workState,
@@ -141,16 +144,14 @@ class CustomWorkListTile extends StatelessWidget {
                       ],
                     ),
                     onTap: _work.startedAt != _work.endedAt
-                        ? () {
-                            showDialog(
+                        ? () => showDialog(
                               barrierDismissible: false,
                               context: context,
                               builder: (_) => WorkDetailsDialog(
                                 workProvider: workProvider,
                                 work: _work,
                               ),
-                            );
-                          }
+                            )
                         : null,
                   );
                 },
@@ -218,7 +219,14 @@ class CustomWorkListTile extends StatelessWidget {
                         ),
                       ],
                     ),
-                    onTap: null,
+                    onTap: () => showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => WorkStateDetailsDialog(
+                        workStateProvider: workStateProvider,
+                        workState: workState,
+                      ),
+                    ),
                   )
                 : Container(),
       ),
@@ -272,6 +280,19 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
+            CustomIconLabel(
+              icon: Icon(Icons.label, color: Colors.black54),
+              label: '勤務状況',
+            ),
+            SizedBox(height: 4.0),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Chip(
+                backgroundColor: Colors.grey.shade300,
+                label: Text('通常勤務'),
+              ),
+            ),
+            SizedBox(height: 8.0),
             CustomIconLabel(
               icon: Icon(Icons.run_circle, color: Colors.blue),
               label: '出勤時間',
@@ -587,6 +608,80 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                       label: '修正する',
                     ),
                   ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class WorkStateDetailsDialog extends StatelessWidget {
+  final WorkStateProvider workStateProvider;
+  final WorkStateModel workState;
+
+  WorkStateDetailsDialog({
+    @required this.workStateProvider,
+    @required this.workState,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color _chipColor = Colors.grey.shade300;
+    if (workState.state == '欠勤') {
+      _chipColor = Colors.red.shade300;
+    } else if (workState.state == '特別休暇') {
+      _chipColor = Colors.green.shade300;
+    } else if (workState.state == '有給休暇') {
+      _chipColor = Colors.teal.shade300;
+    }
+
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              'この記録を削除したい場合は、「削除する」ボタンを押してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            CustomIconLabel(
+              icon: Icon(Icons.label, color: Colors.black54),
+              label: '勤務状況',
+            ),
+            SizedBox(height: 4.0),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Chip(
+                backgroundColor: _chipColor,
+                label: Text('${workState.state}'),
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text('登録日', style: TextStyle(color: Colors.black54)),
+            SizedBox(height: 4.0),
+            Text('${DateFormat('yyyy/MM/dd').format(workState.startedAt)}'),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () {
+                    workStateProvider.delete(workState: workState);
+                    Navigator.pop(context);
+                  },
+                  color: Colors.red,
+                  label: '削除する',
                 ),
               ],
             ),
