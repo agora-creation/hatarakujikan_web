@@ -773,7 +773,9 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
               ),
             ),
             SizedBox(height: 8.0),
-            selectState == '通常勤務'
+            selectState == '通常勤務' ||
+                    selectState == '直行/直帰' ||
+                    selectState == 'テレワーク'
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -828,7 +830,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                   String _date =
                                       '${DateFormat('yyyy-MM-dd').format(startedAt)}';
                                   String _time =
-                                      '${_selected.format(context)}:00.000';
+                                      '${_selected.format(context).padLeft(5, '0')}:00.000';
                                   DateTime _dateTime =
                                       DateTime.parse('$_date $_time');
                                   setState(() => startedAt = _dateTime);
@@ -914,7 +916,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                             String _date =
                                                 '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
                                             String _time =
-                                                '${_selected.format(context)}:00.000';
+                                                '${_selected.format(context).padLeft(5, '0')}:00.000';
                                             DateTime _dateTime =
                                                 DateTime.parse('$_date $_time');
                                             setState(() =>
@@ -985,7 +987,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                             String _date =
                                                 '${DateFormat('yyyy-MM-dd').format(breakEndedAt)}';
                                             String _time =
-                                                '${_selected.format(context)}:00.000';
+                                                '${_selected.format(context).padLeft(5, '0')}:00.000';
                                             DateTime _dateTime =
                                                 DateTime.parse('$_date $_time');
                                             setState(
@@ -1053,7 +1055,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                   String _date =
                                       '${DateFormat('yyyy-MM-dd').format(endedAt)}';
                                   String _time =
-                                      '${_selected.format(context)}:00.000';
+                                      '${_selected.format(context).padLeft(5, '0')}:00.000';
                                   DateTime _dateTime =
                                       DateTime.parse('$_date $_time');
                                   setState(() => endedAt = _dateTime);

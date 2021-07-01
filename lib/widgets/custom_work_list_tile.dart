@@ -342,7 +342,8 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                       if (_selected != null) {
                         String _date =
                             '${DateFormat('yyyy-MM-dd').format(work.startedAt)}';
-                        String _time = '${_selected.format(context)}:00.000';
+                        String _time =
+                            '${_selected.format(context).padLeft(5, '0')}:00.000';
                         DateTime _dateTime = DateTime.parse('$_date $_time');
                         setState(() => work.startedAt = _dateTime);
                       }
@@ -419,7 +420,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                                       String _date =
                                           '${DateFormat('yyyy-MM-dd').format(_breaks.startedAt)}';
                                       String _time =
-                                          '${_selected.format(context)}:00.000';
+                                          '${_selected.format(context).padLeft(5, '0')}:00.000';
                                       DateTime _dateTime =
                                           DateTime.parse('$_date $_time');
                                       setState(
@@ -493,7 +494,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                                       String _date =
                                           '${DateFormat('yyyy-MM-dd').format(_breaks.endedAt)}';
                                       String _time =
-                                          '${_selected.format(context)}:00.000';
+                                          '${_selected.format(context).padLeft(5, '0')}:00.000';
                                       DateTime _dateTime =
                                           DateTime.parse('$_date $_time');
                                       setState(
@@ -564,7 +565,8 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                       if (_selected != null) {
                         String _date =
                             '${DateFormat('yyyy-MM-dd').format(work.endedAt)}';
-                        String _time = '${_selected.format(context)}:00.000';
+                        String _time =
+                            '${_selected.format(context).padLeft(5, '0')}:00.000';
                         DateTime _dateTime = DateTime.parse('$_date $_time');
                         setState(() => work.endedAt = _dateTime);
                       }

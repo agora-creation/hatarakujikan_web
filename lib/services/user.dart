@@ -33,7 +33,7 @@ class UserService {
     await _firebaseFirestore
         .collection(_collection)
         .where('groups', arrayContains: groupId)
-        .orderBy('name', descending: false)
+        .orderBy('recordPassword', descending: false)
         .get()
         .then((value) {
       for (DocumentSnapshot _user in value.docs) {
@@ -52,7 +52,7 @@ class UserService {
         .collection(_collection)
         .where('groups', arrayContains: groupId)
         .where('smartphone', isEqualTo: smartphone)
-        .orderBy('name', descending: false)
+        .orderBy('recordPassword', descending: false)
         .get()
         .then((value) {
       for (DocumentSnapshot _user in value.docs) {
