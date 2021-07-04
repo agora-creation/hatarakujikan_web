@@ -74,6 +74,20 @@ class CustomWorkHeaderListTile extends StatelessWidget {
                   fontSize: 15.0,
                 ),
               ),
+              Text(
+                '修正/削除',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 15.0,
+                ),
+              ),
+              Text(
+                '位置情報',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 15.0,
+                ),
+              ),
             ],
           ),
         ),

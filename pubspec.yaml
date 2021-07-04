@@ -31,6 +31,8 @@ dependencies:
   pdf: ^3.4.2
   universal_html: ^2.0.8
   multiple_stream_builder: ^2.0.0
+  google_maps_flutter: ^2.0.6
+  google_maps_flutter_web: ^0.3.0+2
   intl: ^0.16.1
 dependency_overrides:
   intl: ^0.17.0-nullsafety.2

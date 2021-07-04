@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
@@ -60,12 +61,12 @@ class CustomWorkListTile extends StatelessWidget {
                 itemBuilder: (_, index) {
                   WorkModel _work = works[index];
                   String _startTime = _work.startTime(group);
-                  String _endTime = '---:---';
-                  String _breakTime = '---:---';
-                  String _workTime = '---:---';
-                  String _legalTime = '---:---';
-                  String _nonLegalTime = '---:---';
-                  String _nightTime = '---:---';
+                  String _endTime = '00:00';
+                  String _breakTime = '00:00';
+                  String _workTime = '00:00';
+                  String _legalTime = '00:00';
+                  String _nonLegalTime = '00:00';
+                  String _nightTime = '00:00';
                   if (_work.startedAt != _work.endedAt) {
                     _endTime = _work.endTime(group);
                     _breakTime = _work.breakTime(group);
@@ -142,18 +143,35 @@ class CustomWorkListTile extends StatelessWidget {
                             fontSize: 15.0,
                           ),
                         ),
+                        IconButton(
+                          onPressed: _work.startedAt != _work.endedAt
+                              ? () => showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) => WorkDetailsDialog(
+                                      workProvider: workProvider,
+                                      work: _work,
+                                    ),
+                                  )
+                              : null,
+                          icon: Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => WorkLocationDialog(work: _work),
+                          ),
+                          icon: Icon(
+                            Icons.location_on,
+                            color: Colors.blue,
+                          ),
+                        ),
                       ],
                     ),
-                    onTap: _work.startedAt != _work.endedAt
-                        ? () => showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => WorkDetailsDialog(
-                                workProvider: workProvider,
-                                work: _work,
-                              ),
-                            )
-                        : null,
                   );
                 },
               )
@@ -170,63 +188,76 @@ class CustomWorkListTile extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
                           ),
                         ),
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
                           ),
                         ),
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
                           ),
                         ),
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
                           ),
                         ),
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
                           ),
                         ),
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
                           ),
                         ),
                         Text(
-                          '',
+                          '00:00',
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.transparent,
                             fontSize: 15.0,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => WorkStateDetailsDialog(
+                              workStateProvider: workStateProvider,
+                              workState: workState,
+                            ),
+                          ),
+                          icon: Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: null,
+                          icon: Icon(
+                            Icons.location_on,
+                            color: Colors.transparent,
                           ),
                         ),
                       ],
-                    ),
-                    onTap: () => showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => WorkStateDetailsDialog(
-                        workStateProvider: workStateProvider,
-                        workState: workState,
-                      ),
                     ),
                   )
                 : Container(),
@@ -611,6 +642,76 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                       label: '修正する',
                     ),
                   ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class WorkLocationDialog extends StatefulWidget {
+  final WorkModel work;
+
+  WorkLocationDialog({@required this.work});
+
+  @override
+  _WorkLocationDialogState createState() => _WorkLocationDialogState();
+}
+
+class _WorkLocationDialogState extends State<WorkLocationDialog> {
+  GoogleMapController mapController;
+
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() => mapController = controller);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              '記録した位置情報',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            Container(
+              height: 350.0,
+              child: GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    widget.work.startedLat,
+                    widget.work.startedLon,
+                  ),
+                  zoom: 17.0,
+                ),
+                compassEnabled: false,
+                rotateGesturesEnabled: false,
+                tiltGesturesEnabled: false,
+                myLocationEnabled: false,
+                myLocationButtonEnabled: false,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.blue,
+                  label: 'OK',
                 ),
               ],
             ),
