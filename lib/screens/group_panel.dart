@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -38,6 +39,7 @@ class _GroupPanelState extends State<GroupPanel> {
   int legal;
   String nightStart;
   String nightEnd;
+  GoogleMapController mapController;
 
   void _init() async {
     setState(() {
@@ -65,6 +67,10 @@ class _GroupPanelState extends State<GroupPanel> {
       nightStart = widget.groupProvider.group?.nightStart;
       nightEnd = widget.groupProvider.group?.nightEnd;
     });
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() => mapController = controller);
   }
 
   @override
@@ -247,6 +253,17 @@ class _GroupPanelState extends State<GroupPanel> {
                     style: TextStyle(color: Colors.black54),
                   ),
                 ],
+              ),
+              SizedBox(height: 4.0),
+              Container(
+                height: 350.0,
+                child: GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(33.55959310381485, 133.544067812267),
+                    zoom: 17.0,
+                  ),
+                ),
               ),
               SizedBox(height: 16.0),
               Container(

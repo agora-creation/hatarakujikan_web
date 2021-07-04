@@ -752,6 +752,7 @@ class _WorkLocationDialogState extends State<WorkLocationDialog> {
                   ),
                   zoom: 17.0,
                 ),
+                zoomGesturesEnabled: false,
               ),
             ),
             SizedBox(height: 16.0),
