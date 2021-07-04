@@ -663,9 +663,68 @@ class WorkLocationDialog extends StatefulWidget {
 
 class _WorkLocationDialogState extends State<WorkLocationDialog> {
   GoogleMapController mapController;
+  Set<Marker> markers = {};
+
+  void _init() async {
+    WorkModel _work = widget.work;
+    setState(() {
+      markers.add(Marker(
+        markerId: MarkerId('start_${_work.id}'),
+        position: LatLng(
+          _work.startedLat,
+          _work.startedLon,
+        ),
+        infoWindow: InfoWindow(
+          title: '出勤日時',
+          snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(_work.startedAt)}',
+        ),
+      ));
+      _work.breaks.forEach((e) {
+        markers.add(Marker(
+          markerId: MarkerId('start_${e.id}'),
+          position: LatLng(
+            e.startedLat,
+            e.startedLon,
+          ),
+          infoWindow: InfoWindow(
+            title: '休憩開始日時',
+            snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(e.startedAt)}',
+          ),
+        ));
+        markers.add(Marker(
+          markerId: MarkerId('end_${e.id}'),
+          position: LatLng(
+            e.endedLat,
+            e.endedLon,
+          ),
+          infoWindow: InfoWindow(
+            title: '休憩終了日時',
+            snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(e.endedAt)}',
+          ),
+        ));
+      });
+      markers.add(Marker(
+        markerId: MarkerId('end_${_work.id}'),
+        position: LatLng(
+          _work.endedLat,
+          _work.endedLon,
+        ),
+        infoWindow: InfoWindow(
+          title: '退勤日時',
+          snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(_work.endedAt)}',
+        ),
+      ));
+    });
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() => mapController = controller);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
   }
 
   @override
@@ -685,6 +744,7 @@ class _WorkLocationDialogState extends State<WorkLocationDialog> {
               height: 350.0,
               child: GoogleMap(
                 onMapCreated: _onMapCreated,
+                markers: markers,
                 initialCameraPosition: CameraPosition(
                   target: LatLng(
                     widget.work.startedLat,
@@ -692,11 +752,6 @@ class _WorkLocationDialogState extends State<WorkLocationDialog> {
                   ),
                   zoom: 17.0,
                 ),
-                compassEnabled: false,
-                rotateGesturesEnabled: false,
-                tiltGesturesEnabled: false,
-                myLocationEnabled: false,
-                myLocationButtonEnabled: false,
               ),
             ),
             SizedBox(height: 16.0),
