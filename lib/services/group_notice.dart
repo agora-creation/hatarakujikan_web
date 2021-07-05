@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserNoticeService {
-  String _collection = 'user';
+class GroupNoticeService {
+  String _collection = 'group';
   String _subCollection = 'notice';
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  String id(String userId) {
+  String id(String groupId) {
     String _id = _firebaseFirestore
         .collection(_collection)
-        .doc(userId)
+        .doc(groupId)
         .collection(_subCollection)
         .doc()
         .id;
@@ -18,7 +18,7 @@ class UserNoticeService {
   void create(Map<String, dynamic> values) {
     _firebaseFirestore
         .collection(_collection)
-        .doc(values['userId'])
+        .doc(values['groupId'])
         .collection(_subCollection)
         .doc(values['id'])
         .set(values);

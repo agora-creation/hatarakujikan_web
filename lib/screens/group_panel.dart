@@ -168,6 +168,7 @@ class _GroupPanelState extends State<GroupPanel> {
               Row(
                 children: [
                   Expanded(
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -187,6 +188,7 @@ class _GroupPanelState extends State<GroupPanel> {
                   ),
                   SizedBox(width: 8.0),
                   Expanded(
+                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
