@@ -101,7 +101,7 @@ class _UserTableState extends State<UserTable> {
                     );
                   },
                   color: Colors.blue,
-                  iconData: Icons.add,
+                  iconData: Icons.person_add,
                   label: '新規登録',
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group.dart';
+import 'package:hatarakujikan_web/screens/group_notice.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
 
@@ -26,6 +27,11 @@ const List<MenuItem> kSideMenu = [
     title: 'スタッフの管理',
     route: UserScreen.id,
     icon: Icons.group,
+  ),
+  MenuItem(
+    title: 'お知らせの管理',
+    route: GroupNoticeScreen.id,
+    icon: Icons.notifications,
   ),
   MenuItem(
     title: '会社/組織の設定',

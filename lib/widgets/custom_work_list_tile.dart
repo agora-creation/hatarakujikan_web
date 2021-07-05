@@ -143,33 +143,49 @@ class CustomWorkListTile extends StatelessWidget {
                             fontSize: 15.0,
                           ),
                         ),
-                        IconButton(
-                          onPressed: _work.startedAt != _work.endedAt
-                              ? () => showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (_) => WorkDetailsDialog(
-                                      workProvider: workProvider,
-                                      work: _work,
-                                    ),
-                                  )
-                              : null,
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => WorkLocationDialog(work: _work),
-                          ),
-                          icon: Icon(
-                            Icons.location_on,
-                            color: Colors.blue,
-                          ),
-                        ),
+                        _work.startedAt != _work.endedAt
+                            ? IconButton(
+                                onPressed: () => showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => WorkDetailsDialog(
+                                    workProvider: workProvider,
+                                    work: _work,
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                              )
+                            : IconButton(
+                                onPressed: null,
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                        _work.startedAt != _work.endedAt
+                            ? IconButton(
+                                onPressed: () => showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => WorkLocationDialog(
+                                    work: _work,
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.location_on,
+                                  color: Colors.blue,
+                                ),
+                              )
+                            : IconButton(
+                                onPressed: null,
+                                icon: Icon(
+                                  Icons.location_on,
+                                  color: Colors.transparent,
+                                ),
+                              ),
                       ],
                     ),
                   );

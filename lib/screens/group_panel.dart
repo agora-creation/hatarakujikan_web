@@ -18,11 +18,13 @@ class GroupPanel extends StatefulWidget {
 
 class _GroupPanelState extends State<GroupPanel> {
   TextEditingController name = TextEditingController();
-  List<int> usersNumList = [10, 30, 50, 100];
-  int usersNum;
+  TextEditingController usersNum = TextEditingController();
   TextEditingController positions = TextEditingController();
   bool qrSecurity;
   bool areaSecurity;
+  double areaLat;
+  double areaLon;
+  double areaRange;
   List<String> roundTypeList = ['切捨', '切上'];
   List<int> roundNumList = [1, 5, 10, 15, 30];
   String roundStartType;
@@ -44,7 +46,7 @@ class _GroupPanelState extends State<GroupPanel> {
   void _init() async {
     setState(() {
       name.text = widget.groupProvider.group?.name;
-      usersNum = widget.groupProvider.group?.usersNum;
+      usersNum.text = '${widget.groupProvider.group?.usersNum}人まで';
       String tmp = '';
       for (String _position in widget.groupProvider.group?.positions) {
         if (tmp != '') tmp += ',';
@@ -53,6 +55,9 @@ class _GroupPanelState extends State<GroupPanel> {
       positions.text = tmp;
       qrSecurity = widget.groupProvider.group?.qrSecurity;
       areaSecurity = widget.groupProvider.group?.areaSecurity;
+      areaLat = widget.groupProvider.group?.areaLat;
+      areaLon = widget.groupProvider.group?.areaLon;
+      areaRange = widget.groupProvider.group?.areaRange;
       roundStartType = widget.groupProvider.group?.roundStartType;
       roundStartNum = widget.groupProvider.group?.roundStartNum;
       roundEndType = widget.groupProvider.group?.roundEndType;
@@ -113,10 +118,12 @@ class _GroupPanelState extends State<GroupPanel> {
                     if (!await widget.groupProvider.update(
                       id: widget.groupProvider.group?.id,
                       name: name.text.trim(),
-                      usersNum: usersNum,
                       positions: positions.text.trim(),
                       qrSecurity: qrSecurity,
                       areaSecurity: areaSecurity,
+                      areaLat: areaLat,
+                      areaLon: areaLon,
+                      areaRange: areaRange,
                       roundStartType: roundStartType,
                       roundStartNum: roundStartNum,
                       roundEndType: roundEndType,
@@ -179,38 +186,24 @@ class _GroupPanelState extends State<GroupPanel> {
                     ),
                   ),
                   SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('人数', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: usersNum,
-                            onChanged: (value) {
-                              setState(() => usersNum = value);
-                            },
-                            items: usersNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value人以下',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('人数制限', style: TextStyle(fontSize: 14.0)),
+                        TextFormField(
+                          readOnly: true,
+                          controller: usersNum,
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -260,10 +253,39 @@ class _GroupPanelState extends State<GroupPanel> {
                 child: GoogleMap(
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: CameraPosition(
-                    target: LatLng(33.55959310381485, 133.544067812267),
+                    target: LatLng(areaLat, areaLon),
                     zoom: 17.0,
                   ),
+                  circles: Set.from([
+                    Circle(
+                      circleId: CircleId('area'),
+                      center: LatLng(areaLat, areaLon),
+                      radius: areaRange,
+                      fillColor: Colors.red.withOpacity(0.3),
+                      strokeColor: Colors.transparent,
+                    ),
+                  ]),
+                  onTap: (latLng) {
+                    setState(() {
+                      areaLat = latLng.latitude;
+                      areaLon = latLng.longitude;
+                    });
+                  },
                 ),
+              ),
+              SizedBox(height: 4.0),
+              Center(child: Text('指定範囲の半径: $areaRange m')),
+              Slider(
+                label: '$areaRange',
+                min: 0,
+                max: 500,
+                divisions: 500,
+                value: areaRange,
+                activeColor: Colors.red,
+                inactiveColor: Colors.grey,
+                onChanged: (value) {
+                  setState(() => areaRange = value);
+                },
               ),
               SizedBox(height: 16.0),
               Container(

@@ -10,6 +10,7 @@ class GroupModel {
   bool _areaSecurity;
   double _areaLat;
   double _areaLon;
+  double _areaRange;
   String _roundStartType;
   int _roundStartNum;
   String _roundEndType;
@@ -33,6 +34,7 @@ class GroupModel {
   bool get areaSecurity => _areaSecurity;
   double get areaLat => _areaLat;
   double get areaLon => _areaLon;
+  double get areaRange => _areaRange;
   String get roundStartType => _roundStartType;
   int get roundStartNum => _roundStartNum;
   String get roundEndType => _roundEndType;
@@ -58,6 +60,7 @@ class GroupModel {
     _areaSecurity = snapshot.data()['areaSecurity'];
     _areaLat = snapshot.data()['areaLat'].toDouble();
     _areaLon = snapshot.data()['areaLon'].toDouble();
+    _areaRange = snapshot.data()['areaRange'].toDouble();
     _roundStartType = snapshot.data()['roundStartType'];
     _roundStartNum = snapshot.data()['roundStartNum'];
     _roundEndType = snapshot.data()['roundEndType'];
