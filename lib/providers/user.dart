@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/user.dart';
 import 'package:hatarakujikan_web/services/work.dart';
@@ -8,17 +9,19 @@ class UserProvider with ChangeNotifier {
   WorkService _workService = WorkService();
 
   Future<bool> create({
+    GroupModel group,
+    int usersLen,
     String name,
     String recordPassword,
-    String groupId,
     String position,
   }) async {
+    if (group == null) return false;
+    if (group.usersNum < usersLen) return false;
     if (name == '') return false;
-    if (groupId == '') return false;
     try {
       String _id = _userService.id();
       List<String> _groups = [];
-      _groups.add(groupId);
+      _groups.add(group.id);
       _userService.create({
         'id': _id,
         'name': name,
@@ -96,8 +99,10 @@ class UserProvider with ChangeNotifier {
     return _users;
   }
 
-  Future<List<UserModel>> selectListSP(
-      {String groupId, bool smartphone}) async {
+  Future<List<UserModel>> selectListSP({
+    String groupId,
+    bool smartphone,
+  }) async {
     List<UserModel> _users = [];
     await _userService
         .selectListSP(

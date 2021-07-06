@@ -228,7 +228,7 @@ class _GroupPanelState extends State<GroupPanel> {
                     activeColor: Colors.blue,
                   ),
                   Text(
-                    'アプリから勤務記録時に、QRコード認証をさせる',
+                    'アプリから勤務記録時にQRコード認証をさせる',
                     style: TextStyle(color: Colors.black54),
                   ),
                 ],
@@ -244,7 +244,7 @@ class _GroupPanelState extends State<GroupPanel> {
                     activeColor: Colors.blue,
                   ),
                   Text(
-                    'アプリから勤務記録時に、GPSにより記録できる範囲を限定する',
+                    'アプリから勤務記録時に記録可能な範囲を以下に限定する',
                     style: TextStyle(color: Colors.black54),
                   ),
                 ],

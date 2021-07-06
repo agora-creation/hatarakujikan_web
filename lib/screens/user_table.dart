@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
@@ -95,7 +96,8 @@ class _UserTableState extends State<UserTable> {
                       context: context,
                       builder: (_) => AddUserDialog(
                         userProvider: widget.userProvider,
-                        groupId: widget.groupProvider.group?.id,
+                        group: widget.groupProvider.group,
+                        usersLen: users.length,
                         positions: widget.groupProvider.group?.positions ?? [],
                       ),
                     );
@@ -341,12 +343,14 @@ class _MigrationDialogState extends State<MigrationDialog> {
 
 class AddUserDialog extends StatefulWidget {
   final UserProvider userProvider;
-  final String groupId;
+  final GroupModel group;
+  final int usersLen;
   final List<String> positions;
 
   AddUserDialog({
     @required this.userProvider,
-    @required this.groupId,
+    @required this.group,
+    @required this.usersLen,
     @required this.positions,
   });
 
@@ -456,9 +460,10 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 CustomTextButton(
                   onPressed: () async {
                     if (!await widget.userProvider.create(
+                      group: widget.group,
+                      usersLen: widget.usersLen,
                       name: name.text.trim(),
                       recordPassword: recordPassword.text.trim(),
-                      groupId: widget.groupId,
                       position: position,
                     )) {
                       return;
