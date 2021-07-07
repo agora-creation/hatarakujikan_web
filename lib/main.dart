@@ -10,8 +10,11 @@ import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
-import 'package:hatarakujikan_web/screens/group.dart';
+import 'package:hatarakujikan_web/screens/backup.dart';
+import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_notice.dart';
+import 'package:hatarakujikan_web/screens/group_security.dart';
+import 'package:hatarakujikan_web/screens/group_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
@@ -58,8 +61,11 @@ class MyApp extends StatelessWidget {
         home: SplashController(),
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
-          GroupScreen.id: (context) => GroupScreen(),
+          BackupScreen.id: (context) => BackupScreen(),
+          GroupInfoScreen.id: (context) => GroupInfoScreen(),
           GroupNoticeScreen.id: (context) => GroupNoticeScreen(),
+          GroupSecurityScreen.id: (context) => GroupSecurityScreen(),
+          GroupWorkScreen.id: (context) => GroupWorkScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),
         },

@@ -3,6 +3,10 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
+const String serverUrl = 'https://fcm.googleapis.com/fcm/send';
+const String serverKey =
+    'AAAAZNHaT_E:APA91bH9VRe1rNTG5aXLLEOltYAtMwzK5PEoQPCsiusrzcRtTOdRx3KSZ27dOYcwnSjfpz7d0_S9KAAVSDUuyuARZHnpQD_jBqOZ2sIlXLhTQQ5QdyPbiLdAMPL91Y3CCudCJSEkkR6w';
+
 class UserNoticeService {
   String _collection = 'user';
   String _subCollection = 'notice';
@@ -18,15 +22,12 @@ class UserNoticeService {
   }
 
   void send({String token, String title, String body}) {
-    Uri _uri = Uri.parse('https://fcm.googleapis.com/fcm/send');
-    String _key =
-        'AAAAZNHaT_E:APA91bH9VRe1rNTG5aXLLEOltYAtMwzK5PEoQPCsiusrzcRtTOdRx3KSZ27dOYcwnSjfpz7d0_S9KAAVSDUuyuARZHnpQD_jBqOZ2sIlXLhTQQ5QdyPbiLdAMPL91Y3CCudCJSEkkR6w';
     try {
       http.post(
-        _uri,
+        Uri.parse(serverUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': _key,
+          'Authorization': 'key=$serverKey',
         },
         body: jsonEncode({
           'to': token,

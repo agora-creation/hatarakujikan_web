@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
-import 'package:hatarakujikan_web/screens/group.dart';
+import 'package:hatarakujikan_web/screens/backup.dart';
+import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_notice.dart';
+import 'package:hatarakujikan_web/screens/group_security.dart';
+import 'package:hatarakujikan_web/screens/group_work.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
 
@@ -35,7 +38,28 @@ const List<MenuItem> kSideMenu = [
   ),
   MenuItem(
     title: '会社/組織の設定',
-    route: GroupScreen.id,
     icon: Icons.store,
+    children: [
+      MenuItem(
+        title: '基本情報の変更',
+        route: GroupInfoScreen.id,
+        icon: Icons.chevron_right,
+      ),
+      MenuItem(
+        title: 'セキュリティ設定',
+        route: GroupSecurityScreen.id,
+        icon: Icons.chevron_right,
+      ),
+      MenuItem(
+        title: '勤怠ルール設定',
+        route: GroupWorkScreen.id,
+        icon: Icons.chevron_right,
+      ),
+    ],
+  ),
+  MenuItem(
+    title: 'バックアップについて',
+    route: BackupScreen.id,
+    icon: Icons.settings_backup_restore,
   ),
 ];

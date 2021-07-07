@@ -66,18 +66,18 @@ class GroupNoticeProvider with ChangeNotifier {
     String message,
   }) async {
     try {
-      for (UserModel user in users) {
+      for (UserModel _user in users) {
         _userNoticeService.create({
           'id': id,
           'groupId': groupId,
-          'userId': user.id,
+          'userId': _user.id,
           'title': title,
           'message': message,
           'read': false,
           'createdAt': DateTime.now(),
         });
         _userNoticeService.send(
-          token: user.token,
+          token: _user.token,
           title: title,
           body: message,
         );
