@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/screens/group_work_panel.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,7 @@ class GroupWorkScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: Container(),
+      body: GroupWorkPanel(groupProvider: groupProvider),
     );
   }
 }

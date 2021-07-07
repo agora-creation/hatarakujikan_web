@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -55,14 +56,28 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () async {},
+                  onPressed: () async {
+                    await qrPdf(group: widget.groupProvider.group);
+                  },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
                   label: 'QRコード出力',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
-                  onPressed: () async {},
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateInfo(
+                      id: widget.groupProvider.group?.id,
+                      name: name.text.trim(),
+                      positions: positions.text.trim(),
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('変更の保存が完了しました')),
+                    );
+                    widget.groupProvider.reloadGroupModel();
+                  },
                   color: Colors.blue,
                   iconData: Icons.save,
                   label: '変更を保存',
@@ -80,7 +95,10 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('人数', style: TextStyle(fontSize: 14.0)),
-                  Text('10 人まで', style: TextStyle(fontSize: 16.0)),
+                  Text(
+                    '${widget.groupProvider.group?.usersNum} 人まで',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
                 ],
               ),
               SizedBox(height: 8.0),

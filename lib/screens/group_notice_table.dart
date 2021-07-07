@@ -280,7 +280,7 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Container(
-        width: 450.0,
+        width: 550.0,
         child: ListView(
           shrinkWrap: true,
           children: [

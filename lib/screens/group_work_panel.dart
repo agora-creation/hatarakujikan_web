@@ -1,30 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
-import 'package:hatarakujikan_web/widgets/custom_link_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
-class GroupPanel extends StatefulWidget {
+class GroupWorkPanel extends StatefulWidget {
   final GroupProvider groupProvider;
 
-  GroupPanel({@required this.groupProvider});
+  GroupWorkPanel({@required this.groupProvider});
 
   @override
-  _GroupPanelState createState() => _GroupPanelState();
+  _GroupWorkPanelState createState() => _GroupWorkPanelState();
 }
 
-class _GroupPanelState extends State<GroupPanel> {
-  TextEditingController name = TextEditingController();
-  TextEditingController usersNum = TextEditingController();
-  TextEditingController positions = TextEditingController();
-  bool qrSecurity;
-  bool areaSecurity;
-  double areaLat;
-  double areaLon;
-  double areaRange;
+class _GroupWorkPanelState extends State<GroupWorkPanel> {
   List<String> roundTypeList = ['切捨', '切上'];
   List<int> roundNumList = [1, 5, 10, 15, 30];
   String roundStartType;
@@ -41,23 +30,9 @@ class _GroupPanelState extends State<GroupPanel> {
   int legal;
   String nightStart;
   String nightEnd;
-  GoogleMapController mapController;
 
   void _init() async {
     setState(() {
-      name.text = widget.groupProvider.group?.name;
-      usersNum.text = '${widget.groupProvider.group?.usersNum}人まで';
-      String tmp = '';
-      for (String _position in widget.groupProvider.group?.positions) {
-        if (tmp != '') tmp += ',';
-        tmp += _position;
-      }
-      positions.text = tmp;
-      qrSecurity = widget.groupProvider.group?.qrSecurity;
-      areaSecurity = widget.groupProvider.group?.areaSecurity;
-      areaLat = widget.groupProvider.group?.areaLat;
-      areaLon = widget.groupProvider.group?.areaLon;
-      areaRange = widget.groupProvider.group?.areaRange;
       roundStartType = widget.groupProvider.group?.roundStartType;
       roundStartNum = widget.groupProvider.group?.roundStartNum;
       roundEndType = widget.groupProvider.group?.roundEndType;
@@ -74,10 +49,6 @@ class _GroupPanelState extends State<GroupPanel> {
     });
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() => mapController = controller);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -90,11 +61,11 @@ class _GroupPanelState extends State<GroupPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '会社/組織の設定',
+          '勤怠ルール設定',
           style: kAdminTitleTextStyle,
         ),
         Text(
-          '会社/組織に関する各種設定を行います。セキュリティに関する設定や、時間に関する設定ができます。',
+          '各勤務時間の計算に必要な項目をここで設定できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -102,194 +73,42 @@ class _GroupPanelState extends State<GroupPanel> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(),
-            Row(
-              children: [
-                CustomTextIconButton(
-                  onPressed: () async {
-                    await qrPdf(group: widget.groupProvider.group);
-                  },
-                  color: Colors.redAccent,
-                  iconData: Icons.qr_code,
-                  label: 'QRコード出力',
-                ),
-                SizedBox(width: 4.0),
-                CustomTextIconButton(
-                  onPressed: () async {
-                    if (!await widget.groupProvider.update(
-                      id: widget.groupProvider.group?.id,
-                      name: name.text.trim(),
-                      positions: positions.text.trim(),
-                      qrSecurity: qrSecurity,
-                      areaSecurity: areaSecurity,
-                      areaLat: areaLat,
-                      areaLon: areaLon,
-                      areaRange: areaRange,
-                      roundStartType: roundStartType,
-                      roundStartNum: roundStartNum,
-                      roundEndType: roundEndType,
-                      roundEndNum: roundEndNum,
-                      roundBreakStartType: roundBreakStartType,
-                      roundBreakStartNum: roundBreakStartNum,
-                      roundBreakEndType: roundBreakEndType,
-                      roundBreakEndNum: roundBreakEndNum,
-                      roundWorkType: roundWorkType,
-                      roundWorkNum: roundWorkNum,
-                      legal: legal,
-                      nightStart: nightStart,
-                      nightEnd: nightEnd,
-                    )) {
-                      return;
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('設定の保存が完了しました')),
-                    );
-                    widget.groupProvider.reloadGroupModel();
-                  },
-                  color: Colors.blue,
-                  iconData: Icons.save,
-                  label: '設定を保存',
-                ),
-              ],
+            CustomTextIconButton(
+              onPressed: () async {
+                if (!await widget.groupProvider.updateWork(
+                  id: widget.groupProvider.group?.id,
+                  roundStartType: roundStartType,
+                  roundStartNum: roundStartNum,
+                  roundEndType: roundEndType,
+                  roundEndNum: roundEndNum,
+                  roundBreakStartType: roundBreakStartType,
+                  roundBreakStartNum: roundBreakStartNum,
+                  roundBreakEndType: roundBreakEndType,
+                  roundBreakEndNum: roundBreakEndNum,
+                  roundWorkType: roundWorkType,
+                  roundWorkNum: roundWorkNum,
+                  legal: legal,
+                  nightStart: nightStart,
+                  nightEnd: nightEnd,
+                )) {
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('設定の保存が完了しました')),
+                );
+                widget.groupProvider.reloadGroupModel();
+              },
+              color: Colors.blue,
+              iconData: Icons.save,
+              label: '設定を保存',
             ),
           ],
         ),
         SizedBox(height: 8.0),
         Expanded(
-          child: ListView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: kBottomBorderDecoration,
-                child: CustomIconLabel(
-                  icon: Icon(Icons.store, color: Colors.black54),
-                  label: '会社情報',
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('会社/組織名', style: TextStyle(fontSize: 14.0)),
-                        TextFormField(
-                          controller: name,
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                          ),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8.0),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('人数制限', style: TextStyle(fontSize: 14.0)),
-                        TextFormField(
-                          readOnly: true,
-                          controller: usersNum,
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                          ),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.0),
-              Container(
-                decoration: kBottomBorderDecoration,
-                child: CustomIconLabel(
-                  icon: Icon(Icons.security, color: Colors.black54),
-                  label: '記録セキュリティ',
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Checkbox(
-                    value: qrSecurity,
-                    onChanged: (value) {
-                      setState(() => qrSecurity = value);
-                    },
-                    activeColor: Colors.blue,
-                  ),
-                  Text(
-                    'アプリから勤務記録時にQRコード認証をさせる',
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                ],
-              ),
-              SizedBox(height: 4.0),
-              Row(
-                children: [
-                  Checkbox(
-                    value: areaSecurity,
-                    onChanged: (value) {
-                      setState(() => areaSecurity = value);
-                    },
-                    activeColor: Colors.blue,
-                  ),
-                  Text(
-                    'アプリから勤務記録時に記録可能な範囲を以下に限定する',
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                ],
-              ),
-              SizedBox(height: 4.0),
-              Container(
-                height: 350.0,
-                child: GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(areaLat, areaLon),
-                    zoom: 17.0,
-                  ),
-                  circles: Set.from([
-                    Circle(
-                      circleId: CircleId('area'),
-                      center: LatLng(areaLat, areaLon),
-                      radius: areaRange,
-                      fillColor: Colors.red.withOpacity(0.3),
-                      strokeColor: Colors.transparent,
-                    ),
-                  ]),
-                  onTap: (latLng) {
-                    setState(() {
-                      areaLat = latLng.latitude;
-                      areaLon = latLng.longitude;
-                    });
-                  },
-                ),
-              ),
-              SizedBox(height: 4.0),
-              Center(child: Text('指定範囲の半径: $areaRange m')),
-              Slider(
-                label: '$areaRange',
-                min: 0,
-                max: 500,
-                divisions: 500,
-                value: areaRange,
-                activeColor: Colors.red,
-                inactiveColor: Colors.grey,
-                onChanged: (value) {
-                  setState(() => areaRange = value);
-                },
-              ),
-              SizedBox(height: 16.0),
               Container(
                 decoration: kBottomBorderDecoration,
                 child: CustomIconLabel(
@@ -789,34 +608,6 @@ class _GroupPanelState extends State<GroupPanel> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
-              Container(
-                decoration: kBottomBorderDecoration,
-                child: CustomIconLabel(
-                  icon: Icon(Icons.list_alt, color: Colors.black54),
-                  label: '雇用形態 (カンマ区切りで入力してください)',
-                ),
-              ),
-              SizedBox(height: 8.0),
-              TextFormField(
-                controller: positions,
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 14.0,
-                ),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 40.0),
-              Center(
-                child: CustomLinkButton(
-                  onTap: () {},
-                  color: Colors.red,
-                  label: 'この会社/組織を削除申請する',
-                ),
-              ),
-              SizedBox(height: 24.0),
             ],
           ),
         ),

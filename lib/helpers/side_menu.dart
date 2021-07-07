@@ -58,7 +58,7 @@ const List<MenuItem> kSideMenu = [
     ],
   ),
   MenuItem(
-    title: 'バックアップについて',
+    title: 'バックアップ',
     route: BackupScreen.id,
     icon: Icons.settings_backup_restore,
   ),

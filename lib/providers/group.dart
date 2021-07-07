@@ -105,15 +105,55 @@ class GroupProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> update({
+  Future<bool> updateInfo({
     String id,
     String name,
     String positions,
+  }) async {
+    try {
+      List<String> _positions = [];
+      List<String> _tmp = positions.split(',') ?? [];
+      for (String _position in _tmp) {
+        _positions.add(_position);
+      }
+      _groupService.update({
+        'id': id,
+        'name': name,
+        'positions': _positions,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateSecurity({
+    String id,
     bool qrSecurity,
     bool areaSecurity,
     double areaLat,
     double areaLon,
     double areaRange,
+  }) async {
+    try {
+      _groupService.update({
+        'id': id,
+        'qrSecurity': qrSecurity,
+        'areaSecurity': areaSecurity,
+        'areaLat': areaLat,
+        'areaLon': areaLon,
+        'areaRange': areaRange,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateWork({
+    String id,
     String roundStartType,
     int roundStartNum,
     String roundEndType,
@@ -129,20 +169,8 @@ class GroupProvider with ChangeNotifier {
     String nightEnd,
   }) async {
     try {
-      List<String> _positions = [];
-      List<String> _tmp = positions.split(',') ?? [];
-      for (String _position in _tmp) {
-        _positions.add(_position);
-      }
       _groupService.update({
         'id': id,
-        'name': name,
-        'positions': _positions,
-        'qrSecurity': qrSecurity,
-        'areaSecurity': areaSecurity,
-        'areaLat': areaLat,
-        'areaLon': areaLon,
-        'areaRange': areaRange,
         'roundStartType': roundStartType,
         'roundStartNum': roundStartNum,
         'roundEndType': roundEndType,
