@@ -114,4 +114,20 @@ class UserProvider with ChangeNotifier {
     });
     return _users;
   }
+
+  Future<List<UserModel>> selectListNotice({
+    String groupId,
+    String noticeId,
+  }) async {
+    List<UserModel> _users = [];
+    await _userService
+        .selectListNotice(
+      groupId: groupId,
+      noticeId: noticeId,
+    )
+        .then((value) {
+      _users = value;
+    });
+    return _users;
+  }
 }

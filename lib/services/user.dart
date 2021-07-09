@@ -61,4 +61,32 @@ class UserService {
     });
     return _users;
   }
+
+  Future<List<UserModel>> selectListNotice({
+    String groupId,
+    String noticeId,
+  }) async {
+    List<UserModel> _users = [];
+    await _firebaseFirestore
+        .collection(_collection)
+        .where('groups', arrayContains: groupId)
+        .where('smartphone', isEqualTo: true)
+        .orderBy('recordPassword', descending: false)
+        .get()
+        .then((value) async {
+      for (DocumentSnapshot _user in value.docs) {
+        UserModel user = UserModel.fromSnapshot(_user);
+        DocumentSnapshot noticeSnapshot = await _firebaseFirestore
+            .collection(_collection)
+            .doc(user.id)
+            .collection('notice')
+            .doc(noticeId)
+            .get();
+        if (noticeSnapshot.exists == false) {
+          _users.add(UserModel.fromSnapshot(_user));
+        }
+      }
+    });
+    return _users;
+  }
 }

@@ -28,25 +28,6 @@ class GroupNoticeTable extends StatefulWidget {
 }
 
 class _GroupNoticeTableState extends State<GroupNoticeTable> {
-  List<UserModel> users = [];
-
-  void _init() async {
-    await widget.userProvider
-        .selectListSP(
-      groupId: widget.groupProvider.group?.id,
-      smartphone: true,
-    )
-        .then((value) {
-      setState(() => users = value);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
@@ -119,7 +100,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                         builder: (_) => GroupNoticeDetailsDialog(
                           groupNoticeProvider: widget.groupNoticeProvider,
                           groupNotice: groupNotices[index],
-                          users: users,
+                          userProvider: widget.userProvider,
                         ),
                       );
                     },
@@ -244,12 +225,12 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
 class GroupNoticeDetailsDialog extends StatefulWidget {
   final GroupNoticeProvider groupNoticeProvider;
   final GroupNoticeModel groupNotice;
-  final List<UserModel> users;
+  final UserProvider userProvider;
 
   GroupNoticeDetailsDialog({
     @required this.groupNoticeProvider,
     @required this.groupNotice,
-    @required this.users,
+    @required this.userProvider,
   });
 
   @override
@@ -261,9 +242,18 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
   final ScrollController _scrollController = ScrollController();
   TextEditingController title = TextEditingController();
   TextEditingController message = TextEditingController();
+  List<UserModel> users = [];
   List<UserModel> selected = [];
 
   void _init() async {
+    await widget.userProvider
+        .selectListNotice(
+      groupId: widget.groupNotice?.groupId,
+      noticeId: widget.groupNotice?.id,
+    )
+        .then((value) {
+      setState(() => users = value);
+    });
     setState(() {
       title.text = widget.groupNotice?.title;
       message.text = widget.groupNotice?.message;
@@ -338,9 +328,9 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   controller: _scrollController,
-                  itemCount: widget.users.length,
+                  itemCount: users.length,
                   itemBuilder: (_, index) {
-                    UserModel _user = widget.users[index];
+                    UserModel _user = users[index];
                     var contain = selected.where((e) => e.id == _user.id);
                     return Container(
                       decoration: kBottomBorderDecoration,
