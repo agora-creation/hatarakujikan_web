@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
-import 'package:hatarakujikan_web/screens/backup.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_notice.dart';
 import 'package:hatarakujikan_web/screens/group_security.dart';
@@ -56,10 +55,5 @@ const List<MenuItem> kSideMenu = [
         icon: Icons.chevron_right,
       ),
     ],
-  ),
-  MenuItem(
-    title: 'バックアップ',
-    route: BackupScreen.id,
-    icon: Icons.settings_backup_restore,
   ),
 ];

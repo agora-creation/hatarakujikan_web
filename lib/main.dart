@@ -10,7 +10,6 @@ import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
-import 'package:hatarakujikan_web/screens/backup.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_notice.dart';
 import 'package:hatarakujikan_web/screens/group_security.dart';
@@ -61,7 +60,6 @@ class MyApp extends StatelessWidget {
         home: SplashController(),
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
-          BackupScreen.id: (context) => BackupScreen(),
           GroupInfoScreen.id: (context) => GroupInfoScreen(),
           GroupNoticeScreen.id: (context) => GroupNoticeScreen(),
           GroupSecurityScreen.id: (context) => GroupSecurityScreen(),
