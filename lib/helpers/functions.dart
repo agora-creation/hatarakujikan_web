@@ -82,9 +82,9 @@ String subTime(String left, String right) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
   List<String> _lefts = left.split(':');
   List<String> _rights = right.split(':');
-  double _hm = (int.parse(_lefts.last) - int.parse(_rights.last)) / 60;
+  double _hm = (int.parse(_lefts.last) + int.parse(_rights.last)) / 60;
   int _m = (int.parse(_lefts.last) - int.parse(_rights.last)) % 60;
-  int _h = int.parse(_lefts.first) - int.parse(_rights.first) + _hm.toInt();
+  int _h = int.parse(_lefts.first) - int.parse(_rights.first) - _hm.toInt();
   if (_h.toString().length == 1) {
     return '${twoDigits(_h)}:${twoDigits(_m)}';
   } else {
