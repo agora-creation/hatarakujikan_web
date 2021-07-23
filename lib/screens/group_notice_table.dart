@@ -47,7 +47,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'お知らせを一覧表示します。このお知らせはアプリの方専用です。',
+          'お知らせを一覧表示します。このお知らせはスマートフォンアプリのスタッフに送信されます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -67,7 +67,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                 );
               },
               color: Colors.blue,
-              iconData: Icons.notification_add,
+              iconData: Icons.add,
               label: '新規登録',
             ),
           ],

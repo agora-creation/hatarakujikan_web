@@ -107,11 +107,11 @@ class _WorkTableState extends State<WorkTable> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '勤務の管理',
+          '勤怠の管理',
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフがスマートフォンやタブレット端末で記録した勤務時間を年月形式で一覧表示します。',
+          'スタッフがスマートフォンやタブレット端末で記録した勤務時間を年月形式で一覧表示します。記録忘れなどの場合はここから登録することもできます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -212,7 +212,7 @@ class _WorkTableState extends State<WorkTable> {
                     );
                   },
                   color: Colors.blue,
-                  iconData: Icons.post_add,
+                  iconData: Icons.add,
                   label: '新規登録',
                 ),
               ],

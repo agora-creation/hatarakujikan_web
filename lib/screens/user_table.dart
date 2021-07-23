@@ -43,7 +43,7 @@ class _UserTableState extends State<UserTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフの情報を一覧表示します。アプリから登録するか、この画面で登録できます。',
+          'スタッフの情報を一覧表示します。スマートフォンアプリから登録するか、ここで登録できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -103,7 +103,7 @@ class _UserTableState extends State<UserTable> {
                     );
                   },
                   color: Colors.blue,
-                  iconData: Icons.person_add,
+                  iconData: Icons.add,
                   label: '新規登録',
                 ),
               ],
