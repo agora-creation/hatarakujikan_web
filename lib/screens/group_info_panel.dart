@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
 class GroupInfoPanel extends StatefulWidget {
@@ -94,9 +95,9 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('人数', style: TextStyle(fontSize: 14.0)),
+                  Text('人数制限', style: TextStyle(fontSize: 14.0)),
                   Text(
-                    '${widget.groupProvider.group?.usersNum} 人まで',
+                    'スタッフを${widget.groupProvider.group?.usersNum}人まで登録可能',
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ],
@@ -106,16 +107,7 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('会社/組織名', style: TextStyle(fontSize: 14.0)),
-                  TextFormField(
-                    controller: name,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
-                    ),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  CustomTextFormField2(controller: name),
                 ],
               ),
               SizedBox(height: 8.0),
@@ -126,16 +118,14 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                     '雇用形態 (カンマ区切りで入力してください)',
                     style: TextStyle(fontSize: 14.0),
                   ),
-                  TextFormField(
-                    controller: positions,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
-                    ),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  CustomTextFormField2(controller: positions),
+                ],
+              ),
+              SizedBox(height: 8.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
                 ],
               ),
             ],

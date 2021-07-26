@@ -157,6 +157,20 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                 ),
               ],
             ),
+            SizedBox(height: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black38),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                ),
+              ],
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

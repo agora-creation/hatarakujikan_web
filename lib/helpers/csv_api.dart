@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:csv/csv.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
@@ -84,7 +86,13 @@ Future<void> workCsv({
   }
 
   String csv = const ListToCsvConverter().convert(rows);
-  AnchorElement(href: 'data:text/csv;charset=Shift_JIS,$csv')
+  List<int> bytes = List.from(utf8.encode(csv));
+  bytes.insert(0, 0xBF);
+  bytes.insert(0, 0xBB);
+  bytes.insert(0, 0xEF);
+  String csvDecode = utf8.decode(bytes);
+  print(csvDecode);
+  AnchorElement(href: 'data:text/csv;charset=utf-8bom,$csvDecode')
     ..setAttribute('download', 'work.csv')
     ..click();
   return;
