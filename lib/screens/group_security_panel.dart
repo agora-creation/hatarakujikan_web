@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
 class GroupSecurityPanel extends StatefulWidget {
@@ -51,7 +53,7 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'アプリから勤務時間を記録する際のセキュリティ設定を行うことができます。',
+          'スマートフォンアプリから勤務時間を記録する際、不明な記録が残らないようにセキュリティ設定を行うことができます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -59,26 +61,37 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(),
-            CustomTextIconButton(
-              onPressed: () async {
-                if (!await widget.groupProvider.updateSecurity(
-                  id: widget.groupProvider.group?.id,
-                  qrSecurity: qrSecurity,
-                  areaSecurity: areaSecurity,
-                  areaLat: areaLat,
-                  areaLon: areaLon,
-                  areaRange: areaRange,
-                )) {
-                  return;
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('設定の保存が完了しました')),
-                );
-                widget.groupProvider.reloadGroupModel();
-              },
-              color: Colors.blue,
-              iconData: Icons.save,
-              label: '設定を保存',
+            Row(
+              children: [
+                CustomTextIconButton(
+                  onPressed: () async {
+                    await qrPdf(group: widget.groupProvider.group);
+                  },
+                  color: Colors.redAccent,
+                  iconData: Icons.qr_code,
+                  label: 'QRコード出力',
+                ),
+                SizedBox(width: 4.0),
+                CustomTextIconButton(
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => ConfirmDialog(
+                        groupProvider: widget.groupProvider,
+                        qrSecurity: qrSecurity,
+                        areaSecurity: areaSecurity,
+                        areaLat: areaLat,
+                        areaLon: areaLon,
+                        areaRange: areaRange,
+                      ),
+                    );
+                  },
+                  color: Colors.blue,
+                  iconData: Icons.save,
+                  label: '設定を保存',
+                ),
+              ],
             ),
           ],
         ),
@@ -95,7 +108,7 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
                         setState(() => qrSecurity = value);
                       },
                       value: qrSecurity,
-                      title: Text('勤務時間の記録時にQRコード認証をさせる'),
+                      title: Text('QRコードで認証'),
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
                   ),
@@ -106,7 +119,7 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
                         setState(() => areaSecurity = value);
                       },
                       value: areaSecurity,
-                      title: Text('勤務時間の記録時に記録可能な範囲を指定する'),
+                      title: Text('記録可能な範囲を制限'),
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
                   ),
@@ -161,6 +174,73 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ConfirmDialog extends StatelessWidget {
+  final GroupProvider groupProvider;
+  final bool qrSecurity;
+  final bool areaSecurity;
+  final double areaLat;
+  final double areaLon;
+  final double areaRange;
+
+  ConfirmDialog({
+    @required this.groupProvider,
+    @required this.qrSecurity,
+    @required this.areaSecurity,
+    @required this.areaLat,
+    @required this.areaLon,
+    @required this.areaRange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 16.0),
+          Text(
+            '設定内容を保存します。よろしいですか？',
+            style: TextStyle(fontSize: 16.0),
+          ),
+          SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CustomTextButton(
+                onPressed: () => Navigator.pop(context),
+                color: Colors.grey,
+                label: 'キャンセル',
+              ),
+              CustomTextButton(
+                onPressed: () async {
+                  if (!await groupProvider.updateSecurity(
+                    id: groupProvider.group?.id,
+                    qrSecurity: qrSecurity,
+                    areaSecurity: areaSecurity,
+                    areaLat: areaLat,
+                    areaLon: areaLon,
+                    areaRange: areaRange,
+                  )) {
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('セキュリティ設定を保存しました')),
+                  );
+                  groupProvider.reloadGroupModel();
+                  Navigator.pop(context);
+                },
+                color: Colors.blue,
+                label: 'はい',
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

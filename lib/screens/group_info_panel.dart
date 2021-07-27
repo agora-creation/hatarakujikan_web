@@ -225,6 +225,7 @@ class ConfirmDialog extends StatelessWidget {
                     return;
                   }
                   groupProvider.signOut();
+                  Navigator.pop(context);
                   changeScreen(context, LoginScreen());
                 },
                 color: Colors.blue,
