@@ -82,14 +82,15 @@ String subTime(String left, String right) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
   List<String> _lefts = left.split(':');
   List<String> _rights = right.split(':');
-  double _hm = (int.parse(_lefts.last) + int.parse(_rights.last)) / 60;
-  int _m = (int.parse(_lefts.last) - int.parse(_rights.last)) % 60;
-  int _h = int.parse(_lefts.first) - int.parse(_rights.first) - _hm.toInt();
-  if (_h.toString().length == 1) {
-    return '${twoDigits(_h)}:${twoDigits(_m)}';
-  } else {
-    return '$_h:${twoDigits(_m)}';
-  }
+  // 時 → 分
+  int _leftM = (int.parse(_lefts.first) * 60) + int.parse(_lefts.last);
+  int _rightM = (int.parse(_rights.first) * 60) + int.parse(_rights.last);
+  // 分で引き算
+  int _diffM = _leftM - _rightM;
+  // 分 → 時
+  double _h = _diffM / 60;
+  int _m = _diffM % 60;
+  return '${twoDigits(_h.toInt())}:${twoDigits(_m)}';
 }
 
 // 法定内時間/法定外時間

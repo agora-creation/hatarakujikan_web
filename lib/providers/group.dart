@@ -108,6 +108,7 @@ class GroupProvider with ChangeNotifier {
   Future<bool> updateInfo({
     String id,
     String name,
+    String adminUserId,
     String positions,
   }) async {
     try {
@@ -119,6 +120,7 @@ class GroupProvider with ChangeNotifier {
       _groupService.update({
         'id': id,
         'name': name,
+        'adminUserId': adminUserId,
         'positions': _positions,
       });
       return true;
