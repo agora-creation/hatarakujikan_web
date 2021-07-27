@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/style.dart';
 
 class CustomIconLabel extends StatelessWidget {
-  final Icon icon;
+  final IconData iconData;
   final String label;
 
   CustomIconLabel({
-    this.icon,
+    this.iconData,
     this.label,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        icon,
-        SizedBox(width: 4.0),
-        Text(label, style: TextStyle(color: Colors.black54)),
-      ],
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 4.0),
+      decoration: kBottomBorderDecoration,
+      child: Row(
+        children: [
+          Icon(iconData, color: Colors.black54),
+          SizedBox(width: 4.0),
+          Text(label, style: TextStyle(color: Colors.black54)),
+        ],
+      ),
     );
   }
 }

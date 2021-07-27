@@ -250,7 +250,7 @@ class _MigrationDialogState extends State<MigrationDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomIconLabel(
-                        icon: Icon(Icons.person, color: Colors.black54),
+                        iconData: Icons.person,
                         label: '移行元',
                       ),
                       DropdownButton<UserModel>(
@@ -284,7 +284,7 @@ class _MigrationDialogState extends State<MigrationDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomIconLabel(
-                        icon: Icon(Icons.person, color: Colors.black54),
+                        iconData: Icons.person,
                         label: '移行先',
                       ),
                       DropdownButton<UserModel>(

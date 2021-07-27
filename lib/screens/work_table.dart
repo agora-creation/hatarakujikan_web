@@ -461,7 +461,7 @@ class _CsvDialogState extends State<CsvDialog> {
             ),
             SizedBox(height: 16.0),
             CustomIconLabel(
-              icon: Icon(Icons.today, color: Colors.black54),
+              iconData: Icons.today,
               label: '年月',
             ),
             SizedBox(height: 4.0),
@@ -580,7 +580,7 @@ class _PdfDialogState extends State<PdfDialog> {
             ),
             SizedBox(height: 16.0),
             CustomIconLabel(
-              icon: Icon(Icons.today, color: Colors.black54),
+              iconData: Icons.today,
               label: '年月',
             ),
             SizedBox(height: 4.0),
@@ -602,7 +602,7 @@ class _PdfDialogState extends State<PdfDialog> {
             ),
             SizedBox(height: 8.0),
             CustomIconLabel(
-              icon: Icon(Icons.person, color: Colors.black54),
+              iconData: Icons.person,
               label: 'スタッフ',
             ),
             Container(
@@ -720,7 +720,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
             ),
             SizedBox(height: 16.0),
             CustomIconLabel(
-              icon: Icon(Icons.person, color: Colors.black54),
+              iconData: Icons.person,
               label: 'スタッフ',
             ),
             Container(
@@ -747,7 +747,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
             ),
             SizedBox(height: 8.0),
             CustomIconLabel(
-              icon: Icon(Icons.label, color: Colors.black54),
+              iconData: Icons.label,
               label: '勤務状況',
             ),
             Container(
@@ -780,7 +780,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomIconLabel(
-                        icon: Icon(Icons.run_circle, color: Colors.blue),
+                        iconData: Icons.run_circle,
                         label: '出勤日時',
                       ),
                       SizedBox(height: 4.0),
@@ -862,8 +862,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                           ? Column(
                               children: [
                                 CustomIconLabel(
-                                  icon: Icon(Icons.run_circle,
-                                      color: Colors.orange),
+                                  iconData: Icons.run_circle,
                                   label: '休憩開始日時',
                                 ),
                                 SizedBox(height: 4.0),
@@ -931,10 +930,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                 ),
                                 SizedBox(height: 8.0),
                                 CustomIconLabel(
-                                  icon: Icon(
-                                    Icons.run_circle_outlined,
-                                    color: Colors.orange,
-                                  ),
+                                  iconData: Icons.run_circle_outlined,
                                   label: '休憩終了日時',
                                 ),
                                 SizedBox(height: 4.0),
@@ -1005,7 +1001,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                           : Container(),
                       SizedBox(height: 8.0),
                       CustomIconLabel(
-                        icon: Icon(Icons.run_circle, color: Colors.red),
+                        iconData: Icons.run_circle,
                         label: '退勤日時',
                       ),
                       SizedBox(height: 4.0),

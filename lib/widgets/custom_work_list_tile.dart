@@ -329,7 +329,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
             ),
             SizedBox(height: 16.0),
             CustomIconLabel(
-              icon: Icon(Icons.label, color: Colors.black54),
+              iconData: Icons.label,
               label: '勤務状況',
             ),
             SizedBox(height: 4.0),
@@ -342,7 +342,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
             ),
             SizedBox(height: 8.0),
             CustomIconLabel(
-              icon: Icon(Icons.run_circle, color: Colors.blue),
+              iconData: Icons.run_circle,
               label: '出勤日時',
             ),
             SizedBox(height: 4.0),
@@ -416,7 +416,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CustomIconLabel(
-                            icon: Icon(Icons.run_circle, color: Colors.orange),
+                            iconData: Icons.run_circle,
                             label: '休憩開始日時',
                           ),
                           SizedBox(height: 4.0),
@@ -487,10 +487,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                           ),
                           SizedBox(height: 8.0),
                           CustomIconLabel(
-                            icon: Icon(
-                              Icons.run_circle_outlined,
-                              color: Colors.orange,
-                            ),
+                            iconData: Icons.run_circle_outlined,
                             label: '休憩終了日時',
                           ),
                           SizedBox(height: 4.0),
@@ -566,7 +563,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                 : Container(),
             SizedBox(height: 8.0),
             CustomIconLabel(
-              icon: Icon(Icons.run_circle, color: Colors.red),
+              iconData: Icons.run_circle,
               label: '退勤日時',
             ),
             SizedBox(height: 4.0),
@@ -827,7 +824,7 @@ class WorkStateDetailsDialog extends StatelessWidget {
             ),
             SizedBox(height: 16.0),
             CustomIconLabel(
-              icon: Icon(Icons.label, color: Colors.black54),
+              iconData: Icons.label,
               label: '勤務状況',
             ),
             SizedBox(height: 4.0),

@@ -378,7 +378,7 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomIconLabel(
-                      icon: Icon(Icons.run_circle, color: Colors.blue),
+                      iconData: Icons.run_circle,
                       label: '出勤時間',
                     ),
                     SizedBox(height: 4.0),
@@ -397,10 +397,7 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   CustomIconLabel(
-                                    icon: Icon(
-                                      Icons.run_circle,
-                                      color: Colors.orange,
-                                    ),
+                                    iconData: Icons.run_circle,
                                     label: '休憩開始時間',
                                   ),
                                   SizedBox(height: 4.0),
@@ -409,10 +406,7 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                                   ),
                                   SizedBox(height: 8.0),
                                   CustomIconLabel(
-                                    icon: Icon(
-                                      Icons.run_circle_outlined,
-                                      color: Colors.orange,
-                                    ),
+                                    iconData: Icons.run_circle_outlined,
                                     label: '休憩終了時間',
                                   ),
                                   SizedBox(height: 4.0),
@@ -426,7 +420,7 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                         : Container(),
                     SizedBox(height: 8.0),
                     CustomIconLabel(
-                      icon: Icon(Icons.run_circle, color: Colors.red),
+                      iconData: Icons.run_circle,
                       label: '退勤時間',
                     ),
                     SizedBox(height: 4.0),

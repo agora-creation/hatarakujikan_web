@@ -147,7 +147,13 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                     items: users.map((value) {
                       return DropdownMenuItem(
                         value: value,
-                        child: Text('${value.name}'),
+                        child: Text(
+                          '${value.name}',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
                       );
                     }).toList(),
                   ),

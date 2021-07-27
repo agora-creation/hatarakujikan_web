@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
@@ -65,7 +67,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          '各勤務時間の計算に必要な項目をここで設定できます。',
+          '各勤務時間の計算をする際に必要な項目を設定できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -73,34 +75,44 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(),
-            CustomTextIconButton(
-              onPressed: () async {
-                if (!await widget.groupProvider.updateWork(
-                  id: widget.groupProvider.group?.id,
-                  roundStartType: roundStartType,
-                  roundStartNum: roundStartNum,
-                  roundEndType: roundEndType,
-                  roundEndNum: roundEndNum,
-                  roundBreakStartType: roundBreakStartType,
-                  roundBreakStartNum: roundBreakStartNum,
-                  roundBreakEndType: roundBreakEndType,
-                  roundBreakEndNum: roundBreakEndNum,
-                  roundWorkType: roundWorkType,
-                  roundWorkNum: roundWorkNum,
-                  legal: legal,
-                  nightStart: nightStart,
-                  nightEnd: nightEnd,
-                )) {
-                  return;
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('設定の保存が完了しました')),
-                );
-                widget.groupProvider.reloadGroupModel();
-              },
-              color: Colors.blue,
-              iconData: Icons.save,
-              label: '設定を保存',
+            Row(
+              children: [
+                CustomTextIconButton(
+                  onPressed: () async {
+                    await qrPdf(group: widget.groupProvider.group);
+                  },
+                  color: Colors.redAccent,
+                  iconData: Icons.qr_code,
+                  label: 'QRコード出力',
+                ),
+                SizedBox(width: 4.0),
+                CustomTextIconButton(
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateWork(
+                      id: widget.groupProvider.group?.id,
+                      roundStartType: roundStartType,
+                      roundStartNum: roundStartNum,
+                      roundEndType: roundEndType,
+                      roundEndNum: roundEndNum,
+                      roundBreakStartType: roundBreakStartType,
+                      roundBreakStartNum: roundBreakStartNum,
+                      roundBreakEndType: roundBreakEndType,
+                      roundBreakEndNum: roundBreakEndNum,
+                      roundWorkType: roundWorkType,
+                      roundWorkNum: roundWorkNum,
+                      legal: legal,
+                      nightStart: nightStart,
+                      nightEnd: nightEnd,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroupModel();
+                  },
+                  color: Colors.blue,
+                  iconData: Icons.save,
+                  label: '設定を保存',
+                ),
+              ],
             ),
           ],
         ),
@@ -109,12 +121,9 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: kBottomBorderDecoration,
-                child: CustomIconLabel(
-                  icon: Icon(Icons.access_time, color: Colors.black54),
-                  label: '時間のまるめ',
-                ),
+              CustomIconLabel(
+                iconData: Icons.access_time,
+                label: '時間のまるめ',
               ),
               SizedBox(height: 8.0),
               Row(
@@ -125,32 +134,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: roundStartType,
-                            onChanged: (value) {
-                              setState(() => roundStartType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundStartType,
+                        onChanged: (value) {
+                          setState(() => roundStartType = value);
+                        },
+                        items: roundTypeList.map((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -159,32 +159,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: roundStartNum,
-                            onChanged: (value) {
-                              setState(() => roundStartNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundStartNum,
+                        onChanged: (value) {
+                          setState(() => roundStartNum = value);
+                        },
+                        items: roundNumList.map((value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(
+                              '$value分',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -199,32 +190,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: roundEndType,
-                            onChanged: (value) {
-                              setState(() => roundEndType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundEndType,
+                        onChanged: (value) {
+                          setState(() => roundEndType = value);
+                        },
+                        items: roundTypeList.map((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -233,32 +215,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: roundEndNum,
-                            onChanged: (value) {
-                              setState(() => roundEndNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundEndNum,
+                        onChanged: (value) {
+                          setState(() => roundEndNum = value);
+                        },
+                        items: roundNumList.map((value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(
+                              '$value分',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -273,32 +246,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: roundBreakStartType,
-                            onChanged: (value) {
-                              setState(() => roundBreakStartType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundBreakStartType,
+                        onChanged: (value) {
+                          setState(() => roundBreakStartType = value);
+                        },
+                        items: roundTypeList.map((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -307,32 +271,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: roundBreakStartNum,
-                            onChanged: (value) {
-                              setState(() => roundBreakStartNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundBreakStartNum,
+                        onChanged: (value) {
+                          setState(() => roundBreakStartNum = value);
+                        },
+                        items: roundNumList.map((value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(
+                              '$value分',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -347,32 +302,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: roundBreakEndType,
-                            onChanged: (value) {
-                              setState(() => roundBreakEndType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundBreakEndType,
+                        onChanged: (value) {
+                          setState(() => roundBreakEndType = value);
+                        },
+                        items: roundTypeList.map((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -381,32 +327,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: roundBreakEndNum,
-                            onChanged: (value) {
-                              setState(() => roundBreakEndNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundBreakEndNum,
+                        onChanged: (value) {
+                          setState(() => roundBreakEndNum = value);
+                        },
+                        items: roundNumList.map((value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(
+                              '$value分',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -421,32 +358,23 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: roundWorkType,
-                            onChanged: (value) {
-                              setState(() => roundWorkType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundWorkType,
+                        onChanged: (value) {
+                          setState(() => roundWorkType = value);
+                        },
+                        items: roundTypeList.map((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -455,80 +383,56 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black38),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int>(
-                            value: roundWorkNum,
-                            onChanged: (value) {
-                              setState(() => roundWorkNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CustomDropdownButton(
+                        value: roundWorkNum,
+                        onChanged: (value) {
+                          setState(() => roundWorkNum = value);
+                        },
+                        items: roundNumList.map((value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(
+                              '$value分',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
                 ],
               ),
               SizedBox(height: 16.0),
-              Container(
-                decoration: kBottomBorderDecoration,
-                child: CustomIconLabel(
-                  icon: Icon(Icons.access_time, color: Colors.black54),
-                  label: '法定時間',
-                ),
+              CustomIconLabel(
+                iconData: Icons.access_time,
+                label: '法定時間',
               ),
               SizedBox(height: 8.0),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black38),
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    value: legal,
-                    onChanged: (value) {
-                      setState(() => legal = value);
-                    },
-                    items: legalList.map((value) {
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text(
-                          '$value時間',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
+              CustomDropdownButton(
+                value: legal,
+                onChanged: (value) {
+                  setState(() => legal = value);
+                },
+                items: legalList.map((value) {
+                  return DropdownMenuItem<int>(
+                    value: value,
+                    child: Text(
+                      '$value時間',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 16.0),
-              Container(
-                decoration: kBottomBorderDecoration,
-                child: CustomIconLabel(
-                  icon: Icon(Icons.access_time, color: Colors.black54),
-                  label: '深夜時間帯',
-                ),
+              CustomIconLabel(
+                iconData: Icons.access_time,
+                label: '深夜時間帯',
               ),
               SizedBox(height: 8.0),
               Row(
