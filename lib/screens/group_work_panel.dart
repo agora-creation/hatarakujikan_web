@@ -4,7 +4,9 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_icon_button2.dart';
 
 class GroupWorkPanel extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -87,26 +89,27 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
-                  onPressed: () async {
-                    if (!await widget.groupProvider.updateWork(
-                      id: widget.groupProvider.group?.id,
-                      roundStartType: roundStartType,
-                      roundStartNum: roundStartNum,
-                      roundEndType: roundEndType,
-                      roundEndNum: roundEndNum,
-                      roundBreakStartType: roundBreakStartType,
-                      roundBreakStartNum: roundBreakStartNum,
-                      roundBreakEndType: roundBreakEndType,
-                      roundBreakEndNum: roundBreakEndNum,
-                      roundWorkType: roundWorkType,
-                      roundWorkNum: roundWorkNum,
-                      legal: legal,
-                      nightStart: nightStart,
-                      nightEnd: nightEnd,
-                    )) {
-                      return;
-                    }
-                    widget.groupProvider.reloadGroupModel();
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => ConfirmDialog(
+                        groupProvider: widget.groupProvider,
+                        roundStartType: roundStartType,
+                        roundStartNum: roundStartNum,
+                        roundEndType: roundEndType,
+                        roundEndNum: roundEndNum,
+                        roundBreakStartType: roundBreakStartType,
+                        roundBreakStartNum: roundBreakStartNum,
+                        roundBreakEndType: roundBreakEndType,
+                        roundBreakEndNum: roundBreakEndNum,
+                        roundWorkType: roundWorkType,
+                        roundWorkNum: roundWorkNum,
+                        legal: legal,
+                        nightStart: nightStart,
+                        nightEnd: nightEnd,
+                      ),
+                    );
                   },
                   color: Colors.blue,
                   iconData: Icons.save,
@@ -437,7 +440,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
               SizedBox(height: 8.0),
               Row(
                 children: [
-                  TextButton.icon(
+                  CustomTextIconButton2(
                     onPressed: () async {
                       List<String> _hm = nightStart.split(':');
                       TimeOfDay _selected = await showTimePicker(
@@ -452,30 +455,13 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                         setState(() => nightStart = _time);
                       }
                     },
-                    icon: Icon(
-                      Icons.access_time,
-                      color: Colors.black54,
-                      size: 16.0,
-                    ),
-                    label: Text(
-                      nightStart,
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      side: BorderSide(color: Colors.black38, width: 1),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 16.0,
-                        horizontal: 24.0,
-                      ),
-                    ),
+                    iconData: Icons.access_time,
+                    label: nightStart,
                   ),
                   SizedBox(width: 8.0),
                   Text('〜'),
                   SizedBox(width: 8.0),
-                  TextButton.icon(
+                  CustomTextIconButton2(
                     onPressed: () async {
                       List<String> _hm = nightEnd.split(':');
                       TimeOfDay _selected = await showTimePicker(
@@ -490,25 +476,8 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                         setState(() => nightEnd = _time);
                       }
                     },
-                    icon: Icon(
-                      Icons.access_time,
-                      color: Colors.black54,
-                      size: 16.0,
-                    ),
-                    label: Text(
-                      nightEnd,
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      side: BorderSide(color: Colors.black38, width: 1),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 16.0,
-                        horizontal: 24.0,
-                      ),
-                    ),
+                    iconData: Icons.access_time,
+                    label: nightEnd,
                   ),
                 ],
               ),
@@ -516,6 +485,97 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ConfirmDialog extends StatelessWidget {
+  final GroupProvider groupProvider;
+  final String roundStartType;
+  final int roundStartNum;
+  final String roundEndType;
+  final int roundEndNum;
+  final String roundBreakStartType;
+  final int roundBreakStartNum;
+  final String roundBreakEndType;
+  final int roundBreakEndNum;
+  final String roundWorkType;
+  final int roundWorkNum;
+  final int legal;
+  final String nightStart;
+  final String nightEnd;
+
+  ConfirmDialog({
+    @required this.groupProvider,
+    @required this.roundStartType,
+    @required this.roundStartNum,
+    @required this.roundEndType,
+    @required this.roundEndNum,
+    @required this.roundBreakStartType,
+    @required this.roundBreakStartNum,
+    @required this.roundBreakEndType,
+    @required this.roundBreakEndNum,
+    @required this.roundWorkType,
+    @required this.roundWorkNum,
+    @required this.legal,
+    @required this.nightStart,
+    @required this.nightEnd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 16.0),
+          Text(
+            '設定内容を保存します。よろしいですか？',
+            style: TextStyle(fontSize: 16.0),
+          ),
+          SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CustomTextButton(
+                onPressed: () => Navigator.pop(context),
+                color: Colors.grey,
+                label: 'キャンセル',
+              ),
+              CustomTextButton(
+                onPressed: () async {
+                  if (!await groupProvider.updateWork(
+                    id: groupProvider.group?.id,
+                    roundStartType: roundStartType,
+                    roundStartNum: roundStartNum,
+                    roundEndType: roundEndType,
+                    roundEndNum: roundEndNum,
+                    roundBreakStartType: roundBreakStartType,
+                    roundBreakStartNum: roundBreakStartNum,
+                    roundBreakEndType: roundBreakEndType,
+                    roundBreakEndNum: roundBreakEndNum,
+                    roundWorkType: roundWorkType,
+                    roundWorkNum: roundWorkNum,
+                    legal: legal,
+                    nightStart: nightStart,
+                    nightEnd: nightEnd,
+                  )) {
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('勤怠ルール設定を保存しました')),
+                  );
+                  groupProvider.reloadGroupModel();
+                  Navigator.pop(context);
+                },
+                color: Colors.blue,
+                label: 'はい',
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
