@@ -31,14 +31,12 @@ class SectionProvider with ChangeNotifier {
 
   Future<bool> update({
     String id,
-    String groupId,
     String name,
     String adminUserId,
   }) async {
     try {
       _sectionService.update({
         'id': id,
-        'groupId': groupId,
         'name': name,
         'adminUserId': adminUserId,
       });

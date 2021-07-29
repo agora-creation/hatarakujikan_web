@@ -119,13 +119,17 @@ class _SectionTableState extends State<SectionTable> {
                           builder: (_) => SectionDetailsDialog(
                             sectionProvider: widget.sectionProvider,
                             section: sections[index],
-                            groupId: widget.groupProvider.group?.id,
+                            users: users,
                           ),
                         );
                       },
                       cells: [
                         DataCell(Text('${sections[index].name}')),
-                        DataCell(Text('${sections[index].adminUserId}')),
+                        DataCell(Text(
+                          users.length > 0
+                              ? '${users.singleWhere((user) => user.id == sections[index].adminUserId).name}'
+                              : '',
+                        )),
                       ],
                     ),
                   ),
@@ -252,12 +256,12 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
 class SectionDetailsDialog extends StatefulWidget {
   final SectionProvider sectionProvider;
   final SectionModel section;
-  final String groupId;
+  final List<UserModel> users;
 
   SectionDetailsDialog({
     @required this.sectionProvider,
     @required this.section,
-    @required this.groupId,
+    @required this.users,
   });
 
   @override
@@ -266,10 +270,14 @@ class SectionDetailsDialog extends StatefulWidget {
 
 class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
   TextEditingController name = TextEditingController();
+  UserModel adminUser;
 
   void _init() async {
     setState(() {
       name.text = widget.section?.name;
+      adminUser = widget.users.singleWhere(
+        (user) => user.id == widget.section?.adminUserId,
+      );
     });
   }
 
@@ -297,15 +305,39 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('部署名', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: name,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
+                CustomDropdownButton(
+                  value: adminUser,
+                  onChanged: (value) {
+                    setState(() => adminUser = value);
+                  },
+                  items: widget.users.map((value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        '${value.name}',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                Text(
+                  '※部署の管理者は、別管理画面の使用が可能です。',
+                  style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
                 ),
               ],
             ),
@@ -323,6 +355,9 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
                     CustomTextButton(
                       onPressed: () {
                         widget.sectionProvider.delete(section: widget.section);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('部署を削除しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.red,
@@ -333,12 +368,14 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
                       onPressed: () async {
                         if (!await widget.sectionProvider.update(
                           id: widget.section.id,
-                          groupId: widget.groupId,
                           name: name.text.trim(),
-                          adminUserId: '',
+                          adminUserId: adminUser?.id,
                         )) {
                           return;
                         }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('部署を修正しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.blue,

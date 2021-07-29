@@ -6,11 +6,11 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
-import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
+import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
-import 'package:intl/intl.dart';
 
 class UserTable extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -43,7 +43,7 @@ class _UserTableState extends State<UserTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフの情報を一覧表示します。スマートフォンアプリから登録するか、ここで登録できます。',
+          'スタッフを一覧表示します。スマートフォンアプリから新規登録して会社/組織へ加入するか、この画面で新規登録できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -124,11 +124,11 @@ class _UserTableState extends State<UserTable> {
               }
               return DataTable2(
                 columns: [
-                  DataColumn(label: Text('名前')),
+                  DataColumn2(label: Text('スタッフ名'), size: ColumnSize.S),
+                  DataColumn(label: Text('部署')),
                   DataColumn(label: Text('雇用形態')),
-                  DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
-                  DataColumn(label: Text('スマホ利用状況')),
-                  DataColumn(label: Text('管理者権限')),
+                  DataColumn(label: Text('タブレット用暗証番号')),
+                  DataColumn2(label: Text('スマホ利用状況'), size: ColumnSize.S),
                 ],
                 rows: List<DataRow>.generate(
                   users.length,
@@ -147,6 +147,7 @@ class _UserTableState extends State<UserTable> {
                     },
                     cells: [
                       DataCell(Text('${users[index].name}')),
+                      DataCell(Text('')),
                       DataCell(Text('${users[index].position}')),
                       DataCell(Text('${users[index].recordPassword}')),
                       users[index].smartphone
@@ -159,19 +160,6 @@ class _UserTableState extends State<UserTable> {
                           : DataCell(
                               Icon(
                                 Icons.smartphone,
-                                color: Colors.transparent,
-                              ),
-                            ),
-                      users[index].id == widget.groupProvider.group?.adminUserId
-                          ? DataCell(
-                              Icon(
-                                Icons.admin_panel_settings,
-                                color: Colors.red,
-                              ),
-                            )
-                          : DataCell(
-                              Icon(
-                                Icons.admin_panel_settings,
                                 color: Colors.transparent,
                               ),
                             ),
@@ -235,74 +223,73 @@ class _MigrationDialogState extends State<MigrationDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              '「移行元」と「移行先」を選択し、最後に「移行する」ボタンを押してください。',
+              'この機能は、この管理画面から登録したスタッフがスマートフォンアプリの利用を始めた際、スタッフデータが二重に登録されてしまう為、ここでデータの統一化ができます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
+            SizedBox(height: 8.0),
             Text(
-              '移行が完了すると、「移行元」のスタッフデータは削除されます。',
+              '「移行元」と「移行先」をそれぞれ選択し、最後に「移行する」ボタンを押してください。移行が完了すると、「移行元」のスタッフデータは削除されます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomIconLabel(
-                        iconData: Icons.person,
-                        label: '移行元',
-                      ),
-                      DropdownButton<UserModel>(
-                        isExpanded: true,
-                        hint: Text('選択してください'),
-                        value: selectBefUser,
-                        onChanged: (value) {
-                          setState(() => selectBefUser = value);
-                        },
-                        items: befUsers.map((value) {
-                          return DropdownMenuItem<UserModel>(
-                            value: value,
-                            child: Text('${value.name}'),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('移行元', style: TextStyle(fontSize: 14.0)),
+                    CustomDropdownButton(
+                      value: selectBefUser,
+                      onChanged: (value) {
+                        setState(() => selectBefUser = value);
+                      },
+                      items: befUsers.map((value) {
+                        return DropdownMenuItem<UserModel>(
+                          value: value,
+                          child: Text(
+                            '${value.name}',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 16.0),
+                SizedBox(width: 8.0),
                 Center(
                   child: Icon(
                     Icons.arrow_forward,
                     color: Colors.black54,
-                    size: 24.0,
+                    size: 20.0,
                   ),
                 ),
-                SizedBox(width: 16.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomIconLabel(
-                        iconData: Icons.person,
-                        label: '移行先',
-                      ),
-                      DropdownButton<UserModel>(
-                        isExpanded: true,
-                        hint: Text('選択してください'),
-                        value: selectAftUser,
-                        onChanged: (value) {
-                          setState(() => selectAftUser = value);
-                        },
-                        items: aftUsers.map((value) {
-                          return DropdownMenuItem<UserModel>(
-                            value: value,
-                            child: Text('${value.name}'),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+                SizedBox(width: 8.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('移行先', style: TextStyle(fontSize: 14.0)),
+                    CustomDropdownButton(
+                      value: selectAftUser,
+                      onChanged: (value) {
+                        setState(() => selectAftUser = value);
+                      },
+                      items: aftUsers.map((value) {
+                        return DropdownMenuItem<UserModel>(
+                          value: value,
+                          child: Text(
+                            '${value.name}',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -377,23 +364,18 @@ class _AddUserDialogState extends State<AddUserDialog> {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             Text(
-              'また、ここで登録したスタッフデータではスマートフォンアプリをご利用いただけません。スマートフォンアプリ内からご登録をお願いいたします。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              '※ここで新規登録したスタッフデータではスマートフォンアプリにログインできません。スマートフォンアプリから新規登録して会社/組織へ加入してください。',
+              style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('名前', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
+                Text('スタッフ名', style: TextStyle(fontSize: 14.0)),
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: name,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -402,15 +384,10 @@ class _AddUserDialogState extends State<AddUserDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('タブレット用暗証番号', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: recordPassword,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -419,32 +396,23 @@ class _AddUserDialogState extends State<AddUserDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('雇用形態', style: TextStyle(fontSize: 14.0)),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black38),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: position != '' ? position : null,
-                      onChanged: (value) {
-                        setState(() => position = value);
-                      },
-                      items: widget.positions.map((value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
+                CustomDropdownButton(
+                  value: position != '' ? position : null,
+                  onChanged: (value) {
+                    setState(() => position = value);
+                  },
+                  items: widget.positions.map((value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ],
             ),
@@ -468,6 +436,9 @@ class _AddUserDialogState extends State<AddUserDialog> {
                     )) {
                       return;
                     }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('スタッフを登録しました')),
+                    );
                     Navigator.pop(context);
                   },
                   color: Colors.blue,
@@ -530,100 +501,58 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             Text(
-              'ただしスマートフォン利用をされている方は、ここで削除はできません。スマートフォンアプリ内で操作をお願いいたします。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              '※スマートフォンアプリから登録している方は、この画面では削除はできません。スマートフォンアプリ内から削除するか、会社/組織から脱退してください。',
+              style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('名前'),
-                title: TextFormField(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('スタッフ名', style: TextStyle(fontSize: 14.0)),
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: name,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
-              ),
+              ],
             ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('タブレット用暗証番号'),
-                title: TextFormField(
+            SizedBox(height: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('タブレット用暗証番号', style: TextStyle(fontSize: 14.0)),
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: recordPassword,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
-              ),
+              ],
             ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('雇用形態'),
-                title: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black38),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: position != '' ? position : null,
-                      onChanged: (value) {
-                        setState(() => position = value);
-                      },
-                      items: widget.positions.map((value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
+            SizedBox(height: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('雇用形態', style: TextStyle(fontSize: 14.0)),
+                CustomDropdownButton(
+                  value: position != '' ? position : null,
+                  onChanged: (value) {
+                    setState(() => position = value);
+                  },
+                  items: widget.positions.map((value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              ),
+              ],
             ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('作成日時'),
-                title: Text(
-                  '${DateFormat('yyyy/MM/dd HH:mm').format(widget.user.createdAt)}',
-                ),
-              ),
-            ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('スマホ利用状況'),
-                title: widget.user.smartphone ? Text('利用中') : Text(''),
-              ),
-            ),
-            widget.user.smartphone
-                ? Container(
-                    decoration: kBottomBorderDecoration,
-                    child: ListTile(
-                      leading: Text('メールアドレス'),
-                      title: Text('${widget.user.email}'),
-                    ),
-                  )
-                : Container(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -644,6 +573,9 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
                         : CustomTextButton(
                             onPressed: () {
                               widget.userProvider.delete(user: widget.user);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('スタッフを削除しました')),
+                              );
                               Navigator.pop(context);
                             },
                             color: Colors.red,
@@ -660,6 +592,9 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
                         )) {
                           return;
                         }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('スタッフを修正しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.blue,
