@@ -12,6 +12,7 @@ class SectionProvider with ChangeNotifier {
   }) async {
     if (groupId == '') return false;
     if (name == '') return false;
+    if (adminUserId == '') return false;
     try {
       String _id = _sectionService.id();
       _sectionService.create({

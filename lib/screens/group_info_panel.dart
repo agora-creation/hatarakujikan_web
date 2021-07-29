@@ -131,7 +131,11 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('会社/組織名', style: TextStyle(fontSize: 14.0)),
-                  CustomTextFormField2(controller: name),
+                  CustomTextFormField2(
+                    textInputType: null,
+                    maxLines: 1,
+                    controller: name,
+                  ),
                 ],
               ),
               SizedBox(height: 8.0),
@@ -171,7 +175,11 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                     '雇用形態(カンマ区切りで入力してください)',
                     style: TextStyle(fontSize: 14.0),
                   ),
-                  CustomTextFormField2(controller: positions),
+                  CustomTextFormField2(
+                    textInputType: null,
+                    maxLines: 1,
+                    controller: positions,
+                  ),
                 ],
               ),
             ],

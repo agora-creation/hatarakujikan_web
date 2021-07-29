@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/screens/section_table.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,7 @@ class SectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final sectionProvider = Provider.of<SectionProvider>(context);
 
     return CustomAdminScaffold(
@@ -18,6 +20,7 @@ class SectionScreen extends StatelessWidget {
       selectedRoute: id,
       body: SectionTable(
         groupProvider: groupProvider,
+        userProvider: userProvider,
         sectionProvider: sectionProvider,
       ),
     );

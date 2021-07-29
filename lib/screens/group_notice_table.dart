@@ -7,10 +7,11 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/group_notice.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
-import 'package:intl/intl.dart';
 
 class GroupNoticeTable extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -84,38 +85,36 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
               for (DocumentSnapshot groupNotice in snapshot.data.docs) {
                 groupNotices.add(GroupNoticeModel.fromSnapshot(groupNotice));
               }
-              return DataTable2(
-                columns: [
-                  DataColumn2(label: Text('登録日時'), size: ColumnSize.S),
-                  DataColumn(label: Text('タイトル')),
-                  DataColumn2(label: Text('メッセージ'), size: ColumnSize.L),
-                ],
-                rows: List<DataRow>.generate(
-                  groupNotices.length,
-                  (index) => DataRow(
-                    onSelectChanged: (value) {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => GroupNoticeDetailsDialog(
-                          groupNoticeProvider: widget.groupNoticeProvider,
-                          groupNotice: groupNotices[index],
-                          userProvider: widget.userProvider,
-                        ),
-                      );
-                    },
-                    cells: [
-                      DataCell(
-                        Text(
-                          '${DateFormat('yyyy/MM/dd HH:mm').format(groupNotices[index].createdAt)}',
-                        ),
-                      ),
-                      DataCell(Text('${groupNotices[index].title}')),
-                      DataCell(Text('${groupNotices[index].message}')),
-                    ],
+              if (groupNotices.length > 0) {
+                return DataTable2(
+                  columns: [
+                    DataColumn(label: Text('タイトル')),
+                    DataColumn2(label: Text('メッセージ'), size: ColumnSize.L),
+                  ],
+                  rows: List<DataRow>.generate(
+                    groupNotices.length,
+                    (index) => DataRow(
+                      onSelectChanged: (value) {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => GroupNoticeDetailsDialog(
+                            groupNoticeProvider: widget.groupNoticeProvider,
+                            groupNotice: groupNotices[index],
+                            userProvider: widget.userProvider,
+                          ),
+                        );
+                      },
+                      cells: [
+                        DataCell(Text('${groupNotices[index].title}')),
+                        DataCell(Text('${groupNotices[index].message}')),
+                      ],
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                return Text('現在登録されているお知らせはありません');
+              }
             },
           ),
         ),
@@ -154,20 +153,19 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
               '項目を全て入力して、最後に「登録する」ボタンを押してください。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
+            Text(
+              '※ここでは登録はできますが、送信はできません。お知らせの詳細から送信してください。',
+              style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
+            ),
             SizedBox(height: 16.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('タイトル', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: title,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -176,17 +174,10 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('メッセージ', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
-                  keyboardType: TextInputType.multiline,
+                CustomTextFormField2(
+                  textInputType: TextInputType.multiline,
                   maxLines: null,
                   controller: message,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -208,6 +199,9 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
                     )) {
                       return;
                     }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('お知らせを登録しました')),
+                    );
                     Navigator.pop(context);
                   },
                   color: Colors.blue,
@@ -276,7 +270,7 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              'お知らせの内容を修正できます。',
+              'お知らせ情報を修正できます。また、このお知らせ情報を送信先スタッフを選択して、送信することもできます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
@@ -284,15 +278,10 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('タイトル', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: title,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -301,24 +290,18 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('メッセージ', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
-                  keyboardType: TextInputType.multiline,
+                CustomTextFormField2(
+                  textInputType: TextInputType.multiline,
                   maxLines: null,
                   controller: message,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
             SizedBox(height: 8.0),
-            Text('送信先スタッフ', style: TextStyle(fontSize: 14.0)),
-            SizedBox(height: 4.0),
-            Divider(height: 0.0),
+            CustomIconLabel(
+              iconData: Icons.person,
+              label: '送信先スタッフ',
+            ),
             Container(
               height: 300.0,
               child: Scrollbar(
@@ -371,6 +354,9 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                         widget.groupNoticeProvider.delete(
                           groupNotice: widget.groupNotice,
                         );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('お知らせを削除しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.red,
@@ -389,6 +375,9 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                               )) {
                                 return;
                               }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('お知らせを送信しました')),
+                              );
                               Navigator.pop(context);
                             },
                             color: Colors.cyan,
@@ -410,6 +399,9 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                         )) {
                           return;
                         }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('お知らせを修正しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.blue,

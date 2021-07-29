@@ -3,18 +3,24 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/section.dart';
+import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 
 class SectionTable extends StatefulWidget {
   final GroupProvider groupProvider;
+  final UserProvider userProvider;
   final SectionProvider sectionProvider;
 
   SectionTable({
     @required this.groupProvider,
+    @required this.userProvider,
     @required this.sectionProvider,
   });
 
@@ -23,6 +29,25 @@ class SectionTable extends StatefulWidget {
 }
 
 class _SectionTableState extends State<SectionTable> {
+  List<UserModel> users = [];
+
+  void _init() async {
+    await widget.userProvider
+        .selectListSP(
+      groupId: widget.groupProvider.group?.id,
+      smartphone: true,
+    )
+        .then((value) {
+      setState(() => users = value);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
@@ -40,7 +65,7 @@ class _SectionTableState extends State<SectionTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          '部署の情報を一覧表示します。登録した部署は、「スタッフの管理」から割り当ててください。部署の管理者は別管理画面でログインして、部署毎のスタッフを管理できます。',
+          '部署を一覧表示します。登録した部署は、「スタッフの管理」からそれぞれ割り当ててください。部署の管理者は別の管理画面にてログインして、部署毎のスタッフを管理できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -56,6 +81,7 @@ class _SectionTableState extends State<SectionTable> {
                   builder: (_) => AddSectionDialog(
                     sectionProvider: widget.sectionProvider,
                     groupId: widget.groupProvider.group?.id,
+                    users: users,
                   ),
                 );
               },
@@ -77,32 +103,36 @@ class _SectionTableState extends State<SectionTable> {
               for (DocumentSnapshot section in snapshot.data.docs) {
                 sections.add(SectionModel.fromSnapshot(section));
               }
-              return DataTable2(
-                columns: [
-                  DataColumn(label: Text('部署名')),
-                  DataColumn(label: Text('管理者')),
-                ],
-                rows: List<DataRow>.generate(
-                  sections.length,
-                  (index) => DataRow(
-                    onSelectChanged: (value) {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => SectionDetailsDialog(
-                          sectionProvider: widget.sectionProvider,
-                          section: sections[index],
-                          groupId: widget.groupProvider.group?.id,
-                        ),
-                      );
-                    },
-                    cells: [
-                      DataCell(Text('${sections[index].name}')),
-                      DataCell(Text('${sections[index].adminUserId}')),
-                    ],
+              if (sections.length > 0) {
+                return DataTable2(
+                  columns: [
+                    DataColumn(label: Text('部署名')),
+                    DataColumn(label: Text('管理者スタッフ')),
+                  ],
+                  rows: List<DataRow>.generate(
+                    sections.length,
+                    (index) => DataRow(
+                      onSelectChanged: (value) {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => SectionDetailsDialog(
+                            sectionProvider: widget.sectionProvider,
+                            section: sections[index],
+                            groupId: widget.groupProvider.group?.id,
+                          ),
+                        );
+                      },
+                      cells: [
+                        DataCell(Text('${sections[index].name}')),
+                        DataCell(Text('${sections[index].adminUserId}')),
+                      ],
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                return Text('現在登録されている部署はありません');
+              }
             },
           ),
         ),
@@ -114,10 +144,12 @@ class _SectionTableState extends State<SectionTable> {
 class AddSectionDialog extends StatefulWidget {
   final SectionProvider sectionProvider;
   final String groupId;
+  final List<UserModel> users;
 
   AddSectionDialog({
     @required this.sectionProvider,
     @required this.groupId,
+    @required this.users,
   });
 
   @override
@@ -126,6 +158,7 @@ class AddSectionDialog extends StatefulWidget {
 
 class _AddSectionDialogState extends State<AddSectionDialog> {
   TextEditingController name = TextEditingController();
+  UserModel adminUser;
 
   @override
   Widget build(BuildContext context) {
@@ -145,15 +178,10 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('部署名', style: TextStyle(fontSize: 14.0)),
-                TextFormField(
+                CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
                   controller: name,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14.0,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ],
             ),
@@ -162,12 +190,27 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black38),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
+                CustomDropdownButton(
+                  value: adminUser,
+                  onChanged: (value) {
+                    setState(() => adminUser = value);
+                  },
+                  items: widget.users.map((value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        '${value.name}',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                Text(
+                  '※部署の管理者は、別管理画面の使用が可能です。',
+                  style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
                 ),
               ],
             ),
@@ -185,10 +228,13 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                     if (!await widget.sectionProvider.create(
                       groupId: widget.groupId,
                       name: name.text.trim(),
-                      adminUserId: '',
+                      adminUserId: adminUser?.id,
                     )) {
                       return;
                     }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('部署を登録しました')),
+                    );
                     Navigator.pop(context);
                   },
                   color: Colors.blue,
