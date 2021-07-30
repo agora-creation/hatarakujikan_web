@@ -61,11 +61,11 @@ class _SectionTableState extends State<SectionTable> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '部署の管理',
+          '部署/事業所の管理',
           style: kAdminTitleTextStyle,
         ),
         Text(
-          '部署を一覧表示します。登録した部署は、「スタッフの管理」からそれぞれ割り当ててください。部署の管理者は別の管理画面にてログインして、部署毎のスタッフを管理できます。',
+          '部署/事業所を一覧表示します。登録した部署/事業所は、「スタッフの管理」からそれぞれ割り当ててください。部署/事業所の管理者は別の管理画面にてログインしてスタッフを管理できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -106,7 +106,7 @@ class _SectionTableState extends State<SectionTable> {
               if (sections.length > 0) {
                 return DataTable2(
                   columns: [
-                    DataColumn(label: Text('部署名')),
+                    DataColumn(label: Text('部署/事業者名')),
                     DataColumn(label: Text('管理者スタッフ')),
                   ],
                   rows: List<DataRow>.generate(
@@ -135,7 +135,7 @@ class _SectionTableState extends State<SectionTable> {
                   ),
                 );
               } else {
-                return Text('現在登録されている部署はありません');
+                return Text('現在登録されている部署/事業所はありません');
               }
             },
           ),
@@ -181,7 +181,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('部署名', style: TextStyle(fontSize: 14.0)),
+                Text('部署/事業所名', style: TextStyle(fontSize: 14.0)),
                 CustomTextFormField2(
                   textInputType: null,
                   maxLines: 1,
@@ -213,7 +213,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                   }).toList(),
                 ),
                 Text(
-                  '※部署の管理者は、別管理画面の使用が可能です。',
+                  '※部署/事業所の管理者は、別管理画面の使用が可能です。',
                   style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
                 ),
               ],
@@ -237,7 +237,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
                       return;
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('部署を登録しました')),
+                      SnackBar(content: Text('部署/事業所を登録しました')),
                     );
                     Navigator.pop(context);
                   },
@@ -297,14 +297,14 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              '部署の情報を修正できます。',
+              '部署/事業所の情報を修正できます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('部署名', style: TextStyle(fontSize: 14.0)),
+                Text('部署/事業所名', style: TextStyle(fontSize: 14.0)),
                 CustomTextFormField2(
                   textInputType: null,
                   maxLines: 1,
@@ -336,7 +336,7 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
                   }).toList(),
                 ),
                 Text(
-                  '※部署の管理者は、別管理画面の使用が可能です。',
+                  '※部署/事業所の管理者は、別管理画面の使用が可能です。',
                   style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
                 ),
               ],
@@ -356,7 +356,7 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
                       onPressed: () {
                         widget.sectionProvider.delete(section: widget.section);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('部署を削除しました')),
+                          SnackBar(content: Text('部署/事業所を削除しました')),
                         );
                         Navigator.pop(context);
                       },
@@ -374,7 +374,7 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('部署を修正しました')),
+                          SnackBar(content: Text('部署/事業所を修正しました')),
                         );
                         Navigator.pop(context);
                       },

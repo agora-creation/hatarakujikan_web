@@ -30,24 +30,27 @@ class ApplyWorkTable extends StatefulWidget {
 }
 
 class _ApplyWorkTableState extends State<ApplyWorkTable> {
-  UserModel selectUser;
   List<UserModel> users = [];
-  bool selectApproval = false;
+  UserModel searchUser;
+  bool searchApproval = false;
 
   void _init() async {
     await widget.userProvider
-        .selectList(groupId: widget.groupProvider.group?.id)
+        .selectListSP(
+      groupId: widget.groupProvider.group?.id,
+      smartphone: true,
+    )
         .then((value) {
       setState(() => users = value);
     });
   }
 
-  void _changeUser(UserModel user) {
-    setState(() => selectUser = user);
+  void searchUserChange(UserModel user) {
+    setState(() => searchUser = user);
   }
 
-  void _changeApproval(bool approval) {
-    setState(() => selectApproval = approval);
+  void searchApprovalChange(bool approval) {
+    setState(() => searchApproval = approval);
   }
 
   @override
@@ -59,19 +62,19 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream;
-    if (selectUser != null) {
+    if (searchUser != null) {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
           .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-          .where('userId', isEqualTo: selectUser?.id)
-          .where('approval', isEqualTo: selectApproval)
+          .where('userId', isEqualTo: searchUser?.id)
+          .where('approval', isEqualTo: searchApproval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     } else {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
           .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-          .where('approval', isEqualTo: selectApproval)
+          .where('approval', isEqualTo: searchApproval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     }
@@ -85,7 +88,7 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフがスマートフォンから申請した内容を一覧表示します。承認をした場合、自動的に勤務記録が修正されます。',
+          'スタッフがスマートフォンアプリから申請した内容を一覧表示します。承認をした場合は自動的に勤怠データが修正されます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -99,16 +102,16 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                     showDialog(
                       barrierDismissible: false,
                       context: context,
-                      builder: (_) => SelectUserDialog(
+                      builder: (_) => SearchUserDialog(
                         users: users,
-                        selectUser: selectUser,
-                        changeUser: _changeUser,
+                        searchUser: searchUser,
+                        searchUserChange: searchUserChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.person,
-                  label: selectUser?.name ?? '選択してください',
+                  label: searchUser?.name ?? '選択してください',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
@@ -116,15 +119,15 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                     showDialog(
                       barrierDismissible: false,
                       context: context,
-                      builder: (_) => SelectApprovalDialog(
-                        selectApproval: selectApproval,
-                        changeApproval: _changeApproval,
+                      builder: (_) => SearchApprovalDialog(
+                        searchApproval: searchApproval,
+                        searchApprovalChange: searchApprovalChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.approval,
-                  label: selectApproval ? '承認済み' : '承認待ち',
+                  label: searchApproval ? '承認済み' : '承認待ち',
                 ),
               ],
             ),
@@ -146,7 +149,7 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
               return DataTable2(
                 columns: [
                   DataColumn(label: Text('申請日時')),
-                  DataColumn(label: Text('申請者')),
+                  DataColumn(label: Text('申請者名')),
                   DataColumn2(label: Text('事由'), size: ColumnSize.L),
                   DataColumn(label: Text('承認状況')),
                 ],
@@ -186,15 +189,15 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
   }
 }
 
-class SelectUserDialog extends StatelessWidget {
+class SearchUserDialog extends StatelessWidget {
   final List<UserModel> users;
-  final UserModel selectUser;
-  final Function changeUser;
+  final UserModel searchUser;
+  final Function searchUserChange;
 
-  SelectUserDialog({
+  SearchUserDialog({
     @required this.users,
-    @required this.selectUser,
-    @required this.changeUser,
+    @required this.searchUser,
+    @required this.searchUserChange,
   });
 
   @override
@@ -208,7 +211,7 @@ class SelectUserDialog extends StatelessWidget {
           shrinkWrap: true,
           children: [
             SizedBox(height: 16.0),
-            Divider(height: 0.0),
+            Divider(),
             Container(
               height: 350.0,
               child: Scrollbar(
@@ -226,10 +229,10 @@ class SelectUserDialog extends StatelessWidget {
                       child: RadioListTile(
                         title: Text('${_user.name}'),
                         value: _user,
-                        groupValue: selectUser,
+                        groupValue: searchUser,
                         activeColor: Colors.blue,
                         onChanged: (value) {
-                          changeUser(value);
+                          searchUserChange(value);
                           Navigator.pop(context);
                         },
                       ),
@@ -238,7 +241,7 @@ class SelectUserDialog extends StatelessWidget {
                 ),
               ),
             ),
-            Divider(height: 0.0),
+            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,13 +265,13 @@ class SelectUserDialog extends StatelessWidget {
   }
 }
 
-class SelectApprovalDialog extends StatelessWidget {
-  final bool selectApproval;
-  final Function changeApproval;
+class SearchApprovalDialog extends StatelessWidget {
+  final bool searchApproval;
+  final Function searchApprovalChange;
 
-  SelectApprovalDialog({
-    @required this.selectApproval,
-    @required this.changeApproval,
+  SearchApprovalDialog({
+    @required this.searchApproval,
+    @required this.searchApprovalChange,
   });
 
   @override
@@ -280,16 +283,16 @@ class SelectApprovalDialog extends StatelessWidget {
           shrinkWrap: true,
           children: [
             SizedBox(height: 16.0),
-            Divider(height: 0.0),
+            Divider(),
             Container(
               decoration: kBottomBorderDecoration,
               child: RadioListTile(
                 title: Text('承認待ち'),
                 value: false,
-                groupValue: selectApproval,
+                groupValue: searchApproval,
                 activeColor: Colors.blue,
                 onChanged: (value) {
-                  changeApproval(value);
+                  searchApprovalChange(value);
                   Navigator.pop(context);
                 },
               ),
@@ -299,15 +302,15 @@ class SelectApprovalDialog extends StatelessWidget {
               child: RadioListTile(
                 title: Text('承認済み'),
                 value: true,
-                groupValue: selectApproval,
+                groupValue: searchApproval,
                 activeColor: Colors.blue,
                 onChanged: (value) {
-                  changeApproval(value);
+                  searchApprovalChange(value);
                   Navigator.pop(context);
                 },
               ),
             ),
-            Divider(height: 0.0),
+            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -354,21 +357,79 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('申請日時'),
-                title: Text(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '申請日時',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text(
                   '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.createdAt)}',
                 ),
-              ),
+              ],
             ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('申請者'),
-                title: Text('${applyWork.userName}'),
-              ),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '申請者名',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text('${applyWork.userName}'),
+              ],
+            ),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '申請内容',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Container(
+                  decoration: kBottomBorderDecoration,
+                  child: ListTile(
+                    leading: Text('出勤時間'),
+                    title: Text(
+                      '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.startedAt)}',
+                    ),
+                  ),
+                ),
+                applyWork.breaks.length > 0 ? Container() : Container(),
+                Container(
+                  decoration: kBottomBorderDecoration,
+                  child: ListTile(
+                    leading: Text('退勤時間'),
+                    title: Text(
+                      '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.endedAt)}',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '事由',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text('${applyWork.reason}'),
+              ],
+            ),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '承認状況',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                applyWork.approval ? Text('承認済み') : Text('承認待ち')
+              ],
             ),
             Container(
               decoration: kBottomBorderDecoration,
@@ -429,20 +490,6 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-            ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('事由'),
-                title: Text('${applyWork.reason}'),
-              ),
-            ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('承認状況'),
-                title: applyWork.approval ? Text('承認済み') : Text('承認待ち'),
               ),
             ),
             SizedBox(height: 16.0),

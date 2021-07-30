@@ -238,7 +238,7 @@ class ConfirmDialog extends StatelessWidget {
                   )) {
                     return;
                   }
-                  groupProvider.signOut();
+                  await groupProvider.signOut();
                   Navigator.pop(context);
                   changeScreen(context, LoginScreen());
                 },

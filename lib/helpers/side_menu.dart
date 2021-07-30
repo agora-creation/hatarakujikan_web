@@ -32,14 +32,9 @@ const List<MenuItem> kSideMenu = [
     icon: Icons.person,
   ),
   MenuItem(
-    title: '部署の管理',
+    title: '部署/事業所の管理',
     route: SectionScreen.id,
     icon: Icons.account_tree,
-  ),
-  MenuItem(
-    title: 'お知らせの管理',
-    route: GroupNoticeScreen.id,
-    icon: Icons.notifications,
   ),
   MenuItem(
     title: '会社/組織の設定',
@@ -58,6 +53,16 @@ const List<MenuItem> kSideMenu = [
       MenuItem(
         title: '勤怠ルール設定',
         route: GroupWorkScreen.id,
+        icon: Icons.chevron_right,
+      ),
+      MenuItem(
+        title: '雇用形態の管理',
+        route: GroupNoticeScreen.id,
+        icon: Icons.chevron_right,
+      ),
+      MenuItem(
+        title: 'お知らせの管理',
+        route: GroupNoticeScreen.id,
         icon: Icons.chevron_right,
       ),
     ],

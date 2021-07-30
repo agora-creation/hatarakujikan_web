@@ -96,36 +96,35 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
           ],
         ),
         SizedBox(height: 8.0),
+        Container(
+          decoration: kBottomBorderDecoration,
+          child: CheckboxListTile(
+            onChanged: (value) {
+              setState(() => qrSecurity = value);
+            },
+            value: qrSecurity,
+            title: Text('QRコードで記録制限'),
+            subtitle: Text('時間の記録時は常にQRコードを撮る必要があります。'),
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+        ),
+        Container(
+          decoration: kBottomBorderDecoration,
+          child: CheckboxListTile(
+            onChanged: (value) {
+              setState(() => areaSecurity = value);
+            },
+            value: areaSecurity,
+            title: Text('記録可能な範囲を制限'),
+            subtitle: Text('下記地図上の赤い範囲でのみ、時間の記録ができます。'),
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+        ),
+        SizedBox(height: 8.0),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      onChanged: (value) {
-                        setState(() => qrSecurity = value);
-                      },
-                      value: qrSecurity,
-                      title: Text('QRコードで認証'),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                  ),
-                  SizedBox(width: 4.0),
-                  Expanded(
-                    child: CheckboxListTile(
-                      onChanged: (value) {
-                        setState(() => areaSecurity = value);
-                      },
-                      value: areaSecurity,
-                      title: Text('記録可能な範囲を制限'),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
               Expanded(
                 child: GoogleMap(
                   onMapCreated: _onMapCreated,

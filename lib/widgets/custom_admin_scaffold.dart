@@ -29,15 +29,19 @@ class CustomAdminScaffold extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (_) => SignOutDialog(groupProvider: groupProvider),
-              );
-            },
-            icon: Icon(Icons.exit_to_app),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CustomTextButton(
+              onPressed: () {
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (_) => SignOutDialog(groupProvider: groupProvider),
+                );
+              },
+              color: Colors.grey,
+              label: '${groupProvider.adminUser?.name}がログイン中',
+            ),
           ),
         ],
       ),
@@ -100,13 +104,6 @@ class SignOutDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Icon(
-              Icons.exit_to_app,
-              color: Colors.blue,
-              size: 32.0,
-            ),
-          ),
           SizedBox(height: 16.0),
           Text(
             'ログアウトします。よろしいですか？',
@@ -122,8 +119,8 @@ class SignOutDialog extends StatelessWidget {
                 label: 'キャンセル',
               ),
               CustomTextButton(
-                onPressed: () {
-                  groupProvider.signOut();
+                onPressed: () async {
+                  await groupProvider.signOut();
                   Navigator.pop(context);
                   changeScreen(context, LoginScreen());
                 },

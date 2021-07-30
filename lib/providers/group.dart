@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
+import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/group.dart';
+import 'package:hatarakujikan_web/services/user.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
@@ -11,25 +13,22 @@ class GroupProvider with ChangeNotifier {
   FirebaseAuth _auth;
   User _fUser;
   GroupService _groupService = GroupService();
+  UserService _userService = UserService();
   List<GroupModel> _groups = [];
   GroupModel _group;
+  UserModel _adminUser;
 
   Status get status => _status;
   User get fUser => _fUser;
   List<GroupModel> get groups => _groups;
   GroupModel get group => _group;
+  UserModel get adminUser => _adminUser;
 
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
-  bool isHidden = false;
 
   GroupProvider.initialize() : _auth = FirebaseAuth.instance {
     _auth.authStateChanges().listen(_onStateChanged);
-  }
-
-  void changeHidden() {
-    isHidden = !isHidden;
-    notifyListeners();
   }
 
   Future<void> setGroup(GroupModel group) async {
@@ -64,7 +63,7 @@ class GroupProvider with ChangeNotifier {
   }
 
   Future signOut() async {
-    _auth.signOut();
+    await _auth.signOut();
     _status = Status.Unauthenticated;
     _groups.clear();
     _group = null;
@@ -83,6 +82,7 @@ class GroupProvider with ChangeNotifier {
     if (_groupId != "") {
       _group = await _groupService.select(groupId: _groupId);
     }
+    _adminUser = await _userService.select(userId: _fUser.uid);
     notifyListeners();
   }
 
@@ -101,6 +101,7 @@ class GroupProvider with ChangeNotifier {
         _groups.clear();
         _group = await _groupService.select(groupId: _groupId);
       }
+      _adminUser = await _userService.select(userId: _fUser.uid);
     }
     notifyListeners();
   }
