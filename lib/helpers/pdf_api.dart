@@ -16,14 +16,14 @@ Future<void> workPdf({
   WorkProvider workProvider,
   WorkStateProvider workStateProvider,
   GroupModel group,
-  DateTime month,
-  UserModel user,
+  DateTime searchMonth,
+  UserModel searchUser,
 }) async {
-  if (user == null) return;
+  if (searchUser == null) return;
   List<DateTime> days = [];
   List<WorkModel> works = [];
   days.clear();
-  var _dateMap = DateMachineUtil.getMonthDate(month, 0);
+  var _dateMap = DateMachineUtil.getMonthDate(searchMonth, 0);
   DateTime _startAt = DateTime.parse('${_dateMap['start']}');
   DateTime _endAt = DateTime.parse('${_dateMap['end']}');
   for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {
@@ -32,7 +32,7 @@ Future<void> workPdf({
   await workProvider
       .selectList(
     groupId: group.id,
-    userId: user.id,
+    userId: searchUser.id,
     startAt: days.first,
     endAt: days.last,
   )
@@ -43,7 +43,7 @@ Future<void> workPdf({
   await workStateProvider
       .selectList(
     groupId: group.id,
-    userId: user.id,
+    userId: searchUser.id,
     startAt: days.first,
     endAt: days.last,
   )
@@ -280,10 +280,10 @@ Future<void> workPdf({
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(
-                '${DateFormat('yyyy年MM月').format(month)}',
+                '${DateFormat('yyyy年MM月').format(searchMonth)}',
                 style: _headerStyle,
               ),
-              pw.Text('${user.name}', style: _headerStyle),
+              pw.Text('${searchUser.name}', style: _headerStyle),
             ],
           ),
           pw.SizedBox(height: 4.0),

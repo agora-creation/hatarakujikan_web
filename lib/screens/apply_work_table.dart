@@ -8,7 +8,6 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
-import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
@@ -397,7 +396,39 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                applyWork.breaks.length > 0 ? Container() : Container(),
+                applyWork.breaks.length > 0
+                    ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        itemCount: applyWork.breaks.length,
+                        itemBuilder: (_, index) {
+                          BreaksModel _breaks = applyWork.breaks[index];
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                decoration: kBottomBorderDecoration,
+                                child: ListTile(
+                                  leading: Text('休憩開始時間'),
+                                  title: Text(
+                                    '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.startedAt)}',
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: kBottomBorderDecoration,
+                                child: ListTile(
+                                  leading: Text('休憩終了時間'),
+                                  title: Text(
+                                    '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.endedAt)}',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      )
+                    : Container(),
                 Container(
                   decoration: kBottomBorderDecoration,
                   child: ListTile(
@@ -431,67 +462,6 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                 applyWork.approval ? Text('承認済み') : Text('承認待ち')
               ],
             ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: ListTile(
-                leading: Text('申請内容'),
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomIconLabel(
-                      iconData: Icons.run_circle,
-                      label: '出勤時間',
-                    ),
-                    SizedBox(height: 4.0),
-                    Text(
-                      '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.startedAt)}',
-                    ),
-                    SizedBox(height: 8.0),
-                    applyWork.breaks.length > 0
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            physics: ScrollPhysics(),
-                            itemCount: applyWork.breaks.length,
-                            itemBuilder: (_, index) {
-                              BreaksModel _breaks = applyWork.breaks[index];
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomIconLabel(
-                                    iconData: Icons.run_circle,
-                                    label: '休憩開始時間',
-                                  ),
-                                  SizedBox(height: 4.0),
-                                  Text(
-                                    '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.startedAt)}',
-                                  ),
-                                  SizedBox(height: 8.0),
-                                  CustomIconLabel(
-                                    iconData: Icons.run_circle_outlined,
-                                    label: '休憩終了時間',
-                                  ),
-                                  SizedBox(height: 4.0),
-                                  Text(
-                                    '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.endedAt)}',
-                                  ),
-                                ],
-                              );
-                            },
-                          )
-                        : Container(),
-                    SizedBox(height: 8.0),
-                    CustomIconLabel(
-                      iconData: Icons.run_circle,
-                      label: '退勤時間',
-                    ),
-                    SizedBox(height: 4.0),
-                    Text(
-                      '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.endedAt)}',
-                    ),
-                  ],
-                ),
-              ),
-            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -507,6 +477,9 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                         ? CustomTextButton(
                             onPressed: () {
                               applyWorkProvider.delete(applyWork: applyWork);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('申請を削除しました')),
+                              );
                               Navigator.pop(context);
                             },
                             color: Colors.red,
@@ -515,6 +488,9 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                         : CustomTextButton(
                             onPressed: () {
                               applyWorkProvider.delete(applyWork: applyWork);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('申請を却下しました')),
+                              );
                               Navigator.pop(context);
                             },
                             color: Colors.red,
@@ -534,6 +510,9 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                               )) {
                                 return;
                               }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('申請を承認しました')),
+                              );
                               Navigator.pop(context);
                             },
                             color: Colors.blue,

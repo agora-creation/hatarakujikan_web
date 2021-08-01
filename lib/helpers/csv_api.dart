@@ -13,12 +13,12 @@ import 'package:universal_html/html.dart';
 Future<void> workCsv({
   WorkProvider workProvider,
   GroupModel group,
-  DateTime month,
+  DateTime searchMonth,
   List<UserModel> users,
 }) async {
   List<DateTime> days = [];
   days.clear();
-  var _dateMap = DateMachineUtil.getMonthDate(month, 0);
+  var _dateMap = DateMachineUtil.getMonthDate(searchMonth, 0);
   DateTime _startAt = DateTime.parse('${_dateMap['start']}');
   DateTime _endAt = DateTime.parse('${_dateMap['end']}');
   for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {

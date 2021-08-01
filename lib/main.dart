@@ -16,6 +16,7 @@ import 'package:hatarakujikan_web/screens/group_notice.dart';
 import 'package:hatarakujikan_web/screens/group_security.dart';
 import 'package:hatarakujikan_web/screens/group_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
+import 'package:hatarakujikan_web/screens/position.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
           GroupNoticeScreen.id: (context) => GroupNoticeScreen(),
           GroupSecurityScreen.id: (context) => GroupSecurityScreen(),
           GroupWorkScreen.id: (context) => GroupWorkScreen(),
+          PositionScreen.id: (context) => PositionScreen(),
           SectionScreen.id: (context) => SectionScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),

@@ -65,7 +65,7 @@ class _SectionTableState extends State<SectionTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          '部署/事業所を一覧表示します。登録した部署/事業所は、「スタッフの管理」からそれぞれ割り当ててください。部署/事業所の管理者は別の管理画面にてログインしてスタッフを管理できます。',
+          '部署/事業所を一覧表示します。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
