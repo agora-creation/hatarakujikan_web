@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -69,27 +68,20 @@ class CustomWorkListTile extends StatelessWidget {
                   String _nightTime = '00:00';
                   if (_work.startedAt != _work.endedAt) {
                     _endTime = _work.endTime(group);
-                    _breakTime = _work.breakTime(group);
+                    _breakTime = _work.breakTime(group)[0];
                     _workTime = _work.workTime(group);
-                    List<String> _legalList = legalList(
-                      workTime: _work.workTime(group),
-                      legal: group.legal,
-                    );
-                    _legalTime = _legalList.first;
-                    _nonLegalTime = _legalList.last;
-                    List<String> _nightList = nightList(
-                      startedAt: _work.startedAt,
-                      endedAt: _work.endedAt,
-                      nightStart: group.nightStart,
-                      nightEnd: group.nightEnd,
-                    );
-                    _nightTime = _nightList.last;
+                    List<String> _legalTimes = _work.legalTime(group);
+                    _legalTime = _legalTimes.first;
+                    _nonLegalTime = _legalTimes.last;
+                    _nightTime = _work.nightTime(group);
                   }
                   return ListTile(
                     leading: Chip(
                       backgroundColor: _chipColor,
-                      label: Text('${_work.state}',
-                          style: TextStyle(fontSize: 12.0)),
+                      label: Text(
+                        '${_work.state}',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
                     ),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

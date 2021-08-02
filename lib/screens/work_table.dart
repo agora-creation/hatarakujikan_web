@@ -295,20 +295,15 @@ class _WorkTableState extends State<WorkTable> {
                   _work?.workTime(widget.groupProvider.group),
                 );
                 // 法定内時間/法定外時間
-                List<String> _legalList = legalList(
-                  workTime: _work?.workTime(widget.groupProvider.group),
-                  legal: widget.groupProvider.group?.legal,
-                );
-                _legalTime = addTime(_legalTime, _legalList.first);
-                _nonLegalTime = addTime(_nonLegalTime, _legalList.last);
+                List<String> _legalTimes =
+                    _work?.legalTime(widget.groupProvider.group);
+                _legalTime = addTime(_legalTime, _legalTimes.first);
+                _nonLegalTime = addTime(_nonLegalTime, _legalTimes.last);
                 // 深夜時間
-                List<String> _nightList = nightList(
-                  startedAt: _work?.startedAt,
-                  endedAt: _work?.endedAt,
-                  nightStart: widget.groupProvider.group?.nightStart,
-                  nightEnd: widget.groupProvider.group?.nightEnd,
+                _nightTime = addTime(
+                  _nightTime,
+                  _work?.nightTime(widget.groupProvider.group),
                 );
-                _nightTime = addTime(_nightTime, _nightList.last);
               }
             }
             _workCount = _count.length;

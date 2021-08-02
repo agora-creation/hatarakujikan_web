@@ -35,6 +35,9 @@ Future<void> workPdf({
   daysWeek.clear();
   DateTime _startAtWeek = _startAt.add(Duration(days: 7) * -1);
   DateTime _endAtWeek = _endAt.add(Duration(days: 7));
+  for (int i = 0; i <= _endAtWeek.difference(_startAtWeek).inDays; i++) {
+    daysWeek.add(_startAtWeek.add(Duration(days: i)));
+  }
   await workProvider
       .selectList(
     groupId: group.id,
@@ -55,7 +58,6 @@ Future<void> workPdf({
       .then((value) {
     worksWeek = value;
   });
-
   await workStateProvider
       .selectList(
     groupId: group.id,
@@ -80,6 +82,7 @@ Future<void> workPdf({
   String _totalNightTime = '00:00';
   String _totalDayTimeOver = '00:00';
   String _totalNightTimeOver = '00:00';
+  Map _weeks = {};
 
   List<pw.TableRow> _buildRows() {
     List<pw.TableRow> _result = [];
@@ -134,6 +137,36 @@ Future<void> workPdf({
         ],
       ),
     );
+
+    String _workTimeTmp = '00:00';
+    for (int i = 0; i < daysWeek.length; i++) {
+      List<WorkModel> dayWeekWorks = [];
+      for (WorkModel _workWeek in worksWeek) {
+        String _startedAt =
+            '${DateFormat('yyyy-MM-dd').format(_workWeek.startedAt)}';
+        if (daysWeek[i] == DateTime.parse(_startedAt)) {
+          dayWeekWorks.add(_workWeek);
+        }
+      }
+      String _weekText = '${DateFormat('E', 'ja').format(daysWeek[i])}';
+      if (_weekText == '日') {
+        _workTimeTmp = '00:00';
+      }
+      if (dayWeekWorks.length > 0) {
+        for (int j = 0; j < dayWeekWorks.length; j++) {
+          if (dayWeekWorks[j].startedAt != dayWeekWorks[j].endedAt) {
+            _workTimeTmp = addTime(
+              _workTimeTmp,
+              dayWeekWorks[j].workTime(group),
+            );
+          }
+        }
+      }
+      if (_weekText == '土') {
+        _weeks['${DateFormat('yyyy-MM-dd').format(daysWeek[i])}'] =
+            _workTimeTmp;
+      }
+    }
     for (int i = 0; i < days.length; i++) {
       List<WorkModel> dayWorks = [];
       for (WorkModel _work in works) {
@@ -152,11 +185,6 @@ Future<void> workPdf({
         }
       }
       String _dayText = '${DateFormat('dd (E)', 'ja').format(days[i])}';
-      String _weekText = '${DateFormat('E', 'ja').format(days[i])}';
-      String _workTimeWeek = '';
-      if (_weekText == '土') {
-        _workTimeWeek = '00:00';
-      }
       if (dayWorks.length > 0) {
         for (int j = 0; j < dayWorks.length; j++) {
           String _startTime = dayWorks[j].startTime(group);
@@ -169,30 +197,23 @@ Future<void> workPdf({
           String _nightTimeOver = '---:---';
           if (dayWorks[j].startedAt != dayWorks[j].endedAt) {
             _endTime = dayWorks[j].endTime(group);
-            _breakTime = dayWorks[j].breakTime(group);
+            _breakTime = dayWorks[j].breakTime(group)[0];
             _workTime = dayWorks[j].workTime(group);
-            List<String> _calTimeList = timeCalculation01(
-              startedAt: dayWorks[j].startedAt,
-              endedAt: dayWorks[j].endedAt,
-              nightStart: group.nightStart,
-              nightEnd: group.nightEnd,
-              legal: group.legal,
-              workTime: dayWorks[j].workTime(group),
-            );
-            _dayTime = _calTimeList[0];
-            _nightTime = _calTimeList[1];
-            _dayTimeOver = _calTimeList[2];
-            _nightTimeOver = _calTimeList[3];
+            List<String> _calTimes = dayWorks[j].calTime01(group);
+            _dayTime = _calTimes[0];
+            _nightTime = _calTimes[1];
+            _dayTimeOver = _calTimes[2];
+            _nightTimeOver = _calTimes[3];
             _count['${DateFormat('yyyy-MM-dd').format(dayWorks[j].startedAt)}'] =
                 '';
             _totalWorkTime = addTime(
               _totalWorkTime,
               dayWorks[j].workTime(group),
             );
-            _totalDayTime = addTime(_totalDayTime, _calTimeList[0]);
-            _totalNightTime = addTime(_totalNightTime, _calTimeList[1]);
-            _totalDayTimeOver = addTime(_totalDayTimeOver, _calTimeList[2]);
-            _totalNightTimeOver = addTime(_totalNightTimeOver, _calTimeList[3]);
+            _totalDayTime = addTime(_totalDayTime, _dayTime);
+            _totalNightTime = addTime(_totalNightTime, _nightTime);
+            _totalDayTimeOver = addTime(_totalDayTimeOver, _dayTimeOver);
+            _totalNightTimeOver = addTime(_totalNightTimeOver, _nightTimeOver);
           }
           _result.add(
             pw.TableRow(
@@ -242,7 +263,10 @@ Future<void> workPdf({
                 ),
                 pw.Padding(
                   padding: pw.EdgeInsets.all(4.0),
-                  child: pw.Text(_workTimeWeek, style: _listStyle),
+                  child: pw.Text(
+                    _weeks['${DateFormat('yyyy-MM-dd').format(days[i])}'],
+                    style: _listStyle,
+                  ),
                 ),
               ],
             ),
@@ -311,7 +335,10 @@ Future<void> workPdf({
               ),
               pw.Padding(
                 padding: pw.EdgeInsets.all(4.0),
-                child: pw.Text(_workTimeWeek, style: _listStyle),
+                child: pw.Text(
+                  _weeks['${DateFormat('yyyy-MM-dd').format(days[i])}'],
+                  style: _listStyle,
+                ),
               ),
             ],
           ),

@@ -59,19 +59,11 @@ Future<void> workCsv({
         // 勤務時間
         _workTime = addTime(_workTime, _work.workTime(group));
         // 法定内時間
-        List<String> _legalList = legalList(
-          workTime: _work.workTime(group),
-          legal: group.legal,
-        );
-        _legalTime = addTime(_legalTime, _legalList.first);
+        List<String> _legalTimes = _work.legalTime(group);
+        _legalTime = addTime(_legalTime, _legalTimes.first);
         // 深夜時間
-        List<String> _nightList = nightList(
-          startedAt: _work.startedAt,
-          endedAt: _work.endedAt,
-          nightStart: group.nightStart,
-          nightEnd: group.nightEnd,
-        );
-        _nightTime = addTime(_nightTime, _nightList.last);
+        List<String> _calTimes = _work.calTime01(group);
+        _nightTime = addTime(_nightTime, _calTimes[1]);
       }
     }
     _row.add('${_count.length}');
