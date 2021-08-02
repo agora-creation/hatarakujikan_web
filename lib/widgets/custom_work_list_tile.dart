@@ -73,7 +73,8 @@ class CustomWorkListTile extends StatelessWidget {
                     List<String> _legalTimes = _work.legalTime(group);
                     _legalTime = _legalTimes.first;
                     _nonLegalTime = _legalTimes.last;
-                    _nightTime = _work.nightTime(group);
+                    List<String> _nightTimes = _work.nightTime(group);
+                    _nightTime = _nightTimes.last;
                   }
                   return ListTile(
                     leading: Chip(

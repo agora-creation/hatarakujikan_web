@@ -300,10 +300,9 @@ class _WorkTableState extends State<WorkTable> {
                 _legalTime = addTime(_legalTime, _legalTimes.first);
                 _nonLegalTime = addTime(_nonLegalTime, _legalTimes.last);
                 // 深夜時間
-                _nightTime = addTime(
-                  _nightTime,
-                  _work?.nightTime(widget.groupProvider.group),
-                );
+                List<String> _nightTimes =
+                    _work?.nightTime(widget.groupProvider.group);
+                _nightTime = addTime(_nightTime, _nightTimes.last);
               }
             }
             _workCount = _count.length;

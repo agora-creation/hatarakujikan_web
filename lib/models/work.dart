@@ -126,10 +126,11 @@ class WorkModel {
     return [_time, _nonTime];
   }
 
-  // 深夜時間
-  String nightTime(GroupModel group) {
+  // 深夜時間/深夜時間外
+  List<String> nightTime(GroupModel group) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String _time = '00:00';
+    String _dayTime = '00:00';
+    String _nightTime = '00:00';
     String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
@@ -137,6 +138,8 @@ class WorkModel {
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
     // ----------------------------------------
+    DateTime _dayS;
+    DateTime _dayE;
     DateTime _nightS;
     DateTime _nightE;
     DateTime _baseSS = DateTime.parse(
@@ -156,10 +159,14 @@ class WorkModel {
       if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
-        _nightS = DateTime.now();
-        _nightE = DateTime.now();
+        _dayS = _startedAt;
+        _dayE = _endedAt;
+        _nightS = _baseEE;
+        _nightE = _baseEE;
       } else {
         // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
+        _dayS = _startedAt;
+        _dayE = _baseSE;
         _nightS = _baseSE;
         _nightE = _endedAt;
       }
@@ -169,17 +176,32 @@ class WorkModel {
         // 出勤時間[22:00〜05:00]退勤時間[05:00〜22:00]
         _nightS = _startedAt;
         _nightE = _baseSE;
+        _dayS = _baseSE;
+        _dayE = _endedAt;
       } else {
         // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]
+        _dayS = _baseSS;
+        _dayE = _baseSS;
         _nightS = _startedAt;
         _nightE = _endedAt;
       }
     }
     // ----------------------------------------
-    Duration _diff = _nightE.difference(_nightS);
-    String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-    _time = '${twoDigits(_diff.inHours)}:$_minutes';
-    return _time;
+    if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
+      Duration _dayDiff = _dayE.difference(_dayS);
+      String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
+      _dayTime = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
+    } else {
+      _dayTime = '00:00';
+    }
+    if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
+      Duration _nightDiff = _nightE.difference(_nightS);
+      String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
+      _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
+    } else {
+      _nightTime = '00:00';
+    }
+    return [_dayTime, _nightTime];
   }
 
   // 通常時間/深夜時間/通常時間外/深夜時間外
@@ -219,8 +241,8 @@ class WorkModel {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
         _dayS = _startedAt;
         _dayE = _endedAt;
-        _nightS = DateTime.now();
-        _nightE = DateTime.now();
+        _nightS = _baseEE;
+        _nightE = _baseEE;
       } else {
         // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
         _dayS = _startedAt;
@@ -238,30 +260,38 @@ class WorkModel {
         _dayE = _endedAt;
       } else {
         // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]
-        _dayS = DateTime.now();
-        _dayE = DateTime.now();
+        _dayS = _baseSS;
+        _dayE = _baseSS;
         _nightS = _startedAt;
         _nightE = _endedAt;
       }
     }
     // ----------------------------------------
     // 通常時間
-    Duration _dayDiff = _dayE.difference(_dayS);
-    String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
-    _dayTime = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
-    _dayTime = subTime(_dayTime, breakTime(group)[1]);
-    List<String> _dayTimes = _dayTime.split(':');
-    if (group.legal <= int.parse(_dayTimes.first)) {
-      _dayTime = '0${group.legal}:00';
+    if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
+      Duration _dayDiff = _dayE.difference(_dayS);
+      String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
+      _dayTime = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
+      _dayTime = subTime(_dayTime, breakTime(group)[1]);
+      List<String> _dayTimes = _dayTime.split(':');
+      if (group.legal <= int.parse(_dayTimes.first)) {
+        _dayTime = '0${group.legal}:00';
+      }
+    } else {
+      _dayTime = '00:00';
     }
     // 深夜時間
-    Duration _nightDiff = _nightE.difference(_nightS);
-    String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
-    _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
-    _nightTime = subTime(_nightTime, breakTime(group)[2]);
-    List<String> _nightTimes = _nightTime.split(':');
-    if (group.legal <= int.parse(_nightTimes.first)) {
-      _nightTime = '0${group.legal}:00';
+    if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
+      Duration _nightDiff = _nightE.difference(_nightS);
+      String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
+      _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
+      _nightTime = subTime(_nightTime, breakTime(group)[2]);
+      List<String> _nightTimes = _nightTime.split(':');
+      if (group.legal <= int.parse(_nightTimes.first)) {
+        _nightTime = '0${group.legal}:00';
+      }
+    } else {
+      _nightTime = '00:00';
     }
     // ----------------------------------------
     List<String> _workTimes = workTime(group).split(':');
@@ -286,8 +316,8 @@ class WorkModel {
           // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
           _dayOverS = _overTimeS;
           _dayOverE = _endedAt;
-          _nightOverS = DateTime.now();
-          _nightOverE = DateTime.now();
+          _nightOverS = _baseEE;
+          _nightOverE = _baseEE;
         } else {
           // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
           _dayOverS = _overTimeS;
@@ -305,22 +335,32 @@ class WorkModel {
           _dayOverE = _endedAt;
         } else {
           // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]
-          _dayOverS = DateTime.now();
-          _dayOverE = DateTime.now();
+          _dayOverS = _baseSS;
+          _dayOverE = _baseSS;
           _nightOverS = _overTimeS;
           _nightOverE = _endedAt;
         }
       }
       // 通常時間外
-      Duration _dayOverDiff = _dayOverE.difference(_dayOverS);
-      String _dayOverMinutes = twoDigits(_dayOverDiff.inMinutes.remainder(60));
-      _dayTimeOver = '${twoDigits(_dayOverDiff.inHours)}:$_dayOverMinutes';
+      if (_dayOverS.millisecondsSinceEpoch < _dayOverE.millisecondsSinceEpoch) {
+        Duration _dayOverDiff = _dayOverE.difference(_dayOverS);
+        String _dayOverMinutes =
+            twoDigits(_dayOverDiff.inMinutes.remainder(60));
+        _dayTimeOver = '${twoDigits(_dayOverDiff.inHours)}:$_dayOverMinutes';
+      } else {
+        _dayTimeOver = '00:00';
+      }
       // 深夜時間外
-      Duration _nightOverDiff = _nightOverE.difference(_nightOverS);
-      String _nightOverMinutes =
-          twoDigits(_nightOverDiff.inMinutes.remainder(60));
-      _nightTimeOver =
-          '${twoDigits(_nightOverDiff.inHours)}:$_nightOverMinutes';
+      if (_nightOverS.millisecondsSinceEpoch <
+          _nightOverE.millisecondsSinceEpoch) {
+        Duration _nightOverDiff = _nightOverE.difference(_nightOverS);
+        String _nightOverMinutes =
+            twoDigits(_nightOverDiff.inMinutes.remainder(60));
+        _nightTimeOver =
+            '${twoDigits(_nightOverDiff.inHours)}:$_nightOverMinutes';
+      } else {
+        _nightTimeOver = '00:00';
+      }
     }
     // ----------------------------------------
     return [_dayTime, _nightTime, _dayTimeOver, _nightTimeOver];
