@@ -94,7 +94,7 @@ String subTime(String left, String right) {
 }
 
 // 法定内時間/法定外時間
-List<String> legalList({String workTime, int legal}) {
+List<String> legalList({int legal, String workTime}) {
   String _legal = '0$legal:00';
   String _legalTime = '00:00';
   String _nonLegalTime = '00:00';
@@ -180,6 +180,151 @@ List<String> nightList({
   String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
   String _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
   return [_dayTime, _nightTime];
+}
+
+// 通常時間/深夜時間/通常時間外/深夜時間外
+List<String> timeCalculation01({
+  DateTime startedAt,
+  DateTime endedAt,
+  String nightStart,
+  String nightEnd,
+  int legal,
+  String workTime,
+}) {
+  String _legal = '0$legal:00';
+  String _dayTime = '00:00';
+  String _nightTime = '00:00';
+  String _dayTimeOver = '00:00';
+  String _nightTimeOver = '00:00';
+
+  DateTime baseStartS = DateTime.parse(
+    '${DateFormat('yyyy-MM-dd').format(startedAt)} $nightStart:00.000',
+  );
+  DateTime baseEndS = DateTime.parse(
+    '${DateFormat('yyyy-MM-dd').format(startedAt)} $nightEnd:00.000',
+  );
+  DateTime baseStartE = DateTime.parse(
+    '${DateFormat('yyyy-MM-dd').format(endedAt)} $nightStart:00.000',
+  );
+  DateTime baseEndE = DateTime.parse(
+    '${DateFormat('yyyy-MM-dd').format(endedAt)} $nightEnd:00.000',
+  );
+  DateTime _dayS;
+  DateTime _dayE;
+  DateTime _nightS;
+  DateTime _nightE;
+// 出勤時間05:00〜22:00
+  if (startedAt.millisecondsSinceEpoch < baseStartS.millisecondsSinceEpoch &&
+      startedAt.millisecondsSinceEpoch > baseEndS.millisecondsSinceEpoch) {
+    // 退勤時間05:00〜22:00
+    if (endedAt.millisecondsSinceEpoch < baseStartE.millisecondsSinceEpoch &&
+        endedAt.millisecondsSinceEpoch > baseEndE.millisecondsSinceEpoch) {
+      _dayS = startedAt;
+      _dayE = endedAt;
+      _nightS = DateTime.now();
+      _nightE = DateTime.now();
+    } else {
+      _dayS = startedAt;
+      _dayE = baseStartE;
+      _nightS = baseStartE;
+      _nightE = endedAt;
+    }
+    // 出勤時間が22:00〜05:00
+  } else {
+    // 退勤時間が05:00〜22:00
+    if (endedAt.millisecondsSinceEpoch < baseStartE.millisecondsSinceEpoch &&
+        endedAt.millisecondsSinceEpoch > baseEndE.millisecondsSinceEpoch) {
+      _nightS = startedAt;
+      _nightE = baseStartE;
+      _dayS = baseStartE;
+      _dayE = endedAt;
+      // 退勤時間が22:00〜05:00
+    } else {
+      _dayS = DateTime.now();
+      _dayE = DateTime.now();
+      _nightS = startedAt;
+      _nightE = endedAt;
+    }
+  }
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+  // 通常時間
+  Duration _dayDiff = _dayE.difference(_dayS);
+  String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
+  _dayTime = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
+  // start:休憩時間も引く
+  // end休憩時間も引く
+  List<String> _dayTimeHM = _dayTime.split(':');
+  if (legal <= int.parse(_dayTimeHM.first)) {
+    _dayTime = _legal;
+  }
+  // 深夜時間
+  Duration _nightDiff = _nightE.difference(_nightS);
+  String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
+  _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
+  // start:休憩時間も引く
+  // end休憩時間も引く
+  List<String> _nightTimeHM = _nightTime.split(':');
+  if (legal <= int.parse(_nightTimeHM.first)) {
+    _nightTime = _legal;
+  }
+
+  List<String> _workTimeHM = workTime.split(':');
+  if (legal <= int.parse(_workTimeHM.first)) {
+    // 法定時間を超えた時点の時間を求める
+    DateTime overTimeStart = startedAt;
+    DateTime overTimeStartLegal = overTimeStart.add(Duration(hours: legal));
+    // start:休憩時間を足す
+    // end休憩時間を足す
+    DateTime _dayOverS;
+    DateTime _dayOverE;
+    DateTime _nightOverS;
+    DateTime _nightOverE;
+    // 出勤時間05:00〜22:00
+    if (overTimeStartLegal.millisecondsSinceEpoch <
+            baseStartS.millisecondsSinceEpoch &&
+        overTimeStartLegal.millisecondsSinceEpoch >
+            baseEndS.millisecondsSinceEpoch) {
+      // 退勤時間05:00〜22:00
+      if (endedAt.millisecondsSinceEpoch < baseStartE.millisecondsSinceEpoch &&
+          endedAt.millisecondsSinceEpoch > baseEndE.millisecondsSinceEpoch) {
+        _dayOverS = overTimeStartLegal;
+        _dayOverE = endedAt;
+        _nightOverS = DateTime.now();
+        _nightOverE = DateTime.now();
+      } else {
+        _dayOverS = overTimeStartLegal;
+        _dayOverE = baseStartE;
+        _nightOverS = baseStartE;
+        _nightOverE = endedAt;
+      }
+      // 出勤時間が22:00〜05:00
+    } else {
+      // 退勤時間が05:00〜22:00
+      if (endedAt.millisecondsSinceEpoch < baseStartE.millisecondsSinceEpoch &&
+          endedAt.millisecondsSinceEpoch > baseEndE.millisecondsSinceEpoch) {
+        _nightOverS = overTimeStartLegal;
+        _nightOverE = baseStartE;
+        _dayOverS = baseStartE;
+        _dayOverE = endedAt;
+        // 退勤時間が22:00〜05:00
+      } else {
+        _dayOverS = DateTime.now();
+        _dayOverE = DateTime.now();
+        _nightOverS = overTimeStartLegal;
+        _nightOverE = endedAt;
+      }
+    }
+    // 通常時間外
+    Duration _dayOverDiff = _dayOverE.difference(_dayOverS);
+    String _dayOverMinutes = twoDigits(_dayOverDiff.inMinutes.remainder(60));
+    _dayTimeOver = '${twoDigits(_dayOverDiff.inHours)}:$_dayOverMinutes';
+    // 深夜時間外
+    Duration _nightOverDiff = _nightOverE.difference(_nightOverS);
+    String _nightOverMinutes =
+        twoDigits(_nightOverDiff.inMinutes.remainder(60));
+    _nightTimeOver = '${twoDigits(_nightOverDiff.inHours)}:$_nightOverMinutes';
+  }
+  return [_dayTime, _nightTime, _dayTimeOver, _nightTimeOver];
 }
 
 // 時間の切捨

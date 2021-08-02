@@ -6,6 +6,7 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/group_notice.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: ApplyWorkProvider()),
         ChangeNotifierProvider.value(value: GroupProvider.initialize()),
         ChangeNotifierProvider.value(value: GroupNoticeProvider()),
+        ChangeNotifierProvider.value(value: PositionProvider()),
         ChangeNotifierProvider.value(value: SectionProvider()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: WorkProvider()),
