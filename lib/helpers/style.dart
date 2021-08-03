@@ -43,6 +43,19 @@ const BoxDecoration kTopBorderDecoration = BoxDecoration(
   ),
 );
 
+const BoxDecoration kTopBottomBorderDecoration = BoxDecoration(
+  border: Border(
+    top: BorderSide(
+      width: 1.0,
+      color: Color(0xFFE0E0E0),
+    ),
+    bottom: BorderSide(
+      width: 1.0,
+      color: Color(0xFFE0E0E0),
+    ),
+  ),
+);
+
 const TextStyle kTitleTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 32.0,

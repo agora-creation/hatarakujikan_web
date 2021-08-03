@@ -788,15 +788,6 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CheckboxListTile(
-                        onChanged: (value) {
-                          setState(() => isBreaks = value);
-                        },
-                        value: isBreaks,
-                        title: Text('休憩日時も入力する'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      SizedBox(height: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -868,155 +859,158 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                         ],
                       ),
                       SizedBox(height: 8.0),
+                      Container(
+                        decoration: kTopBottomBorderDecoration,
+                        child: CheckboxListTile(
+                          onChanged: (value) {
+                            setState(() => isBreaks = value);
+                          },
+                          value: isBreaks,
+                          title: Text('休憩を追加する'),
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
                       isBreaks == true
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Text(
+                                  '休憩開始日時',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                Row(
                                   children: [
-                                    Text(
-                                      '休憩開始日時',
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14.0,
+                                    Expanded(
+                                      flex: 3,
+                                      child: CustomDateButton(
+                                        onPressed: () async {
+                                          DateTime _selected =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: breakStartedAt,
+                                            firstDate: _firstDate,
+                                            lastDate: _lastDate,
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                                            String _time =
+                                                '${DateFormat('HH:mm').format(breakStartedAt)}';
+                                            DateTime _datetime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(() =>
+                                                breakStartedAt = _datetime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('yyyy/MM/dd').format(breakStartedAt)}',
                                       ),
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: CustomDateButton(
-                                            onPressed: () async {
-                                              DateTime _selected =
-                                                  await showDatePicker(
-                                                context: context,
-                                                initialDate: breakStartedAt,
-                                                firstDate: _firstDate,
-                                                lastDate: _lastDate,
-                                              );
-                                              if (_selected != null) {
-                                                String _date =
-                                                    '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                                String _time =
-                                                    '${DateFormat('HH:mm').format(breakStartedAt)}';
-                                                DateTime _datetime =
-                                                    DateTime.parse(
-                                                        '$_date $_time');
-                                                setState(() =>
-                                                    breakStartedAt = _datetime);
-                                              }
-                                            },
-                                            label:
-                                                '${DateFormat('yyyy/MM/dd').format(breakStartedAt)}',
-                                          ),
-                                        ),
-                                        SizedBox(width: 4.0),
-                                        Expanded(
-                                          flex: 2,
-                                          child: CustomTimeButton(
-                                            onPressed: () async {
-                                              String _hour =
-                                                  '${DateFormat('H').format(breakStartedAt)}';
-                                              String _minute =
-                                                  '${DateFormat('m').format(breakStartedAt)}';
-                                              TimeOfDay _selected =
-                                                  await showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay(
-                                                  hour: int.parse(_hour),
-                                                  minute: int.parse(_minute),
-                                                ),
-                                              );
-                                              if (_selected != null) {
-                                                String _date =
-                                                    '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
-                                                String _time =
-                                                    '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                                DateTime _dateTime =
-                                                    DateTime.parse(
-                                                        '$_date $_time');
-                                                setState(() =>
-                                                    breakStartedAt = _dateTime);
-                                              }
-                                            },
-                                            label:
-                                                '${DateFormat('HH:mm').format(breakStartedAt)}',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8.0),
-                                    Text(
-                                      '休憩終了日時',
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14.0,
+                                    SizedBox(width: 4.0),
+                                    Expanded(
+                                      flex: 2,
+                                      child: CustomTimeButton(
+                                        onPressed: () async {
+                                          String _hour =
+                                              '${DateFormat('H').format(breakStartedAt)}';
+                                          String _minute =
+                                              '${DateFormat('m').format(breakStartedAt)}';
+                                          TimeOfDay _selected =
+                                              await showTimePicker(
+                                            context: context,
+                                            initialTime: TimeOfDay(
+                                              hour: int.parse(_hour),
+                                              minute: int.parse(_minute),
+                                            ),
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
+                                            String _time =
+                                                '${_selected.format(context).padLeft(5, '0')}:00.000';
+                                            DateTime _dateTime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(() =>
+                                                breakStartedAt = _dateTime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('HH:mm').format(breakStartedAt)}',
                                       ),
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: CustomDateButton(
-                                            onPressed: () async {
-                                              DateTime _selected =
-                                                  await showDatePicker(
-                                                context: context,
-                                                initialDate: breakEndedAt,
-                                                firstDate: _firstDate,
-                                                lastDate: _lastDate,
-                                              );
-                                              if (_selected != null) {
-                                                String _date =
-                                                    '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                                String _time =
-                                                    '${DateFormat('HH:mm').format(breakEndedAt)}:00.000';
-                                                DateTime _dateTime =
-                                                    DateTime.parse(
-                                                        '$_date $_time');
-                                                setState(() =>
-                                                    breakEndedAt = _dateTime);
-                                              }
-                                            },
-                                            label:
-                                                '${DateFormat('yyyy/MM/dd').format(breakEndedAt)}',
-                                          ),
-                                        ),
-                                        SizedBox(width: 4.0),
-                                        Expanded(
-                                          flex: 2,
-                                          child: CustomTimeButton(
-                                            onPressed: () async {
-                                              String _hour =
-                                                  '${DateFormat('H').format(breakEndedAt)}';
-                                              String _minute =
-                                                  '${DateFormat('m').format(breakEndedAt)}';
-                                              TimeOfDay _selected =
-                                                  await showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay(
-                                                  hour: int.parse(_hour),
-                                                  minute: int.parse(_minute),
-                                                ),
-                                              );
-                                              if (_selected != null) {
-                                                String _date =
-                                                    '${DateFormat('yyyy-MM-dd').format(breakEndedAt)}';
-                                                String _time =
-                                                    '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                                DateTime _dateTime =
-                                                    DateTime.parse(
-                                                        '$_date $_time');
-                                                setState(() =>
-                                                    breakEndedAt = _dateTime);
-                                              }
-                                            },
-                                            label:
-                                                '${DateFormat('HH:mm').format(breakEndedAt)}',
-                                          ),
-                                        ),
-                                      ],
+                                  ],
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  '休憩終了日時',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: CustomDateButton(
+                                        onPressed: () async {
+                                          DateTime _selected =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: breakEndedAt,
+                                            firstDate: _firstDate,
+                                            lastDate: _lastDate,
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                                            String _time =
+                                                '${DateFormat('HH:mm').format(breakEndedAt)}:00.000';
+                                            DateTime _dateTime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(
+                                                () => breakEndedAt = _dateTime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('yyyy/MM/dd').format(breakEndedAt)}',
+                                      ),
+                                    ),
+                                    SizedBox(width: 4.0),
+                                    Expanded(
+                                      flex: 2,
+                                      child: CustomTimeButton(
+                                        onPressed: () async {
+                                          String _hour =
+                                              '${DateFormat('H').format(breakEndedAt)}';
+                                          String _minute =
+                                              '${DateFormat('m').format(breakEndedAt)}';
+                                          TimeOfDay _selected =
+                                              await showTimePicker(
+                                            context: context,
+                                            initialTime: TimeOfDay(
+                                              hour: int.parse(_hour),
+                                              minute: int.parse(_minute),
+                                            ),
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(breakEndedAt)}';
+                                            String _time =
+                                                '${_selected.format(context).padLeft(5, '0')}:00.000';
+                                            DateTime _dateTime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(
+                                                () => breakEndedAt = _dateTime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('HH:mm').format(breakEndedAt)}',
+                                      ),
                                     ),
                                   ],
                                 ),
