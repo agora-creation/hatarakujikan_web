@@ -149,7 +149,7 @@ class WorkModel {
       '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightEnd}:00.000',
     );
     DateTime _baseSE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightStart}:00.000',
+      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
     );
     DateTime _baseEE = DateTime.parse(
       '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',
@@ -229,7 +229,7 @@ class WorkModel {
       '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightEnd}:00.000',
     );
     DateTime _baseSE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightStart}:00.000',
+      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
     );
     DateTime _baseEE = DateTime.parse(
       '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',

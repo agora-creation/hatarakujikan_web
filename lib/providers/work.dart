@@ -58,11 +58,30 @@ class WorkProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> update({WorkModel work}) async {
+  Future<bool> update({
+    WorkModel work,
+    bool isBreaks,
+    DateTime breakStartedAt,
+    DateTime breakEndedAt,
+  }) async {
     try {
       List<Map> _breaks = [];
       for (BreaksModel breaks in work?.breaks) {
         _breaks.add(breaks.toMap());
+      }
+      if (isBreaks) {
+        String _breaksId = randomString(20);
+        _breaks.add({
+          'id': _breaksId,
+          'startedAt': breakStartedAt,
+          'startedLat': 0.0,
+          'startedLon': 0.0,
+          'startedDev': '管理画面',
+          'endedAt': breakEndedAt,
+          'endedLat': 0.0,
+          'endedLon': 0.0,
+          'endedDev': '管理画面',
+        });
       }
       _workService.update({
         'id': work?.id,

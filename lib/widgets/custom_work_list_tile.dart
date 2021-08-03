@@ -293,9 +293,15 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
   DateTime _lastDate = DateTime.now().add(Duration(days: 365));
   WorkModel work;
   bool isBreaks = false;
+  DateTime breakStartedAt = DateTime.now();
+  DateTime breakEndedAt = DateTime.now();
 
   void _init() async {
-    setState(() => work = widget.work);
+    setState(() {
+      work = widget.work;
+      breakStartedAt = widget.work.startedAt;
+      breakEndedAt = widget.work.startedAt;
+    });
   }
 
   @override
@@ -339,88 +345,66 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CheckboxListTile(
-                  onChanged: (value) {
-                    setState(() => isBreaks = value);
-                  },
-                  value: isBreaks,
-                  title: Text('休憩の有無'),
-                  controlAffinity: ListTileControlAffinity.leading,
+                Text(
+                  '出勤日時',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.0,
+                  ),
                 ),
-                SizedBox(height: 8.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text(
-                      '出勤日時',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 14.0,
+                    Expanded(
+                      flex: 3,
+                      child: CustomDateButton(
+                        onPressed: () async {
+                          DateTime _selected = await showDatePicker(
+                            context: context,
+                            initialDate: work.startedAt,
+                            firstDate: _firstDate,
+                            lastDate: _lastDate,
+                          );
+                          if (_selected != null) {
+                            String _date =
+                                '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                            String _time =
+                                '${DateFormat('HH:mm').format(work.startedAt)}:00.000';
+                            DateTime _dateTime =
+                                DateTime.parse('$_date $_time');
+                            setState(() => work.startedAt = _dateTime);
+                          }
+                        },
+                        label:
+                            '${DateFormat('yyyy/MM/dd').format(work.startedAt)}',
                       ),
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: CustomDateButton(
-                            onPressed: () async {
-                              DateTime _selected = await showDatePicker(
-                                context: context,
-                                initialDate: work.startedAt,
-                                firstDate: _firstDate,
-                                lastDate: _lastDate,
-                              );
-                              if (_selected != null) {
-                                String _date =
-                                    '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                String _time =
-                                    '${DateFormat('HH:mm').format(work.startedAt)}:00.000';
-                                DateTime _dateTime =
-                                    DateTime.parse('$_date $_time');
-                                setState(() => work.startedAt = _dateTime);
-                              }
-                            },
-                            label:
-                                '${DateFormat('yyyy/MM/dd').format(work.startedAt)}',
-                          ),
-                        ),
-                        SizedBox(width: 4.0),
-                        Expanded(
-                          flex: 2,
-                          child: CustomTimeButton(
-                            onPressed: () async {
-                              String _hour =
-                                  '${DateFormat('H').format(work.startedAt)}';
-                              String _minute =
-                                  '${DateFormat('m').format(work.startedAt)}';
-                              TimeOfDay _selected = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay(
-                                  hour: int.parse(_hour),
-                                  minute: int.parse(_minute),
-                                ),
-                              );
-                              if (_selected != null) {
-                                String _date =
-                                    '${DateFormat('yyyy-MM-dd').format(work.startedAt)}';
-                                String _time =
-                                    '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                DateTime _dateTime =
-                                    DateTime.parse('$_date $_time');
-                                setState(() => work.startedAt = _dateTime);
-                              }
-                            },
-                            label:
-                                '${DateFormat('HH:mm').format(work.startedAt)}',
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '記録端末: ${work.startedDev}',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 12.0,
+                    SizedBox(width: 4.0),
+                    Expanded(
+                      flex: 2,
+                      child: CustomTimeButton(
+                        onPressed: () async {
+                          String _hour =
+                              '${DateFormat('H').format(work.startedAt)}';
+                          String _minute =
+                              '${DateFormat('m').format(work.startedAt)}';
+                          TimeOfDay _selected = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay(
+                              hour: int.parse(_hour),
+                              minute: int.parse(_minute),
+                            ),
+                          );
+                          if (_selected != null) {
+                            String _date =
+                                '${DateFormat('yyyy-MM-dd').format(work.startedAt)}';
+                            String _time =
+                                '${_selected.format(context).padLeft(5, '0')}:00.000';
+                            DateTime _dateTime =
+                                DateTime.parse('$_date $_time');
+                            setState(() => work.startedAt = _dateTime);
+                          }
+                        },
+                        label: '${DateFormat('HH:mm').format(work.startedAt)}',
                       ),
                     ),
                   ],
@@ -505,13 +489,6 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                               ),
                             ],
                           ),
-                          Text(
-                            '記録端末: ${_breaks.startedDev}',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 12.0,
-                            ),
-                          ),
                           SizedBox(height: 8.0),
                           Text(
                             '休憩終了日時',
@@ -580,25 +557,183 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                               ),
                             ],
                           ),
-                          Text(
-                            '記録端末: ${_breaks.endedDev}',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 12.0,
-                            ),
-                          ),
                         ],
                       );
                     },
                   )
-                : Container(),
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: kTopBottomBorderDecoration,
+                        child: CheckboxListTile(
+                          onChanged: (value) {
+                            setState(() => isBreaks = value);
+                          },
+                          value: isBreaks,
+                          title: Text('休憩を追加する'),
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      isBreaks == true
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '休憩開始日時',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: CustomDateButton(
+                                        onPressed: () async {
+                                          DateTime _selected =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: breakStartedAt,
+                                            firstDate: _firstDate,
+                                            lastDate: _lastDate,
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                                            String _time =
+                                                '${DateFormat('HH:mm').format(breakStartedAt)}';
+                                            DateTime _datetime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(() =>
+                                                breakStartedAt = _datetime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('yyyy/MM/dd').format(breakStartedAt)}',
+                                      ),
+                                    ),
+                                    SizedBox(width: 4.0),
+                                    Expanded(
+                                      flex: 2,
+                                      child: CustomTimeButton(
+                                        onPressed: () async {
+                                          String _hour =
+                                              '${DateFormat('H').format(breakStartedAt)}';
+                                          String _minute =
+                                              '${DateFormat('m').format(breakStartedAt)}';
+                                          TimeOfDay _selected =
+                                              await showTimePicker(
+                                            context: context,
+                                            initialTime: TimeOfDay(
+                                              hour: int.parse(_hour),
+                                              minute: int.parse(_minute),
+                                            ),
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
+                                            String _time =
+                                                '${_selected.format(context).padLeft(5, '0')}:00.000';
+                                            DateTime _datetime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(() =>
+                                                breakStartedAt = _datetime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('HH:mm').format(breakStartedAt)}',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  '休憩終了日時',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: CustomDateButton(
+                                        onPressed: () async {
+                                          DateTime _selected =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: breakEndedAt,
+                                            firstDate: _firstDate,
+                                            lastDate: _lastDate,
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(_selected)}';
+                                            String _time =
+                                                '${DateFormat('HH:mm').format(breakEndedAt)}:00.000';
+                                            DateTime _dateTime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(
+                                                () => breakEndedAt = _dateTime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('yyyy/MM/dd').format(breakEndedAt)}',
+                                      ),
+                                    ),
+                                    SizedBox(width: 4.0),
+                                    Expanded(
+                                      flex: 2,
+                                      child: CustomTimeButton(
+                                        onPressed: () async {
+                                          String _hour =
+                                              '${DateFormat('H').format(breakEndedAt)}';
+                                          String _minute =
+                                              '${DateFormat('m').format(breakEndedAt)}';
+                                          TimeOfDay _selected =
+                                              await showTimePicker(
+                                            context: context,
+                                            initialTime: TimeOfDay(
+                                              hour: int.parse(_hour),
+                                              minute: int.parse(_minute),
+                                            ),
+                                          );
+                                          if (_selected != null) {
+                                            String _date =
+                                                '${DateFormat('yyyy-MM-dd').format(breakEndedAt)}';
+                                            String _time =
+                                                '${_selected.format(context).padLeft(5, '0')}:00.000';
+                                            DateTime _dateTime =
+                                                DateTime.parse('$_date $_time');
+                                            setState(
+                                                () => breakEndedAt = _dateTime);
+                                          }
+                                        },
+                                        label:
+                                            '${DateFormat('HH:mm').format(breakEndedAt)}',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : Container(),
+                    ],
+                  ),
             SizedBox(height: 8.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '退勤日時',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.0,
+                  ),
                 ),
                 Row(
                   children: [
@@ -657,10 +792,6 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                     ),
                   ],
                 ),
-                Text(
-                  '記録端末: ${work.endedDev}',
-                  style: TextStyle(color: Colors.black54, fontSize: 12.0),
-                ),
               ],
             ),
             SizedBox(height: 16.0),
@@ -677,6 +808,9 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                     CustomTextButton(
                       onPressed: () {
                         widget.workProvider.delete(work: work);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('勤怠情報を削除しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.red,
@@ -685,9 +819,17 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                     SizedBox(width: 4.0),
                     CustomTextButton(
                       onPressed: () async {
-                        if (!await widget.workProvider.update(work: work)) {
+                        if (!await widget.workProvider.update(
+                          work: work,
+                          isBreaks: isBreaks,
+                          breakStartedAt: breakStartedAt,
+                          breakEndedAt: breakEndedAt,
+                        )) {
                           return;
                         }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('勤怠情報を修正しました')),
+                        );
                         Navigator.pop(context);
                       },
                       color: Colors.blue,
