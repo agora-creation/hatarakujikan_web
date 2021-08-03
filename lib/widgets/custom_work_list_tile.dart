@@ -8,7 +8,6 @@ import 'package:hatarakujikan_web/models/work_state.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
-import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
 import 'package:intl/intl.dart';
@@ -144,6 +143,7 @@ class CustomWorkListTile extends StatelessWidget {
                                   builder: (_) => WorkDetailsDialog(
                                     workProvider: workProvider,
                                     work: _work,
+                                    group: group,
                                   ),
                                 ),
                                 icon: Icon(
@@ -278,10 +278,12 @@ class CustomWorkListTile extends StatelessWidget {
 class WorkDetailsDialog extends StatefulWidget {
   final WorkProvider workProvider;
   final WorkModel work;
+  final GroupModel group;
 
   WorkDetailsDialog({
     @required this.workProvider,
     @required this.work,
+    @required this.group,
   });
 
   @override
@@ -314,7 +316,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Container(
-        width: 450.0,
+        width: 550.0,
         child: ListView(
           shrinkWrap: true,
           children: [
@@ -794,6 +796,129 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                 ),
               ],
             ),
+            SizedBox(height: 8.0),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '勤務時間',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.workTime(widget.group)}'),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '法定内時間',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.legalTime(widget.group).first}'),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '法定外時間',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.legalTime(widget.group).last}'),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '深夜時間',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.nightTime(widget.group).last}'),
+                      ],
+                    ),
+                  ],
+                ),
+                Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '通常時間※1',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.calTime01(widget.group)[0]}'),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '深夜時間※2',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.calTime01(widget.group)[1]}'),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '通常時間外※3',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.calTime01(widget.group)[2]}'),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '深夜時間外※4',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text('${work.calTime01(widget.group)[3]}'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1004,22 +1129,30 @@ class WorkStateDetailsDialog extends StatelessWidget {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            CustomIconLabel(
-              iconData: Icons.label,
-              label: '勤務状況',
-            ),
-            SizedBox(height: 4.0),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Chip(
-                backgroundColor: _chipColor,
-                label: Text('${workState.state}'),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '勤務状況',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Chip(
+                  backgroundColor: _chipColor,
+                  label: Text('${workState.state}'),
+                ),
+              ],
             ),
             SizedBox(height: 8.0),
-            Text('登録日', style: TextStyle(color: Colors.black54)),
-            SizedBox(height: 4.0),
-            Text('${DateFormat('yyyy/MM/dd').format(workState.startedAt)}'),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '登録日',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text('${DateFormat('yyyy/MM/dd').format(workState.startedAt)}'),
+              ],
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1032,6 +1165,9 @@ class WorkStateDetailsDialog extends StatelessWidget {
                 CustomTextButton(
                   onPressed: () {
                     workStateProvider.delete(workState: workState);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('勤怠情報を削除しました')),
+                    );
                     Navigator.pop(context);
                   },
                   color: Colors.red,

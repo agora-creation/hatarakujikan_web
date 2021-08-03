@@ -632,13 +632,16 @@ class _PdfDialogState extends State<PdfDialog> {
               ],
             ),
             SizedBox(height: 8.0),
-            CheckboxListTile(
-              onChanged: (value) {
-                setState(() => isAll = value);
-              },
-              value: isAll,
-              title: Text('全スタッフ一括出力'),
-              controlAffinity: ListTileControlAffinity.leading,
+            Container(
+              decoration: kTopBottomBorderDecoration,
+              child: CheckboxListTile(
+                onChanged: (value) {
+                  setState(() => isAll = value);
+                },
+                value: isAll,
+                title: Text('全スタッフ一括出力'),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
