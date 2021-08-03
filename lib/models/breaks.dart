@@ -91,7 +91,7 @@ class BreaksModel {
     DateTime _baseEE = DateTime.parse(
       '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',
     );
-    if (_startedAt.microsecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
+    if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
         _startedAt.millisecondsSinceEpoch > _baseES.millisecondsSinceEpoch) {
       if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
