@@ -538,6 +538,7 @@ class _PdfDialogState extends State<PdfDialog> {
   List<DateTime> days = [];
   DateTime searchMonth = DateTime.now();
   UserModel searchUser;
+  bool isAll = false;
 
   void _generateDays() async {
     days.clear();
@@ -629,6 +630,15 @@ class _PdfDialogState extends State<PdfDialog> {
                   }).toList(),
                 ),
               ],
+            ),
+            SizedBox(height: 8.0),
+            CheckboxListTile(
+              onChanged: (value) {
+                setState(() => isAll = value);
+              },
+              value: isAll,
+              title: Text('全スタッフ一括出力'),
+              controlAffinity: ListTileControlAffinity.leading,
             ),
             SizedBox(height: 16.0),
             Row(
