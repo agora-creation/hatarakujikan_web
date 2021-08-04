@@ -457,7 +457,12 @@ Future<void> workPdf({
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
-  html.window.open(url, '_blank');
+  final anchor = html.document.createElement('a') as html.AnchorElement
+    ..href = url
+    ..download = 'work.pdf';
+  html.document.body.children.add(anchor);
+  anchor.click();
+  html.document.body.children.remove(anchor);
   html.Url.revokeObjectUrl(url);
   return;
 }
@@ -556,7 +561,12 @@ Future<void> qrPdf({GroupModel group}) async {
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
-  html.window.open(url, '_blank');
+  final anchor = html.document.createElement('a') as html.AnchorElement
+    ..href = url
+    ..download = 'work.pdf';
+  html.document.body.children.add(anchor);
+  anchor.click();
+  html.document.body.children.remove(anchor);
   html.Url.revokeObjectUrl(url);
   return;
 }
