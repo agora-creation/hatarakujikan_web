@@ -142,20 +142,12 @@ class WorkModel {
     DateTime _dayE;
     DateTime _nightS;
     DateTime _nightE;
-    DateTime _baseSS = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
-    );
-    DateTime _baseES = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightEnd}:00.000',
-    );
-    DateTime _baseSE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
-    );
-    DateTime _baseEE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',
-    );
+    DateTime _baseSS =
+        DateTime.parse('$_startedDate ${group.nightStart}:00.000');
+    DateTime _baseSE = DateTime.parse('$_startedDate ${group.nightEnd}:00.000');
+    DateTime _baseEE = DateTime.parse('$_endedDate ${group.nightEnd}:00.000');
     if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
-        _startedAt.millisecondsSinceEpoch > _baseES.millisecondsSinceEpoch) {
+        _startedAt.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
       if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
@@ -222,20 +214,12 @@ class WorkModel {
     DateTime _dayE;
     DateTime _nightS;
     DateTime _nightE;
-    DateTime _baseSS = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
-    );
-    DateTime _baseES = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightEnd}:00.000',
-    );
-    DateTime _baseSE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
-    );
-    DateTime _baseEE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',
-    );
+    DateTime _baseSS =
+        DateTime.parse('$_startedDate ${group.nightStart}:00.000');
+    DateTime _baseSE = DateTime.parse('$_startedDate ${group.nightEnd}:00.000');
+    DateTime _baseEE = DateTime.parse('$_endedDate ${group.nightEnd}:00.000');
     if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
-        _startedAt.millisecondsSinceEpoch > _baseES.millisecondsSinceEpoch) {
+        _startedAt.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
       if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
@@ -310,7 +294,7 @@ class WorkModel {
       DateTime _nightOverS;
       DateTime _nightOverE;
       if (_overTimeS.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
-          _overTimeS.millisecondsSinceEpoch > _baseES.millisecondsSinceEpoch) {
+          _overTimeS.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
         if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
             _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
           // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]

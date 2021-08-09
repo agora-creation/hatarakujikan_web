@@ -45,7 +45,7 @@ String randomString(int length) {
       return _randomChars.codeUnitAt(n);
     },
   );
-  return new String.fromCharCodes(codeUnits);
+  return String.fromCharCodes(codeUnits);
 }
 
 Future<String> getPrefs() async {

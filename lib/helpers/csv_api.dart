@@ -76,7 +76,7 @@ Future<void> workCsv({
   }
 
   String csv = const ListToCsvConverter().convert(rows);
-  AnchorElement(href: 'data:text/plain;charset=utf-8,$csv')
+  AnchorElement(href: 'data:text/csv;charset=utf-8,$csv')
     ..setAttribute('download', 'work.csv')
     ..click();
   return;
