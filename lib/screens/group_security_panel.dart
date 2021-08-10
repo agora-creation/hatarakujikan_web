@@ -65,7 +65,7 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
               children: [
                 CustomTextIconButton(
                   onPressed: () async {
-                    await qrPdf(group: widget.groupProvider.group);
+                    await pdfQR(group: widget.groupProvider.group);
                   },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,

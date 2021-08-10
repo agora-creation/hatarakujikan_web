@@ -454,6 +454,29 @@ Future<void> workPdf({
     ),
   );
 
+  pdf.addPage(
+    pw.Page(
+      build: (context) => pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                style: _headerStyle,
+              ),
+              pw.Text(
+                '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                style: _headerStyle,
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
@@ -467,20 +490,24 @@ Future<void> workPdf({
   return;
 }
 
-Future<void> qrPdf({GroupModel group}) async {
-  final pdf = pw.Document();
+Future<void> pdfQR({GroupModel group}) async {
+  // フォント
   final font = await rootBundle.load('assets/fonts/GenShinGothic-Regular.ttf');
   final ttf = pw.Font.ttf(font);
+  // 内容
+  String _id = group.id;
+  String _name = group.name;
+  final pw.TextStyle _nameStyle = pw.TextStyle(font: ttf, fontSize: 18.0);
+  final pw.TextStyle _contentStyle = pw.TextStyle(font: ttf, fontSize: 12.0);
+  // 書き出し
+  final pdf = pw.Document();
   pdf.addPage(pw.Page(
     pageFormat: PdfPageFormat.a4,
     build: (context) {
       return pw.Column(
         children: [
           pw.Center(
-            child: pw.Text(
-              '${group.name}',
-              style: pw.TextStyle(font: ttf, fontSize: 18.0),
-            ),
+            child: pw.Text(_name, style: _nameStyle),
           ),
           pw.SizedBox(height: 16.0),
           pw.Container(
@@ -488,7 +515,7 @@ Future<void> qrPdf({GroupModel group}) async {
             height: 250.0,
             child: pw.BarcodeWidget(
               barcode: pw.Barcode.qrCode(),
-              data: '${group.id}',
+              data: _id,
             ),
           ),
           pw.SizedBox(height: 16.0),
@@ -496,33 +523,33 @@ Future<void> qrPdf({GroupModel group}) async {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(
-                'これは${group.name}の会社/組織IDが埋め込まれたQRコードです。別アプリ「はたらくじかん for スマートフォン」でこのQRコードを使用します。',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                'これは$_nameの会社/組織IDが埋め込まれたQRコードです。別アプリ「はたらくじかん for スマートフォン」でこのQRコードを使用します。',
+                style: _contentStyle,
               ),
               pw.Text(
                 '別アプリ「はたらくじかん for スマートフォン」でこのQRコードを使用します。',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                style: _contentStyle,
               ),
               pw.SizedBox(height: 8.0),
               pw.Text(
                 '【会社/組織に入る時】',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                style: _contentStyle,
               ),
               pw.Text(
                 '① 「はたらくじかん for スマートフォン」を起動し、ログインしておく',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                style: _contentStyle,
               ),
               pw.Text(
                 '② 下部メニューから「会社/組織」をタップする',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                style: _contentStyle,
               ),
               pw.Text(
                 '③ 下部メニューの上の「会社/組織に入る(QRコード)」ボタンをタップする',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                style: _contentStyle,
               ),
               pw.Text(
                 '④ カメラが起動するので、枠内にこのQRコードをおさめるように撮る',
-                style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                style: _contentStyle,
               ),
               pw.SizedBox(height: 8.0),
               group.qrSecurity
@@ -531,23 +558,23 @@ Future<void> qrPdf({GroupModel group}) async {
                       children: [
                         pw.Text(
                           '【出退勤や休憩時間を記録する時】',
-                          style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                          style: _contentStyle,
                         ),
                         pw.Text(
                           '① 「はたらくじかん for スマートフォン」を起動し、ログインしておく',
-                          style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                          style: _contentStyle,
                         ),
                         pw.Text(
                           '② 下部メニューが「ホーム」になっているのを確認する',
-                          style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                          style: _contentStyle,
                         ),
                         pw.Text(
                           '③ 「出勤」「退勤」「休憩開始」「休憩終了」のそれぞれボタンをタップした時にカメラが起動する',
-                          style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                          style: _contentStyle,
                         ),
                         pw.Text(
                           '④ 枠内にこのQRコードをおさめるように撮る',
-                          style: pw.TextStyle(font: ttf, fontSize: 12.0),
+                          style: _contentStyle,
                         ),
                       ],
                     )
@@ -558,15 +585,18 @@ Future<void> qrPdf({GroupModel group}) async {
       );
     },
   ));
+  return await _downloadPdf(pdf: pdf, name: 'work.pdf');
+}
+
+Future<void> _downloadPdf({pw.Document pdf, String name}) async {
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
   final anchor = html.document.createElement('a') as html.AnchorElement
     ..href = url
-    ..download = 'work.pdf';
+    ..download = name;
   html.document.body.children.add(anchor);
   anchor.click();
   html.document.body.children.remove(anchor);
   html.Url.revokeObjectUrl(url);
-  return;
 }
