@@ -12,14 +12,19 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 
-Future<void> workPdf({
+Future<void> pdfWorks({
   WorkProvider workProvider,
   WorkStateProvider workStateProvider,
   GroupModel group,
   DateTime searchMonth,
   UserModel searchUser,
+  bool isAll,
 }) async {
+  // フォント
+  final font = await rootBundle.load('assets/fonts/GenShinGothic-Regular.ttf');
+  final ttf = pw.Font.ttf(font);
   if (searchUser == null) return;
+  // 各種配列初期化
   List<DateTime> days = [];
   List<DateTime> daysWeek = [];
   List<WorkModel> works = [];
@@ -69,12 +74,10 @@ Future<void> workPdf({
     workStates = value;
   });
 
-  final pdf = pw.Document();
-  final font = await rootBundle.load('assets/fonts/GenShinGothic-Regular.ttf');
-  final ttf = pw.Font.ttf(font);
-
   final pw.TextStyle _headerStyle = pw.TextStyle(font: ttf, fontSize: 9.0);
   final pw.TextStyle _listStyle = pw.TextStyle(font: ttf, fontSize: 7.0);
+  // 書き出し
+  final pdf = pw.Document();
 
   Map _count = {};
   String _totalWorkTime = '00:00';
@@ -490,7 +493,7 @@ Future<void> workPdf({
   return;
 }
 
-Future<void> pdfQR({GroupModel group}) async {
+Future<void> QrcodePdf({GroupModel group}) async {
   // フォント
   final font = await rootBundle.load('assets/fonts/GenShinGothic-Regular.ttf');
   final ttf = pw.Font.ttf(font);
@@ -585,10 +588,11 @@ Future<void> pdfQR({GroupModel group}) async {
       );
     },
   ));
-  return await _downloadPdf(pdf: pdf, name: 'work.pdf');
+  await _download(pdf: pdf, name: 'work.pdf');
+  return;
 }
 
-Future<void> _downloadPdf({pw.Document pdf, String name}) async {
+Future<void> _download({pw.Document pdf, String name}) async {
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
