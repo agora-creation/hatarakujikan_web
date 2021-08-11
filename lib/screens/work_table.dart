@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/csv_api.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -653,12 +654,12 @@ class _PdfDialogState extends State<PdfDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    await workPdf(
+                    await PdfApi.works01(
                       workProvider: widget.workProvider,
                       workStateProvider: widget.workStateProvider,
                       group: widget.group,
-                      searchMonth: searchMonth,
-                      searchUser: searchUser,
+                      month: searchMonth,
+                      user: searchUser,
                     );
                   },
                   color: Colors.redAccent,
