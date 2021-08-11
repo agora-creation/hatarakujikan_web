@@ -83,7 +83,7 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
               children: [
                 CustomTextIconButton(
                   onPressed: () async {
-                    await pdfQR(group: widget.groupProvider.group);
+                    await PdfApi.qrcode(group: widget.groupProvider.group);
                   },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,

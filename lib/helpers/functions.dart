@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -115,4 +116,16 @@ String roundUpTime(String time, int per) {
     _minuteNew = 0;
   }
   return '$_hour:${_minuteNew.toString().padLeft(2, '0')}';
+}
+
+// 1ヶ月配列作成
+List<DateTime> generateDays(DateTime month) {
+  List<DateTime> _days = [];
+  var _dateMap = DateMachineUtil.getMonthDate(month, 0);
+  DateTime _start = DateTime.parse('${_dateMap['start']}');
+  DateTime _end = DateTime.parse('${_dateMap['end']}');
+  for (int i = 0; i <= _end.difference(_start).inDays; i++) {
+    _days.add(_start.add(Duration(days: i)));
+  }
+  return _days;
 }

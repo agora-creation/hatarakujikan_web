@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/csv_api.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
-import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -492,10 +491,10 @@ class _CsvDialogState extends State<CsvDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    await workCsv(
+                    await CsvApi.works01(
                       workProvider: widget.workProvider,
                       group: widget.group,
-                      searchMonth: searchMonth,
+                      month: searchMonth,
                       users: widget.users,
                     );
                   },

@@ -12,6 +12,91 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 
+const String fontPath = 'assets/fonts/GenShinGothic-Regular.ttf';
+
+class PdfApi {
+  static Future<void> qrcode({GroupModel group}) async {
+    final font = await rootBundle.load(fontPath);
+    final ttf = pw.Font.ttf(font);
+    final _titleStyle = pw.TextStyle(font: ttf, fontSize: 18.0);
+    final _contentStyle = pw.TextStyle(font: ttf, fontSize: 12.0);
+    final pdf = pw.Document();
+    pdf.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
+      build: (context) {
+        return pw.Column(
+          children: [
+            pw.Center(child: pw.Text('${group.name}', style: _titleStyle)),
+            pw.SizedBox(height: 16.0),
+            pw.Container(
+              width: 250.0,
+              height: 250.0,
+              child: pw.BarcodeWidget(
+                barcode: pw.Barcode.qrCode(),
+                data: '${group.id}',
+              ),
+            ),
+            pw.SizedBox(height: 16.0),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'このQRコードには、${group.name}の会社/組織IDが埋め込まれています。スマートフォンアプリ「はたらくじかん for スマートフォン」で使用します。',
+                  style: _contentStyle,
+                ),
+                pw.SizedBox(height: 8.0),
+                pw.Text(
+                  '【会社/組織に入る時】',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '① 「はたらくじかん for スマートフォン」を起動し、ログインする。',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '② 下部メニューから「会社/組織」をタップする。',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '③ 下部メニューの上の「会社/組織に入る」ボタンをタップする。',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '④ アプリ内カメラが起動するので、枠内にQRコードをおさめるように撮る。',
+                  style: _contentStyle,
+                ),
+                pw.SizedBox(height: 8.0),
+                pw.Text(
+                  '【出退勤や休憩の時間を記録する時】',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '① 「はたらくじかん for スマートフォン」を起動し、ログインする。',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '② 下部メニューから「ホーム」をタップする。',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '③ 「出勤」「退勤」「休憩開始」「休憩終了」ボタンをタップする。',
+                  style: _contentStyle,
+                ),
+                pw.Text(
+                  '④ アプリ内カメラが起動するので、枠内にQRコードをおさめるように撮る。',
+                  style: _contentStyle,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    ));
+    await _download(pdf: pdf, fileName: 'work.pdf');
+    return;
+  }
+}
+
 Future<void> pdfWorks({
   WorkProvider workProvider,
   WorkStateProvider workStateProvider,
@@ -493,112 +578,13 @@ Future<void> pdfWorks({
   return;
 }
 
-Future<void> QrcodePdf({GroupModel group}) async {
-  // フォント
-  final font = await rootBundle.load('assets/fonts/GenShinGothic-Regular.ttf');
-  final ttf = pw.Font.ttf(font);
-  // 内容
-  String _id = group.id;
-  String _name = group.name;
-  final pw.TextStyle _nameStyle = pw.TextStyle(font: ttf, fontSize: 18.0);
-  final pw.TextStyle _contentStyle = pw.TextStyle(font: ttf, fontSize: 12.0);
-  // 書き出し
-  final pdf = pw.Document();
-  pdf.addPage(pw.Page(
-    pageFormat: PdfPageFormat.a4,
-    build: (context) {
-      return pw.Column(
-        children: [
-          pw.Center(
-            child: pw.Text(_name, style: _nameStyle),
-          ),
-          pw.SizedBox(height: 16.0),
-          pw.Container(
-            width: 250.0,
-            height: 250.0,
-            child: pw.BarcodeWidget(
-              barcode: pw.Barcode.qrCode(),
-              data: _id,
-            ),
-          ),
-          pw.SizedBox(height: 16.0),
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                'これは$_nameの会社/組織IDが埋め込まれたQRコードです。別アプリ「はたらくじかん for スマートフォン」でこのQRコードを使用します。',
-                style: _contentStyle,
-              ),
-              pw.Text(
-                '別アプリ「はたらくじかん for スマートフォン」でこのQRコードを使用します。',
-                style: _contentStyle,
-              ),
-              pw.SizedBox(height: 8.0),
-              pw.Text(
-                '【会社/組織に入る時】',
-                style: _contentStyle,
-              ),
-              pw.Text(
-                '① 「はたらくじかん for スマートフォン」を起動し、ログインしておく',
-                style: _contentStyle,
-              ),
-              pw.Text(
-                '② 下部メニューから「会社/組織」をタップする',
-                style: _contentStyle,
-              ),
-              pw.Text(
-                '③ 下部メニューの上の「会社/組織に入る(QRコード)」ボタンをタップする',
-                style: _contentStyle,
-              ),
-              pw.Text(
-                '④ カメラが起動するので、枠内にこのQRコードをおさめるように撮る',
-                style: _contentStyle,
-              ),
-              pw.SizedBox(height: 8.0),
-              group.qrSecurity
-                  ? pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text(
-                          '【出退勤や休憩時間を記録する時】',
-                          style: _contentStyle,
-                        ),
-                        pw.Text(
-                          '① 「はたらくじかん for スマートフォン」を起動し、ログインしておく',
-                          style: _contentStyle,
-                        ),
-                        pw.Text(
-                          '② 下部メニューが「ホーム」になっているのを確認する',
-                          style: _contentStyle,
-                        ),
-                        pw.Text(
-                          '③ 「出勤」「退勤」「休憩開始」「休憩終了」のそれぞれボタンをタップした時にカメラが起動する',
-                          style: _contentStyle,
-                        ),
-                        pw.Text(
-                          '④ 枠内にこのQRコードをおさめるように撮る',
-                          style: _contentStyle,
-                        ),
-                      ],
-                    )
-                  : pw.Container(),
-            ],
-          ),
-        ],
-      );
-    },
-  ));
-  await _download(pdf: pdf, name: 'work.pdf');
-  return;
-}
-
-Future<void> _download({pw.Document pdf, String name}) async {
+Future<void> _download({pw.Document pdf, String fileName}) async {
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
   final anchor = html.document.createElement('a') as html.AnchorElement
     ..href = url
-    ..download = name;
+    ..download = fileName;
   html.document.body.children.add(anchor);
   anchor.click();
   html.document.body.children.remove(anchor);
