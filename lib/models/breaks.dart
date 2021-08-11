@@ -59,7 +59,7 @@ class BreaksModel {
     return _time;
   }
 
-  List<String> breakTime(GroupModel group) {
+  List<String> breakTimes(GroupModel group) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String _time = '00:00';
     String _dayTime = '00:00';

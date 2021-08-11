@@ -71,15 +71,15 @@ class WorkModel {
     return _time;
   }
 
-  List<String> breakTime(GroupModel group) {
+  List<String> breakTimes(GroupModel group) {
     String _time = '00:00';
     String _dayTime = '00:00';
     String _nightTime = '00:00';
     if (breaks.length > 0) {
       for (BreaksModel _break in breaks) {
-        _time = addTime(_time, _break.breakTime(group)[0]);
-        _dayTime = addTime(_dayTime, _break.breakTime(group)[1]);
-        _nightTime = addTime(_nightTime, _break.breakTime(group)[2]);
+        _time = addTime(_time, _break.breakTimes(group)[0]);
+        _dayTime = addTime(_dayTime, _break.breakTimes(group)[1]);
+        _nightTime = addTime(_nightTime, _break.breakTimes(group)[2]);
       }
     }
     return [_time, _dayTime, _nightTime];
@@ -102,7 +102,7 @@ class WorkModel {
     String _breakTime = '00:00';
     if (breaks.length > 0) {
       for (BreaksModel _break in breaks) {
-        _breakTime = addTime(_breakTime, _break.breakTime(group)[0]);
+        _breakTime = addTime(_breakTime, _break.breakTimes(group)[0]);
       }
     }
     // 勤務時間と休憩の合計時間の差を求める
@@ -111,7 +111,7 @@ class WorkModel {
   }
 
   // 法定内時間/法定外時間
-  List<String> legalTime(GroupModel group) {
+  List<String> legalTimes(GroupModel group) {
     String _time = '00:00';
     String _nonTime = '00:00';
     List<String> _times = workTime(group).split(':');
@@ -127,7 +127,7 @@ class WorkModel {
   }
 
   // 深夜時間/深夜時間外
-  List<String> nightTime(GroupModel group) {
+  List<String> nightTimes(GroupModel group) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String _dayTime = '00:00';
     String _nightTime = '00:00';
@@ -197,7 +197,7 @@ class WorkModel {
   }
 
   // 通常時間/深夜時間/通常時間外/深夜時間外
-  List<String> calTime01(GroupModel group) {
+  List<String> calTimes01(GroupModel group) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String _dayTime = '00:00';
     String _nightTime = '00:00';
@@ -256,7 +256,7 @@ class WorkModel {
       Duration _dayDiff = _dayE.difference(_dayS);
       String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
       _dayTime = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
-      _dayTime = subTime(_dayTime, breakTime(group)[1]);
+      _dayTime = subTime(_dayTime, breakTimes(group)[1]);
       List<String> _dayTimes = _dayTime.split(':');
       if (group.legal <= int.parse(_dayTimes.first)) {
         _dayTime = '0${group.legal}:00';
@@ -269,7 +269,7 @@ class WorkModel {
       Duration _nightDiff = _nightE.difference(_nightS);
       String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
       _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
-      _nightTime = subTime(_nightTime, breakTime(group)[2]);
+      _nightTime = subTime(_nightTime, breakTimes(group)[2]);
       List<String> _nightTimes = _nightTime.split(':');
       if (group.legal <= int.parse(_nightTimes.first)) {
         _nightTime = '0${group.legal}:00';
@@ -284,7 +284,7 @@ class WorkModel {
       DateTime _overTimeS = _startedAt;
       _overTimeS = _overTimeS.add(Duration(hours: group.legal));
       // 休憩時間を足す
-      List<String> _breakTimes = breakTime(group)[0].split(':');
+      List<String> _breakTimes = breakTimes(group)[0].split(':');
       _overTimeS =
           _overTimeS.add(Duration(hours: int.parse(_breakTimes.first)));
       _overTimeS =

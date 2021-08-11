@@ -296,12 +296,12 @@ class _WorkTableState extends State<WorkTable> {
                 );
                 // 法定内時間/法定外時間
                 List<String> _legalTimes =
-                    _work?.legalTime(widget.groupProvider.group);
+                    _work?.legalTimes(widget.groupProvider.group);
                 _legalTime = addTime(_legalTime, _legalTimes.first);
                 _nonLegalTime = addTime(_nonLegalTime, _legalTimes.last);
                 // 深夜時間
                 List<String> _nightTimes =
-                    _work?.nightTime(widget.groupProvider.group);
+                    _work?.nightTimes(widget.groupProvider.group);
                 _nightTime = addTime(_nightTime, _nightTimes.last);
               }
             }
@@ -660,6 +660,8 @@ class _PdfDialogState extends State<PdfDialog> {
                       group: widget.group,
                       month: searchMonth,
                       user: searchUser,
+                      isAll: isAll,
+                      users: widget.users,
                     );
                   },
                   color: Colors.redAccent,

@@ -16,21 +16,22 @@ class CsvApi {
   }) async {
     List<List<dynamic>> rows = [];
     List<dynamic> row = [];
+    // 1行目(項目名)
     row.add('社員番号');
     row.add('社員名');
     row.add('平日出勤');
     row.add('出勤時間');
     row.add('支給項目2');
     rows.add(row);
-
+    // 2行目以降(データ)
     List<DateTime> days = generateDays(month);
     for (UserModel _user in users) {
-      String _recordPassword = _user.recordPassword;
-      String _name = _user.name;
-      Map _workDays = {};
-      String _workTime = '00:00';
-      String _legalTime = '00:00';
-      String _nightTime = '00:00';
+      String recordPassword = _user.recordPassword;
+      String name = _user.name;
+      Map count = {};
+      String workTime = '00:00';
+      String legalTime = '00:00';
+      String nightTime = '00:00';
       List<WorkModel> _works = [];
       await workProvider
           .selectList(
@@ -46,31 +47,38 @@ class CsvApi {
         if (_work.startedAt != _work.endedAt) {
           // 勤務日数
           String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
-          _workDays[_key] = '';
+          count[_key] = '';
           // 勤務時間
-          _workTime = addTime(_workTime, _work.workTime(group));
+          workTime = addTime(workTime, _work.workTime(group));
           // 法定内時間
-          List<String> _legalTimes = _work.legalTime(group);
-          _legalTime = addTime(_legalTime, _legalTimes.first);
+          List<String> _legalTimes = _work.legalTimes(group);
+          legalTime = addTime(legalTime, _legalTimes.first);
           // 深夜時間
-          List<String> _calTimes = _work.calTime01(group);
-          _nightTime = addTime(_nightTime, _calTimes[1]);
+          List<String> _calTimes = _work.calTimes01(group);
+          nightTime = addTime(nightTime, _calTimes[1]);
         }
       }
-
+      // 勤務日数
+      int workDays = count.length;
       List<dynamic> _row = [];
-      _row.add('$_recordPassword');
-      _row.add('$_name');
-      _row.add('${_workDays.length}');
+      _row.add(recordPassword);
+      _row.add(name);
+      _row.add('$workDays');
       if (_user.position == '正社員') {
-        _row.add('$_workTime');
+        _row.add(workTime);
         _row.add('00:00');
       } else {
-        _row.add('$_legalTime');
-        _row.add('$_nightTime');
+        _row.add(legalTime);
+        _row.add(nightTime);
       }
       rows.add(_row);
     }
+    _download(rows: rows, fileName: 'work.csv');
+    return;
+  }
+
+  static Future<void> works02() async {
+    List<List<dynamic>> rows = [];
     _download(rows: rows, fileName: 'work.csv');
     return;
   }

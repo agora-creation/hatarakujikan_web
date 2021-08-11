@@ -34,7 +34,7 @@ class GroupProvider with ChangeNotifier {
   Future<void> setGroup(GroupModel group) async {
     _groups.clear();
     _group = group;
-    await setPrefs(group.id);
+    await setPrefs(key: 'groupId', value: group.id);
     notifyListeners();
   }
 
@@ -67,7 +67,7 @@ class GroupProvider with ChangeNotifier {
     _status = Status.Unauthenticated;
     _groups.clear();
     _group = null;
-    await removePrefs();
+    await removePrefs(key: 'groupId');
     notifyListeners();
     return Future.delayed(Duration.zero);
   }
@@ -78,7 +78,7 @@ class GroupProvider with ChangeNotifier {
   }
 
   Future reloadGroupModel() async {
-    String _groupId = await getPrefs();
+    String _groupId = await getPrefs(key: 'groupId');
     if (_groupId != "") {
       _group = await _groupService.select(groupId: _groupId);
     }
@@ -91,7 +91,7 @@ class GroupProvider with ChangeNotifier {
       _status = Status.Unauthenticated;
     } else {
       _fUser = firebaseUser;
-      String _groupId = await getPrefs();
+      String _groupId = await getPrefs(key: 'groupId');
       if (_groupId == '') {
         _status = Status.Unauthenticated;
         _groups.clear();

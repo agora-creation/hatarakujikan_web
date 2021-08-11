@@ -67,12 +67,12 @@ class CustomWorkListTile extends StatelessWidget {
                   String _nightTime = '00:00';
                   if (_work.startedAt != _work.endedAt) {
                     _endTime = _work.endTime(group);
-                    _breakTime = _work.breakTime(group)[0];
+                    _breakTime = _work.breakTimes(group)[0];
                     _workTime = _work.workTime(group);
-                    List<String> _legalTimes = _work.legalTime(group);
+                    List<String> _legalTimes = _work.legalTimes(group);
                     _legalTime = _legalTimes.first;
                     _nonLegalTime = _legalTimes.last;
-                    List<String> _nightTimes = _work.nightTime(group);
+                    List<String> _nightTimes = _work.nightTimes(group);
                     _nightTime = _nightTimes.last;
                   }
                   return ListTile(
@@ -827,7 +827,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.legalTime(widget.group).first}'),
+                        Text('${work.legalTimes(widget.group).first}'),
                       ],
                     ),
                     Column(
@@ -840,7 +840,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.legalTime(widget.group).last}'),
+                        Text('${work.legalTimes(widget.group).last}'),
                       ],
                     ),
                     Column(
@@ -853,7 +853,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.nightTime(widget.group).last}'),
+                        Text('${work.nightTimes(widget.group).last}'),
                       ],
                     ),
                   ],
@@ -872,7 +872,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.calTime01(widget.group)[0]}'),
+                        Text('${work.calTimes01(widget.group)[0]}'),
                       ],
                     ),
                     Column(
@@ -885,7 +885,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.calTime01(widget.group)[1]}'),
+                        Text('${work.calTimes01(widget.group)[1]}'),
                       ],
                     ),
                     Column(
@@ -898,7 +898,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.calTime01(widget.group)[2]}'),
+                        Text('${work.calTimes01(widget.group)[2]}'),
                       ],
                     ),
                     Column(
@@ -911,7 +911,7 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
                             fontSize: 14.0,
                           ),
                         ),
-                        Text('${work.calTime01(widget.group)[3]}'),
+                        Text('${work.calTimes01(widget.group)[3]}'),
                       ],
                     ),
                   ],
