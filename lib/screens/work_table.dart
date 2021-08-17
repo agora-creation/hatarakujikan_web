@@ -418,6 +418,7 @@ class _CsvDialogState extends State<CsvDialog> {
   DateTime _lastDate = DateTime(DateTime.now().year + 1);
   DateTime searchMonth = DateTime.now();
   List<DateTime> days = [];
+  bool _isLoading = false;
 
   void _generateDays() async {
     days.clear();
@@ -447,65 +448,77 @@ class _CsvDialogState extends State<CsvDialog> {
     return AlertDialog(
       content: Container(
         width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            SizedBox(height: 16.0),
-            Text(
-              '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
-            ),
-            SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '年月',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                CustomDateButton(
-                  onPressed: () async {
-                    var selected = await showMonthPicker(
-                      context: context,
-                      initialDate: searchMonth,
-                      firstDate: _firstDate,
-                      lastDate: _lastDate,
-                    );
-                    if (selected == null) return;
-                    setState(() {
-                      searchMonth = selected;
-                      _generateDays();
-                    });
-                  },
-                  label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
-                ),
-              ],
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
-                  label: 'キャンセル',
-                ),
-                CustomTextButton(
-                  onPressed: () async {
-                    await CsvApi.works01(
-                      workProvider: widget.workProvider,
-                      group: widget.group,
-                      month: searchMonth,
-                      users: widget.users,
-                    );
-                  },
-                  color: Colors.green,
-                  label: '出力する',
-                ),
-              ],
-            ),
-          ],
-        ),
+        child: _isLoading
+            ? ListView(
+                shrinkWrap: true,
+                children: [
+                  SizedBox(height: 16.0),
+                  Loading(color: Colors.orange),
+                  SizedBox(height: 16.0),
+                ],
+              )
+            : ListView(
+                shrinkWrap: true,
+                children: [
+                  SizedBox(height: 16.0),
+                  Text(
+                    '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
+                    style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                  ),
+                  SizedBox(height: 16.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '年月',
+                        style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                      ),
+                      CustomDateButton(
+                        onPressed: () async {
+                          var selected = await showMonthPicker(
+                            context: context,
+                            initialDate: searchMonth,
+                            firstDate: _firstDate,
+                            lastDate: _lastDate,
+                          );
+                          if (selected == null) return;
+                          setState(() {
+                            searchMonth = selected;
+                            _generateDays();
+                          });
+                        },
+                        label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomTextButton(
+                        onPressed: () => Navigator.pop(context),
+                        color: Colors.grey,
+                        label: 'キャンセル',
+                      ),
+                      CustomTextButton(
+                        onPressed: () async {
+                          setState(() => _isLoading = true);
+                          await CsvApi.works01(
+                            workProvider: widget.workProvider,
+                            group: widget.group,
+                            month: searchMonth,
+                            users: widget.users,
+                          );
+                          setState(() => _isLoading = false);
+                          Navigator.pop(context);
+                        },
+                        color: Colors.green,
+                        label: '出力する',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -539,6 +552,7 @@ class _PdfDialogState extends State<PdfDialog> {
   DateTime searchMonth = DateTime.now();
   UserModel searchUser;
   bool isAll = false;
+  bool _isLoading = false;
 
   void _generateDays() async {
     days.clear();
@@ -569,108 +583,120 @@ class _PdfDialogState extends State<PdfDialog> {
     return AlertDialog(
       content: Container(
         width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            SizedBox(height: 16.0),
-            Text(
-              '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
-            ),
-            SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '年月',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                CustomDateButton(
-                  onPressed: () async {
-                    var selected = await showMonthPicker(
-                      context: context,
-                      initialDate: searchMonth,
-                      firstDate: _firstDate,
-                      lastDate: _lastDate,
-                    );
-                    if (selected == null) return;
-                    setState(() {
-                      searchMonth = selected;
-                      _generateDays();
-                    });
-                  },
-                  label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'スタッフ',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                CustomDropdownButton(
-                  value: searchUser,
-                  onChanged: (value) {
-                    setState(() => searchUser = value);
-                  },
-                  items: widget.users.map((value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(
-                        '${value.name}',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14.0,
-                        ),
+        child: _isLoading
+            ? ListView(
+                shrinkWrap: true,
+                children: [
+                  SizedBox(height: 16.0),
+                  Loading(color: Colors.orange),
+                  SizedBox(height: 16.0),
+                ],
+              )
+            : ListView(
+                shrinkWrap: true,
+                children: [
+                  SizedBox(height: 16.0),
+                  Text(
+                    '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
+                    style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                  ),
+                  SizedBox(height: 16.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '年月',
+                        style: TextStyle(color: Colors.black54, fontSize: 14.0),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-            Container(
-              decoration: kTopBottomBorderDecoration,
-              child: CheckboxListTile(
-                onChanged: (value) {
-                  setState(() => isAll = value);
-                },
-                value: isAll,
-                title: Text('全スタッフ一括出力'),
-                controlAffinity: ListTileControlAffinity.leading,
+                      CustomDateButton(
+                        onPressed: () async {
+                          var selected = await showMonthPicker(
+                            context: context,
+                            initialDate: searchMonth,
+                            firstDate: _firstDate,
+                            lastDate: _lastDate,
+                          );
+                          if (selected == null) return;
+                          setState(() {
+                            searchMonth = selected;
+                            _generateDays();
+                          });
+                        },
+                        label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'スタッフ',
+                        style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                      ),
+                      CustomDropdownButton(
+                        value: searchUser,
+                        onChanged: (value) {
+                          setState(() => searchUser = value);
+                        },
+                        items: widget.users.map((value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(
+                              '${value.name}',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.0),
+                  Container(
+                    decoration: kTopBottomBorderDecoration,
+                    child: CheckboxListTile(
+                      onChanged: (value) {
+                        setState(() => isAll = value);
+                      },
+                      value: isAll,
+                      title: Text('全スタッフ一括出力'),
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomTextButton(
+                        onPressed: () => Navigator.pop(context),
+                        color: Colors.grey,
+                        label: 'キャンセル',
+                      ),
+                      CustomTextButton(
+                        onPressed: () async {
+                          setState(() => _isLoading = true);
+                          await PdfApi.works01(
+                            workProvider: widget.workProvider,
+                            workStateProvider: widget.workStateProvider,
+                            group: widget.group,
+                            month: searchMonth,
+                            user: searchUser,
+                            isAll: isAll,
+                            users: widget.users,
+                          );
+                          setState(() => _isLoading = false);
+                          Navigator.pop(context);
+                        },
+                        color: Colors.redAccent,
+                        label: '出力する',
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
-                  label: 'キャンセル',
-                ),
-                CustomTextButton(
-                  onPressed: () async {
-                    await PdfApi.works01(
-                      workProvider: widget.workProvider,
-                      workStateProvider: widget.workStateProvider,
-                      group: widget.group,
-                      month: searchMonth,
-                      user: searchUser,
-                      isAll: isAll,
-                      users: widget.users,
-                    );
-                  },
-                  color: Colors.redAccent,
-                  label: '出力する',
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
