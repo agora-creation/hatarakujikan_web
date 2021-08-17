@@ -138,6 +138,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundStartType,
                         onChanged: (value) {
                           setState(() => roundStartType = value);
@@ -163,6 +164,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundStartNum,
                         onChanged: (value) {
                           setState(() => roundStartNum = value);
@@ -194,6 +196,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundEndType,
                         onChanged: (value) {
                           setState(() => roundEndType = value);
@@ -219,6 +222,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundEndNum,
                         onChanged: (value) {
                           setState(() => roundEndNum = value);
@@ -250,6 +254,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundBreakStartType,
                         onChanged: (value) {
                           setState(() => roundBreakStartType = value);
@@ -275,6 +280,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundBreakStartNum,
                         onChanged: (value) {
                           setState(() => roundBreakStartNum = value);
@@ -306,6 +312,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundBreakEndType,
                         onChanged: (value) {
                           setState(() => roundBreakEndType = value);
@@ -331,6 +338,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundBreakEndNum,
                         onChanged: (value) {
                           setState(() => roundBreakEndNum = value);
@@ -362,6 +370,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ方', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundWorkType,
                         onChanged: (value) {
                           setState(() => roundWorkType = value);
@@ -387,6 +396,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     children: [
                       Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
                       CustomDropdownButton(
+                        isExpanded: false,
                         value: roundWorkNum,
                         onChanged: (value) {
                           setState(() => roundWorkNum = value);
@@ -415,6 +425,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
               ),
               SizedBox(height: 8.0),
               CustomDropdownButton(
+                isExpanded: false,
                 value: legal,
                 onChanged: (value) {
                   setState(() => legal = value);

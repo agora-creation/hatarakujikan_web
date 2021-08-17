@@ -239,6 +239,7 @@ class _MigrationDialogState extends State<MigrationDialog> {
                   children: [
                     Text('移行元', style: TextStyle(fontSize: 14.0)),
                     CustomDropdownButton(
+                      isExpanded: false,
                       value: selectBefUser,
                       onChanged: (value) {
                         setState(() => selectBefUser = value);
@@ -272,6 +273,7 @@ class _MigrationDialogState extends State<MigrationDialog> {
                   children: [
                     Text('移行先', style: TextStyle(fontSize: 14.0)),
                     CustomDropdownButton(
+                      isExpanded: false,
                       value: selectAftUser,
                       onChanged: (value) {
                         setState(() => selectAftUser = value);
@@ -397,6 +399,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
               children: [
                 Text('雇用形態', style: TextStyle(fontSize: 14.0)),
                 CustomDropdownButton(
+                  isExpanded: true,
                   value: position != '' ? position : null,
                   onChanged: (value) {
                     setState(() => position = value);
@@ -534,6 +537,7 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
               children: [
                 Text('雇用形態', style: TextStyle(fontSize: 14.0)),
                 CustomDropdownButton(
+                  isExpanded: true,
                   value: position != '' ? position : null,
                   onChanged: (value) {
                     setState(() => position = value);

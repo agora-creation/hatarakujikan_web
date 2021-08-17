@@ -797,128 +797,147 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
               ],
             ),
             SizedBox(height: 8.0),
-            Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Table(
+              border: TableBorder.all(color: Colors.grey.shade300),
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                TableRow(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '勤務時間',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '勤務時間',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.workTime(widget.group)}'),
-                      ],
+                          Text('${work.workTime(widget.group)}'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '法定内時間',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '法定内時間',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.legalTimes(widget.group).first}'),
-                      ],
+                          Text('${work.legalTimes(widget.group).first}'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '法定外時間',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '法定外時間',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.legalTimes(widget.group).last}'),
-                      ],
+                          Text('${work.legalTimes(widget.group).last}'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '深夜時間',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '深夜時間',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.nightTimes(widget.group).last}'),
-                      ],
+                          Text('${work.nightTimes(widget.group).last}'),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-                Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                TableRow(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '通常時間※1',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '通常時間※1',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.calTimes01(widget.group)[0]}'),
-                      ],
+                          Text('${work.calTimes01(widget.group)[0]}'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '深夜時間※2',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '深夜時間※2',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.calTimes01(widget.group)[1]}'),
-                      ],
+                          Text('${work.calTimes01(widget.group)[1]}'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '通常時間外※3',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '通常時間外※3',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.calTimes01(widget.group)[2]}'),
-                      ],
+                          Text('${work.calTimes01(widget.group)[2]}'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '深夜時間外※4',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '深夜時間外※4',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14.0,
+                            ),
                           ),
-                        ),
-                        Text('${work.calTimes01(widget.group)[3]}'),
-                      ],
+                          Text('${work.calTimes01(widget.group)[3]}'),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

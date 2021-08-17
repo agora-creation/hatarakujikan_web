@@ -476,6 +476,7 @@ class _CsvDialogState extends State<CsvDialog> {
                         style: TextStyle(color: Colors.black54, fontSize: 14.0),
                       ),
                       CustomDropdownButton(
+                        isExpanded: true,
                         value: _temp,
                         onChanged: (value) {
                           setState(() => _temp = value);
@@ -665,6 +666,7 @@ class _PdfDialogState extends State<PdfDialog> {
                         style: TextStyle(color: Colors.black54, fontSize: 14.0),
                       ),
                       CustomDropdownButton(
+                        isExpanded: true,
                         value: searchUser,
                         onChanged: (value) {
                           setState(() => searchUser = value);
@@ -797,6 +799,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                   style: TextStyle(color: Colors.black54, fontSize: 14.0),
                 ),
                 CustomDropdownButton(
+                  isExpanded: true,
                   value: searchUser,
                   onChanged: (value) {
                     setState(() => searchUser = value);
@@ -825,6 +828,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                   style: TextStyle(color: Colors.black54, fontSize: 14.0),
                 ),
                 CustomDropdownButton(
+                  isExpanded: true,
                   value: state,
                   onChanged: (value) {
                     setState(() => state = value);

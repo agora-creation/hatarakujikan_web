@@ -195,6 +195,7 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
               children: [
                 Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
                 CustomDropdownButton(
+                  isExpanded: true,
                   value: adminUser,
                   onChanged: (value) {
                     setState(() => adminUser = value);
@@ -318,6 +319,7 @@ class _SectionDetailsDialogState extends State<SectionDetailsDialog> {
               children: [
                 Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
                 CustomDropdownButton(
+                  isExpanded: true,
                   value: adminUser,
                   onChanged: (value) {
                     setState(() => adminUser = value);
