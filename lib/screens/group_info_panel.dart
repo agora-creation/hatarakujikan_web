@@ -144,6 +144,7 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                 children: [
                   Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
                   CustomDropdownButton(
+                    isExpanded: false,
                     value: adminUser,
                     onChanged: (value) {
                       setState(() => adminUser = value);

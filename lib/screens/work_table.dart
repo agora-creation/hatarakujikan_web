@@ -419,6 +419,8 @@ class _CsvDialogState extends State<CsvDialog> {
   DateTime searchMonth = DateTime.now();
   List<DateTime> days = [];
   bool _isLoading = false;
+  List<String> _templates = ['A', 'B', 'C'];
+  String _temp;
 
   void _generateDays() async {
     days.clear();
@@ -466,6 +468,34 @@ class _CsvDialogState extends State<CsvDialog> {
                     style: TextStyle(color: Colors.black54, fontSize: 14.0),
                   ),
                   SizedBox(height: 16.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'テンプレート',
+                        style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                      ),
+                      CustomDropdownButton(
+                        value: _temp,
+                        onChanged: (value) {
+                          setState(() => _temp = value);
+                        },
+                        items: _templates.map((value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.0),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
