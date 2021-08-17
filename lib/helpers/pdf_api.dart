@@ -178,6 +178,7 @@ class PdfApi {
 
     // 全スタッフ一括出力フラグ
     if (isAll) {
+      if (users == null) return;
       for (UserModel _user in users) {
         // 各種データ取得
         List<WorkModel> works = await workProvider.selectList(
@@ -416,6 +417,7 @@ class PdfApi {
         ));
       }
     } else {
+      if (user == null) return;
       // 各種データ取得
       List<WorkModel> works = await workProvider.selectList(
         groupId: group.id,
