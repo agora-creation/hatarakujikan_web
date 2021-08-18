@@ -387,7 +387,7 @@ class PdfApi {
             decoration: pw.BoxDecoration(color: PdfColors.grey300),
             children: [
               _cell(label: '総勤務日数 [$workDays日]'),
-              _cell(label: '総勤務時間 [$workTimes}]'),
+              _cell(label: '総勤務時間 [$workTimes]'),
               _cell(label: '総通常時間 [$dayTimes]'),
               _cell(label: '総深夜時間 [$nightTimes]'),
               _cell(label: '総通常時間外 [$dayTimeOvers]'),
@@ -625,7 +625,7 @@ class PdfApi {
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
             _cell(label: '総勤務日数 [$workDays日]'),
-            _cell(label: '総勤務時間 [$workTimes}]'),
+            _cell(label: '総勤務時間 [$workTimes]'),
             _cell(label: '総通常時間 [$dayTimes]'),
             _cell(label: '総深夜時間 [$nightTimes]'),
             _cell(label: '総通常時間外 [$dayTimeOvers]'),

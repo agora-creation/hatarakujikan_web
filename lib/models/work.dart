@@ -145,10 +145,11 @@ class WorkModel {
     DateTime _baseSS =
         DateTime.parse('$_startedDate ${group.nightStart}:00.000');
     DateTime _baseSE = DateTime.parse('$_startedDate ${group.nightEnd}:00.000');
+    DateTime _baseES = DateTime.parse('$_endedDate ${group.nightStart}:00.000');
     DateTime _baseEE = DateTime.parse('$_endedDate ${group.nightEnd}:00.000');
     if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
         _startedAt.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
-      if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
         _dayS = _startedAt;
@@ -158,17 +159,17 @@ class WorkModel {
       } else {
         // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
         _dayS = _startedAt;
-        _dayE = _baseSE;
-        _nightS = _baseSE;
+        _dayE = _baseES;
+        _nightS = _baseES;
         _nightE = _endedAt;
       }
     } else {
-      if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[22:00〜05:00]退勤時間[05:00〜22:00]
         _nightS = _startedAt;
-        _nightE = _baseSE;
-        _dayS = _baseSE;
+        _nightE = _baseES;
+        _dayS = _baseES;
         _dayE = _endedAt;
       } else {
         // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]
@@ -217,10 +218,11 @@ class WorkModel {
     DateTime _baseSS =
         DateTime.parse('$_startedDate ${group.nightStart}:00.000');
     DateTime _baseSE = DateTime.parse('$_startedDate ${group.nightEnd}:00.000');
+    DateTime _baseES = DateTime.parse('$_endedDate ${group.nightStart}:00.000');
     DateTime _baseEE = DateTime.parse('$_endedDate ${group.nightEnd}:00.000');
     if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
         _startedAt.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
-      if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
         _dayS = _startedAt;
@@ -230,17 +232,17 @@ class WorkModel {
       } else {
         // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
         _dayS = _startedAt;
-        _dayE = _baseSE;
-        _nightS = _baseSE;
+        _dayE = _baseES;
+        _nightS = _baseES;
         _nightE = _endedAt;
       }
     } else {
-      if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[22:00〜05:00]退勤時間[05:00〜22:00]
         _nightS = _startedAt;
-        _nightE = _baseSE;
-        _dayS = _baseSE;
+        _nightE = _baseES;
+        _dayS = _baseES;
         _dayE = _endedAt;
       } else {
         // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]
@@ -295,7 +297,7 @@ class WorkModel {
       DateTime _nightOverE;
       if (_overTimeS.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
           _overTimeS.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
-        if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+        if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
             _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
           // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
           _dayOverS = _overTimeS;
@@ -305,17 +307,17 @@ class WorkModel {
         } else {
           // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
           _dayOverS = _overTimeS;
-          _dayOverE = _baseSE;
-          _nightOverS = _baseSE;
+          _dayOverE = _baseES;
+          _nightOverS = _baseES;
           _nightOverE = _endedAt;
         }
       } else {
-        if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+        if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
             _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
           // 出勤時間[22:00〜05:00]退勤時間[05:00〜22:00]
           _nightOverS = _overTimeS;
-          _nightOverE = _baseSE;
-          _dayOverS = _baseSE;
+          _nightOverE = _baseES;
+          _dayOverS = _baseES;
           _dayOverE = _endedAt;
         } else {
           // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]

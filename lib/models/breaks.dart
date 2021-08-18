@@ -82,18 +82,18 @@ class BreaksModel {
     DateTime _baseSS = DateTime.parse(
       '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
     );
-    DateTime _baseES = DateTime.parse(
+    DateTime _baseSE = DateTime.parse(
       '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightEnd}:00.000',
     );
-    DateTime _baseSE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
+    DateTime _baseES = DateTime.parse(
+      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightStart}:00.000',
     );
     DateTime _baseEE = DateTime.parse(
       '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',
     );
     if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
-        _startedAt.millisecondsSinceEpoch > _baseES.millisecondsSinceEpoch) {
-      if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+        _startedAt.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
+      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
         _dayS = _startedAt;
@@ -103,17 +103,17 @@ class BreaksModel {
       } else {
         // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
         _dayS = _startedAt;
-        _dayE = _baseSE;
-        _nightS = _baseSE;
+        _dayE = _baseES;
+        _nightS = _baseES;
         _nightE = _endedAt;
       }
     } else {
-      if (_endedAt.millisecondsSinceEpoch < _baseSE.millisecondsSinceEpoch &&
+      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
           _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
         // 出勤時間[22:00〜05:00]退勤時間[05:00〜22:00]
         _nightS = _startedAt;
-        _nightE = _baseSE;
-        _dayS = _baseSE;
+        _nightE = _baseES;
+        _dayS = _baseES;
         _dayE = _endedAt;
       } else {
         // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]

@@ -419,8 +419,7 @@ class _CsvDialogState extends State<CsvDialog> {
   DateTime searchMonth = DateTime.now();
   List<DateTime> days = [];
   bool _isLoading = false;
-  List<String> _templates = ['A', 'B', 'C'];
-  String _temp;
+  String template;
 
   void _generateDays() async {
     days.clear();
@@ -435,6 +434,7 @@ class _CsvDialogState extends State<CsvDialog> {
   void _init() async {
     setState(() {
       searchMonth = widget.searchMonth;
+      template = csvTemplates.first;
     });
   }
 
@@ -477,11 +477,11 @@ class _CsvDialogState extends State<CsvDialog> {
                       ),
                       CustomDropdownButton(
                         isExpanded: true,
-                        value: _temp,
+                        value: template,
                         onChanged: (value) {
-                          setState(() => _temp = value);
+                          setState(() => template = value);
                         },
-                        items: _templates.map((value) {
+                        items: csvTemplates.map((value) {
                           return DropdownMenuItem(
                             value: value,
                             child: Text(
