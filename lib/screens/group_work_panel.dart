@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button2.dart';
+import 'package:hatarakujikan_web/widgets/custom_week_checkbox.dart';
 
 class GroupWorkPanel extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -121,374 +122,454 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
         ),
         SizedBox(height: 8.0),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
             children: [
-              CustomIconLabel(
-                iconData: Icons.access_time,
-                label: '時間のまるめ',
-              ),
-              SizedBox(height: 8.0),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('出勤時間　　'),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  CustomIconLabel(
+                    iconData: Icons.access_time,
+                    label: '時間のまるめ',
+                  ),
+                  SizedBox(height: 8.0),
+                  Row(
                     children: [
-                      Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundStartType,
-                        onChanged: (value) {
-                          setState(() => roundStartType = value);
-                        },
-                        items: roundTypeList.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                      Text('出勤時間　　'),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundStartType,
+                            onChanged: (value) {
+                              setState(() => roundStartType = value);
+                            },
+                            items: roundTypeList.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundStartNum,
+                            onChanged: (value) {
+                              setState(() => roundStartNum = value);
+                            },
+                            items: roundNumList.map((value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(
+                                  '$value分',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 8.0),
+                  Row(
                     children: [
-                      Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundStartNum,
-                        onChanged: (value) {
-                          setState(() => roundStartNum = value);
-                        },
-                        items: roundNumList.map((value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(
-                              '$value分',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                      Text('退勤時間　　'),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundEndType,
+                            onChanged: (value) {
+                              setState(() => roundEndType = value);
+                            },
+                            items: roundTypeList.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundEndNum,
+                            onChanged: (value) {
+                              setState(() => roundEndNum = value);
+                            },
+                            items: roundNumList.map((value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(
+                                  '$value分',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text('退勤時間　　'),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 8.0),
+                  Row(
                     children: [
-                      Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundEndType,
-                        onChanged: (value) {
-                          setState(() => roundEndType = value);
-                        },
-                        items: roundTypeList.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                      Text('休憩開始時間'),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundBreakStartType,
+                            onChanged: (value) {
+                              setState(() => roundBreakStartType = value);
+                            },
+                            items: roundTypeList.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundBreakStartNum,
+                            onChanged: (value) {
+                              setState(() => roundBreakStartNum = value);
+                            },
+                            items: roundNumList.map((value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(
+                                  '$value分',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 8.0),
+                  Row(
                     children: [
-                      Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundEndNum,
-                        onChanged: (value) {
-                          setState(() => roundEndNum = value);
-                        },
-                        items: roundNumList.map((value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(
-                              '$value分',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                      Text('休憩終了時間'),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundBreakEndType,
+                            onChanged: (value) {
+                              setState(() => roundBreakEndType = value);
+                            },
+                            items: roundTypeList.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundBreakEndNum,
+                            onChanged: (value) {
+                              setState(() => roundBreakEndNum = value);
+                            },
+                            items: roundNumList.map((value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(
+                                  '$value分',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text('休憩開始時間'),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 8.0),
+                  Row(
                     children: [
-                      Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundBreakStartType,
-                        onChanged: (value) {
-                          setState(() => roundBreakStartType = value);
-                        },
-                        items: roundTypeList.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                      Text('勤務時間　　'),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundWorkType,
+                            onChanged: (value) {
+                              setState(() => roundWorkType = value);
+                            },
+                            items: roundTypeList.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
+                          CustomDropdownButton(
+                            isExpanded: false,
+                            value: roundWorkNum,
+                            onChanged: (value) {
+                              setState(() => roundWorkNum = value);
+                            },
+                            items: roundNumList.map((value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(
+                                  '$value分',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundBreakStartNum,
-                        onChanged: (value) {
-                          setState(() => roundBreakStartNum = value);
-                        },
-                        items: roundNumList.map((value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(
-                              '$value分',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
+                  SizedBox(height: 16.0),
+                  CustomIconLabel(
+                    iconData: Icons.access_time,
+                    label: '法定時間',
                   ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text('休憩終了時間'),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundBreakEndType,
-                        onChanged: (value) {
-                          setState(() => roundBreakEndType = value);
-                        },
-                        items: roundTypeList.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundBreakEndNum,
-                        onChanged: (value) {
-                          setState(() => roundBreakEndNum = value);
-                        },
-                        items: roundNumList.map((value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(
-                              '$value分',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text('勤務時間　　'),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundWorkType,
-                        onChanged: (value) {
-                          setState(() => roundWorkType = value);
-                        },
-                        items: roundTypeList.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                      CustomDropdownButton(
-                        isExpanded: false,
-                        value: roundWorkNum,
-                        onChanged: (value) {
-                          setState(() => roundWorkNum = value);
-                        },
-                        items: roundNumList.map((value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(
-                              '$value分',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.0),
-              CustomIconLabel(
-                iconData: Icons.access_time,
-                label: '法定時間',
-              ),
-              SizedBox(height: 8.0),
-              CustomDropdownButton(
-                isExpanded: false,
-                value: legal,
-                onChanged: (value) {
-                  setState(() => legal = value);
-                },
-                items: legalList.map((value) {
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text(
-                      '$value時間',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 14.0,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 16.0),
-              CustomIconLabel(
-                iconData: Icons.access_time,
-                label: '深夜時間帯',
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  CustomTextIconButton2(
-                    onPressed: () async {
-                      List<String> _hm = nightStart.split(':');
-                      TimeOfDay _selected = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay(
-                          hour: int.parse(_hm.first),
-                          minute: int.parse(_hm.last),
+                  SizedBox(height: 8.0),
+                  CustomDropdownButton(
+                    isExpanded: false,
+                    value: legal,
+                    onChanged: (value) {
+                      setState(() => legal = value);
+                    },
+                    items: legalList.map((value) {
+                      return DropdownMenuItem<int>(
+                        value: value,
+                        child: Text(
+                          '$value時間',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
                         ),
                       );
-                      if (_selected != null) {
-                        String _time = '${_selected.format(context)}';
-                        setState(() => nightStart = _time);
-                      }
-                    },
-                    iconData: Icons.access_time,
-                    label: nightStart,
+                    }).toList(),
                   ),
-                  SizedBox(width: 8.0),
-                  Text('〜'),
-                  SizedBox(width: 8.0),
-                  CustomTextIconButton2(
-                    onPressed: () async {
-                      List<String> _hm = nightEnd.split(':');
-                      TimeOfDay _selected = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay(
-                          hour: int.parse(_hm.first),
-                          minute: int.parse(_hm.last),
-                        ),
-                      );
-                      if (_selected != null) {
-                        String _time = '${_selected.format(context)}';
-                        setState(() => nightEnd = _time);
-                      }
-                    },
+                  SizedBox(height: 16.0),
+                  CustomIconLabel(
                     iconData: Icons.access_time,
-                    label: nightEnd,
+                    label: '深夜時間帯',
+                  ),
+                  SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      CustomTextIconButton2(
+                        onPressed: () async {
+                          List<String> _hm = nightStart.split(':');
+                          TimeOfDay _selected = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay(
+                              hour: int.parse(_hm.first),
+                              minute: int.parse(_hm.last),
+                            ),
+                          );
+                          if (_selected != null) {
+                            String _time = '${_selected.format(context)}';
+                            setState(() => nightStart = _time);
+                          }
+                        },
+                        iconData: Icons.access_time,
+                        label: nightStart,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text('〜'),
+                      SizedBox(width: 8.0),
+                      CustomTextIconButton2(
+                        onPressed: () async {
+                          List<String> _hm = nightEnd.split(':');
+                          TimeOfDay _selected = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay(
+                              hour: int.parse(_hm.first),
+                              minute: int.parse(_hm.last),
+                            ),
+                          );
+                          if (_selected != null) {
+                            String _time = '${_selected.format(context)}';
+                            setState(() => nightEnd = _time);
+                          }
+                        },
+                        iconData: Icons.access_time,
+                        label: nightEnd,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  CustomIconLabel(
+                    iconData: Icons.access_time,
+                    label: '残業時間',
+                  ),
+                  SizedBox(height: 8.0),
+                  CustomTextIconButton2(
+                    onPressed: () {},
+                    iconData: Icons.access_time,
+                    label: '00:00',
+                  ),
+                  SizedBox(height: 16.0),
+                  CustomIconLabel(
+                    iconData: Icons.calendar_view_week,
+                    label: '平日/休日',
+                  ),
+                  SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '月',
+                        ),
+                      ),
+                      SizedBox(width: 4.0),
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '火',
+                        ),
+                      ),
+                      SizedBox(width: 4.0),
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '水',
+                        ),
+                      ),
+                      SizedBox(width: 4.0),
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '木',
+                        ),
+                      ),
+                      SizedBox(width: 4.0),
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '金',
+                        ),
+                      ),
+                      SizedBox(width: 8.0),
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '土',
+                        ),
+                      ),
+                      SizedBox(width: 8.0),
+                      Expanded(
+                        child: CustomWeekCheckbox(
+                          onChanged: (value) {},
+                          value: false,
+                          label: '日',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

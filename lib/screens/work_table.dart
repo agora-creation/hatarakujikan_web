@@ -432,6 +432,7 @@ class _CsvDialogState extends State<CsvDialog> {
   }
 
   void _init() async {
+    CsvApi.groupCheck(group: widget.group);
     setState(() {
       searchMonth = widget.searchMonth;
       template = csvTemplates.first;
@@ -534,7 +535,8 @@ class _CsvDialogState extends State<CsvDialog> {
                       CustomTextButton(
                         onPressed: () async {
                           setState(() => _isLoading = true);
-                          await CsvApi.works01(
+                          await CsvApi.download(
+                            template: template,
                             workProvider: widget.workProvider,
                             group: widget.group,
                             month: searchMonth,

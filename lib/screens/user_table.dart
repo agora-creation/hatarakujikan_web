@@ -223,77 +223,63 @@ class _MigrationDialogState extends State<MigrationDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              'この機能は、この管理画面から登録したスタッフがスマートフォンアプリの利用を始めた際、スタッフデータが二重に登録されてしまう為、ここでデータの統一化ができます。',
+              'この機能は、この管理画面から登録したスタッフがスマートフォンアプリの利用を始めた際、スタッフデータが二重に登録されてしまう為、ここでスタッフデータの統一化ができます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 8.0),
             Text(
-              '「移行元」と「移行先」をそれぞれ選択し、最後に「移行する」ボタンを押してください。移行が完了すると、「移行元」のスタッフデータは削除されます。',
+              '「移行元スタッフ」と「移行先スタッフ」をそれぞれ選択し、最後に「移行する」ボタンを押してください。移行が完了すると、「移行元」のスタッフデータは削除されます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('移行元', style: TextStyle(fontSize: 14.0)),
-                    CustomDropdownButton(
-                      isExpanded: false,
-                      value: selectBefUser,
-                      onChanged: (value) {
-                        setState(() => selectBefUser = value);
-                      },
-                      items: befUsers.map((value) {
-                        return DropdownMenuItem<UserModel>(
-                          value: value,
-                          child: Text(
-                            '${value.name}',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+            Text('移行元スタッフ(未スマホユーザー)', style: TextStyle(fontSize: 14.0)),
+            CustomDropdownButton(
+              isExpanded: true,
+              value: selectBefUser,
+              onChanged: (value) {
+                setState(() => selectBefUser = value);
+              },
+              items: befUsers.map((value) {
+                return DropdownMenuItem<UserModel>(
+                  value: value,
+                  child: Text(
+                    '${value.name}',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
                     ),
-                  ],
-                ),
-                SizedBox(width: 8.0),
-                Center(
-                  child: Icon(
-                    Icons.arrow_forward,
-                    color: Colors.black54,
-                    size: 20.0,
                   ),
-                ),
-                SizedBox(width: 8.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('移行先', style: TextStyle(fontSize: 14.0)),
-                    CustomDropdownButton(
-                      isExpanded: false,
-                      value: selectAftUser,
-                      onChanged: (value) {
-                        setState(() => selectAftUser = value);
-                      },
-                      items: aftUsers.map((value) {
-                        return DropdownMenuItem<UserModel>(
-                          value: value,
-                          child: Text(
-                            '${value.name}',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 8.0),
+            Center(
+              child: Icon(
+                Icons.arrow_downward,
+                color: Colors.black54,
+                size: 28.0,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text('移行先スタッフ(スマホユーザー)', style: TextStyle(fontSize: 14.0)),
+            CustomDropdownButton(
+              isExpanded: false,
+              value: selectAftUser,
+              onChanged: (value) {
+                setState(() => selectAftUser = value);
+              },
+              items: aftUsers.map((value) {
+                return DropdownMenuItem<UserModel>(
+                  value: value,
+                  child: Text(
+                    '${value.name}',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                );
+              }).toList(),
             ),
             SizedBox(height: 16.0),
             Row(
