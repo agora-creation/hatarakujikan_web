@@ -52,21 +52,12 @@ class _WorkTableState extends State<WorkTable> {
   List<DateTime> days = [];
 
   void _init() async {
+    setState(() => days = generateDays(searchMonth));
     await widget.userProvider
         .selectList(groupId: widget.groupProvider.group?.id)
         .then((value) {
       setState(() => users = value);
     });
-  }
-
-  void _generateDays() async {
-    days.clear();
-    var _dateMap = DateMachineUtil.getMonthDate(searchMonth, 0);
-    DateTime _startAt = DateTime.parse('${_dateMap['start']}');
-    DateTime _endAt = DateTime.parse('${_dateMap['end']}');
-    for (int i = 0; i <= _endAt.difference(_startAt).inDays; i++) {
-      days.add(_startAt.add(Duration(days: i)));
-    }
   }
 
   void searchUserChange(UserModel user) {
@@ -76,7 +67,6 @@ class _WorkTableState extends State<WorkTable> {
   @override
   void initState() {
     super.initState();
-    _generateDays();
     _init();
   }
 
@@ -131,7 +121,7 @@ class _WorkTableState extends State<WorkTable> {
                     if (selected == null) return;
                     setState(() {
                       searchMonth = selected;
-                      _generateDays();
+                      days = generateDays(searchMonth);
                     });
                   },
                   color: Colors.lightBlueAccent,

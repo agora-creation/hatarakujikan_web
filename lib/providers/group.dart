@@ -6,6 +6,11 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/group.dart';
 import 'package:hatarakujikan_web/services/user.dart';
 
+const List<String> roundTypeList = ['切捨', '切上'];
+const List<int> roundNumList = [1, 5, 10, 15, 30];
+const List<int> legalList = [8];
+const List<String> weekList = ['日', '月', '火', '水', '木', '金', '土'];
+
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
 class GroupProvider with ChangeNotifier {
@@ -170,6 +175,9 @@ class GroupProvider with ChangeNotifier {
     int legal,
     String nightStart,
     String nightEnd,
+    String workStart,
+    String workEnd,
+    List<String> holidays,
   }) async {
     try {
       _groupService.update({
@@ -187,6 +195,9 @@ class GroupProvider with ChangeNotifier {
         'legal': legal,
         'nightStart': nightStart,
         'nightEnd': nightEnd,
+        'workStart': workStart,
+        'workEnd': workEnd,
+        'holidays': holidays,
       });
       return true;
     } catch (e) {

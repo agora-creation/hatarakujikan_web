@@ -24,6 +24,9 @@ class GroupModel {
   int _legal;
   String _nightStart;
   String _nightEnd;
+  String _workStart;
+  String _workEnd;
+  List<String> holidays;
   DateTime _createdAt;
 
   String get id => _id;
@@ -48,6 +51,8 @@ class GroupModel {
   int get legal => _legal;
   String get nightStart => _nightStart;
   String get nightEnd => _nightEnd;
+  String get workStart => _workStart;
+  String get workEnd => _workEnd;
   DateTime get createdAt => _createdAt;
 
   GroupModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -74,12 +79,23 @@ class GroupModel {
     _legal = snapshot.data()['legal'];
     _nightStart = snapshot.data()['nightStart'];
     _nightEnd = snapshot.data()['nightEnd'];
+    _workStart = snapshot.data()['workStart'];
+    _workEnd = snapshot.data()['workEnd'];
+    holidays = _convertHolidays(snapshot.data()['holidays']) ?? [];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 
   List<String> _convertPositions(List positions) {
     List<String> converted = [];
     for (String data in positions) {
+      converted.add(data);
+    }
+    return converted;
+  }
+
+  List<String> _convertHolidays(List holidays) {
+    List<String> converted = [];
+    for (String data in holidays) {
       converted.add(data);
     }
     return converted;

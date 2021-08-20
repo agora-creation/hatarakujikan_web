@@ -7,17 +7,17 @@ import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart';
 
-List<String> csvTemplates = ['ひろめカンパニー専用形式', '土佐税理士事務所専用形式'];
+List<String> csvTemplates = ['ひろめカンパニー用レイアウト', '土佐税理士事務所用レイアウト'];
 
 class CsvApi {
   static void groupCheck({GroupModel group}) {
     String _id = group.id;
     switch (_id) {
       case 'UryZHGotsjyR0Zb6g06J':
-        csvTemplates.removeWhere((e) => e != 'ひろめカンパニー専用形式');
+        csvTemplates.removeWhere((e) => e != 'ひろめカンパニー用レイアウト');
         return;
       case 'h74zqng5i59qHdMG16Cb':
-        csvTemplates.removeWhere((e) => e != '土佐税理士事務所専用形式');
+        csvTemplates.removeWhere((e) => e != '土佐税理士事務所用レイアウト');
         return;
       default:
         return;
@@ -33,7 +33,7 @@ class CsvApi {
   }) async {
     if (template == null) return;
     switch (template) {
-      case 'ひろめカンパニー専用形式':
+      case 'ひろめカンパニー用レイアウト':
         await _works01(
           workProvider: workProvider,
           group: group,
@@ -41,7 +41,7 @@ class CsvApi {
           users: users,
         );
         return;
-      case '土佐税理士事務所専用形式':
+      case '土佐税理士事務所用レイアウト':
         await _works02(
           workProvider: workProvider,
           group: group,
@@ -123,12 +123,98 @@ Future<void> _works02({
   List<UserModel> users,
 }) async {
   List<List<String>> rows = [];
+  List<String> row = [];
+  row.add('社員コード');
+  row.add('就業日数');
+  row.add('出勤日数');
+  row.add('欠勤日数');
+  row.add('有休日数');
+  row.add('特休日数');
+  row.add('休出日数');
+  row.add('代休日数');
+  row.add('遅早回数');
+  row.add('出勤時間');
+  row.add('遅早時間');
+  row.add('平日普通残業時間');
+  row.add('平日深夜残業時間');
+  row.add('休日残業時間');
+  row.add('休日深夜残業時間');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  row.add('予備項目');
+  rows.add(row);
+  List<DateTime> days = generateDays(month);
+  for (UserModel _user in users) {
+    String recordPassword = _user.recordPassword;
+    Map count = {};
+    List<WorkModel> _works = [];
+    await workProvider
+        .selectList(
+      groupId: group.id,
+      userId: _user.id,
+      startAt: days.first,
+      endAt: days.last,
+    )
+        .then((value) {
+      _works = value;
+    });
+    for (WorkModel _work in _works) {
+      if (_work.startedAt != _work.endedAt) {
+        String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+        count[_key] = '';
+      }
+    }
+    int workDays = count.length;
+    List<String> _row = [];
+    _row.add('$recordPassword');
+    _row.add('$workDays');
+    _row.add('$workDays');
+    _row.add('0');
+    _row.add('0');
+    _row.add('0');
+    _row.add('0');
+    _row.add('0');
+    _row.add('0');
+    _row.add('00:00');
+    _row.add('00:00');
+    _row.add('00:00');
+    _row.add('00:00');
+    _row.add('00:00');
+    _row.add('00:00');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    _row.add('');
+    rows.add(_row);
+  }
   _download(rows: rows, fileName: 'works.csv');
 }
 
 void _download({List<List<String>> rows, String fileName}) {
   String csv = const ListToCsvConverter().convert(rows);
-  print(csv);
   AnchorElement(href: 'data:text/csv;charset=utf-8,$csv')
     ..setAttribute('download', fileName)
     ..click();

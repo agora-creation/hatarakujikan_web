@@ -19,8 +19,6 @@ class GroupWorkPanel extends StatefulWidget {
 }
 
 class _GroupWorkPanelState extends State<GroupWorkPanel> {
-  List<String> roundTypeList = ['切捨', '切上'];
-  List<int> roundNumList = [1, 5, 10, 15, 30];
   String roundStartType;
   int roundStartNum;
   String roundEndType;
@@ -31,10 +29,12 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
   int roundBreakEndNum;
   String roundWorkType;
   int roundWorkNum;
-  List<int> legalList = [8];
   int legal;
   String nightStart;
   String nightEnd;
+  String workStart;
+  String workEnd;
+  List<String> holidays;
 
   void _init() async {
     setState(() {
@@ -51,6 +51,9 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
       legal = widget.groupProvider.group?.legal;
       nightStart = widget.groupProvider.group?.nightStart;
       nightEnd = widget.groupProvider.group?.nightEnd;
+      workStart = widget.groupProvider.group?.workStart;
+      workEnd = widget.groupProvider.group?.workEnd;
+      holidays = widget.groupProvider.group?.holidays;
     });
   }
 
@@ -109,6 +112,9 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                         legal: legal,
                         nightStart: nightStart,
                         nightEnd: nightEnd,
+                        workStart: workStart,
+                        workEnd: workEnd,
+                        holidays: holidays,
                       ),
                     );
                   },
@@ -134,7 +140,13 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 8.0),
                   Row(
                     children: [
-                      Text('出勤時間　　'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          Text('出勤時間　　'),
+                        ],
+                      ),
                       SizedBox(width: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +204,13 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 8.0),
                   Row(
                     children: [
-                      Text('退勤時間　　'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          Text('退勤時間　　'),
+                        ],
+                      ),
                       SizedBox(width: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +268,13 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 8.0),
                   Row(
                     children: [
-                      Text('休憩開始時間'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          Text('休憩開始時間'),
+                        ],
+                      ),
                       SizedBox(width: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +332,13 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 8.0),
                   Row(
                     children: [
-                      Text('休憩終了時間'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          Text('休憩終了時間'),
+                        ],
+                      ),
                       SizedBox(width: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,7 +396,13 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 8.0),
                   Row(
                     children: [
-                      Text('勤務時間　　'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          Text('勤務時間　　'),
+                        ],
+                      ),
                       SizedBox(width: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,7 +460,7 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 16.0),
                   CustomIconLabel(
                     iconData: Icons.access_time,
-                    label: '法定時間',
+                    label: '法定労働時間',
                   ),
                   SizedBox(height: 8.0),
                   CustomDropdownButton(
@@ -454,57 +490,129 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                   SizedBox(height: 8.0),
                   Row(
                     children: [
-                      CustomTextIconButton2(
-                        onPressed: () async {
-                          List<String> _hm = nightStart.split(':');
-                          TimeOfDay _selected = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay(
-                              hour: int.parse(_hm.first),
-                              minute: int.parse(_hm.last),
-                            ),
-                          );
-                          if (_selected != null) {
-                            String _time = '${_selected.format(context)}';
-                            setState(() => nightStart = _time);
-                          }
-                        },
-                        iconData: Icons.access_time,
-                        label: nightStart,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('開始', style: TextStyle(fontSize: 14.0)),
+                          CustomTextIconButton2(
+                            onPressed: () async {
+                              List<String> _hm = nightStart.split(':');
+                              TimeOfDay _selected = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay(
+                                  hour: int.parse(_hm.first),
+                                  minute: int.parse(_hm.last),
+                                ),
+                              );
+                              if (_selected != null) {
+                                String _time = '${_selected.format(context)}';
+                                setState(() => nightStart = _time);
+                              }
+                            },
+                            iconData: Icons.access_time,
+                            label: nightStart,
+                          ),
+                        ],
                       ),
                       SizedBox(width: 8.0),
-                      Text('〜'),
+                      Column(
+                        children: [
+                          Text(''),
+                          Text('〜'),
+                        ],
+                      ),
                       SizedBox(width: 8.0),
-                      CustomTextIconButton2(
-                        onPressed: () async {
-                          List<String> _hm = nightEnd.split(':');
-                          TimeOfDay _selected = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay(
-                              hour: int.parse(_hm.first),
-                              minute: int.parse(_hm.last),
-                            ),
-                          );
-                          if (_selected != null) {
-                            String _time = '${_selected.format(context)}';
-                            setState(() => nightEnd = _time);
-                          }
-                        },
-                        iconData: Icons.access_time,
-                        label: nightEnd,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('終了', style: TextStyle(fontSize: 14.0)),
+                          CustomTextIconButton2(
+                            onPressed: () async {
+                              List<String> _hm = nightEnd.split(':');
+                              TimeOfDay _selected = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay(
+                                  hour: int.parse(_hm.first),
+                                  minute: int.parse(_hm.last),
+                                ),
+                              );
+                              if (_selected != null) {
+                                String _time = '${_selected.format(context)}';
+                                setState(() => nightEnd = _time);
+                              }
+                            },
+                            iconData: Icons.access_time,
+                            label: nightEnd,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                   SizedBox(height: 16.0),
                   CustomIconLabel(
                     iconData: Icons.access_time,
-                    label: '残業時間',
+                    label: '所定労働時間帯',
                   ),
                   SizedBox(height: 8.0),
-                  CustomTextIconButton2(
-                    onPressed: () {},
-                    iconData: Icons.access_time,
-                    label: '00:00',
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('開始', style: TextStyle(fontSize: 14.0)),
+                          CustomTextIconButton2(
+                            onPressed: () async {
+                              List<String> _hm = workStart.split(':');
+                              TimeOfDay _selected = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay(
+                                  hour: int.parse(_hm.first),
+                                  minute: int.parse(_hm.last),
+                                ),
+                              );
+                              if (_selected != null) {
+                                String _time = '${_selected.format(context)}';
+                                setState(() => workStart = _time);
+                              }
+                            },
+                            iconData: Icons.access_time,
+                            label: workStart,
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        children: [
+                          Text(''),
+                          Text('〜'),
+                        ],
+                      ),
+                      SizedBox(width: 8.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('終了', style: TextStyle(fontSize: 14.0)),
+                          CustomTextIconButton2(
+                            onPressed: () async {
+                              List<String> _hm = workEnd.split(':');
+                              TimeOfDay _selected = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay(
+                                  hour: int.parse(_hm.first),
+                                  minute: int.parse(_hm.last),
+                                ),
+                              );
+                              if (_selected != null) {
+                                String _time = '${_selected.format(context)}';
+                                setState(() => workEnd = _time);
+                              }
+                            },
+                            iconData: Icons.access_time,
+                            label: workEnd,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   SizedBox(height: 16.0),
                   CustomIconLabel(
@@ -512,64 +620,28 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                     label: '平日/休日',
                   ),
                   SizedBox(height: 8.0),
+                  Text(
+                    '※休日とする曜日にチェックを入れてください。',
+                    style: TextStyle(fontSize: 14.0),
+                  ),
                   Row(
-                    children: [
-                      Expanded(
+                    children: weekList.map((e) {
+                      return Expanded(
                         child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '月',
+                          onChanged: (value) {
+                            setState(() {
+                              if (holidays.contains(e)) {
+                                holidays.remove(e);
+                              } else {
+                                holidays.add(e);
+                              }
+                            });
+                          },
+                          value: holidays.contains(e),
+                          label: e,
                         ),
-                      ),
-                      SizedBox(width: 4.0),
-                      Expanded(
-                        child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '火',
-                        ),
-                      ),
-                      SizedBox(width: 4.0),
-                      Expanded(
-                        child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '水',
-                        ),
-                      ),
-                      SizedBox(width: 4.0),
-                      Expanded(
-                        child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '木',
-                        ),
-                      ),
-                      SizedBox(width: 4.0),
-                      Expanded(
-                        child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '金',
-                        ),
-                      ),
-                      SizedBox(width: 8.0),
-                      Expanded(
-                        child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '土',
-                        ),
-                      ),
-                      SizedBox(width: 8.0),
-                      Expanded(
-                        child: CustomWeekCheckbox(
-                          onChanged: (value) {},
-                          value: false,
-                          label: '日',
-                        ),
-                      ),
-                    ],
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
@@ -596,6 +668,9 @@ class ConfirmDialog extends StatelessWidget {
   final int legal;
   final String nightStart;
   final String nightEnd;
+  final String workStart;
+  final String workEnd;
+  final List<String> holidays;
 
   ConfirmDialog({
     @required this.groupProvider,
@@ -612,6 +687,9 @@ class ConfirmDialog extends StatelessWidget {
     @required this.legal,
     @required this.nightStart,
     @required this.nightEnd,
+    @required this.workStart,
+    @required this.workEnd,
+    @required this.holidays,
   });
 
   @override
@@ -652,6 +730,9 @@ class ConfirmDialog extends StatelessWidget {
                     legal: legal,
                     nightStart: nightStart,
                     nightEnd: nightEnd,
+                    workStart: workStart,
+                    workEnd: workEnd,
+                    holidays: holidays,
                   )) {
                     return;
                   }
