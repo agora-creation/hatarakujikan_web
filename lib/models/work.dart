@@ -401,4 +401,14 @@ class WorkModel {
     // ----------------------------------------
     return [_dayTime, _nightTime, _dayTimeOver, _nightTimeOver];
   }
+
+  // 平日普通残業時間/平日深夜残業時間/休日普通残業時間/休日深夜残業時間
+  List<String> calTimes02(GroupModel group) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String _time1 = '00:00';
+    String _time2 = '00:00';
+    String _time3 = '00:00';
+    String _time4 = '00:00';
+    return [_time1, _time2, _time3, _time4];
+  }
 }

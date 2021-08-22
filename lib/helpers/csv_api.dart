@@ -137,7 +137,7 @@ Future<void> _works02({
   row.add('遅早時間');
   row.add('平日普通残業時間');
   row.add('平日深夜残業時間');
-  row.add('休日残業時間');
+  row.add('休日普通残業時間');
   row.add('休日深夜残業時間');
   row.add('予備項目');
   row.add('予備項目');
@@ -162,6 +162,10 @@ Future<void> _works02({
     Map overCount = {};
     String workTime = '00:00';
     String overTime = '00:00';
+    String overTime1 = '00:00';
+    String overTime2 = '00:00';
+    String overTime3 = '00:00';
+    String overTime4 = '00:00';
     List<WorkModel> _works = [];
     await workProvider
         .selectList(
@@ -184,12 +188,16 @@ Future<void> _works02({
         }
         if (_work.overTimes(group).last != '00:00') {
           String _key2 =
-              '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_1';
+              '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_2';
           overCount[_key2] = '';
         }
         workTime = addTime(workTime, _work.workTime(group));
         overTime = addTime(overTime, _work.overTimes(group).first);
         overTime = addTime(overTime, _work.overTimes(group).last);
+        overTime1 = addTime(overTime1, _work.calTimes02(group)[0]);
+        overTime2 = addTime(overTime2, _work.calTimes02(group)[1]);
+        overTime3 = addTime(overTime3, _work.calTimes02(group)[2]);
+        overTime4 = addTime(overTime4, _work.calTimes02(group)[3]);
       }
     }
     int workDays = count.length;
@@ -206,10 +214,10 @@ Future<void> _works02({
     _row.add('$overDays');
     _row.add('$workTime');
     _row.add('$overTime');
-    _row.add('00:00');
-    _row.add('00:00');
-    _row.add('00:00');
-    _row.add('00:00');
+    _row.add('$overTime1');
+    _row.add('$overTime2');
+    _row.add('$overTime3');
+    _row.add('$overTime4');
     _row.add('');
     _row.add('');
     _row.add('');
