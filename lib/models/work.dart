@@ -409,6 +409,58 @@ class WorkModel {
     String _time2 = '00:00';
     String _time3 = '00:00';
     String _time4 = '00:00';
+    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedTime = '${endTime(group)}:00.000';
+    DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
+    // ----------------------------------------
+    DateTime _overS;
+    DateTime _overE;
+    DateTime _baseE = DateTime.parse('$_endedDate ${group.workEnd}:00.000');
+    if (_endedAt.millisecondsSinceEpoch > _baseE.millisecondsSinceEpoch) {
+      _overS = _baseE;
+      _overE = _endedAt;
+    } else {
+      _overS = _baseE;
+      _overE = _baseE;
+    }
+    // ----------------------------------------
+    String week = '${DateFormat('E', 'ja').format(_overS)}';
+    if (group.holidays.contains(week)) {
+      // 休日普通残業時間
+      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
+        Duration _overDiff = _overE.difference(_overS);
+        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
+        _time3 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      } else {
+        _time3 = '00:00';
+      }
+      // 休日深夜残業時間
+      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
+        Duration _overDiff = _overE.difference(_overS);
+        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
+        _time4 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      } else {
+        _time4 = '00:00';
+      }
+    } else {
+      // 平日普通残業時間
+      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
+        Duration _overDiff = _overE.difference(_overS);
+        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
+        _time1 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      } else {
+        _time1 = '00:00';
+      }
+      // 平日深夜残業時間
+      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
+        Duration _overDiff = _overE.difference(_overS);
+        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
+        _time2 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      } else {
+        _time2 = '00:00';
+      }
+    }
+    // ----------------------------------------
     return [_time1, _time2, _time3, _time4];
   }
 }
