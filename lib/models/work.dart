@@ -425,37 +425,85 @@ class WorkModel {
     }
     // ----------------------------------------
     String week = '${DateFormat('E', 'ja').format(_overS)}';
+    DateTime _dayS;
+    DateTime _dayE;
+    DateTime _nightS;
+    DateTime _nightE;
+    DateTime _baseSS = DateTime.parse(
+      '${DateFormat('yyyy-MM-dd').format(_overS)} ${group.nightStart}:00.000',
+    );
+    DateTime _baseSE = DateTime.parse(
+      '${DateFormat('yyyy-MM-dd').format(_overS)} ${group.nightEnd}:00.000',
+    );
+    DateTime _baseES = DateTime.parse(
+      '${DateFormat('yyyy-MM-dd').format(_overE)} ${group.nightStart}:00.000',
+    );
+    DateTime _baseEE = DateTime.parse(
+      '${DateFormat('yyyy-MM-dd').format(_overE)} ${group.nightEnd}:00.000',
+    );
+    if (_overS.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
+        _overS.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
+      if (_overE.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
+          _overE.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
+        // 開始時間[05:00〜22:00]終了時間[05:00〜22:00]
+        _dayS = _overS;
+        _dayE = _overE;
+        _nightS = _baseEE;
+        _nightE = _baseEE;
+      } else {
+        // 開始時間[05:00〜22:00]終了時間[22:00〜05:00]
+        _dayS = _overS;
+        _dayE = _baseES;
+        _nightS = _baseES;
+        _nightE = _overE;
+      }
+    } else {
+      if (_overE.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
+          _overE.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
+        // 開始時間[22:00〜05:00]終了時間[05:00〜22:00]
+        _nightS = _overS;
+        _nightE = _baseES;
+        _dayS = _baseES;
+        _dayE = _overE;
+      } else {
+        // 開始時間[22:00〜05:00]終了時間[22:00〜05:00]
+        _dayS = _baseSS;
+        _dayE = _baseSS;
+        _nightS = _overS;
+        _nightE = _overE;
+      }
+    }
     if (group.holidays.contains(week)) {
       // 休日普通残業時間
-      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
-        Duration _overDiff = _overE.difference(_overS);
-        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
-        _time3 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
+        Duration _dayDiff = _dayE.difference(_dayS);
+        String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
+        _time3 = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
       } else {
         _time3 = '00:00';
       }
       // 休日深夜残業時間
-      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
-        Duration _overDiff = _overE.difference(_overS);
-        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
-        _time4 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
+        Duration _nightDiff = _nightE.difference(_nightS);
+        String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
+        _time4 = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
       } else {
         _time4 = '00:00';
       }
     } else {
       // 平日普通残業時間
-      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
-        Duration _overDiff = _overE.difference(_overS);
-        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
-        _time1 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
+        Duration _dayDiff = _dayE.difference(_dayS);
+        String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
+        _time1 = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
       } else {
         _time1 = '00:00';
       }
       // 平日深夜残業時間
-      if (_overS.millisecondsSinceEpoch < _overE.millisecondsSinceEpoch) {
-        Duration _overDiff = _overE.difference(_overS);
-        String _overMinutes = twoDigits(_overDiff.inMinutes.remainder(60));
-        _time2 = '${twoDigits(_overDiff.inHours)}:$_overMinutes';
+      if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
+        Duration _nightDiff = _nightE.difference(_nightS);
+        String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
+        _time2 = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
       } else {
         _time2 = '00:00';
       }
