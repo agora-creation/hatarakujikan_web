@@ -159,6 +159,9 @@ Future<void> _works02({
   for (UserModel _user in users) {
     String recordPassword = _user.recordPassword;
     Map count = {};
+    Map overCount = {};
+    String workTime = '00:00';
+    String overTime = '00:00';
     List<WorkModel> _works = [];
     await workProvider
         .selectList(
@@ -174,9 +177,23 @@ Future<void> _works02({
       if (_work.startedAt != _work.endedAt) {
         String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
         count[_key] = '';
+        if (_work.overTimes(group).first != '00:00') {
+          String _key1 =
+              '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_1';
+          overCount[_key1] = '';
+        }
+        if (_work.overTimes(group).last != '00:00') {
+          String _key2 =
+              '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_1';
+          overCount[_key2] = '';
+        }
+        workTime = addTime(workTime, _work.workTime(group));
+        overTime = addTime(overTime, _work.overTimes(group).first);
+        overTime = addTime(overTime, _work.overTimes(group).last);
       }
     }
     int workDays = count.length;
+    int overDays = overCount.length;
     List<String> _row = [];
     _row.add('$recordPassword');
     _row.add('$workDays');
@@ -186,9 +203,9 @@ Future<void> _works02({
     _row.add('0');
     _row.add('0');
     _row.add('0');
-    _row.add('0');
-    _row.add('00:00');
-    _row.add('00:00');
+    _row.add('$overDays');
+    _row.add('$workTime');
+    _row.add('$overTime');
     _row.add('00:00');
     _row.add('00:00');
     _row.add('00:00');

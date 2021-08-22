@@ -197,6 +197,56 @@ class WorkModel {
     return [_dayTime, _nightTime];
   }
 
+  // 早出時間/残業時間
+  List<String> overTimes(GroupModel group) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String _time1 = '00:00';
+    String _time2 = '00:00';
+    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedTime = '${startTime(group)}:00.000';
+    DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
+    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedTime = '${endTime(group)}:00.000';
+    DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
+    // ----------------------------------------
+    DateTime _over1S;
+    DateTime _over1E;
+    DateTime _over2S;
+    DateTime _over2E;
+    DateTime _baseS = DateTime.parse('$_startedDate ${group.workStart}:00.000');
+    DateTime _baseE = DateTime.parse('$_endedDate ${group.workEnd}:00.000');
+    if (_startedAt.millisecondsSinceEpoch < _baseS.millisecondsSinceEpoch) {
+      _over1S = _startedAt;
+      _over1E = _baseS;
+    } else {
+      _over1S = _baseS;
+      _over1E = _baseS;
+    }
+    if (_endedAt.millisecondsSinceEpoch > _baseE.millisecondsSinceEpoch) {
+      _over2S = _baseE;
+      _over2E = _endedAt;
+    } else {
+      _over2S = _baseE;
+      _over2E = _baseE;
+    }
+    // ----------------------------------------
+    if (_over1S.millisecondsSinceEpoch < _over1E.millisecondsSinceEpoch) {
+      Duration _over1Diff = _over1E.difference(_over1S);
+      String _over1Minutes = twoDigits(_over1Diff.inMinutes.remainder(60));
+      _time1 = '${twoDigits(_over1Diff.inHours)}:$_over1Minutes';
+    } else {
+      _time1 = '00:00';
+    }
+    if (_over2S.millisecondsSinceEpoch < _over2E.millisecondsSinceEpoch) {
+      Duration _over2Diff = _over2E.difference(_over2S);
+      String _over2Minutes = twoDigits(_over2Diff.inMinutes.remainder(60));
+      _time2 = '${twoDigits(_over2Diff.inHours)}:$_over2Minutes';
+    } else {
+      _time2 = '00:00';
+    }
+    return [_time1, _time2];
+  }
+
   // 通常時間/深夜時間/通常時間外/深夜時間外
   List<String> calTimes01(GroupModel group) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
