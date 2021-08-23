@@ -5,6 +5,7 @@ class SectionModel {
   String _groupId;
   String _name;
   String _adminUserId;
+  List<String> userIds;
   DateTime _createdAt;
 
   String get id => _id;
