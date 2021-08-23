@@ -27,6 +27,7 @@ dependencies:
   qr_flutter: ^4.0.0
   flutter_admin_scaffold: ^1.0.0
   data_table_2: ^2.0.3
+  table_calendar: ^3.0.2
   csv: ^5.0.0
   pdf: ^3.4.2
   universal_html: ^2.0.8

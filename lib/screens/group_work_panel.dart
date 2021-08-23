@@ -4,10 +4,12 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
+import 'package:hatarakujikan_web/widgets/custom_table_calendar.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button2.dart';
 import 'package:hatarakujikan_web/widgets/custom_week_checkbox.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class GroupWorkPanel extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -643,6 +645,12 @@ class _GroupWorkPanelState extends State<GroupWorkPanel> {
                       );
                     }).toList(),
                   ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    '※休日とする日付を選択してください。',
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  CustomTableCalendar(),
                 ],
               ),
             ],

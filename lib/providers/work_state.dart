@@ -4,7 +4,7 @@ import 'package:hatarakujikan_web/services/work_state.dart';
 
 class WorkStateProvider with ChangeNotifier {
   WorkStateService _workStateService = WorkStateService();
-  List<String> _states = ['通常勤務', '直行/直帰', 'テレワーク', '欠勤', '特別休暇', '有給休暇'];
+  List<String> _states = ['通常勤務', '直行/直帰', 'テレワーク', '欠勤', '特別休暇', '有給休暇', '代休'];
 
   List<String> get states => _states;
 

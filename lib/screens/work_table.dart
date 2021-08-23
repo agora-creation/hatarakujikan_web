@@ -156,6 +156,7 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => CsvDialog(
                         workProvider: widget.workProvider,
+                        workStateProvider: widget.workStateProvider,
                         group: widget.groupProvider.group,
                         searchMonth: searchMonth,
                         users: users,
@@ -388,12 +389,14 @@ class SearchUserDialog extends StatelessWidget {
 
 class CsvDialog extends StatefulWidget {
   final WorkProvider workProvider;
+  final WorkStateProvider workStateProvider;
   final GroupModel group;
   final DateTime searchMonth;
   final List<UserModel> users;
 
   CsvDialog({
     @required this.workProvider,
+    @required this.workStateProvider,
     @required this.group,
     @required this.searchMonth,
     @required this.users,
@@ -528,6 +531,7 @@ class _CsvDialogState extends State<CsvDialog> {
                           await CsvApi.download(
                             template: template,
                             workProvider: widget.workProvider,
+                            workStateProvider: widget.workStateProvider,
                             group: widget.group,
                             month: searchMonth,
                             users: widget.users,

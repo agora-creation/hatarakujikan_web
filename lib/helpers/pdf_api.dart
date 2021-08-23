@@ -351,6 +351,9 @@ class PdfApi {
                 case '有給休暇':
                   _stateColor = PdfColors.teal100;
                   break;
+                case '代休':
+                  _stateColor = PdfColors.pink100;
+                  break;
               }
               _row.add(pw.TableRow(
                 children: [
@@ -588,6 +591,9 @@ class PdfApi {
                 break;
               case '有給休暇':
                 _stateColor = PdfColors.teal100;
+                break;
+              case '代休':
+                _stateColor = PdfColors.pink100;
                 break;
             }
             _row.add(pw.TableRow(

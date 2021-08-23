@@ -3,7 +3,9 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/models/work_state.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart';
 
@@ -27,6 +29,7 @@ class CsvApi {
   static Future<void> download({
     String template,
     WorkProvider workProvider,
+    WorkStateProvider workStateProvider,
     GroupModel group,
     DateTime month,
     List<UserModel> users,
@@ -44,6 +47,7 @@ class CsvApi {
       case '土佐税理士事務所用レイアウト':
         await _works02(
           workProvider: workProvider,
+          workStateProvider: workStateProvider,
           group: group,
           month: month,
           users: users,
@@ -118,6 +122,7 @@ Future<void> _works01({
 
 Future<void> _works02({
   WorkProvider workProvider,
+  WorkStateProvider workStateProvider,
   GroupModel group,
   DateTime month,
   List<UserModel> users,
@@ -159,6 +164,11 @@ Future<void> _works02({
   for (UserModel _user in users) {
     String recordPassword = _user.recordPassword;
     Map count = {};
+    Map state1Count = {};
+    Map state2Count = {};
+    Map state3Count = {};
+    Map state4Count = {};
+    Map holidayCount = {};
     Map overCount = {};
     String workTime = '00:00';
     String overTime = '00:00';
@@ -166,21 +176,26 @@ Future<void> _works02({
     String overTime2 = '00:00';
     String overTime3 = '00:00';
     String overTime4 = '00:00';
-    List<WorkModel> _works = [];
-    await workProvider
-        .selectList(
+    List<WorkModel> _works = await workProvider.selectList(
       groupId: group.id,
       userId: _user.id,
       startAt: days.first,
       endAt: days.last,
-    )
-        .then((value) {
-      _works = value;
-    });
+    );
+    List<WorkStateModel> _workStates = await workStateProvider.selectList(
+      groupId: group.id,
+      userId: _user.id,
+      startAt: days.first,
+      endAt: days.last,
+    );
     for (WorkModel _work in _works) {
       if (_work.startedAt != _work.endedAt) {
         String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
         count[_key] = '';
+        String _week = '${DateFormat('E', 'ja').format(_work.startedAt)}';
+        if (group.holidays.contains(_week)) {
+          holidayCount[_key] = '';
+        }
         if (_work.overTimes(group).first != '00:00') {
           String _key1 =
               '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_1';
@@ -201,16 +216,33 @@ Future<void> _works02({
       }
     }
     int workDays = count.length;
+    int holidayDays = holidayCount.length;
     int overDays = overCount.length;
+    for (WorkStateModel _workState in _workStates) {
+      String _key = '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
+      if (_workState.state == '欠勤') {
+        state1Count[_key] = '';
+      } else if (_workState.state == '特別休暇') {
+        state2Count[_key] = '';
+      } else if (_workState.state == '有給休暇') {
+        state3Count[_key] = '';
+      } else if (_workState.state == '代休') {
+        state4Count[_key] = '';
+      }
+    }
+    int state1Days = state1Count.length;
+    int state2Days = state2Count.length;
+    int state3Days = state3Count.length;
+    int state4Days = state4Count.length;
     List<String> _row = [];
     _row.add('$recordPassword');
     _row.add('$workDays');
     _row.add('$workDays');
-    _row.add('0');
-    _row.add('0');
-    _row.add('0');
-    _row.add('0');
-    _row.add('0');
+    _row.add('$state1Days');
+    _row.add('$state3Days');
+    _row.add('$state2Days');
+    _row.add('$holidayDays');
+    _row.add('$state4Days');
     _row.add('$overDays');
     _row.add('$workTime');
     _row.add('$overTime');
@@ -240,7 +272,7 @@ Future<void> _works02({
 
 void _download({List<List<String>> rows, String fileName}) {
   String csv = const ListToCsvConverter().convert(rows);
-  AnchorElement(href: 'data:text/csv;charset=utf-8,$csv')
+  AnchorElement(href: 'data:text/plain;charset=utf-8,$csv')
     ..setAttribute('download', fileName)
     ..click();
 }

@@ -38,6 +38,8 @@ class CustomWorkListTile extends StatelessWidget {
       _chipColor = Colors.green.shade300;
     } else if (workState?.state == '有給休暇') {
       _chipColor = Colors.teal.shade300;
+    } else if (workState?.state == '代休') {
+      _chipColor = Colors.pink.shade300;
     }
 
     return Container(
@@ -1134,6 +1136,8 @@ class WorkStateDetailsDialog extends StatelessWidget {
       _chipColor = Colors.green.shade300;
     } else if (workState.state == '有給休暇') {
       _chipColor = Colors.teal.shade300;
+    } else if (workState.state == '代休') {
+      _chipColor = Colors.pink.shade300;
     }
 
     return AlertDialog(
