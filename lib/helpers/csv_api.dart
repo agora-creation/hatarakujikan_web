@@ -104,18 +104,13 @@ Future<void> _works01({
       }
     }
     int workDays = count.length;
+    workTime = subTime(workTime, nightTime);
     List<String> _row = [];
     _row.add('$recordPassword');
     _row.add('$name');
     _row.add('$workDays');
-
-    if (_user.position == '正社員') {
-      _row.add('$workTime');
-      _row.add('00:00');
-    } else {
-      _row.add('$legalTime');
-      _row.add('$nightTime');
-    }
+    _row.add('$workTime');
+    _row.add('$nightTime');
     rows.add(_row);
   }
   _download(rows: rows, fileName: 'works.csv');
