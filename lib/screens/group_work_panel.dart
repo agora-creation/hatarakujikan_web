@@ -9,7 +9,6 @@ import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button2.dart';
 import 'package:hatarakujikan_web/widgets/custom_week_checkbox.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class GroupWorkPanel extends StatefulWidget {
   final GroupProvider groupProvider;

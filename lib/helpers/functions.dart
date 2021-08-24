@@ -64,6 +64,8 @@ Future<void> removePrefs({String key}) async {
   _prefs.remove(key);
 }
 
+String twoDigits(int n) => n.toString().padLeft(2, '0');
+
 String addTime(String left, String right) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
   List<String> _lefts = left.split(':');
