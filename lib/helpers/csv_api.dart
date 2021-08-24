@@ -108,6 +108,7 @@ Future<void> _works01({
     _row.add('$recordPassword');
     _row.add('$name');
     _row.add('$workDays');
+
     if (_user.position == '正社員') {
       _row.add('$workTime');
       _row.add('00:00');
