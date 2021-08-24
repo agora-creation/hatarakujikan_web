@@ -60,10 +60,9 @@ class BreaksModel {
   }
 
   List<String> breakTimes(GroupModel group) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String _time = '00:00';
-    String _dayTime = '00:00';
-    String _nightTime = '00:00';
+    String _time1 = '00:00';
+    String _time2 = '00:00';
+    String _time3 = '00:00';
     String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
@@ -73,71 +72,31 @@ class BreaksModel {
     // 休憩開始時間と休憩終了時間の差を求める
     Duration _diff = _endedAt.difference(_startedAt);
     String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-    _time = '${twoDigits(_diff.inHours)}:$_minutes';
+    _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
     // ----------------------------------------
-    DateTime _dayS;
-    DateTime _dayE;
-    DateTime _nightS;
-    DateTime _nightE;
-    DateTime _baseSS = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightStart}:00.000',
+    // 通常時間と深夜時間に分ける
+    List<DateTime> _dayNightList = separateDayNight(
+      startedAt: _startedAt,
+      endedAt: _endedAt,
+      nightStart: group.nightStart,
+      nightEnd: group.nightEnd,
     );
-    DateTime _baseSE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startedAt)} ${group.nightEnd}:00.000',
-    );
-    DateTime _baseES = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightStart}:00.000',
-    );
-    DateTime _baseEE = DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endedAt)} ${group.nightEnd}:00.000',
-    );
-    if (_startedAt.millisecondsSinceEpoch < _baseSS.millisecondsSinceEpoch &&
-        _startedAt.millisecondsSinceEpoch > _baseSE.millisecondsSinceEpoch) {
-      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
-          _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
-        // 出勤時間[05:00〜22:00]退勤時間[05:00〜22:00]
-        _dayS = _startedAt;
-        _dayE = _endedAt;
-        _nightS = _baseEE;
-        _nightE = _baseEE;
-      } else {
-        // 出勤時間[05:00〜22:00]退勤時間[22:00〜05:00]
-        _dayS = _startedAt;
-        _dayE = _baseES;
-        _nightS = _baseES;
-        _nightE = _endedAt;
-      }
-    } else {
-      if (_endedAt.millisecondsSinceEpoch < _baseES.millisecondsSinceEpoch &&
-          _endedAt.millisecondsSinceEpoch > _baseEE.millisecondsSinceEpoch) {
-        // 出勤時間[22:00〜05:00]退勤時間[05:00〜22:00]
-        _nightS = _startedAt;
-        _nightE = _baseES;
-        _dayS = _baseES;
-        _dayE = _endedAt;
-      } else {
-        // 出勤時間[22:00〜05:00]退勤時間[22:00〜05:00]
-        _dayS = _baseSS;
-        _dayE = _baseSS;
-        _nightS = _startedAt;
-        _nightE = _endedAt;
-      }
-    }
+    DateTime _dayS = _dayNightList[0];
+    DateTime _dayE = _dayNightList[1];
+    DateTime _nightS = _dayNightList[2];
+    DateTime _nightE = _dayNightList[3];
     // ----------------------------------------
     if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
-      Duration _dayDiff = _dayE.difference(_dayS);
-      String _dayMinutes = twoDigits(_dayDiff.inMinutes.remainder(60));
-      _dayTime = '${twoDigits(_dayDiff.inHours)}:$_dayMinutes';
-    } else {
-      _dayTime = '00:00';
+      Duration _diff = _dayE.difference(_dayS);
+      String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+      _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
     }
     if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
-      Duration _nightDiff = _nightE.difference(_nightS);
-      String _nightMinutes = twoDigits(_nightDiff.inMinutes.remainder(60));
-      _nightTime = '${twoDigits(_nightDiff.inHours)}:$_nightMinutes';
-    } else {
-      _nightTime = '00:00';
+      Duration _diff = _nightE.difference(_nightS);
+      String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+      _time3 = '${twoDigits(_diff.inHours)}:$_minutes';
     }
-    return [_time, _dayTime, _nightTime];
+    // ----------------------------------------
+    return [_time1, _time2, _time3];
   }
 }
