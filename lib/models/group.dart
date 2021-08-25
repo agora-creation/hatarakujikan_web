@@ -60,7 +60,7 @@ class GroupModel {
     _name = snapshot.data()['name'];
     _adminUserId = snapshot.data()['adminUserId'];
     _usersNum = snapshot.data()['usersNum'];
-    positions = _convertPositions(snapshot.data()['positions']) ?? [];
+    positions = _convertList(snapshot.data()['positions']) ?? [];
     _qrSecurity = snapshot.data()['qrSecurity'];
     _areaSecurity = snapshot.data()['areaSecurity'];
     _areaLat = snapshot.data()['areaLat'].toDouble();
@@ -81,21 +81,13 @@ class GroupModel {
     _nightEnd = snapshot.data()['nightEnd'];
     _workStart = snapshot.data()['workStart'];
     _workEnd = snapshot.data()['workEnd'];
-    holidays = _convertHolidays(snapshot.data()['holidays']) ?? [];
+    holidays = _convertList(snapshot.data()['holidays']) ?? [];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 
-  List<String> _convertPositions(List positions) {
+  List<String> _convertList(List list) {
     List<String> converted = [];
-    for (String data in positions) {
-      converted.add(data);
-    }
-    return converted;
-  }
-
-  List<String> _convertHolidays(List holidays) {
-    List<String> converted = [];
-    for (String data in holidays) {
+    for (String data in list) {
       converted.add(data);
     }
     return converted;

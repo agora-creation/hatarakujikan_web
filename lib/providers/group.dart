@@ -115,19 +115,12 @@ class GroupProvider with ChangeNotifier {
     String id,
     String name,
     String adminUserId,
-    String positions,
   }) async {
     try {
-      List<String> _positions = [];
-      List<String> _tmp = positions.split(',') ?? [];
-      for (String _position in _tmp) {
-        _positions.add(_position);
-      }
       _groupService.update({
         'id': id,
         'name': name,
         'adminUserId': adminUserId,
-        'positions': _positions,
       });
       return true;
     } catch (e) {

@@ -37,16 +37,16 @@ class UserModel {
     _workLv = snapshot.data()['workLv'];
     _lastWorkId = snapshot.data()['lastWorkId'] ?? '';
     _lastBreakId = snapshot.data()['lastBreakId'] ?? '';
-    groups = _convertGroups(snapshot.data()['groups']) ?? [];
+    groups = _convertList(snapshot.data()['groups']) ?? [];
     _position = snapshot.data()['position'] ?? '';
     _token = snapshot.data()['token'] ?? '';
     _smartphone = snapshot.data()['smartphone'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 
-  List<String> _convertGroups(List groups) {
+  List<String> _convertList(List list) {
     List<String> converted = [];
-    for (String data in groups) {
+    for (String data in list) {
       converted.add(data);
     }
     return converted;

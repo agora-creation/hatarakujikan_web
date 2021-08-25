@@ -26,19 +26,12 @@ class GroupInfoPanel extends StatefulWidget {
 
 class _GroupInfoPanelState extends State<GroupInfoPanel> {
   TextEditingController name = TextEditingController();
-  TextEditingController positions = TextEditingController();
   List<UserModel> users = [];
   UserModel adminUser;
 
   void _init() async {
     setState(() {
       name.text = widget.groupProvider.group?.name;
-      String tmp = '';
-      for (String _position in widget.groupProvider.group?.positions) {
-        if (tmp != '') tmp += ',';
-        tmp += _position;
-      }
-      positions.text = tmp;
     });
     await widget.userProvider
         .selectListSP(
@@ -99,7 +92,6 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                         groupProvider: widget.groupProvider,
                         name: name.text.trim(),
                         adminUserId: adminUser?.id,
-                        positions: positions.text.trim(),
                       ),
                     );
                   },
@@ -168,21 +160,6 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
                   ),
                 ],
               ),
-              SizedBox(height: 8.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '雇用形態(カンマ区切りで入力してください)',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  CustomTextFormField2(
-                    textInputType: null,
-                    maxLines: 1,
-                    controller: positions,
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -195,13 +172,11 @@ class ConfirmDialog extends StatelessWidget {
   final GroupProvider groupProvider;
   final String name;
   final String adminUserId;
-  final String positions;
 
   ConfirmDialog({
     @required this.groupProvider,
     @required this.name,
     @required this.adminUserId,
-    @required this.positions,
   });
 
   @override
@@ -235,7 +210,6 @@ class ConfirmDialog extends StatelessWidget {
                     id: groupProvider.group?.id,
                     name: name,
                     adminUserId: adminUserId,
-                    positions: positions,
                   )) {
                     return;
                   }

@@ -20,6 +20,7 @@ class SectionProvider with ChangeNotifier {
         'groupId': groupId,
         'name': name,
         'adminUserId': adminUserId,
+        'userIds': [],
         'createdAt': DateTime.now(),
       });
       return true;
@@ -39,6 +40,7 @@ class SectionProvider with ChangeNotifier {
         'id': id,
         'name': name,
         'adminUserId': adminUserId,
+        'userIds': [],
       });
       return true;
     } catch (e) {

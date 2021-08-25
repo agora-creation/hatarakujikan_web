@@ -10,21 +10,29 @@ class GroupService {
   }
 
   Future<GroupModel> select({String groupId}) async {
-    DocumentSnapshot snapshot =
-        await _firebaseFirestore.collection(_collection).doc(groupId).get();
-    return GroupModel.fromSnapshot(snapshot);
+    GroupModel _group;
+    await _firebaseFirestore
+        .collection(_collection)
+        .doc(groupId)
+        .get()
+        .then((value) {
+      _group = GroupModel.fromSnapshot(value);
+    });
+    return _group;
   }
 
   Future<List<GroupModel>> selectList({String adminUserId}) async {
     List<GroupModel> _groups = [];
-    QuerySnapshot snapshot = await _firebaseFirestore
+    await _firebaseFirestore
         .collection(_collection)
         .where('adminUserId', isEqualTo: adminUserId)
         .orderBy('createdAt', descending: true)
-        .get();
-    for (DocumentSnapshot _group in snapshot.docs) {
-      _groups.add(GroupModel.fromSnapshot(_group));
-    }
+        .get()
+        .then((value) {
+      for (DocumentSnapshot _group in value.docs) {
+        _groups.add(GroupModel.fromSnapshot(_group));
+      }
+    });
     return _groups;
   }
 }

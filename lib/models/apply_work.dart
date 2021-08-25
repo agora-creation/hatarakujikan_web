@@ -39,9 +39,9 @@ class ApplyWorkModel {
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 
-  List<BreaksModel> _convertBreaks(List breaks) {
+  List<BreaksModel> _convertBreaks(List list) {
     List<BreaksModel> converted = [];
-    for (Map data in breaks) {
+    for (Map data in list) {
       converted.add(BreaksModel.fromMap(data));
     }
     return converted;

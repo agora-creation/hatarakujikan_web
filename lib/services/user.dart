@@ -23,9 +23,15 @@ class UserService {
   }
 
   Future<UserModel> select({String userId}) async {
-    DocumentSnapshot snapshot =
-        await _firebaseFirestore.collection(_collection).doc(userId).get();
-    return UserModel.fromSnapshot(snapshot);
+    UserModel _user;
+    await _firebaseFirestore
+        .collection(_collection)
+        .doc(userId)
+        .get()
+        .then((value) {
+      _user = UserModel.fromSnapshot(value);
+    });
+    return _user;
   }
 
   Future<List<UserModel>> selectList({String groupId}) async {

@@ -13,7 +13,6 @@ class UserProvider with ChangeNotifier {
     int usersLen,
     String name,
     String recordPassword,
-    String position,
   }) async {
     if (group == null) return false;
     if (group.usersNum < usersLen) return false;
@@ -32,7 +31,7 @@ class UserProvider with ChangeNotifier {
         'lastWorkId': '',
         'lastBreakId': '',
         'groups': _groups,
-        'position': position,
+        'position': '',
         'token': '',
         'smartphone': false,
         'createdAt': DateTime.now(),
@@ -48,14 +47,12 @@ class UserProvider with ChangeNotifier {
     String id,
     String name,
     String recordPassword,
-    String position,
   }) async {
     try {
       _userService.update({
         'id': id,
         'name': name,
         'recordPassword': recordPassword,
-        'position': position,
       });
       return true;
     } catch (e) {

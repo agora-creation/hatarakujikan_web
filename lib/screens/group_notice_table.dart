@@ -48,7 +48,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'お知らせを一覧表示します。このお知らせはスマートフォンアプリのスタッフに送信されます。',
+          'お知らせを一覧表示します。このお知らせはスマートフォンアプリのスタッフにのみ送信できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -90,24 +90,42 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                   columns: [
                     DataColumn(label: Text('タイトル')),
                     DataColumn2(label: Text('メッセージ'), size: ColumnSize.L),
+                    DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+                    DataColumn2(label: Text('送信'), size: ColumnSize.S),
                   ],
                   rows: List<DataRow>.generate(
                     groupNotices.length,
                     (index) => DataRow(
-                      onSelectChanged: (value) {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (_) => GroupNoticeDetailsDialog(
-                            groupNoticeProvider: widget.groupNoticeProvider,
-                            groupNotice: groupNotices[index],
-                            userProvider: widget.userProvider,
-                          ),
-                        );
-                      },
                       cells: [
                         DataCell(Text('${groupNotices[index].title}')),
                         DataCell(Text('${groupNotices[index].message}')),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditGroupNoticeDialog(
+                                groupNoticeProvider: widget.groupNoticeProvider,
+                                groupNotice: groupNotices[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                        )),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => SendGroupNoticeDialog(
+                                groupNoticeProvider: widget.groupNoticeProvider,
+                                userProvider: widget.userProvider,
+                                groupNotice: groupNotices[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.send, color: Colors.blue),
+                        )),
                       ],
                     ),
                   ),
@@ -154,7 +172,7 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             Text(
-              '※ここでは登録はできますが、送信はできません。お知らせの詳細から送信してください。',
+              '※ここでは登録のみで、送信はされません。',
               style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
@@ -216,38 +234,24 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
   }
 }
 
-class GroupNoticeDetailsDialog extends StatefulWidget {
+class EditGroupNoticeDialog extends StatefulWidget {
   final GroupNoticeProvider groupNoticeProvider;
   final GroupNoticeModel groupNotice;
-  final UserProvider userProvider;
 
-  GroupNoticeDetailsDialog({
+  EditGroupNoticeDialog({
     @required this.groupNoticeProvider,
     @required this.groupNotice,
-    @required this.userProvider,
   });
 
   @override
-  _GroupNoticeDetailsDialogState createState() =>
-      _GroupNoticeDetailsDialogState();
+  _EditGroupNoticeDialogState createState() => _EditGroupNoticeDialogState();
 }
 
-class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
-  final ScrollController _scrollController = ScrollController();
+class _EditGroupNoticeDialogState extends State<EditGroupNoticeDialog> {
   TextEditingController title = TextEditingController();
   TextEditingController message = TextEditingController();
-  List<UserModel> users = [];
-  List<UserModel> selected = [];
 
   void _init() async {
-    await widget.userProvider
-        .selectListNotice(
-      groupId: widget.groupNotice?.groupId,
-      noticeId: widget.groupNotice?.id,
-    )
-        .then((value) {
-      setState(() => users = value);
-    });
     setState(() {
       title.text = widget.groupNotice?.title;
       message.text = widget.groupNotice?.message;
@@ -264,13 +268,13 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Container(
-        width: 550.0,
+        width: 450.0,
         child: ListView(
           shrinkWrap: true,
           children: [
             SizedBox(height: 16.0),
             Text(
-              'お知らせ情報を修正できます。また、このお知らせ情報を送信先スタッフを選択して、送信することもできます。',
+              'お知らせ情報を修正できます。',
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
@@ -297,47 +301,6 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                 ),
               ],
             ),
-            SizedBox(height: 8.0),
-            CustomIconLabel(
-              iconData: Icons.person,
-              label: '送信先スタッフ',
-            ),
-            Container(
-              height: 300.0,
-              child: Scrollbar(
-                isAlwaysShown: true,
-                controller: _scrollController,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: ScrollPhysics(),
-                  controller: _scrollController,
-                  itemCount: users.length,
-                  itemBuilder: (_, index) {
-                    UserModel _user = users[index];
-                    var contain = selected.where((e) => e.id == _user.id);
-                    return Container(
-                      decoration: kBottomBorderDecoration,
-                      child: CheckboxListTile(
-                        title: Text('${_user.name}'),
-                        value: contain.isNotEmpty,
-                        activeColor: Colors.blue,
-                        onChanged: (value) {
-                          var contain = selected.where((e) => e.id == _user.id);
-                          setState(() {
-                            if (contain.isEmpty) {
-                              selected.add(_user);
-                            } else {
-                              selected.removeWhere((e) => e.id == _user.id);
-                            }
-                          });
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Divider(height: 0.0),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -363,32 +326,6 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                       label: '削除する',
                     ),
                     SizedBox(width: 4.0),
-                    selected.length > 0
-                        ? CustomTextButton(
-                            onPressed: () async {
-                              if (!await widget.groupNoticeProvider.send(
-                                users: selected,
-                                id: widget.groupNotice.id,
-                                groupId: widget.groupNotice.groupId,
-                                title: title.text.trim(),
-                                message: message.text,
-                              )) {
-                                return;
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('お知らせを送信しました')),
-                              );
-                              Navigator.pop(context);
-                            },
-                            color: Colors.cyan,
-                            label: '送信する',
-                          )
-                        : CustomTextButton(
-                            onPressed: null,
-                            color: Colors.grey,
-                            label: '送信する',
-                          ),
-                    SizedBox(width: 4.0),
                     CustomTextButton(
                       onPressed: () async {
                         if (!await widget.groupNoticeProvider.update(
@@ -409,6 +346,165 @@ class _GroupNoticeDetailsDialogState extends State<GroupNoticeDetailsDialog> {
                     ),
                   ],
                 ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SendGroupNoticeDialog extends StatefulWidget {
+  final GroupNoticeProvider groupNoticeProvider;
+  final UserProvider userProvider;
+  final GroupNoticeModel groupNotice;
+
+  SendGroupNoticeDialog({
+    @required this.groupNoticeProvider,
+    @required this.userProvider,
+    @required this.groupNotice,
+  });
+
+  @override
+  _SendGroupNoticeDialogState createState() => _SendGroupNoticeDialogState();
+}
+
+class _SendGroupNoticeDialogState extends State<SendGroupNoticeDialog> {
+  final ScrollController _scrollController = ScrollController();
+  List<UserModel> _users = [];
+  List<UserModel> _selected = [];
+
+  void _init() async {
+    await widget.userProvider
+        .selectListNotice(
+      groupId: widget.groupNotice?.groupId,
+      noticeId: widget.groupNotice?.id,
+    )
+        .then((value) {
+      setState(() => _users = value);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              'お知らせ情報を送信先スタッフを選択して、送信してください。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'タイトル',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text('${widget.groupNotice?.title}'),
+              ],
+            ),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'メッセージ',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text('${widget.groupNotice?.message}'),
+              ],
+            ),
+            Divider(),
+            SizedBox(height: 8.0),
+            CustomIconLabel(
+              iconData: Icons.person,
+              label: '送信先スタッフ',
+            ),
+            Container(
+              height: 350.0,
+              child: Scrollbar(
+                isAlwaysShown: true,
+                controller: _scrollController,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  controller: _scrollController,
+                  itemCount: _users.length,
+                  itemBuilder: (_, index) {
+                    UserModel _user = _users[index];
+                    var contain = _selected.where((e) => e.id == _user.id);
+                    return Container(
+                      decoration: kBottomBorderDecoration,
+                      child: CheckboxListTile(
+                        title: Text('${_user.name}'),
+                        value: contain.isNotEmpty,
+                        activeColor: Colors.blue,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        onChanged: (value) {
+                          var _contain =
+                              _selected.where((e) => e.id == _user.id);
+                          setState(() {
+                            if (_contain.isEmpty) {
+                              _selected.add(_user);
+                            } else {
+                              _selected.removeWhere((e) => e.id == _user.id);
+                            }
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Divider(height: 0.0),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                _selected.length > 0
+                    ? CustomTextButton(
+                        onPressed: () async {
+                          if (!await widget.groupNoticeProvider.send(
+                            users: _selected,
+                            id: widget.groupNotice.id,
+                            groupId: widget.groupNotice.groupId,
+                            title: widget.groupNotice.title,
+                            message: widget.groupNotice.message,
+                          )) {
+                            return;
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('お知らせを送信しました')),
+                          );
+                          Navigator.pop(context);
+                        },
+                        color: Colors.cyan,
+                        label: '送信する',
+                      )
+                    : CustomTextButton(
+                        onPressed: null,
+                        color: Colors.grey,
+                        label: '送信する',
+                      ),
               ],
             ),
           ],

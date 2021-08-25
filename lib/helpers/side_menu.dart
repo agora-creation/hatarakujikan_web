@@ -5,7 +5,6 @@ import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_notice.dart';
 import 'package:hatarakujikan_web/screens/group_security.dart';
 import 'package:hatarakujikan_web/screens/group_work.dart';
-import 'package:hatarakujikan_web/screens/position.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
@@ -35,11 +34,6 @@ const List<MenuItem> kSideMenu = [
   MenuItem(
     title: '部署/事業所の管理',
     route: SectionScreen.id,
-    icon: Icons.account_tree,
-  ),
-  MenuItem(
-    title: '雇用形態の管理',
-    route: PositionScreen.id,
     icon: Icons.account_tree,
   ),
   MenuItem(

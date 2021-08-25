@@ -38,9 +38,15 @@ class WorkService {
   }
 
   Future<WorkModel> select({String workId}) async {
-    DocumentSnapshot snapshot =
-        await _firebaseFirestore.collection(_collection).doc(workId).get();
-    return WorkModel.fromSnapshot(snapshot);
+    WorkModel _work;
+    await _firebaseFirestore
+        .collection(_collection)
+        .doc(workId)
+        .get()
+        .then((value) {
+      _work = WorkModel.fromSnapshot(value);
+    });
+    return _work;
   }
 
   Future<List<WorkModel>> selectList({

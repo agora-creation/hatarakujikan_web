@@ -78,9 +78,8 @@ Future<void> _works01({
     String recordPassword = _user.recordPassword;
     String name = _user.name;
     Map count = {};
-    String workTime = '00:00';
-    String legalTime = '00:00';
-    String nightTime = '00:00';
+    String time1 = '00:00';
+    String time2 = '00:00';
     List<WorkModel> _works = [];
     await workProvider
         .selectList(
@@ -96,21 +95,17 @@ Future<void> _works01({
       if (_work.startedAt != _work.endedAt) {
         String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
         count[_key] = '';
-        workTime = addTime(workTime, _work.workTime(group));
-        List<String> _legalTimes = _work.legalTimes(group);
-        legalTime = addTime(legalTime, _legalTimes.first);
-        List<String> _calTimes = _work.calTimes01(group);
-        nightTime = addTime(nightTime, _calTimes[1]);
+        time1 = addTime(time1, _work.calTimes01(group)[0]);
+        time2 = addTime(time2, _work.calTimes01(group)[1]);
       }
     }
     int workDays = count.length;
-    workTime = subTime(workTime, nightTime);
     List<String> _row = [];
     _row.add('$recordPassword');
     _row.add('$name');
     _row.add('$workDays');
-    _row.add('$workTime');
-    _row.add('$nightTime');
+    _row.add('$time1');
+    _row.add('$time2');
     rows.add(_row);
   }
   _download(rows: rows, fileName: 'works.csv');

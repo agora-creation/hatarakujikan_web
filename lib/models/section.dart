@@ -19,6 +19,15 @@ class SectionModel {
     _groupId = snapshot.data()['groupId'];
     _name = snapshot.data()['name'];
     _adminUserId = snapshot.data()['adminUserId'];
+    userIds = _convertList(snapshot.data()['userIds']) ?? [];
     _createdAt = snapshot.data()['createdAt'].toDate();
+  }
+
+  List<String> _convertList(List list) {
+    List<String> converted = [];
+    for (String data in list) {
+      converted.add(data);
+    }
+    return converted;
   }
 }

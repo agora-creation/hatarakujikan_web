@@ -151,31 +151,33 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                   DataColumn(label: Text('申請者名')),
                   DataColumn2(label: Text('事由'), size: ColumnSize.L),
                   DataColumn(label: Text('承認状況')),
+                  DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
                 ],
                 rows: List<DataRow>.generate(
                   applyWorks.length,
                   (index) => DataRow(
-                    onSelectChanged: (value) {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => ApplyWorkDetailsDialog(
-                          applyWorkProvider: widget.applyWorkProvider,
-                          applyWork: applyWorks[index],
-                        ),
-                      );
-                    },
                     cells: [
-                      DataCell(
-                        Text(
-                          '${DateFormat('yyyy/MM/dd HH:mm').format(applyWorks[index].createdAt)}',
-                        ),
-                      ),
+                      DataCell(Text(
+                        '${DateFormat('yyyy/MM/dd HH:mm').format(applyWorks[index].createdAt)}',
+                      )),
                       DataCell(Text('${applyWorks[index].userName}')),
                       DataCell(Text('${applyWorks[index].reason}')),
                       applyWorks[index].approval
                           ? DataCell(Text('承認済み'))
                           : DataCell(Text('承認待ち')),
+                      DataCell(IconButton(
+                        onPressed: () {
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => ApplyWorkDetailsDialog(
+                              applyWorkProvider: widget.applyWorkProvider,
+                              applyWork: applyWorks[index],
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                      )),
                     ],
                   ),
                 ),

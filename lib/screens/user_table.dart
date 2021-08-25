@@ -98,7 +98,6 @@ class _UserTableState extends State<UserTable> {
                         userProvider: widget.userProvider,
                         group: widget.groupProvider.group,
                         usersLen: users.length,
-                        positions: widget.groupProvider.group?.positions ?? [],
                       ),
                     );
                   },
@@ -124,45 +123,31 @@ class _UserTableState extends State<UserTable> {
               }
               return DataTable2(
                 columns: [
-                  DataColumn2(label: Text('スタッフ名'), size: ColumnSize.S),
-                  DataColumn(label: Text('部署')),
-                  DataColumn(label: Text('雇用形態')),
-                  DataColumn(label: Text('タブレット用暗証番号')),
-                  DataColumn2(label: Text('スマホ利用状況'), size: ColumnSize.S),
+                  DataColumn(label: Text('スタッフ名')),
+                  DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
+                  DataColumn(label: Text('メールアドレス')),
+                  DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
                 ],
                 rows: List<DataRow>.generate(
                   users.length,
                   (index) => DataRow(
-                    onSelectChanged: (value) {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => UserDetailsDialog(
-                          userProvider: widget.userProvider,
-                          user: users[index],
-                          positions:
-                              widget.groupProvider.group?.positions ?? [],
-                        ),
-                      );
-                    },
                     cells: [
                       DataCell(Text('${users[index].name}')),
-                      DataCell(Text('')),
-                      DataCell(Text('${users[index].position}')),
                       DataCell(Text('${users[index].recordPassword}')),
-                      users[index].smartphone
-                          ? DataCell(
-                              Icon(
-                                Icons.smartphone,
-                                color: Colors.blue,
-                              ),
-                            )
-                          : DataCell(
-                              Icon(
-                                Icons.smartphone,
-                                color: Colors.transparent,
-                              ),
+                      DataCell(Text('${users[index].email}')),
+                      DataCell(IconButton(
+                        onPressed: () {
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => UserDetailsDialog(
+                              userProvider: widget.userProvider,
+                              user: users[index],
                             ),
+                          );
+                        },
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                      )),
                     ],
                   ),
                 ),
@@ -320,13 +305,11 @@ class AddUserDialog extends StatefulWidget {
   final UserProvider userProvider;
   final GroupModel group;
   final int usersLen;
-  final List<String> positions;
 
   AddUserDialog({
     @required this.userProvider,
     @required this.group,
     @required this.usersLen,
-    @required this.positions,
   });
 
   @override
@@ -336,7 +319,6 @@ class AddUserDialog extends StatefulWidget {
 class _AddUserDialogState extends State<AddUserDialog> {
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
-  String position = '';
 
   @override
   Widget build(BuildContext context) {
@@ -379,32 +361,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 ),
               ],
             ),
-            SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('雇用形態', style: TextStyle(fontSize: 14.0)),
-                CustomDropdownButton(
-                  isExpanded: true,
-                  value: position != '' ? position : null,
-                  onChanged: (value) {
-                    setState(() => position = value);
-                  },
-                  items: widget.positions.map((value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -421,7 +377,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
                       usersLen: widget.usersLen,
                       name: name.text.trim(),
                       recordPassword: recordPassword.text.trim(),
-                      position: position,
                     )) {
                       return;
                     }
@@ -445,12 +400,10 @@ class _AddUserDialogState extends State<AddUserDialog> {
 class UserDetailsDialog extends StatefulWidget {
   final UserProvider userProvider;
   final UserModel user;
-  final List<String> positions;
 
   UserDetailsDialog({
     @required this.userProvider,
     @required this.user,
-    @required this.positions,
   });
 
   @override
@@ -460,13 +413,11 @@ class UserDetailsDialog extends StatefulWidget {
 class _UserDetailsDialogState extends State<UserDetailsDialog> {
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
-  String position = '';
 
   void _init() async {
     setState(() {
       name.text = widget.user?.name;
       recordPassword.text = widget.user?.recordPassword;
-      position = widget.user?.position ?? '';
     });
   }
 
@@ -517,32 +468,6 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
                 ),
               ],
             ),
-            SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('雇用形態', style: TextStyle(fontSize: 14.0)),
-                CustomDropdownButton(
-                  isExpanded: true,
-                  value: position != '' ? position : null,
-                  onChanged: (value) {
-                    setState(() => position = value);
-                  },
-                  items: widget.positions.map((value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -578,7 +503,6 @@ class _UserDetailsDialogState extends State<UserDetailsDialog> {
                           id: widget.user.id,
                           name: name.text.trim(),
                           recordPassword: recordPassword.text.trim(),
-                          position: position,
                         )) {
                           return;
                         }
