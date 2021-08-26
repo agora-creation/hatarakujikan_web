@@ -140,7 +140,7 @@ class _UserTableState extends State<UserTable> {
                           showDialog(
                             barrierDismissible: false,
                             context: context,
-                            builder: (_) => UserDetailsDialog(
+                            builder: (_) => EditUserDialog(
                               userProvider: widget.userProvider,
                               user: users[index],
                             ),
@@ -334,7 +334,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             Text(
-              '※ここで新規登録したスタッフデータではスマートフォンアプリにログインできません。スマートフォンアプリから新規登録して会社/組織へ加入してください。',
+              '※ここで新規登録したスタッフデータではスマートフォンアプリにログインできません。スマートフォンアプリから新規登録して、会社/組織へ加入してください。',
               style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
@@ -397,20 +397,20 @@ class _AddUserDialogState extends State<AddUserDialog> {
   }
 }
 
-class UserDetailsDialog extends StatefulWidget {
+class EditUserDialog extends StatefulWidget {
   final UserProvider userProvider;
   final UserModel user;
 
-  UserDetailsDialog({
+  EditUserDialog({
     @required this.userProvider,
     @required this.user,
   });
 
   @override
-  _UserDetailsDialogState createState() => _UserDetailsDialogState();
+  _EditUserDialogState createState() => _EditUserDialogState();
 }
 
-class _UserDetailsDialogState extends State<UserDetailsDialog> {
+class _EditUserDialogState extends State<EditUserDialog> {
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
 

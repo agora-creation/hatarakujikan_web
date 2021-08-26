@@ -142,7 +142,7 @@ class CustomWorkListTile extends StatelessWidget {
                                 onPressed: () => showDialog(
                                   barrierDismissible: false,
                                   context: context,
-                                  builder: (_) => WorkDetailsDialog(
+                                  builder: (_) => EditWorkDialog(
                                     workProvider: workProvider,
                                     work: _work,
                                     group: group,
@@ -165,7 +165,7 @@ class CustomWorkListTile extends StatelessWidget {
                                 onPressed: () => showDialog(
                                   barrierDismissible: false,
                                   context: context,
-                                  builder: (_) => WorkLocationDialog(
+                                  builder: (_) => LocationWorkDialog(
                                     work: _work,
                                   ),
                                 ),
@@ -251,7 +251,7 @@ class CustomWorkListTile extends StatelessWidget {
                           onPressed: () => showDialog(
                             barrierDismissible: false,
                             context: context,
-                            builder: (_) => WorkStateDetailsDialog(
+                            builder: (_) => EditWorkStateDialog(
                               workStateProvider: workStateProvider,
                               workState: workState,
                             ),
@@ -277,22 +277,22 @@ class CustomWorkListTile extends StatelessWidget {
   }
 }
 
-class WorkDetailsDialog extends StatefulWidget {
+class EditWorkDialog extends StatefulWidget {
   final WorkProvider workProvider;
   final WorkModel work;
   final GroupModel group;
 
-  WorkDetailsDialog({
+  EditWorkDialog({
     @required this.workProvider,
     @required this.work,
     @required this.group,
   });
 
   @override
-  _WorkDetailsDialogState createState() => _WorkDetailsDialogState();
+  _EditWorkDialogState createState() => _EditWorkDialogState();
 }
 
-class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
+class _EditWorkDialogState extends State<EditWorkDialog> {
   DateTime _firstDate = DateTime.now().subtract(Duration(days: 365));
   DateTime _lastDate = DateTime.now().add(Duration(days: 365));
   WorkModel work;
@@ -992,16 +992,16 @@ class _WorkDetailsDialogState extends State<WorkDetailsDialog> {
   }
 }
 
-class WorkLocationDialog extends StatefulWidget {
+class LocationWorkDialog extends StatefulWidget {
   final WorkModel work;
 
-  WorkLocationDialog({@required this.work});
+  LocationWorkDialog({@required this.work});
 
   @override
-  _WorkLocationDialogState createState() => _WorkLocationDialogState();
+  _LocationWorkDialogState createState() => _LocationWorkDialogState();
 }
 
-class _WorkLocationDialogState extends State<WorkLocationDialog> {
+class _LocationWorkDialogState extends State<LocationWorkDialog> {
   GoogleMapController mapController;
   Set<Marker> markers = {};
 
@@ -1118,11 +1118,11 @@ class _WorkLocationDialogState extends State<WorkLocationDialog> {
   }
 }
 
-class WorkStateDetailsDialog extends StatelessWidget {
+class EditWorkStateDialog extends StatelessWidget {
   final WorkStateProvider workStateProvider;
   final WorkStateModel workState;
 
-  WorkStateDetailsDialog({
+  EditWorkStateDialog({
     @required this.workStateProvider,
     @required this.workState,
   });

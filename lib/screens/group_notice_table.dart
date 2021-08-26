@@ -98,7 +98,10 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                     (index) => DataRow(
                       cells: [
                         DataCell(Text('${groupNotices[index].title}')),
-                        DataCell(Text('${groupNotices[index].message}')),
+                        DataCell(Text(
+                          '${groupNotices[index].message}',
+                          overflow: TextOverflow.ellipsis,
+                        )),
                         DataCell(IconButton(
                           onPressed: () {
                             showDialog(

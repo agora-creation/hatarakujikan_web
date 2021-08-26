@@ -12,16 +12,16 @@ class SectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
     final sectionProvider = Provider.of<SectionProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
       body: SectionTable(
         groupProvider: groupProvider,
-        userProvider: userProvider,
         sectionProvider: sectionProvider,
+        userProvider: userProvider,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/section.dart';
+import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/section.dart';
 
 class SectionProvider with ChangeNotifier {
@@ -8,18 +9,16 @@ class SectionProvider with ChangeNotifier {
   Future<bool> create({
     String groupId,
     String name,
-    String adminUserId,
   }) async {
     if (groupId == '') return false;
     if (name == '') return false;
-    if (adminUserId == '') return false;
     try {
       String _id = _sectionService.id();
       _sectionService.create({
         'id': _id,
         'groupId': groupId,
         'name': name,
-        'adminUserId': adminUserId,
+        'adminUserId': '',
         'userIds': [],
         'createdAt': DateTime.now(),
       });
@@ -33,14 +32,31 @@ class SectionProvider with ChangeNotifier {
   Future<bool> update({
     String id,
     String name,
-    String adminUserId,
   }) async {
     try {
       _sectionService.update({
         'id': id,
         'name': name,
-        'adminUserId': adminUserId,
-        'userIds': [],
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateUsers({
+    List<UserModel> users,
+    String id,
+  }) async {
+    try {
+      List<String> _userIds = [];
+      for (UserModel _user in users) {
+        _userIds.add(_user.id);
+      }
+      _sectionService.update({
+        'id': id,
+        'userIds': _userIds,
       });
       return true;
     } catch (e) {

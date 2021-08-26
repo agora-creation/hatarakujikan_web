@@ -161,7 +161,10 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                         '${DateFormat('yyyy/MM/dd HH:mm').format(applyWorks[index].createdAt)}',
                       )),
                       DataCell(Text('${applyWorks[index].userName}')),
-                      DataCell(Text('${applyWorks[index].reason}')),
+                      DataCell(Text(
+                        '${applyWorks[index].reason}',
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       applyWorks[index].approval
                           ? DataCell(Text('承認済み'))
                           : DataCell(Text('承認待ち')),
@@ -170,7 +173,7 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                           showDialog(
                             barrierDismissible: false,
                             context: context,
-                            builder: (_) => ApplyWorkDetailsDialog(
+                            builder: (_) => EditApplyWorkDialog(
                               applyWorkProvider: widget.applyWorkProvider,
                               applyWork: applyWorks[index],
                             ),
@@ -335,11 +338,11 @@ class SearchApprovalDialog extends StatelessWidget {
   }
 }
 
-class ApplyWorkDetailsDialog extends StatelessWidget {
+class EditApplyWorkDialog extends StatelessWidget {
   final ApplyWorkProvider applyWorkProvider;
   final ApplyWorkModel applyWork;
 
-  ApplyWorkDetailsDialog({
+  EditApplyWorkDialog({
     @required this.applyWorkProvider,
     @required this.applyWork,
   });
@@ -464,6 +467,7 @@ class ApplyWorkDetailsDialog extends StatelessWidget {
                 applyWork.approval ? Text('承認済み') : Text('承認待ち')
               ],
             ),
+            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
