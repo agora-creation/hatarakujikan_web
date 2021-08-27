@@ -8,6 +8,7 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
@@ -109,42 +110,50 @@ class _SectionTableState extends State<SectionTable> {
                   ],
                   rows: List<DataRow>.generate(
                     sections.length,
-                    (index) => DataRow(
-                      cells: [
-                        DataCell(Text('${sections[index].name}')),
-                        DataCell(Text(
-                          '${sections[index].userIds}',
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                        DataCell(IconButton(
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => EditSectionDialog(
-                                sectionProvider: widget.sectionProvider,
-                                section: sections[index],
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                        )),
-                        DataCell(IconButton(
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => UserSectionDialog(
-                                sectionProvider: widget.sectionProvider,
-                                userProvider: widget.userProvider,
-                                section: sections[index],
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.person, color: Colors.blue),
-                        )),
-                      ],
-                    ),
+                    (index) {
+                      String _sectionUser = '';
+                      for (String _id in sections[index].userIds) {
+                        if (_sectionUser != '') _sectionUser += ',';
+                        UserModel _user = users.singleWhere((e) => e.id == _id);
+                        _sectionUser += _user.name;
+                      }
+                      return DataRow(
+                        cells: [
+                          DataCell(Text('${sections[index].name}')),
+                          DataCell(Text(
+                            '$_sectionUser',
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                          DataCell(IconButton(
+                            onPressed: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => EditSectionDialog(
+                                  sectionProvider: widget.sectionProvider,
+                                  section: sections[index],
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                          )),
+                          DataCell(IconButton(
+                            onPressed: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => UserSectionDialog(
+                                  sectionProvider: widget.sectionProvider,
+                                  userProvider: widget.userProvider,
+                                  section: sections[index],
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.person, color: Colors.blue),
+                          )),
+                        ],
+                      );
+                    },
                   ),
                 );
               } else {
@@ -364,6 +373,10 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
         .then((value) {
       setState(() => _users = value);
     });
+    for (String _id in widget.section?.userIds) {
+      UserModel _user = _users.singleWhere((e) => e.id == _id);
+      _selected.add(_user);
+    }
   }
 
   @override
@@ -415,26 +428,19 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
                   itemBuilder: (_, index) {
                     UserModel _user = _users[index];
                     var contain = _selected.where((e) => e.id == _user.id);
-
-                    return Container(
-                      decoration: kBottomBorderDecoration,
-                      child: CheckboxListTile(
-                        title: Text('${_user.name}'),
-                        value: contain.isNotEmpty,
-                        activeColor: Colors.blue,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        onChanged: (value) {
-                          var _contain =
-                              _selected.where((e) => e.id == _user.id);
-                          setState(() {
-                            if (_contain.isEmpty) {
-                              _selected.add(_user);
-                            } else {
-                              _selected.removeWhere((e) => e.id == _user.id);
-                            }
-                          });
-                        },
-                      ),
+                    return CustomCheckboxListTile(
+                      onChanged: (value) {
+                        var _contain = _selected.where((e) => e.id == _user.id);
+                        setState(() {
+                          if (_contain.isEmpty) {
+                            _selected.add(_user);
+                          } else {
+                            _selected.removeWhere((e) => e.id == _user.id);
+                          }
+                        });
+                      },
+                      label: '${_user.name}',
+                      value: contain.isNotEmpty,
                     );
                   },
                 ),

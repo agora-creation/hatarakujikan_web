@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/group_notice.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
@@ -449,25 +450,19 @@ class _SendGroupNoticeDialogState extends State<SendGroupNoticeDialog> {
                   itemBuilder: (_, index) {
                     UserModel _user = _users[index];
                     var contain = _selected.where((e) => e.id == _user.id);
-                    return Container(
-                      decoration: kBottomBorderDecoration,
-                      child: CheckboxListTile(
-                        title: Text('${_user.name}'),
-                        value: contain.isNotEmpty,
-                        activeColor: Colors.blue,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        onChanged: (value) {
-                          var _contain =
-                              _selected.where((e) => e.id == _user.id);
-                          setState(() {
-                            if (_contain.isEmpty) {
-                              _selected.add(_user);
-                            } else {
-                              _selected.removeWhere((e) => e.id == _user.id);
-                            }
-                          });
-                        },
-                      ),
+                    return CustomCheckboxListTile(
+                      onChanged: (value) {
+                        var _contain = _selected.where((e) => e.id == _user.id);
+                        setState(() {
+                          if (_contain.isEmpty) {
+                            _selected.add(_user);
+                          } else {
+                            _selected.removeWhere((e) => e.id == _user.id);
+                          }
+                        });
+                      },
+                      label: '${_user.name}',
+                      value: contain.isNotEmpty,
                     );
                   },
                 ),

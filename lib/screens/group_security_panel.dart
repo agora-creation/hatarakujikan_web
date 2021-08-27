@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
@@ -96,29 +97,19 @@ class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
           ],
         ),
         SizedBox(height: 8.0),
-        Container(
-          decoration: kBottomBorderDecoration,
-          child: CheckboxListTile(
-            onChanged: (value) {
-              setState(() => qrSecurity = value);
-            },
-            value: qrSecurity,
-            title: Text('QRコードで記録制限'),
-            subtitle: Text('時間の記録時は常にQRコードを撮る必要があります。'),
-            controlAffinity: ListTileControlAffinity.leading,
-          ),
+        CustomCheckboxListTile(
+          onChanged: (value) {
+            setState(() => qrSecurity = value);
+          },
+          label: 'QRコードで記録制限',
+          value: qrSecurity,
         ),
-        Container(
-          decoration: kBottomBorderDecoration,
-          child: CheckboxListTile(
-            onChanged: (value) {
-              setState(() => areaSecurity = value);
-            },
-            value: areaSecurity,
-            title: Text('記録可能な範囲を制限'),
-            subtitle: Text('下記地図上の赤い範囲でのみ、時間の記録ができます。'),
-            controlAffinity: ListTileControlAffinity.leading,
-          ),
+        CustomCheckboxListTile(
+          onChanged: (value) {
+            setState(() => areaSecurity = value);
+          },
+          label: '記録可能な範囲を制限',
+          value: areaSecurity,
         ),
         SizedBox(height: 8.0),
         Expanded(
