@@ -134,7 +134,7 @@ class _GroupInfoPanelState extends State<GroupInfoPanel> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('管理者スタッフ', style: TextStyle(fontSize: 14.0)),
+                  Text('管理者を選ぶ', style: TextStyle(fontSize: 14.0)),
                   CustomDropdownButton(
                     isExpanded: false,
                     value: adminUser,

@@ -43,7 +43,7 @@ const List<MenuItem> kSideMenu = [
   ),
   MenuItem(
     title: '会社/組織の設定',
-    icon: Icons.store,
+    icon: Icons.settings,
     children: [
       MenuItem(
         title: '基本情報の変更',

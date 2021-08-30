@@ -145,46 +145,50 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
               for (DocumentSnapshot applyWork in snapshot.data.docs) {
                 applyWorks.add(ApplyWorkModel.fromSnapshot(applyWork));
               }
-              return DataTable2(
-                columns: [
-                  DataColumn(label: Text('申請日時')),
-                  DataColumn(label: Text('申請者名')),
-                  DataColumn2(label: Text('事由'), size: ColumnSize.L),
-                  DataColumn(label: Text('承認状況')),
-                  DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
-                ],
-                rows: List<DataRow>.generate(
-                  applyWorks.length,
-                  (index) => DataRow(
-                    cells: [
-                      DataCell(Text(
-                        '${DateFormat('yyyy/MM/dd HH:mm').format(applyWorks[index].createdAt)}',
-                      )),
-                      DataCell(Text('${applyWorks[index].userName}')),
-                      DataCell(Text(
-                        '${applyWorks[index].reason}',
-                        overflow: TextOverflow.ellipsis,
-                      )),
-                      applyWorks[index].approval
-                          ? DataCell(Text('承認済み'))
-                          : DataCell(Text('承認待ち')),
-                      DataCell(IconButton(
-                        onPressed: () {
-                          showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => EditApplyWorkDialog(
-                              applyWorkProvider: widget.applyWorkProvider,
-                              applyWork: applyWorks[index],
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.edit, color: Colors.blue),
-                      )),
-                    ],
+              if (applyWorks.length > 0) {
+                return DataTable2(
+                  columns: [
+                    DataColumn(label: Text('申請日時')),
+                    DataColumn(label: Text('申請者名')),
+                    DataColumn2(label: Text('事由'), size: ColumnSize.L),
+                    DataColumn(label: Text('承認状況')),
+                    DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
+                  ],
+                  rows: List<DataRow>.generate(
+                    applyWorks.length,
+                    (index) => DataRow(
+                      cells: [
+                        DataCell(Text(
+                          '${DateFormat('yyyy/MM/dd HH:mm').format(applyWorks[index].createdAt)}',
+                        )),
+                        DataCell(Text('${applyWorks[index].userName}')),
+                        DataCell(Text(
+                          '${applyWorks[index].reason}',
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                        applyWorks[index].approval
+                            ? DataCell(Text('承認済み'))
+                            : DataCell(Text('承認待ち')),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditApplyWorkDialog(
+                                applyWorkProvider: widget.applyWorkProvider,
+                                applyWork: applyWorks[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                        )),
+                      ],
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                return Text('現在申請/承認データはありません');
+              }
             },
           ),
         ),

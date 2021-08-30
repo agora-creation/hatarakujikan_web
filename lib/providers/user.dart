@@ -112,6 +112,22 @@ class UserProvider with ChangeNotifier {
     return _users;
   }
 
+  Future<List<UserModel>> selectListSectionSP({
+    List<String> userIds,
+    bool smartphone,
+  }) async {
+    List<UserModel> _users = [];
+    await _userService
+        .selectListSectionSP(
+      userIds: userIds,
+      smartphone: smartphone,
+    )
+        .then((value) {
+      _users = value;
+    });
+    return _users;
+  }
+
   Future<List<UserModel>> selectListNotice({
     String groupId,
     String noticeId,

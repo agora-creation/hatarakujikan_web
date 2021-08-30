@@ -9,6 +9,7 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
+import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
@@ -105,25 +106,40 @@ class _SectionTableState extends State<SectionTable> {
                   columns: [
                     DataColumn(label: Text('部署/事業所名')),
                     DataColumn2(label: Text('現在の登録スタッフ'), size: ColumnSize.L),
+                    DataColumn(label: Text('現在の管理者')),
                     DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
                     DataColumn2(label: Text('スタッフ登録'), size: ColumnSize.S),
+                    DataColumn2(label: Text('管理者登録'), size: ColumnSize.S),
                   ],
                   rows: List<DataRow>.generate(
                     sections.length,
                     (index) {
-                      String _sectionUser = '';
-                      for (String _id in sections[index].userIds) {
-                        if (_sectionUser != '') _sectionUser += ',';
-                        UserModel _user = users.singleWhere((e) => e.id == _id);
-                        _sectionUser += _user.name;
+                      String _sectionUsers = '';
+                      if (sections[index].userIds != null) {
+                        for (String _id in sections[index].userIds) {
+                          if (_sectionUsers != '') _sectionUsers += ',';
+                          UserModel _user = users.singleWhere(
+                            (e) => e.id == _id,
+                          );
+                          _sectionUsers += _user.name;
+                        }
                       }
+                      String _sectionAdminUser = '';
+                      if (sections[index].adminUserId != '') {
+                        UserModel _user = users.singleWhere(
+                          (e) => e.id == sections[index].adminUserId,
+                        );
+                        _sectionAdminUser = _user.name;
+                      }
+
                       return DataRow(
                         cells: [
                           DataCell(Text('${sections[index].name}')),
                           DataCell(Text(
-                            '$_sectionUser',
+                            '$_sectionUsers',
                             overflow: TextOverflow.ellipsis,
                           )),
+                          DataCell(Text('$_sectionAdminUser')),
                           DataCell(IconButton(
                             onPressed: () {
                               showDialog(
@@ -150,6 +166,23 @@ class _SectionTableState extends State<SectionTable> {
                               );
                             },
                             icon: Icon(Icons.person, color: Colors.blue),
+                          )),
+                          DataCell(IconButton(
+                            onPressed: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => AdminUserSectionDialog(
+                                  sectionProvider: widget.sectionProvider,
+                                  userProvider: widget.userProvider,
+                                  section: sections[index],
+                                ),
+                              );
+                            },
+                            icon: Icon(
+                              Icons.manage_accounts,
+                              color: Colors.blue,
+                            ),
                           )),
                         ],
                       );
@@ -321,7 +354,7 @@ class _EditSectionDialogState extends State<EditSectionDialog> {
                     CustomTextButton(
                       onPressed: () async {
                         if (!await widget.sectionProvider.update(
-                          id: widget.section.id,
+                          section: widget.section,
                           name: name.text.trim(),
                         )) {
                           return;
@@ -459,13 +492,146 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
                 CustomTextButton(
                   onPressed: () async {
                     if (!await widget.sectionProvider.updateUsers(
+                      section: widget.section,
                       users: _selected,
-                      id: widget.section.id,
                     )) {
                       return;
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('部署/事業所情報にスタッフ情報を登録しました')),
+                    );
+                    Navigator.pop(context);
+                  },
+                  color: Colors.blue,
+                  label: '登録する',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AdminUserSectionDialog extends StatefulWidget {
+  final SectionProvider sectionProvider;
+  final UserProvider userProvider;
+  final SectionModel section;
+
+  AdminUserSectionDialog({
+    @required this.sectionProvider,
+    @required this.userProvider,
+    @required this.section,
+  });
+
+  @override
+  _AdminUserSectionDialogState createState() => _AdminUserSectionDialogState();
+}
+
+class _AdminUserSectionDialogState extends State<AdminUserSectionDialog> {
+  List<UserModel> _users = [];
+  UserModel _selected;
+
+  void _init() async {
+    if (widget.section.userIds.length > 0) {
+      await widget.userProvider
+          .selectListSectionSP(
+        userIds: widget.section?.userIds,
+        smartphone: true,
+      )
+          .then((value) {
+        setState(() => _users = value);
+      });
+    }
+    if (widget.section?.adminUserId != '') {
+      _selected = _users.singleWhere(
+        (e) => e.id == widget.section?.adminUserId,
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 16.0),
+            Text(
+              '登録したスタッフ情報の中から管理者を一人決めます。部署/事業所の管理者は専用の管理画面とタブレットアプリを利用できます。',
+              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+            ),
+            SizedBox(height: 16.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '部署/事業所名',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                Text('${widget.section?.name}'),
+              ],
+            ),
+            Divider(),
+            SizedBox(height: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '管理者を選ぶ',
+                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
+                ),
+                _users.length > 0
+                    ? CustomDropdownButton(
+                        isExpanded: true,
+                        value: _selected,
+                        onChanged: (value) {
+                          setState(() => _selected = value);
+                        },
+                        items: _users.map((value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(
+                              '${value.name}',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      )
+                    : Container(),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () async {
+                    if (!await widget.sectionProvider.updateAdminUser(
+                      section: widget.section,
+                      user: _selected,
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('部署/事業所情報に管理者を登録しました。')),
                     );
                     Navigator.pop(context);
                   },
