@@ -73,6 +73,8 @@ class UserService {
     bool smartphone,
   }) async {
     List<UserModel> _users = [];
+    print(userIds.length);
+
     await _firebaseFirestore
         .collection(_collection)
         .where('id', whereIn: userIds)
