@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
-import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/section/login.dart';
-import 'package:hatarakujikan_web/screens/select.dart';
+import 'package:hatarakujikan_web/providers/section.dart';
+import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_link_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field.dart';
 import 'package:hatarakujikan_web/widgets/error_dialog.dart';
@@ -11,10 +10,10 @@ import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/round_background_button.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
+class SectionLoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final groupProvider = Provider.of<GroupProvider>(context);
+    final sectionProvider = Provider.of<SectionProvider>(context);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -31,7 +30,7 @@ class LoginScreen extends StatelessWidget {
               ],
             ),
           ),
-          child: groupProvider.status == Status.Authenticating
+          child: sectionProvider.status == SectionStatus.Authenticating
               ? Loading(color: Colors.white)
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +49,7 @@ class LoginScreen extends StatelessWidget {
                         Text('for WEB', style: kSubTitleTextStyle),
                         SizedBox(height: 8.0),
                         Text(
-                          '会社/組織の管理者専用',
+                          '部署/事業所の管理者専用',
                           style: TextStyle(color: Colors.white),
                         ),
                       ],
@@ -62,7 +61,7 @@ class LoginScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CustomTextFormField(
-                            controller: groupProvider.email,
+                            controller: sectionProvider.email,
                             obscureText: false,
                             textInputType: TextInputType.emailAddress,
                             maxLines: 1,
@@ -74,7 +73,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 16.0),
                           CustomTextFormField(
-                            controller: groupProvider.password,
+                            controller: sectionProvider.password,
                             obscureText: true,
                             textInputType: null,
                             maxLines: 1,
@@ -87,7 +86,7 @@ class LoginScreen extends StatelessWidget {
                           SizedBox(height: 24.0),
                           RoundBackgroundButton(
                             onPressed: () async {
-                              if (!await groupProvider.signIn()) {
+                              if (!await sectionProvider.signIn()) {
                                 showDialog(
                                   barrierDismissible: false,
                                   context: context,
@@ -97,11 +96,7 @@ class LoginScreen extends StatelessWidget {
                                 );
                                 return;
                               }
-                              groupProvider.clearController();
-                              overlayScreen(
-                                context,
-                                SelectScreen(groupProvider: groupProvider),
-                              );
+                              sectionProvider.clearController();
                             },
                             label: 'ログイン',
                             color: Colors.white,
@@ -114,9 +109,9 @@ class LoginScreen extends StatelessWidget {
                     Center(
                       child: CustomLinkButton(
                         onTap: () {
-                          nextScreen(context, SectionLoginScreen());
+                          nextScreen(context, LoginScreen());
                         },
-                        label: '部署/事業所の管理者はここをクリック',
+                        label: '会社/組織の管理者はここをクリック',
                         color: Colors.white,
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/side_menu.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
@@ -17,6 +18,7 @@ class SectionScreen extends StatelessWidget {
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
+      items: kSideMenu,
       selectedRoute: id,
       body: SectionTable(
         groupProvider: groupProvider,

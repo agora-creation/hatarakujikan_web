@@ -14,22 +14,22 @@ import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 
-class GroupNoticeTable extends StatefulWidget {
+class NoticeTable extends StatefulWidget {
   final GroupProvider groupProvider;
   final GroupNoticeProvider groupNoticeProvider;
   final UserProvider userProvider;
 
-  GroupNoticeTable({
+  NoticeTable({
     @required this.groupProvider,
     @required this.groupNoticeProvider,
     @required this.userProvider,
   });
 
   @override
-  _GroupNoticeTableState createState() => _GroupNoticeTableState();
+  _NoticeTableState createState() => _NoticeTableState();
 }
 
-class _GroupNoticeTableState extends State<GroupNoticeTable> {
+class _NoticeTableState extends State<NoticeTable> {
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
@@ -62,7 +62,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                 showDialog(
                   barrierDismissible: false,
                   context: context,
-                  builder: (_) => AddGroupNoticeDialog(
+                  builder: (_) => AddNoticeDialog(
                     groupNoticeProvider: widget.groupNoticeProvider,
                     groupId: widget.groupProvider.group?.id,
                   ),
@@ -108,7 +108,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                             showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => EditGroupNoticeDialog(
+                              builder: (_) => EditNoticeDialog(
                                 groupNoticeProvider: widget.groupNoticeProvider,
                                 groupNotice: groupNotices[index],
                               ),
@@ -121,7 +121,7 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
                             showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => SendGroupNoticeDialog(
+                              builder: (_) => SendNoticeDialog(
                                 groupNoticeProvider: widget.groupNoticeProvider,
                                 userProvider: widget.userProvider,
                                 groupNotice: groupNotices[index],
@@ -145,20 +145,20 @@ class _GroupNoticeTableState extends State<GroupNoticeTable> {
   }
 }
 
-class AddGroupNoticeDialog extends StatefulWidget {
+class AddNoticeDialog extends StatefulWidget {
   final GroupNoticeProvider groupNoticeProvider;
   final String groupId;
 
-  AddGroupNoticeDialog({
+  AddNoticeDialog({
     @required this.groupNoticeProvider,
     @required this.groupId,
   });
 
   @override
-  _AddGroupNoticeDialogState createState() => _AddGroupNoticeDialogState();
+  _AddNoticeDialogState createState() => _AddNoticeDialogState();
 }
 
-class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
+class _AddNoticeDialogState extends State<AddNoticeDialog> {
   TextEditingController title = TextEditingController();
   TextEditingController message = TextEditingController();
 
@@ -238,20 +238,20 @@ class _AddGroupNoticeDialogState extends State<AddGroupNoticeDialog> {
   }
 }
 
-class EditGroupNoticeDialog extends StatefulWidget {
+class EditNoticeDialog extends StatefulWidget {
   final GroupNoticeProvider groupNoticeProvider;
   final GroupNoticeModel groupNotice;
 
-  EditGroupNoticeDialog({
+  EditNoticeDialog({
     @required this.groupNoticeProvider,
     @required this.groupNotice,
   });
 
   @override
-  _EditGroupNoticeDialogState createState() => _EditGroupNoticeDialogState();
+  _EditNoticeDialogState createState() => _EditNoticeDialogState();
 }
 
-class _EditGroupNoticeDialogState extends State<EditGroupNoticeDialog> {
+class _EditNoticeDialogState extends State<EditNoticeDialog> {
   TextEditingController title = TextEditingController();
   TextEditingController message = TextEditingController();
 
@@ -359,22 +359,22 @@ class _EditGroupNoticeDialogState extends State<EditGroupNoticeDialog> {
   }
 }
 
-class SendGroupNoticeDialog extends StatefulWidget {
+class SendNoticeDialog extends StatefulWidget {
   final GroupNoticeProvider groupNoticeProvider;
   final UserProvider userProvider;
   final GroupNoticeModel groupNotice;
 
-  SendGroupNoticeDialog({
+  SendNoticeDialog({
     @required this.groupNoticeProvider,
     @required this.userProvider,
     @required this.groupNotice,
   });
 
   @override
-  _SendGroupNoticeDialogState createState() => _SendGroupNoticeDialogState();
+  _SendNoticeDialogState createState() => _SendNoticeDialogState();
 }
 
-class _SendGroupNoticeDialogState extends State<SendGroupNoticeDialog> {
+class _SendNoticeDialogState extends State<SendNoticeDialog> {
   final ScrollController _scrollController = ScrollController();
   List<UserModel> _users = [];
   List<UserModel> _selected = [];

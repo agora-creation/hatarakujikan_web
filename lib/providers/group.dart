@@ -84,7 +84,7 @@ class GroupProvider with ChangeNotifier {
 
   Future reloadGroupModel() async {
     String _groupId = await getPrefs(key: 'groupId');
-    if (_groupId != "") {
+    if (_groupId != '') {
       _group = await _groupService.select(groupId: _groupId);
     }
     _adminUser = await _userService.select(userId: _fUser.uid);

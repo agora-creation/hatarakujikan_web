@@ -11,20 +11,20 @@ import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
-class GroupInfoPanel extends StatefulWidget {
+class SettingInfoPanel extends StatefulWidget {
   final GroupProvider groupProvider;
   final UserProvider userProvider;
 
-  GroupInfoPanel({
+  SettingInfoPanel({
     @required this.groupProvider,
     @required this.userProvider,
   });
 
   @override
-  _GroupInfoPanelState createState() => _GroupInfoPanelState();
+  _SettingInfoPanelState createState() => _SettingInfoPanelState();
 }
 
-class _GroupInfoPanelState extends State<GroupInfoPanel> {
+class _SettingInfoPanelState extends State<SettingInfoPanel> {
   TextEditingController name = TextEditingController();
   List<UserModel> users = [];
   UserModel adminUser;

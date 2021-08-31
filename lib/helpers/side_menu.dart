@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
-import 'package:hatarakujikan_web/screens/group_info.dart';
-import 'package:hatarakujikan_web/screens/group_notice.dart';
-import 'package:hatarakujikan_web/screens/group_security.dart';
-import 'package:hatarakujikan_web/screens/group_work.dart';
+import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
+import 'package:hatarakujikan_web/screens/setting_info.dart';
+import 'package:hatarakujikan_web/screens/setting_security.dart';
+import 'package:hatarakujikan_web/screens/setting_work.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
 
@@ -38,7 +38,7 @@ const List<MenuItem> kSideMenu = [
   ),
   MenuItem(
     title: 'お知らせの管理',
-    route: GroupNoticeScreen.id,
+    route: NoticeScreen.id,
     icon: Icons.notifications,
   ),
   MenuItem(
@@ -47,19 +47,43 @@ const List<MenuItem> kSideMenu = [
     children: [
       MenuItem(
         title: '基本情報の変更',
-        route: GroupInfoScreen.id,
+        route: SettingInfoScreen.id,
         icon: Icons.chevron_right,
       ),
       MenuItem(
         title: 'セキュリティ設定',
-        route: GroupSecurityScreen.id,
+        route: SettingSecurityScreen.id,
         icon: Icons.chevron_right,
       ),
       MenuItem(
         title: '勤怠ルール設定',
-        route: GroupWorkScreen.id,
+        route: SettingWorkScreen.id,
         icon: Icons.chevron_right,
       ),
     ],
+  ),
+];
+
+const List<MenuItem> kSectionSideMenu = [
+  MenuItem(
+    title: '勤怠の管理',
+    route: WorkScreen.id,
+    icon: Icons.history,
+  ),
+  MenuItem(
+    title: '申請/承認の管理',
+    icon: Icons.receipt,
+    children: [
+      MenuItem(
+        title: '記録修正申請',
+        route: ApplyWorkScreen.id,
+        icon: Icons.chevron_right,
+      ),
+    ],
+  ),
+  MenuItem(
+    title: 'スタッフの管理',
+    route: UserScreen.id,
+    icon: Icons.person,
   ),
 ];

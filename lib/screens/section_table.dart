@@ -449,7 +449,7 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
               label: 'スタッフ',
             ),
             Container(
-              width: 350.0,
+              width: 250.0,
               child: Scrollbar(
                 isAlwaysShown: true,
                 controller: _scrollController,
@@ -536,7 +536,7 @@ class _AdminUserSectionDialogState extends State<AdminUserSectionDialog> {
   void _init() async {
     if (widget.section.userIds.length > 0) {
       await widget.userProvider
-          .selectListSectionSP(
+          .selectListSmartphone(
         userIds: widget.section?.userIds,
         smartphone: true,
       )

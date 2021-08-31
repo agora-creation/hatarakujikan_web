@@ -112,13 +112,13 @@ class UserProvider with ChangeNotifier {
     return _users;
   }
 
-  Future<List<UserModel>> selectListSectionSP({
+  Future<List<UserModel>> selectListSmartphone({
     List<String> userIds,
     bool smartphone,
   }) async {
     List<UserModel> _users = [];
     await _userService
-        .selectListSectionSP(
+        .selectListSmartphone(
       userIds: userIds,
       smartphone: smartphone,
     )

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/side_menu.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/screens/user_table.dart';
@@ -15,6 +16,7 @@ class UserScreen extends StatelessWidget {
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
+      items: kSideMenu,
       selectedRoute: id,
       body: UserTable(
         groupProvider: groupProvider,

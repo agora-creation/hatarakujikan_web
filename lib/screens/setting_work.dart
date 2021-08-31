@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/side_menu.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/group_security_panel.dart';
+import 'package:hatarakujikan_web/screens/setting_work_panel.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:provider/provider.dart';
 
-class GroupSecurityScreen extends StatelessWidget {
-  static const String id = 'group_security';
+class SettingWorkScreen extends StatelessWidget {
+  static const String id = 'group_work';
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +14,9 @@ class GroupSecurityScreen extends StatelessWidget {
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
+      items: kSideMenu,
       selectedRoute: id,
-      body: GroupSecurityPanel(groupProvider: groupProvider),
+      body: SettingWorkPanel(groupProvider: groupProvider),
     );
   }
 }

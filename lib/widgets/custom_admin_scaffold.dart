@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
-import 'package:hatarakujikan_web/helpers/side_menu.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 
 class CustomAdminScaffold extends StatelessWidget {
   final GroupProvider groupProvider;
+  final List<MenuItem> items;
   final String selectedRoute;
   final Widget body;
 
   CustomAdminScaffold({
     this.groupProvider,
+    this.items,
     this.selectedRoute,
     this.body,
   });
@@ -52,7 +53,7 @@ class CustomAdminScaffold extends StatelessWidget {
         activeBackgroundColor: Colors.white,
         activeIconColor: Colors.black54,
         activeTextStyle: TextStyle(color: Colors.black54, fontSize: 14.0),
-        items: kSideMenu,
+        items: items,
         selectedRoute: selectedRoute,
         onSelected: (item) {
           if (item.route != null) {

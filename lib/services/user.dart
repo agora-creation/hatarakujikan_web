@@ -68,24 +68,24 @@ class UserService {
     return _users;
   }
 
-  Future<List<UserModel>> selectListSectionSP({
+  Future<List<UserModel>> selectListSmartphone({
     List<String> userIds,
     bool smartphone,
   }) async {
     List<UserModel> _users = [];
-    print(userIds.length);
-
-    await _firebaseFirestore
-        .collection(_collection)
-        .where('id', whereIn: userIds)
-        .where('smartphone', isEqualTo: smartphone)
-        .orderBy('recordPassword', descending: false)
-        .get()
-        .then((value) {
-      for (DocumentSnapshot _user in value.docs) {
-        _users.add(UserModel.fromSnapshot(_user));
-      }
-    });
+    for (String _id in userIds) {
+      await _firebaseFirestore
+          .collection(_collection)
+          .where('id', isEqualTo: _id)
+          .where('smartphone', isEqualTo: smartphone)
+          .orderBy('recordPassword', descending: false)
+          .get()
+          .then((value) {
+        for (DocumentSnapshot _user in value.docs) {
+          _users.add(UserModel.fromSnapshot(_user));
+        }
+      });
+    }
     return _users;
   }
 

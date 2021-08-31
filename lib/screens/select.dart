@@ -6,16 +6,16 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 
-class GroupSelect extends StatefulWidget {
+class SelectScreen extends StatefulWidget {
   final GroupProvider groupProvider;
 
-  GroupSelect({@required this.groupProvider});
+  SelectScreen({@required this.groupProvider});
 
   @override
-  _GroupSelectState createState() => _GroupSelectState();
+  _SelectScreenState createState() => _SelectScreenState();
 }
 
-class _GroupSelectState extends State<GroupSelect> {
+class _SelectScreenState extends State<SelectScreen> {
   bool _isLoading = false;
 
   void _init() async {

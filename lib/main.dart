@@ -11,12 +11,12 @@ import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
-import 'package:hatarakujikan_web/screens/group_info.dart';
-import 'package:hatarakujikan_web/screens/group_notice.dart';
-import 'package:hatarakujikan_web/screens/group_security.dart';
-import 'package:hatarakujikan_web/screens/group_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
+import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
+import 'package:hatarakujikan_web/screens/setting_info.dart';
+import 'package:hatarakujikan_web/screens/setting_security.dart';
+import 'package:hatarakujikan_web/screens/setting_work.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: ApplyWorkProvider()),
         ChangeNotifierProvider.value(value: GroupProvider.initialize()),
         ChangeNotifierProvider.value(value: GroupNoticeProvider()),
-        ChangeNotifierProvider.value(value: SectionProvider()),
+        ChangeNotifierProvider.value(value: SectionProvider.initialize()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: WorkProvider()),
         ChangeNotifierProvider.value(value: WorkStateProvider()),
@@ -63,10 +63,10 @@ class MyApp extends StatelessWidget {
         home: SplashController(),
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
-          GroupInfoScreen.id: (context) => GroupInfoScreen(),
-          GroupNoticeScreen.id: (context) => GroupNoticeScreen(),
-          GroupSecurityScreen.id: (context) => GroupSecurityScreen(),
-          GroupWorkScreen.id: (context) => GroupWorkScreen(),
+          SettingInfoScreen.id: (context) => SettingInfoScreen(),
+          NoticeScreen.id: (context) => NoticeScreen(),
+          SettingSecurityScreen.id: (context) => SettingSecurityScreen(),
+          SettingWorkScreen.id: (context) => SettingWorkScreen(),
           SectionScreen.id: (context) => SectionScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),

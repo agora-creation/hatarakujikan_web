@@ -7,16 +7,16 @@ import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 
-class GroupSecurityPanel extends StatefulWidget {
+class SettingSecurityPanel extends StatefulWidget {
   final GroupProvider groupProvider;
 
-  GroupSecurityPanel({@required this.groupProvider});
+  SettingSecurityPanel({@required this.groupProvider});
 
   @override
-  _GroupSecurityPanelState createState() => _GroupSecurityPanelState();
+  _SettingSecurityPanelState createState() => _SettingSecurityPanelState();
 }
 
-class _GroupSecurityPanelState extends State<GroupSecurityPanel> {
+class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
   GoogleMapController mapController;
   bool qrSecurity;
   bool areaSecurity;

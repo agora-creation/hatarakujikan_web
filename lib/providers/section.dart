@@ -1,10 +1,117 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/section.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/section.dart';
+import 'package:hatarakujikan_web/services/user.dart';
+
+enum SectionStatus {
+  Uninitialized,
+  Authenticated,
+  Authenticating,
+  Unauthenticated
+}
 
 class SectionProvider with ChangeNotifier {
+  SectionStatus _status = SectionStatus.Uninitialized;
+  FirebaseAuth _auth;
+  User _fUser;
   SectionService _sectionService = SectionService();
+  UserService _userService = UserService();
+  List<SectionModel> _sections = [];
+  SectionModel _section;
+  UserModel _adminUser;
+
+  SectionStatus get status => _status;
+  User get fUser => _fUser;
+  List<SectionModel> get sections => _sections;
+  SectionModel get section => _section;
+  UserModel get adminUser => _adminUser;
+
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  SectionProvider.initialize() : _auth = FirebaseAuth.instance {
+    _auth.authStateChanges().listen(_onStateChanged);
+  }
+
+  Future<void> setSection(SectionModel section) async {
+    _sections.clear();
+    _section = section;
+    await setPrefs(key: 'sectionId', value: section.id);
+    notifyListeners();
+  }
+
+  Future<bool> signIn() async {
+    if (email.text == null) return false;
+    if (password.text == null) return false;
+    try {
+      _status = SectionStatus.Authenticating;
+      notifyListeners();
+      await _auth
+          .signInWithEmailAndPassword(
+        email: email.text.trim(),
+        password: password.text.trim(),
+      )
+          .then((value) async {
+        _sections.clear();
+        _sections = await _sectionService.selectList(
+          adminUserId: value.user.uid,
+        );
+      });
+      return true;
+    } catch (e) {
+      _status = SectionStatus.Unauthenticated;
+      notifyListeners();
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future signOut() async {
+    await _auth.signOut();
+    _status = SectionStatus.Unauthenticated;
+    _sections.clear();
+    _section = null;
+    await removePrefs(key: 'sectionId');
+    notifyListeners();
+    return Future.delayed(Duration.zero);
+  }
+
+  void clearController() {
+    email.text = '';
+    password.text = '';
+  }
+
+  Future reloadSectionModel() async {
+    String _sectionId = await getPrefs(key: 'sectionId');
+    if (_sectionId != '') {
+      _section = await _sectionService.select(sectionId: _sectionId);
+    }
+    _adminUser = await _userService.select(userId: _fUser.uid);
+    notifyListeners();
+  }
+
+  Future _onStateChanged(User firebaseUser) async {
+    if (firebaseUser == null) {
+      _status = SectionStatus.Unauthenticated;
+    } else {
+      _fUser = firebaseUser;
+      String _sectionId = await getPrefs(key: 'sectionId');
+      if (_sectionId == '') {
+        _status = SectionStatus.Unauthenticated;
+        _sections.clear();
+        _section = null;
+      } else {
+        _status = SectionStatus.Authenticated;
+        _sections.clear();
+        _section = await _sectionService.select(sectionId: _sectionId);
+      }
+      _adminUser = await _userService.select(userId: _fUser.uid);
+    }
+    notifyListeners();
+  }
 
   Future<bool> create({
     String groupId,
