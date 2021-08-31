@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -15,6 +16,7 @@ import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
 import 'package:hatarakujikan_web/screens/section/apply_work.dart';
+import 'package:hatarakujikan_web/screens/section/login.dart';
 import 'package:hatarakujikan_web/screens/section/setting_info.dart';
 import 'package:hatarakujikan_web/screens/section/user.dart';
 import 'package:hatarakujikan_web/screens/section/work.dart';
@@ -84,24 +86,70 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SplashController extends StatelessWidget {
+class SplashController extends StatefulWidget {
+  @override
+  State<SplashController> createState() => _SplashControllerState();
+}
+
+class _SplashControllerState extends State<SplashController> {
+  Widget _widget = SplashScreen();
+
+  void _init() async {
+    if (await getPrefs(key: 'groupId') != '') {
+      final groupProvider = Provider.of<GroupProvider>(context);
+      switch (groupProvider.status) {
+        case Status.Uninitialized:
+          _widget = SplashScreen();
+          break;
+        case Status.Unauthenticated:
+        case Status.Authenticating:
+          _widget = LoginScreen();
+          break;
+        case Status.Authenticated:
+          if (groupProvider.group == null) {
+            groupProvider.signOut();
+            _widget = LoginScreen();
+          } else {
+            _widget = WorkScreen();
+          }
+          break;
+        default:
+          _widget = LoginScreen();
+          break;
+      }
+    } else if (await getPrefs(key: 'sectionId') != '') {
+      final sectionProvider = Provider.of<SectionProvider>(context);
+      switch (sectionProvider.status) {
+        case SectionStatus.Uninitialized:
+          _widget = SplashScreen();
+          break;
+        case SectionStatus.Unauthenticated:
+        case SectionStatus.Authenticating:
+          _widget = SectionLoginScreen();
+          break;
+        case SectionStatus.Authenticated:
+          if (sectionProvider.section == null) {
+            sectionProvider.signOut();
+            _widget = SectionLoginScreen();
+          } else {
+            _widget = SectionWorkScreen();
+          }
+          break;
+        default:
+          _widget = SectionLoginScreen();
+          break;
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final groupProvider = Provider.of<GroupProvider>(context);
-    switch (groupProvider.status) {
-      case Status.Uninitialized:
-        return SplashScreen();
-      case Status.Unauthenticated:
-      case Status.Authenticating:
-        return LoginScreen();
-      case Status.Authenticated:
-        if (groupProvider.group == null) {
-          groupProvider.signOut();
-          return LoginScreen();
-        }
-        return WorkScreen();
-      default:
-        return LoginScreen();
-    }
+    return _widget;
   }
 }

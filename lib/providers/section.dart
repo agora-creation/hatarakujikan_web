@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/section.dart';
 import 'package:hatarakujikan_web/models/user.dart';
+import 'package:hatarakujikan_web/services/group.dart';
 import 'package:hatarakujikan_web/services/section.dart';
 import 'package:hatarakujikan_web/services/user.dart';
 
@@ -17,15 +19,18 @@ class SectionProvider with ChangeNotifier {
   SectionStatus _status = SectionStatus.Uninitialized;
   FirebaseAuth _auth;
   User _fUser;
+  GroupService _groupService = GroupService();
   SectionService _sectionService = SectionService();
   UserService _userService = UserService();
   List<SectionModel> _sections = [];
+  GroupModel _group;
   SectionModel _section;
   UserModel _adminUser;
 
   SectionStatus get status => _status;
   User get fUser => _fUser;
   List<SectionModel> get sections => _sections;
+  GroupModel get group => _group;
   SectionModel get section => _section;
   UserModel get adminUser => _adminUser;
 
@@ -39,6 +44,7 @@ class SectionProvider with ChangeNotifier {
   Future<void> setSection(SectionModel section) async {
     _sections.clear();
     _section = section;
+    _group = await _groupService.select(groupId: _section.groupId);
     await setPrefs(key: 'sectionId', value: section.id);
     notifyListeners();
   }
@@ -59,6 +65,7 @@ class SectionProvider with ChangeNotifier {
         _sections = await _sectionService.selectList(
           adminUserId: value.user.uid,
         );
+        _group = await _groupService.select(groupId: _sections.first.groupId);
       });
       return true;
     } catch (e) {
@@ -74,6 +81,7 @@ class SectionProvider with ChangeNotifier {
     _status = SectionStatus.Unauthenticated;
     _sections.clear();
     _section = null;
+    _group = null;
     await removePrefs(key: 'sectionId');
     notifyListeners();
     return Future.delayed(Duration.zero);
@@ -88,6 +96,7 @@ class SectionProvider with ChangeNotifier {
     String _sectionId = await getPrefs(key: 'sectionId');
     if (_sectionId != '') {
       _section = await _sectionService.select(sectionId: _sectionId);
+      _group = await _groupService.select(groupId: _section.groupId);
     }
     _adminUser = await _userService.select(userId: _fUser.uid);
     notifyListeners();
@@ -103,10 +112,12 @@ class SectionProvider with ChangeNotifier {
         _status = SectionStatus.Unauthenticated;
         _sections.clear();
         _section = null;
+        _group = null;
       } else {
         _status = SectionStatus.Authenticated;
         _sections.clear();
         _section = await _sectionService.select(sectionId: _sectionId);
+        _group = await _groupService.select(groupId: _section.groupId);
       }
       _adminUser = await _userService.select(userId: _fUser.uid);
     }
