@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/side_menu.dart';
-import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/login.dart';
+import 'package:hatarakujikan_web/providers/section.dart';
+import 'package:hatarakujikan_web/screens/section/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 
-class CustomAdminScaffold extends StatelessWidget {
-  final GroupProvider groupProvider;
+class CustomAdminScaffold2 extends StatelessWidget {
+  final SectionProvider sectionProvider;
   final String selectedRoute;
   final Widget body;
 
-  CustomAdminScaffold({
-    this.groupProvider,
+  CustomAdminScaffold2({
+    this.sectionProvider,
     this.selectedRoute,
     this.body,
   });
@@ -25,7 +25,7 @@ class CustomAdminScaffold extends StatelessWidget {
         backgroundColor: Colors.orange,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          groupProvider.group?.name ?? '',
+          sectionProvider.section?.name ?? '',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
@@ -36,11 +36,13 @@ class CustomAdminScaffold extends StatelessWidget {
                 showDialog(
                   barrierDismissible: false,
                   context: context,
-                  builder: (_) => SignOutDialog(groupProvider: groupProvider),
+                  builder: (_) => SignOutDialog(
+                    sectionProvider: sectionProvider,
+                  ),
                 );
               },
               color: Colors.grey,
-              label: '${groupProvider.adminUser?.name}がログイン中',
+              label: '${sectionProvider.adminUser?.name}がログイン中',
             ),
           ),
         ],
@@ -52,7 +54,7 @@ class CustomAdminScaffold extends StatelessWidget {
         activeBackgroundColor: Colors.white,
         activeIconColor: Colors.black54,
         activeTextStyle: TextStyle(color: Colors.black54, fontSize: 14.0),
-        items: kSideMenu,
+        items: kSideMenu2,
         selectedRoute: selectedRoute,
         onSelected: (item) {
           if (item.route != null) {
@@ -93,9 +95,9 @@ class CustomAdminScaffold extends StatelessWidget {
 }
 
 class SignOutDialog extends StatelessWidget {
-  final GroupProvider groupProvider;
+  final SectionProvider sectionProvider;
 
-  SignOutDialog({@required this.groupProvider});
+  SignOutDialog({@required this.sectionProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -120,9 +122,9 @@ class SignOutDialog extends StatelessWidget {
               ),
               CustomTextButton(
                 onPressed: () async {
-                  await groupProvider.signOut();
+                  await sectionProvider.signOut();
                   Navigator.pop(context);
-                  changeScreen(context, LoginScreen());
+                  changeScreen(context, SectionLoginScreen());
                 },
                 color: Colors.blue,
                 label: 'はい',

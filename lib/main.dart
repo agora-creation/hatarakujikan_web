@@ -14,6 +14,7 @@ import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
+import 'package:hatarakujikan_web/screens/section/work.dart';
 import 'package:hatarakujikan_web/screens/setting_info.dart';
 import 'package:hatarakujikan_web/screens/setting_security.dart';
 import 'package:hatarakujikan_web/screens/setting_work.dart';
@@ -70,6 +71,7 @@ class MyApp extends StatelessWidget {
           SectionScreen.id: (context) => SectionScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),
+          SectionWorkScreen.id: (context) => SectionWorkScreen(),
         },
       ),
     );

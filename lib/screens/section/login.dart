@@ -3,6 +3,7 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
+import 'package:hatarakujikan_web/screens/section/select.dart';
 import 'package:hatarakujikan_web/widgets/custom_link_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field.dart';
 import 'package:hatarakujikan_web/widgets/error_dialog.dart';
@@ -97,6 +98,12 @@ class SectionLoginScreen extends StatelessWidget {
                                 return;
                               }
                               sectionProvider.clearController();
+                              overlayScreen(
+                                context,
+                                SectionSelectScreen(
+                                  sectionProvider: sectionProvider,
+                                ),
+                              );
                             },
                             label: 'ログイン',
                             color: Colors.white,
