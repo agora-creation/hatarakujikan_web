@@ -3,8 +3,8 @@ import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold2.dart';
 import 'package:provider/provider.dart';
 
-class SectionUserScreen extends StatelessWidget {
-  static const String id = 'section_user';
+class SectionSettingInfoScreen extends StatelessWidget {
+  static const String id = 'section_setting_info';
 
   @override
   Widget build(BuildContext context) {

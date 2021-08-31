@@ -14,6 +14,9 @@ import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
+import 'package:hatarakujikan_web/screens/section/apply_work.dart';
+import 'package:hatarakujikan_web/screens/section/setting_info.dart';
+import 'package:hatarakujikan_web/screens/section/user.dart';
 import 'package:hatarakujikan_web/screens/section/work.dart';
 import 'package:hatarakujikan_web/screens/setting_info.dart';
 import 'package:hatarakujikan_web/screens/setting_security.dart';
@@ -64,13 +67,16 @@ class MyApp extends StatelessWidget {
         home: SplashController(),
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
-          SettingInfoScreen.id: (context) => SettingInfoScreen(),
           NoticeScreen.id: (context) => NoticeScreen(),
+          SectionScreen.id: (context) => SectionScreen(),
+          SettingInfoScreen.id: (context) => SettingInfoScreen(),
           SettingSecurityScreen.id: (context) => SettingSecurityScreen(),
           SettingWorkScreen.id: (context) => SettingWorkScreen(),
-          SectionScreen.id: (context) => SectionScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),
+          SectionApplyWorkScreen.id: (context) => SectionApplyWorkScreen(),
+          SectionSettingInfoScreen.id: (context) => SectionSettingInfoScreen(),
+          SectionUserScreen.id: (context) => SectionUserScreen(),
           SectionWorkScreen.id: (context) => SectionWorkScreen(),
         },
       ),
