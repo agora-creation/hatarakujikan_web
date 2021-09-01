@@ -56,7 +56,9 @@ class GroupProvider with ChangeNotifier {
       )
           .then((value) async {
         _groups.clear();
-        _groups = await _groupService.selectList(adminUserId: value.user.uid);
+        _groups = await _groupService.selectListAdminUser(
+          adminUserId: value.user.uid,
+        );
       });
       return true;
     } catch (e) {
@@ -85,9 +87,9 @@ class GroupProvider with ChangeNotifier {
   Future reloadGroupModel() async {
     String _groupId = await getPrefs(key: 'groupId');
     if (_groupId != '') {
-      _group = await _groupService.select(groupId: _groupId);
+      _group = await _groupService.select(id: _groupId);
     }
-    _adminUser = await _userService.select(userId: _fUser.uid);
+    _adminUser = await _userService.select(id: _fUser.uid);
     notifyListeners();
   }
 
@@ -104,9 +106,9 @@ class GroupProvider with ChangeNotifier {
       } else {
         _status = Status.Authenticated;
         _groups.clear();
-        _group = await _groupService.select(groupId: _groupId);
+        _group = await _groupService.select(id: _groupId);
       }
-      _adminUser = await _userService.select(userId: _fUser.uid);
+      _adminUser = await _userService.select(id: _fUser.uid);
     }
     notifyListeners();
   }

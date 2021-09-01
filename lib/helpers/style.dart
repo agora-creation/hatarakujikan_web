@@ -25,6 +25,17 @@ ThemeData theme() {
   );
 }
 
+const BoxDecoration kLoginDecoration = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFFFFb74D),
+      Color(0xFFFF9800),
+    ],
+  ),
+);
+
 const BoxDecoration kBottomBorderDecoration = BoxDecoration(
   border: Border(
     bottom: BorderSide(
@@ -77,3 +88,23 @@ const TextStyle kAdminSubTitleTextStyle = TextStyle(
   color: Colors.black45,
   fontSize: 16.0,
 );
+
+const TextStyle kListDayTextStyle = TextStyle(
+  color: Colors.black54,
+  fontSize: 15.0,
+);
+
+const TextStyle kListTimeTextStyle = TextStyle(
+  color: Colors.black87,
+  fontSize: 15.0,
+);
+
+const TextStyle kListTime2TextStyle = TextStyle(
+  color: Colors.transparent,
+  fontSize: 15.0,
+);
+
+DateTime kMonthFirstDate = DateTime(DateTime.now().year - 1);
+DateTime kMonthLastDate = DateTime(DateTime.now().year + 1);
+DateTime kDayFirstDate = DateTime.now().subtract(Duration(days: 365));
+DateTime kDayLastDate = DateTime.now().add(Duration(days: 365));

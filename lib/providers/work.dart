@@ -108,7 +108,7 @@ class WorkProvider with ChangeNotifier {
   }) async {
     List<WorkModel> _works = [];
     await _workService
-        .selectList(
+        .selectListStartEnd(
       groupId: groupId,
       userId: userId,
       startAt: startAt,

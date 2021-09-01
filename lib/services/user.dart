@@ -22,11 +22,11 @@ class UserService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<UserModel> select({String userId}) async {
+  Future<UserModel> select({String id}) async {
     UserModel _user;
     await _firebaseFirestore
         .collection(_collection)
-        .doc(userId)
+        .doc(id)
         .get()
         .then((value) {
       _user = UserModel.fromSnapshot(value);
@@ -34,7 +34,7 @@ class UserService {
     return _user;
   }
 
-  Future<List<UserModel>> selectList({String groupId}) async {
+  Future<List<UserModel>> selectListGroupId({String groupId}) async {
     List<UserModel> _users = [];
     await _firebaseFirestore
         .collection(_collection)
@@ -49,7 +49,7 @@ class UserService {
     return _users;
   }
 
-  Future<List<UserModel>> selectListSP({
+  Future<List<UserModel>> selectListGroupIdSP({
     String groupId,
     bool smartphone,
   }) async {
@@ -68,7 +68,7 @@ class UserService {
     return _users;
   }
 
-  Future<List<UserModel>> selectListSmartphone({
+  Future<List<UserModel>> selectListUserIdsSP({
     List<String> userIds,
     bool smartphone,
   }) async {
@@ -89,7 +89,7 @@ class UserService {
     return _users;
   }
 
-  Future<List<UserModel>> selectListNotice({
+  Future<List<UserModel>> selectListGroupIdNotice({
     String groupId,
     String noticeId,
   }) async {

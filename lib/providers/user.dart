@@ -90,7 +90,7 @@ class UserProvider with ChangeNotifier {
 
   Future<List<UserModel>> selectList({String groupId}) async {
     List<UserModel> _users = [];
-    await _userService.selectList(groupId: groupId).then((value) {
+    await _userService.selectListGroupId(groupId: groupId).then((value) {
       _users = value;
     });
     return _users;
@@ -102,7 +102,7 @@ class UserProvider with ChangeNotifier {
   }) async {
     List<UserModel> _users = [];
     await _userService
-        .selectListSP(
+        .selectListGroupIdSP(
       groupId: groupId,
       smartphone: smartphone,
     )
@@ -118,7 +118,7 @@ class UserProvider with ChangeNotifier {
   }) async {
     List<UserModel> _users = [];
     await _userService
-        .selectListSmartphone(
+        .selectListUserIdsSP(
       userIds: userIds,
       smartphone: smartphone,
     )
@@ -134,7 +134,7 @@ class UserProvider with ChangeNotifier {
   }) async {
     List<UserModel> _users = [];
     await _userService
-        .selectListNotice(
+        .selectListGroupIdNotice(
       groupId: groupId,
       noticeId: noticeId,
     )

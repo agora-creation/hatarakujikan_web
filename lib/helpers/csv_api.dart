@@ -80,17 +80,12 @@ Future<void> _works01({
     Map count = {};
     String time1 = '00:00';
     String time2 = '00:00';
-    List<WorkModel> _works = [];
-    await workProvider
-        .selectList(
+    List<WorkModel> _works = await workProvider.selectList(
       groupId: group.id,
       userId: _user.id,
       startAt: days.first,
       endAt: days.last,
-    )
-        .then((value) {
-      _works = value;
-    });
+    );
     for (WorkModel _work in _works) {
       if (_work.startedAt != _work.endedAt) {
         String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
@@ -187,14 +182,13 @@ Future<void> _works02({
         if (group.holidays.contains(_week)) {
           holidayCount[_key] = '';
         }
+        DateFormat _keyFormat = DateFormat('yyyyMMddHHmm');
         if (_work.overTimes(group).first != '00:00') {
-          String _key1 =
-              '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_1';
+          String _key1 = '${_keyFormat.format(_work.startedAt)}_1';
           overCount[_key1] = '';
         }
         if (_work.overTimes(group).last != '00:00') {
-          String _key2 =
-              '${DateFormat('yyyyMMddHHmm').format(_work.startedAt)}_2';
+          String _key2 = '${_keyFormat.format(_work.startedAt)}_2';
           overCount[_key2] = '';
         }
         workTime = addTime(workTime, _work.workTime(group));
@@ -211,14 +205,19 @@ Future<void> _works02({
     int overDays = overCount.length;
     for (WorkStateModel _workState in _workStates) {
       String _key = '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
-      if (_workState.state == '欠勤') {
-        state1Count[_key] = '';
-      } else if (_workState.state == '特別休暇') {
-        state2Count[_key] = '';
-      } else if (_workState.state == '有給休暇') {
-        state3Count[_key] = '';
-      } else if (_workState.state == '代休') {
-        state4Count[_key] = '';
+      switch (_workState.state) {
+        case '欠勤':
+          state1Count[_key] = '';
+          break;
+        case '特別休暇':
+          state2Count[_key] = '';
+          break;
+        case '有給休暇':
+          state3Count[_key] = '';
+          break;
+        case '代休':
+          state4Count[_key] = '';
+          break;
       }
     }
     int state1Days = state1Count.length;

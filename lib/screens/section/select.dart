@@ -74,7 +74,8 @@ class _SectionSelectScreenState extends State<SectionSelectScreen> {
                       Navigator.of(context, rootNavigator: true).pop();
                       changeScreen(context, SectionWorkScreen());
                     },
-                    title: Text('${_section.name}'),
+                    title: Text(
+                        '${widget.sectionProvider.group?.name} (${_section.name})'),
                     trailing: Icon(Icons.chevron_right),
                   ),
                 );

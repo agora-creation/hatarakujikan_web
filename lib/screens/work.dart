@@ -15,6 +15,7 @@ import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
@@ -68,15 +69,13 @@ class WorkTable extends StatefulWidget {
 }
 
 class _WorkTableState extends State<WorkTable> {
-  DateTime _firstDate = DateTime(DateTime.now().year - 1);
-  DateTime _lastDate = DateTime(DateTime.now().year + 1);
-  DateTime searchMonth = DateTime.now();
+  DateTime month = DateTime.now();
   List<UserModel> users = [];
-  UserModel searchUser;
+  UserModel user;
   List<DateTime> days = [];
 
   void _init() async {
-    setState(() => days = generateDays(searchMonth));
+    setState(() => days = generateDays(month));
     await widget.userProvider
         .selectList(groupId: widget.groupProvider.group?.id)
         .then((value) {
@@ -84,8 +83,8 @@ class _WorkTableState extends State<WorkTable> {
     });
   }
 
-  void searchUserChange(UserModel user) {
-    setState(() => searchUser = user);
+  void userChange(UserModel userModel) {
+    setState(() => user = userModel);
   }
 
   @override
@@ -97,21 +96,21 @@ class _WorkTableState extends State<WorkTable> {
   @override
   Widget build(BuildContext context) {
     Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-            '${DateFormat('yyyy-MM-dd').format(days.first)} 00:00:00.000')
-        .millisecondsSinceEpoch);
+      '${DateFormat('yyyy-MM-dd').format(days.first)} 00:00:00.000',
+    ).millisecondsSinceEpoch);
     Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-            '${DateFormat('yyyy-MM-dd').format(days.last)} 23:59:59.999')
-        .millisecondsSinceEpoch);
+      '${DateFormat('yyyy-MM-dd').format(days.last)} 23:59:59.999',
+    ).millisecondsSinceEpoch);
     Stream<QuerySnapshot> _streamWork = FirebaseFirestore.instance
         .collection('work')
-        .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-        .where('userId', isEqualTo: searchUser?.id ?? 'error')
+        .where('groupId', isEqualTo: widget.groupProvider.group?.id ?? 'error')
+        .where('userId', isEqualTo: user?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     Stream<QuerySnapshot> _streamWorkState = FirebaseFirestore.instance
         .collection('workState')
-        .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-        .where('userId', isEqualTo: searchUser?.id ?? 'error')
+        .where('groupId', isEqualTo: widget.groupProvider.group?.id ?? 'error')
+        .where('userId', isEqualTo: user?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     List<WorkModel> works = [];
@@ -138,19 +137,19 @@ class _WorkTableState extends State<WorkTable> {
                   onPressed: () async {
                     var selected = await showMonthPicker(
                       context: context,
-                      initialDate: searchMonth,
-                      firstDate: _firstDate,
-                      lastDate: _lastDate,
+                      initialDate: month,
+                      firstDate: kMonthFirstDate,
+                      lastDate: kMonthLastDate,
                     );
                     if (selected == null) return;
                     setState(() {
-                      searchMonth = selected;
-                      days = generateDays(searchMonth);
+                      month = selected;
+                      days = generateDays(month);
                     });
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.today,
-                  label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                  label: '${DateFormat('yyyy年MM月').format(month)}',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
@@ -160,14 +159,14 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => SearchUserDialog(
                         users: users,
-                        searchUser: searchUser,
-                        searchUserChange: searchUserChange,
+                        user: user,
+                        userChange: userChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.person,
-                  label: searchUser?.name ?? '選択してください',
+                  label: user?.name ?? '選択してください',
                 ),
               ],
             ),
@@ -182,7 +181,7 @@ class _WorkTableState extends State<WorkTable> {
                         workProvider: widget.workProvider,
                         workStateProvider: widget.workStateProvider,
                         group: widget.groupProvider.group,
-                        searchMonth: searchMonth,
+                        month: month,
                         users: users,
                       ),
                     );
@@ -201,9 +200,9 @@ class _WorkTableState extends State<WorkTable> {
                         workProvider: widget.workProvider,
                         workStateProvider: widget.workStateProvider,
                         group: widget.groupProvider.group,
-                        searchMonth: searchMonth,
+                        month: month,
                         users: users,
-                        searchUser: searchUser,
+                        user: user,
                       ),
                     );
                   },
@@ -222,7 +221,7 @@ class _WorkTableState extends State<WorkTable> {
                         workStateProvider: widget.workStateProvider,
                         groupId: widget.groupProvider.group?.id,
                         users: users,
-                        searchUser: searchUser,
+                        user: user,
                       ),
                     );
                   },
@@ -244,38 +243,38 @@ class _WorkTableState extends State<WorkTable> {
                 return Loading(color: Colors.orange);
               }
               works.clear();
-              for (DocumentSnapshot work in snapshot.item1.data.docs) {
-                works.add(WorkModel.fromSnapshot(work));
+              for (DocumentSnapshot doc in snapshot.item1.data.docs) {
+                works.add(WorkModel.fromSnapshot(doc));
               }
               workStates.clear();
-              for (DocumentSnapshot workState in snapshot.item2.data.docs) {
-                workStates.add(WorkStateModel.fromSnapshot(workState));
+              for (DocumentSnapshot doc in snapshot.item2.data.docs) {
+                workStates.add(WorkStateModel.fromSnapshot(doc));
               }
               return ListView.builder(
                 itemCount: days.length,
                 itemBuilder: (_, index) {
-                  List<WorkModel> _dayWorks = [];
+                  List<WorkModel> dayWorks = [];
                   for (WorkModel _work in works) {
-                    String _startedAt =
+                    String _start =
                         '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
-                    if (days[index] == DateTime.parse(_startedAt)) {
-                      _dayWorks.add(_work);
+                    if (days[index] == DateTime.parse(_start)) {
+                      dayWorks.add(_work);
                     }
                   }
-                  WorkStateModel _dayWorkState;
+                  WorkStateModel dayWorkState;
                   for (WorkStateModel _workState in workStates) {
-                    String _startedAt =
+                    String _start =
                         '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
-                    if (days[index] == DateTime.parse(_startedAt)) {
-                      _dayWorkState = _workState;
+                    if (days[index] == DateTime.parse(_start)) {
+                      dayWorkState = _workState;
                     }
                   }
                   return CustomWorkListTile(
                     workProvider: widget.workProvider,
                     workStateProvider: widget.workStateProvider,
                     day: days[index],
-                    works: _dayWorks,
-                    workState: _dayWorkState,
+                    dayWorks: dayWorks,
+                    dayWorkState: dayWorkState,
                     group: widget.groupProvider.group,
                   );
                 },
@@ -301,20 +300,17 @@ class _WorkTableState extends State<WorkTable> {
             }
             for (WorkModel _work in _worksTmp) {
               if (_work?.startedAt != _work?.endedAt) {
-                // 勤務日数
-                _count['${DateFormat('yyyy-MM-dd').format(_work?.startedAt)}'] =
-                    '';
-                // 勤務時間
+                String _key =
+                    '${DateFormat('yyyy-MM-dd').format(_work?.startedAt)}';
+                _count[_key] = '';
                 _workTime = addTime(
                   _workTime,
                   _work?.workTime(widget.groupProvider.group),
                 );
-                // 法定内時間/法定外時間
                 List<String> _legalTimes =
                     _work?.legalTimes(widget.groupProvider.group);
                 _legalTime = addTime(_legalTime, _legalTimes.first);
                 _nonLegalTime = addTime(_nonLegalTime, _legalTimes.last);
-                // 深夜時間
                 List<String> _nightTimes =
                     _work?.nightTimes(widget.groupProvider.group);
                 _nightTime = addTime(_nightTime, _nightTimes.last);
@@ -337,13 +333,13 @@ class _WorkTableState extends State<WorkTable> {
 
 class SearchUserDialog extends StatelessWidget {
   final List<UserModel> users;
-  final UserModel searchUser;
-  final Function searchUserChange;
+  final UserModel user;
+  final Function userChange;
 
   SearchUserDialog({
     @required this.users,
-    @required this.searchUser,
-    @required this.searchUserChange,
+    @required this.user,
+    @required this.userChange,
   });
 
   @override
@@ -370,18 +366,14 @@ class SearchUserDialog extends StatelessWidget {
                   itemCount: users.length,
                   itemBuilder: (_, index) {
                     UserModel _user = users[index];
-                    return Container(
-                      decoration: kBottomBorderDecoration,
-                      child: RadioListTile(
-                        title: Text('${_user.name}'),
-                        value: _user,
-                        groupValue: searchUser,
-                        activeColor: Colors.blue,
-                        onChanged: (value) {
-                          searchUserChange(value);
-                          Navigator.pop(context);
-                        },
-                      ),
+                    return CustomRadioListTile(
+                      onChanged: (value) {
+                        userChange(value);
+                        Navigator.pop(context);
+                      },
+                      label: '${_user.name}',
+                      value: _user,
+                      groupValue: user,
                     );
                   },
                 ),
@@ -415,14 +407,14 @@ class CsvDialog extends StatefulWidget {
   final WorkProvider workProvider;
   final WorkStateProvider workStateProvider;
   final GroupModel group;
-  final DateTime searchMonth;
+  final DateTime month;
   final List<UserModel> users;
 
   CsvDialog({
     @required this.workProvider,
     @required this.workStateProvider,
     @required this.group,
-    @required this.searchMonth,
+    @required this.month,
     @required this.users,
   });
 
@@ -431,9 +423,7 @@ class CsvDialog extends StatefulWidget {
 }
 
 class _CsvDialogState extends State<CsvDialog> {
-  DateTime _firstDate = DateTime(DateTime.now().year - 1);
-  DateTime _lastDate = DateTime(DateTime.now().year + 1);
-  DateTime searchMonth = DateTime.now();
+  DateTime month = DateTime.now();
   List<DateTime> days = [];
   bool _isLoading = false;
   String template;
@@ -441,9 +431,9 @@ class _CsvDialogState extends State<CsvDialog> {
   void _init() async {
     CsvApi.groupCheck(group: widget.group);
     setState(() {
-      searchMonth = widget.searchMonth;
+      month = widget.month;
       template = csvTemplates.first;
-      days = generateDays(searchMonth);
+      days = generateDays(month);
     });
   }
 
@@ -516,17 +506,17 @@ class _CsvDialogState extends State<CsvDialog> {
                         onPressed: () async {
                           var selected = await showMonthPicker(
                             context: context,
-                            initialDate: searchMonth,
-                            firstDate: _firstDate,
-                            lastDate: _lastDate,
+                            initialDate: month,
+                            firstDate: kMonthFirstDate,
+                            lastDate: kMonthLastDate,
                           );
                           if (selected == null) return;
                           setState(() {
-                            searchMonth = selected;
-                            days = generateDays(searchMonth);
+                            month = selected;
+                            days = generateDays(month);
                           });
                         },
-                        label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                        label: '${DateFormat('yyyy年MM月').format(month)}',
                       ),
                     ],
                   ),
@@ -547,7 +537,7 @@ class _CsvDialogState extends State<CsvDialog> {
                             workProvider: widget.workProvider,
                             workStateProvider: widget.workStateProvider,
                             group: widget.group,
-                            month: searchMonth,
+                            month: month,
                             users: widget.users,
                           );
                           setState(() => _isLoading = false);
@@ -569,17 +559,17 @@ class PdfDialog extends StatefulWidget {
   final WorkProvider workProvider;
   final WorkStateProvider workStateProvider;
   final GroupModel group;
-  final DateTime searchMonth;
+  final DateTime month;
   final List<UserModel> users;
-  final UserModel searchUser;
+  final UserModel user;
 
   PdfDialog({
     @required this.workProvider,
     @required this.workStateProvider,
     @required this.group,
-    @required this.searchMonth,
+    @required this.month,
     @required this.users,
-    @required this.searchUser,
+    @required this.user,
   });
 
   @override
@@ -587,19 +577,17 @@ class PdfDialog extends StatefulWidget {
 }
 
 class _PdfDialogState extends State<PdfDialog> {
-  DateTime _firstDate = DateTime(DateTime.now().year - 1);
-  DateTime _lastDate = DateTime(DateTime.now().year + 1);
   List<DateTime> days = [];
-  DateTime searchMonth = DateTime.now();
-  UserModel searchUser;
+  DateTime month = DateTime.now();
+  UserModel user;
   bool isAll = false;
   bool _isLoading = false;
 
   void _init() async {
     setState(() {
-      searchMonth = widget.searchMonth;
-      searchUser = widget.searchUser;
-      days = generateDays(searchMonth);
+      month = widget.month;
+      user = widget.user;
+      days = generateDays(month);
     });
   }
 
@@ -643,17 +631,17 @@ class _PdfDialogState extends State<PdfDialog> {
                         onPressed: () async {
                           var selected = await showMonthPicker(
                             context: context,
-                            initialDate: searchMonth,
-                            firstDate: _firstDate,
-                            lastDate: _lastDate,
+                            initialDate: month,
+                            firstDate: kMonthFirstDate,
+                            lastDate: kMonthLastDate,
                           );
                           if (selected == null) return;
                           setState(() {
-                            searchMonth = selected;
-                            days = generateDays(searchMonth);
+                            month = selected;
+                            days = generateDays(month);
                           });
                         },
-                        label: '${DateFormat('yyyy年MM月').format(searchMonth)}',
+                        label: '${DateFormat('yyyy年MM月').format(month)}',
                       ),
                     ],
                   ),
@@ -667,9 +655,9 @@ class _PdfDialogState extends State<PdfDialog> {
                       ),
                       CustomDropdownButton(
                         isExpanded: true,
-                        value: searchUser,
+                        value: user,
                         onChanged: (value) {
-                          setState(() => searchUser = value);
+                          setState(() => user = value);
                         },
                         items: widget.users.map((value) {
                           return DropdownMenuItem(
@@ -714,8 +702,8 @@ class _PdfDialogState extends State<PdfDialog> {
                             workProvider: widget.workProvider,
                             workStateProvider: widget.workStateProvider,
                             group: widget.group,
-                            month: searchMonth,
-                            user: searchUser,
+                            month: month,
+                            user: user,
                             isAll: isAll,
                             users: widget.users,
                           );
@@ -739,14 +727,14 @@ class AddWorkDialog extends StatefulWidget {
   final WorkStateProvider workStateProvider;
   final String groupId;
   final List<UserModel> users;
-  final UserModel searchUser;
+  final UserModel user;
 
   AddWorkDialog({
     @required this.workProvider,
     @required this.workStateProvider,
     @required this.groupId,
     @required this.users,
-    @required this.searchUser,
+    @required this.user,
   });
 
   @override
@@ -754,9 +742,7 @@ class AddWorkDialog extends StatefulWidget {
 }
 
 class _AddWorkDialogState extends State<AddWorkDialog> {
-  DateTime _firstDate = DateTime.now().subtract(Duration(days: 365));
-  DateTime _lastDate = DateTime.now().add(Duration(days: 365));
-  UserModel searchUser;
+  UserModel user;
   String state;
   DateTime startedAt = DateTime.now();
   DateTime endedAt = DateTime.now();
@@ -766,7 +752,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
 
   void _init() async {
     setState(() {
-      searchUser = widget.searchUser;
+      user = widget.user;
       state = widget.workStateProvider.states.first;
     });
   }
@@ -800,9 +786,9 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                 ),
                 CustomDropdownButton(
                   isExpanded: true,
-                  value: searchUser,
+                  value: user,
                   onChanged: (value) {
-                    setState(() => searchUser = value);
+                    setState(() => user = value);
                   },
                   items: widget.users.map((value) {
                     return DropdownMenuItem(
@@ -872,8 +858,8 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                     DateTime _selected = await showDatePicker(
                                       context: context,
                                       initialDate: startedAt,
-                                      firstDate: _firstDate,
-                                      lastDate: _lastDate,
+                                      firstDate: kDayFirstDate,
+                                      lastDate: kDayLastDate,
                                     );
                                     if (_selected != null) {
                                       String _date =
@@ -957,18 +943,18 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                               await showDatePicker(
                                             context: context,
                                             initialDate: breakStartedAt,
-                                            firstDate: _firstDate,
-                                            lastDate: _lastDate,
+                                            firstDate: kDayFirstDate,
+                                            lastDate: kDayLastDate,
                                           );
                                           if (_selected != null) {
                                             String _date =
                                                 '${DateFormat('yyyy-MM-dd').format(_selected)}';
                                             String _time =
                                                 '${DateFormat('HH:mm').format(breakStartedAt)}';
-                                            DateTime _datetime =
+                                            DateTime _dateTime =
                                                 DateTime.parse('$_date $_time');
                                             setState(() =>
-                                                breakStartedAt = _datetime);
+                                                breakStartedAt = _dateTime);
                                           }
                                         },
                                         label:
@@ -1027,8 +1013,8 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                               await showDatePicker(
                                             context: context,
                                             initialDate: breakEndedAt,
-                                            firstDate: _firstDate,
-                                            lastDate: _lastDate,
+                                            firstDate: kDayFirstDate,
+                                            lastDate: kDayLastDate,
                                           );
                                           if (_selected != null) {
                                             String _date =
@@ -1102,8 +1088,8 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                     DateTime _selected = await showDatePicker(
                                       context: context,
                                       initialDate: endedAt,
-                                      firstDate: _firstDate,
-                                      lastDate: _lastDate,
+                                      firstDate: kDayFirstDate,
+                                      lastDate: kDayLastDate,
                                     );
                                     if (_selected != null) {
                                       String _date =
@@ -1171,8 +1157,8 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                 DateTime _selected = await showDatePicker(
                                   context: context,
                                   initialDate: startedAt,
-                                  firstDate: _firstDate,
-                                  lastDate: _lastDate,
+                                  firstDate: kDayFirstDate,
+                                  lastDate: kDayLastDate,
                                 );
                                 if (_selected != null) {
                                   String _date =
@@ -1211,9 +1197,16 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                     if (state == '通常勤務' ||
                         state == '直行/直帰' ||
                         state == 'テレワーク') {
+                      if (startedAt == endedAt) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('出勤日時と退勤日時に同じ日時が入力されています')),
+                        );
+                        Navigator.pop(context);
+                        return;
+                      }
                       if (!await widget.workProvider.create(
                         groupId: widget.groupId,
-                        userId: searchUser?.id,
+                        userId: user?.id,
                         startedAt: startedAt,
                         endedAt: endedAt,
                         isBreaks: isBreaks,
@@ -1225,7 +1218,7 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                     } else {
                       if (!await widget.workStateProvider.create(
                         groupId: widget.groupId,
-                        userId: searchUser?.id,
+                        userId: user?.id,
                         startedAt: startedAt,
                         state: state,
                       )) {

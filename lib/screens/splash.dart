@@ -10,16 +10,7 @@ class SplashScreen extends StatelessWidget {
         child: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFFFFb74D),
-                Color(0xFFFF9800),
-              ],
-            ),
-          ),
+          decoration: kLoginDecoration,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

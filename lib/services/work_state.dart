@@ -37,7 +37,7 @@ class WorkStateService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<List<WorkStateModel>> selectList({
+  Future<List<WorkStateModel>> selectListStartEnd({
     String groupId,
     String userId,
     DateTime startAt,

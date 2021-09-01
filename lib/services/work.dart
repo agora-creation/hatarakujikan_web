@@ -37,11 +37,11 @@ class WorkService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<WorkModel> select({String workId}) async {
+  Future<WorkModel> select({String id}) async {
     WorkModel _work;
     await _firebaseFirestore
         .collection(_collection)
-        .doc(workId)
+        .doc(id)
         .get()
         .then((value) {
       _work = WorkModel.fromSnapshot(value);
@@ -49,7 +49,7 @@ class WorkService {
     return _work;
   }
 
-  Future<List<WorkModel>> selectList({
+  Future<List<WorkModel>> selectListStartEnd({
     String groupId,
     String userId,
     DateTime startAt,
@@ -57,11 +57,11 @@ class WorkService {
   }) async {
     List<WorkModel> _works = [];
     Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-            '${DateFormat('yyyy-MM-dd').format(startAt)} 00:00:00.000')
-        .millisecondsSinceEpoch);
-    Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(
-        DateTime.parse('${DateFormat('yyyy-MM-dd').format(endAt)} 23:59:59.999')
-            .millisecondsSinceEpoch);
+      '${DateFormat('yyyy-MM-dd').format(startAt)} 00:00:00.000',
+    ).millisecondsSinceEpoch);
+    Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
+      '${DateFormat('yyyy-MM-dd').format(endAt)} 23:59:59.999',
+    ).millisecondsSinceEpoch);
     await _firebaseFirestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)

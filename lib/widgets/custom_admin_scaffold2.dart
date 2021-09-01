@@ -25,7 +25,7 @@ class CustomAdminScaffold2 extends StatelessWidget {
         backgroundColor: Colors.orange,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          sectionProvider.section?.name ?? '',
+          '${sectionProvider.group?.name} (${sectionProvider.section?.name})',
           style: TextStyle(color: Colors.white),
         ),
         actions: [

@@ -22,11 +22,11 @@ class SectionService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<SectionModel> select({String sectionId}) async {
+  Future<SectionModel> select({String id}) async {
     SectionModel _section;
     await _firebaseFirestore
         .collection(_collection)
-        .doc(sectionId)
+        .doc(id)
         .get()
         .then((value) {
       _section = SectionModel.fromSnapshot(value);
@@ -34,7 +34,7 @@ class SectionService {
     return _section;
   }
 
-  Future<List<SectionModel>> selectList({String adminUserId}) async {
+  Future<List<SectionModel>> selectListAdminUser({String adminUserId}) async {
     List<SectionModel> _sections = [];
     await _firebaseFirestore
         .collection(_collection)

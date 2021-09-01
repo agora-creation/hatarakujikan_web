@@ -16,182 +16,136 @@ class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
   final WorkStateProvider workStateProvider;
   final DateTime day;
-  final List<WorkModel> works;
-  final WorkStateModel workState;
+  final List<WorkModel> dayWorks;
+  final WorkStateModel dayWorkState;
   final GroupModel group;
 
   CustomWorkListTile({
     this.workProvider,
     this.workStateProvider,
     this.day,
-    this.works,
-    this.workState,
+    this.dayWorks,
+    this.dayWorkState,
     this.group,
   });
 
   @override
   Widget build(BuildContext context) {
     Color _chipColor = Colors.grey.shade300;
-    if (workState?.state == '欠勤') {
-      _chipColor = Colors.red.shade300;
-    } else if (workState?.state == '特別休暇') {
-      _chipColor = Colors.green.shade300;
-    } else if (workState?.state == '有給休暇') {
-      _chipColor = Colors.teal.shade300;
-    } else if (workState?.state == '代休') {
-      _chipColor = Colors.pink.shade300;
+    switch (dayWorkState?.state) {
+      case '欠勤':
+        _chipColor = Colors.red.shade300;
+        break;
+      case '特別休暇':
+        _chipColor = Colors.green.shade300;
+        break;
+      case '有給休暇':
+        _chipColor = Colors.teal.shade300;
+        break;
+      case '代休':
+        _chipColor = Colors.pink.shade300;
+        break;
     }
-
     return Container(
       decoration: kBottomBorderDecoration,
       child: ListTile(
         leading: Text(
           '${DateFormat('dd (E)', 'ja').format(day)}',
-          style: TextStyle(
-            color: Colors.black54,
-            fontSize: 15.0,
-          ),
+          style: kListDayTextStyle,
         ),
-        title: works.length > 0
+        title: dayWorks.length > 0
             ? ListView.separated(
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 separatorBuilder: (_, index) => Divider(height: 0.0),
-                itemCount: works.length,
+                itemCount: dayWorks.length,
                 itemBuilder: (_, index) {
-                  WorkModel _work = works[index];
-                  String _startTime = _work.startTime(group);
-                  String _endTime = '00:00';
-                  String _breakTime = '00:00';
-                  String _workTime = '00:00';
-                  String _legalTime = '00:00';
-                  String _nonLegalTime = '00:00';
-                  String _nightTime = '00:00';
+                  WorkModel _work = dayWorks[index];
                   if (_work.startedAt != _work.endedAt) {
-                    _endTime = _work.endTime(group);
-                    _breakTime = _work.breakTimes(group)[0];
-                    _workTime = _work.workTime(group);
+                    String _startTime = _work.startTime(group);
+                    String _endTime = _work.endTime(group);
+                    String _breakTime = _work.breakTimes(group)[0];
+                    String _workTime = _work.workTime(group);
                     List<String> _legalTimes = _work.legalTimes(group);
-                    _legalTime = _legalTimes.first;
-                    _nonLegalTime = _legalTimes.last;
+                    String _legalTime = _legalTimes.first;
+                    String _nonLegalTime = _legalTimes.last;
                     List<String> _nightTimes = _work.nightTimes(group);
-                    _nightTime = _nightTimes.last;
-                  }
-                  return ListTile(
-                    leading: Chip(
-                      backgroundColor: _chipColor,
-                      label: Text(
-                        '${_work.state}',
-                        style: TextStyle(fontSize: 12.0),
+                    String _nightTime = _nightTimes.last;
+                    return ListTile(
+                      leading: Chip(
+                        backgroundColor: _chipColor,
+                        label: Text(
+                          '${_work.state}',
+                          style: TextStyle(fontSize: 12.0),
+                        ),
                       ),
-                    ),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _startTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _startTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        Text(
-                          _endTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                          Text(
+                            _endTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        Text(
-                          _breakTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                          Text(
+                            _breakTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        Text(
-                          _workTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                          Text(
+                            _workTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        Text(
-                          _legalTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                          Text(
+                            _legalTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        Text(
-                          _nonLegalTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                          Text(
+                            _nonLegalTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        Text(
-                          _nightTime,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15.0,
+                          Text(
+                            _nightTime,
+                            style: kListTimeTextStyle,
                           ),
-                        ),
-                        _work.startedAt != _work.endedAt
-                            ? IconButton(
-                                onPressed: () => showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (_) => EditWorkDialog(
-                                    workProvider: workProvider,
-                                    work: _work,
-                                    group: group,
-                                  ),
-                                ),
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.blue,
-                                ),
-                              )
-                            : IconButton(
-                                onPressed: null,
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.transparent,
-                                ),
+                          IconButton(
+                            onPressed: () => showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditWorkDialog(
+                                workProvider: workProvider,
+                                work: _work,
+                                group: group,
                               ),
-                        _work.startedAt != _work.endedAt
-                            ? IconButton(
-                                onPressed: () => showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (_) => LocationWorkDialog(
-                                    work: _work,
-                                  ),
-                                ),
-                                icon: Icon(
-                                  Icons.location_on,
-                                  color: Colors.blue,
-                                ),
-                              )
-                            : IconButton(
-                                onPressed: null,
-                                icon: Icon(
-                                  Icons.location_on,
-                                  color: Colors.transparent,
-                                ),
+                            ),
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                          ),
+                          IconButton(
+                            onPressed: () => showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => LocationWorkDialog(
+                                work: _work,
                               ),
-                      ],
-                    ),
-                  );
+                            ),
+                            icon: Icon(Icons.location_on, color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Container();
+                  }
                 },
               )
-            : workState != null
+            : dayWorkState != null
                 ? ListTile(
                     leading: Chip(
                       backgroundColor: _chipColor,
                       label: Text(
-                        '${workState.state}',
+                        '${dayWorkState.state}',
                         style: TextStyle(fontSize: 12.0),
                       ),
                     ),
@@ -200,52 +154,31 @@ class CustomWorkListTile extends StatelessWidget {
                       children: [
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         Text(
                           '00:00',
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 15.0,
-                          ),
+                          style: kListTime2TextStyle,
                         ),
                         IconButton(
                           onPressed: () => showDialog(
@@ -253,13 +186,10 @@ class CustomWorkListTile extends StatelessWidget {
                             context: context,
                             builder: (_) => EditWorkStateDialog(
                               workStateProvider: workStateProvider,
-                              workState: workState,
+                              workState: dayWorkState,
                             ),
                           ),
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.blue,
-                          ),
+                          icon: Icon(Icons.edit, color: Colors.blue),
                         ),
                         IconButton(
                           onPressed: null,
@@ -293,8 +223,6 @@ class EditWorkDialog extends StatefulWidget {
 }
 
 class _EditWorkDialogState extends State<EditWorkDialog> {
-  DateTime _firstDate = DateTime.now().subtract(Duration(days: 365));
-  DateTime _lastDate = DateTime.now().add(Duration(days: 365));
   WorkModel work;
   bool isBreaks = false;
   DateTime breakStartedAt = DateTime.now();
@@ -365,8 +293,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                           DateTime _selected = await showDatePicker(
                             context: context,
                             initialDate: work.startedAt,
-                            firstDate: _firstDate,
-                            lastDate: _lastDate,
+                            firstDate: kDayFirstDate,
+                            lastDate: kDayLastDate,
                           );
                           if (_selected != null) {
                             String _date =
@@ -442,8 +370,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                     DateTime _selected = await showDatePicker(
                                       context: context,
                                       initialDate: _breaks.startedAt,
-                                      firstDate: _firstDate,
-                                      lastDate: _lastDate,
+                                      firstDate: kDayFirstDate,
+                                      lastDate: kDayLastDate,
                                     );
                                     if (_selected != null) {
                                       String _date =
@@ -510,8 +438,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                     DateTime _selected = await showDatePicker(
                                       context: context,
                                       initialDate: _breaks.endedAt,
-                                      firstDate: _firstDate,
-                                      lastDate: _lastDate,
+                                      firstDate: kDayFirstDate,
+                                      lastDate: kDayLastDate,
                                     );
                                     if (_selected != null) {
                                       String _date =
@@ -601,18 +529,18 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                               await showDatePicker(
                                             context: context,
                                             initialDate: breakStartedAt,
-                                            firstDate: _firstDate,
-                                            lastDate: _lastDate,
+                                            firstDate: kDayFirstDate,
+                                            lastDate: kDayLastDate,
                                           );
                                           if (_selected != null) {
                                             String _date =
                                                 '${DateFormat('yyyy-MM-dd').format(_selected)}';
                                             String _time =
                                                 '${DateFormat('HH:mm').format(breakStartedAt)}';
-                                            DateTime _datetime =
+                                            DateTime _dateTime =
                                                 DateTime.parse('$_date $_time');
                                             setState(() =>
-                                                breakStartedAt = _datetime);
+                                                breakStartedAt = _dateTime);
                                           }
                                         },
                                         label:
@@ -641,10 +569,10 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                                 '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
                                             String _time =
                                                 '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                            DateTime _datetime =
+                                            DateTime _dateTime =
                                                 DateTime.parse('$_date $_time');
                                             setState(() =>
-                                                breakStartedAt = _datetime);
+                                                breakStartedAt = _dateTime);
                                           }
                                         },
                                         label:
@@ -671,8 +599,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                               await showDatePicker(
                                             context: context,
                                             initialDate: breakEndedAt,
-                                            firstDate: _firstDate,
-                                            lastDate: _lastDate,
+                                            firstDate: kDayFirstDate,
+                                            lastDate: kDayLastDate,
                                           );
                                           if (_selected != null) {
                                             String _date =
@@ -748,8 +676,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                           DateTime _selected = await showDatePicker(
                             context: context,
                             initialDate: work.endedAt,
-                            firstDate: _firstDate,
-                            lastDate: _lastDate,
+                            firstDate: kDayFirstDate,
+                            lastDate: kDayLastDate,
                           );
                           if (_selected != null) {
                             String _date =
@@ -1130,16 +1058,20 @@ class EditWorkStateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color _chipColor = Colors.grey.shade300;
-    if (workState.state == '欠勤') {
-      _chipColor = Colors.red.shade300;
-    } else if (workState.state == '特別休暇') {
-      _chipColor = Colors.green.shade300;
-    } else if (workState.state == '有給休暇') {
-      _chipColor = Colors.teal.shade300;
-    } else if (workState.state == '代休') {
-      _chipColor = Colors.pink.shade300;
+    switch (workState.state) {
+      case '欠勤':
+        _chipColor = Colors.red.shade300;
+        break;
+      case '特別休暇':
+        _chipColor = Colors.green.shade300;
+        break;
+      case '有給休暇':
+        _chipColor = Colors.teal.shade300;
+        break;
+      case '代休':
+        _chipColor = Colors.pink.shade300;
+        break;
     }
-
     return AlertDialog(
       content: Container(
         width: 450.0,

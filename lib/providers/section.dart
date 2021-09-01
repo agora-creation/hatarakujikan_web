@@ -44,7 +44,7 @@ class SectionProvider with ChangeNotifier {
   Future<void> setSection(SectionModel section) async {
     _sections.clear();
     _section = section;
-    _group = await _groupService.select(groupId: _section.groupId);
+    _group = await _groupService.select(id: _section.groupId);
     await setPrefs(key: 'sectionId', value: section.id);
     notifyListeners();
   }
@@ -62,10 +62,10 @@ class SectionProvider with ChangeNotifier {
       )
           .then((value) async {
         _sections.clear();
-        _sections = await _sectionService.selectList(
+        _sections = await _sectionService.selectListAdminUser(
           adminUserId: value.user.uid,
         );
-        _group = await _groupService.select(groupId: _sections.first.groupId);
+        _group = await _groupService.select(id: _sections.first.groupId);
       });
       return true;
     } catch (e) {
@@ -95,10 +95,10 @@ class SectionProvider with ChangeNotifier {
   Future reloadSectionModel() async {
     String _sectionId = await getPrefs(key: 'sectionId');
     if (_sectionId != '') {
-      _section = await _sectionService.select(sectionId: _sectionId);
-      _group = await _groupService.select(groupId: _section.groupId);
+      _section = await _sectionService.select(id: _sectionId);
+      _group = await _groupService.select(id: _section.groupId);
     }
-    _adminUser = await _userService.select(userId: _fUser.uid);
+    _adminUser = await _userService.select(id: _fUser.uid);
     notifyListeners();
   }
 
@@ -116,10 +116,10 @@ class SectionProvider with ChangeNotifier {
       } else {
         _status = SectionStatus.Authenticated;
         _sections.clear();
-        _section = await _sectionService.select(sectionId: _sectionId);
-        _group = await _groupService.select(groupId: _section.groupId);
+        _section = await _sectionService.select(id: _sectionId);
+        _group = await _groupService.select(id: _section.groupId);
       }
-      _adminUser = await _userService.select(userId: _fUser.uid);
+      _adminUser = await _userService.select(id: _fUser.uid);
     }
     notifyListeners();
   }
