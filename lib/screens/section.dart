@@ -7,7 +7,6 @@ import 'package:hatarakujikan_web/models/section.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
-import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -25,7 +24,6 @@ class SectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
     final sectionProvider = Provider.of<SectionProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -33,7 +31,6 @@ class SectionScreen extends StatelessWidget {
       body: SectionTable(
         groupProvider: groupProvider,
         sectionProvider: sectionProvider,
-        userProvider: userProvider,
       ),
     );
   }
@@ -42,12 +39,10 @@ class SectionScreen extends StatelessWidget {
 class SectionTable extends StatefulWidget {
   final GroupProvider groupProvider;
   final SectionProvider sectionProvider;
-  final UserProvider userProvider;
 
   SectionTable({
     @required this.groupProvider,
     @required this.sectionProvider,
-    @required this.userProvider,
   });
 
   @override
@@ -55,26 +50,11 @@ class SectionTable extends StatefulWidget {
 }
 
 class _SectionTableState extends State<SectionTable> {
-  List<UserModel> users = [];
-
-  void _init() async {
-    String _groupId = widget.groupProvider.group?.id;
-    await widget.userProvider.selectList(groupId: _groupId).then((value) {
-      setState(() => users = value);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
         .collection('section')
-        .where('groupId', isEqualTo: widget.groupProvider.group?.id)
+        .where('groupId', isEqualTo: widget.groupProvider.group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     List<SectionModel> sections = [];
@@ -121,8 +101,8 @@ class _SectionTableState extends State<SectionTable> {
                 return Loading(color: Colors.orange);
               }
               sections.clear();
-              for (DocumentSnapshot section in snapshot.data.docs) {
-                sections.add(SectionModel.fromSnapshot(section));
+              for (DocumentSnapshot doc in snapshot.data.docs) {
+                sections.add(SectionModel.fromSnapshot(doc));
               }
               if (sections.length > 0) {
                 return DataTable2(
@@ -141,7 +121,8 @@ class _SectionTableState extends State<SectionTable> {
                       if (sections[index].userIds != null) {
                         for (String _id in sections[index].userIds) {
                           if (_sectionUsers != '') _sectionUsers += ',';
-                          UserModel _user = users.singleWhere(
+                          UserModel _user =
+                              widget.groupProvider.users.singleWhere(
                             (e) => e.id == _id,
                           );
                           _sectionUsers += _user.name;
@@ -149,12 +130,12 @@ class _SectionTableState extends State<SectionTable> {
                       }
                       String _sectionAdminUser = '';
                       if (sections[index].adminUserId != '') {
-                        UserModel _user = users.singleWhere(
+                        UserModel _user =
+                            widget.groupProvider.users.singleWhere(
                           (e) => e.id == sections[index].adminUserId,
                         );
                         _sectionAdminUser = _user.name;
                       }
-
                       return DataRow(
                         cells: [
                           DataCell(Text('${sections[index].name}')),
@@ -182,8 +163,8 @@ class _SectionTableState extends State<SectionTable> {
                                 barrierDismissible: false,
                                 context: context,
                                 builder: (_) => UserSectionDialog(
+                                  groupProvider: widget.groupProvider,
                                   sectionProvider: widget.sectionProvider,
-                                  userProvider: widget.userProvider,
                                   section: sections[index],
                                 ),
                               );
@@ -196,8 +177,8 @@ class _SectionTableState extends State<SectionTable> {
                                 barrierDismissible: false,
                                 context: context,
                                 builder: (_) => AdminUserSectionDialog(
+                                  groupProvider: widget.groupProvider,
                                   sectionProvider: widget.sectionProvider,
-                                  userProvider: widget.userProvider,
                                   section: sections[index],
                                 ),
                               );
@@ -315,9 +296,7 @@ class _EditSectionDialogState extends State<EditSectionDialog> {
   TextEditingController name = TextEditingController();
 
   void _init() async {
-    setState(() {
-      name.text = widget.section?.name;
-    });
+    name.text = widget.section?.name;
   }
 
   @override
@@ -377,7 +356,7 @@ class _EditSectionDialogState extends State<EditSectionDialog> {
                     CustomTextButton(
                       onPressed: () async {
                         if (!await widget.sectionProvider.update(
-                          section: widget.section,
+                          id: widget.section?.id,
                           name: name.text.trim(),
                         )) {
                           return;
@@ -402,13 +381,13 @@ class _EditSectionDialogState extends State<EditSectionDialog> {
 }
 
 class UserSectionDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final SectionProvider sectionProvider;
-  final UserProvider userProvider;
   final SectionModel section;
 
   UserSectionDialog({
+    @required this.groupProvider,
     @required this.sectionProvider,
-    @required this.userProvider,
     @required this.section,
   });
 
@@ -418,19 +397,13 @@ class UserSectionDialog extends StatefulWidget {
 
 class _UserSectionDialogState extends State<UserSectionDialog> {
   final ScrollController _scrollController = ScrollController();
-  List<UserModel> _users = [];
   List<UserModel> _selected = [];
 
   void _init() async {
-    await widget.userProvider
-        .selectList(
-      groupId: widget.section?.groupId,
-    )
-        .then((value) {
-      setState(() => _users = value);
-    });
     for (String _id in widget.section?.userIds) {
-      UserModel _user = _users.singleWhere((e) => e.id == _id);
+      UserModel _user = widget.groupProvider.users.singleWhere(
+        (e) => e.id == _id,
+      );
       _selected.add(_user);
     }
   }
@@ -480,9 +453,9 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   controller: _scrollController,
-                  itemCount: _users.length,
+                  itemCount: widget.groupProvider.users.length,
                   itemBuilder: (_, index) {
-                    UserModel _user = _users[index];
+                    UserModel _user = widget.groupProvider.users[index];
                     var contain = _selected.where((e) => e.id == _user.id);
                     return CustomCheckboxListTile(
                       onChanged: (value) {
@@ -538,13 +511,13 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
 }
 
 class AdminUserSectionDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final SectionProvider sectionProvider;
-  final UserProvider userProvider;
   final SectionModel section;
 
   AdminUserSectionDialog({
+    @required this.groupProvider,
     @required this.sectionProvider,
-    @required this.userProvider,
     @required this.section,
   });
 
@@ -553,22 +526,11 @@ class AdminUserSectionDialog extends StatefulWidget {
 }
 
 class _AdminUserSectionDialogState extends State<AdminUserSectionDialog> {
-  List<UserModel> _users = [];
   UserModel _selected;
 
   void _init() async {
-    if (widget.section.userIds.length > 0) {
-      await widget.userProvider
-          .selectListSmartphone(
-        userIds: widget.section?.userIds,
-        smartphone: true,
-      )
-          .then((value) {
-        setState(() => _users = value);
-      });
-    }
     if (widget.section?.adminUserId != '') {
-      _selected = _users.singleWhere(
+      _selected = widget.groupProvider.users.singleWhere(
         (e) => e.id == widget.section?.adminUserId,
       );
     }
@@ -613,14 +575,14 @@ class _AdminUserSectionDialogState extends State<AdminUserSectionDialog> {
                   '管理者を選ぶ',
                   style: TextStyle(color: Colors.black54, fontSize: 14.0),
                 ),
-                _users.length > 0
+                widget.groupProvider.users.length > 0
                     ? CustomDropdownButton(
                         isExpanded: true,
                         value: _selected,
                         onChanged: (value) {
                           setState(() => _selected = value);
                         },
-                        items: _users.map((value) {
+                        items: widget.groupProvider.users.map((value) {
                           return DropdownMenuItem(
                             value: value,
                             child: Text(

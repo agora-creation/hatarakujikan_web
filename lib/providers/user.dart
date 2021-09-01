@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
+import 'package:hatarakujikan_web/services/group.dart';
 import 'package:hatarakujikan_web/services/user.dart';
 import 'package:hatarakujikan_web/services/work.dart';
 
 class UserProvider with ChangeNotifier {
+  GroupService _groupService = GroupService();
   UserService _userService = UserService();
   WorkService _workService = WorkService();
 
   Future<bool> create({
-    GroupModel group,
-    int usersLen,
     String name,
     String recordPassword,
+    GroupModel group,
   }) async {
-    if (group == null) return false;
-    if (group.usersNum < usersLen) return false;
     if (name == '') return false;
+    if (group == null) return false;
     try {
       String _id = _userService.id();
       List<String> _groups = [];
@@ -35,6 +35,13 @@ class UserProvider with ChangeNotifier {
         'token': '',
         'smartphone': false,
         'createdAt': DateTime.now(),
+      });
+      List<String> _userIds = [];
+      _userIds = group.userIds;
+      _userIds.add(_id);
+      _groupService.update({
+        'id': group.id,
+        'userIds': _userIds,
       });
       return true;
     } catch (e) {
@@ -61,8 +68,18 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  void delete({UserModel user}) {
-    _userService.delete({'id': user?.id});
+  void delete({
+    UserModel user,
+    GroupModel group,
+  }) {
+    _userService.delete({'id': user.id});
+    List<String> _userIds = [];
+    _userIds = group.userIds;
+    _userIds.remove(user.id);
+    _groupService.update({
+      'id': group.id,
+      'userIds': _userIds,
+    });
   }
 
   Future<bool> migration({

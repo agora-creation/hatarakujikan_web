@@ -59,11 +59,11 @@ class GroupNoticeProvider with ChangeNotifier {
   }
 
   Future<bool> send({
-    List<UserModel> users,
     String id,
     String groupId,
     String title,
     String message,
+    List<UserModel> users,
   }) async {
     try {
       for (UserModel _user in users) {

@@ -54,24 +54,22 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
   List<String> holidays;
 
   void _init() async {
-    setState(() {
-      roundStartType = widget.groupProvider.group?.roundStartType;
-      roundStartNum = widget.groupProvider.group?.roundStartNum;
-      roundEndType = widget.groupProvider.group?.roundEndType;
-      roundEndNum = widget.groupProvider.group?.roundEndNum;
-      roundBreakStartType = widget.groupProvider.group?.roundBreakStartType;
-      roundBreakStartNum = widget.groupProvider.group?.roundBreakStartNum;
-      roundBreakEndType = widget.groupProvider.group?.roundBreakEndType;
-      roundBreakEndNum = widget.groupProvider.group?.roundBreakEndNum;
-      roundWorkType = widget.groupProvider.group?.roundWorkType;
-      roundWorkNum = widget.groupProvider.group?.roundWorkNum;
-      legal = widget.groupProvider.group?.legal;
-      nightStart = widget.groupProvider.group?.nightStart;
-      nightEnd = widget.groupProvider.group?.nightEnd;
-      workStart = widget.groupProvider.group?.workStart;
-      workEnd = widget.groupProvider.group?.workEnd;
-      holidays = widget.groupProvider.group?.holidays;
-    });
+    roundStartType = widget.groupProvider.group?.roundStartType;
+    roundStartNum = widget.groupProvider.group?.roundStartNum;
+    roundEndType = widget.groupProvider.group?.roundEndType;
+    roundEndNum = widget.groupProvider.group?.roundEndNum;
+    roundBreakStartType = widget.groupProvider.group?.roundBreakStartType;
+    roundBreakStartNum = widget.groupProvider.group?.roundBreakStartNum;
+    roundBreakEndType = widget.groupProvider.group?.roundBreakEndType;
+    roundBreakEndNum = widget.groupProvider.group?.roundBreakEndNum;
+    roundWorkType = widget.groupProvider.group?.roundWorkType;
+    roundWorkNum = widget.groupProvider.group?.roundWorkNum;
+    legal = widget.groupProvider.group?.legal;
+    nightStart = widget.groupProvider.group?.nightStart;
+    nightEnd = widget.groupProvider.group?.nightEnd;
+    workStart = widget.groupProvider.group?.workStart;
+    workEnd = widget.groupProvider.group?.workEnd;
+    holidays = widget.groupProvider.group?.holidays;
   }
 
   @override

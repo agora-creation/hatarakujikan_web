@@ -65,15 +65,17 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
     if (user != null) {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
-          .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-          .where('userId', isEqualTo: user?.id)
+          .where('groupId',
+              isEqualTo: widget.groupProvider.group?.id ?? 'error')
+          .where('userId', isEqualTo: user?.id ?? 'error')
           .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     } else {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
-          .where('groupId', isEqualTo: widget.groupProvider.group?.id)
+          .where('groupId',
+              isEqualTo: widget.groupProvider.group?.id ?? 'error')
           .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();

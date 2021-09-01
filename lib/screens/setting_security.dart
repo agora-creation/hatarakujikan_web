@@ -42,13 +42,11 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
   double areaRange;
 
   void _init() async {
-    setState(() {
-      qrSecurity = widget.groupProvider.group?.qrSecurity;
-      areaSecurity = widget.groupProvider.group?.areaSecurity;
-      areaLat = widget.groupProvider.group?.areaLat;
-      areaLon = widget.groupProvider.group?.areaLon;
-      areaRange = widget.groupProvider.group?.areaRange;
-    });
+    qrSecurity = widget.groupProvider.group?.qrSecurity;
+    areaSecurity = widget.groupProvider.group?.areaSecurity;
+    areaLat = widget.groupProvider.group?.areaLat;
+    areaLon = widget.groupProvider.group?.areaLon;
+    areaRange = widget.groupProvider.group?.areaRange;
   }
 
   void _onMapCreated(GoogleMapController controller) {

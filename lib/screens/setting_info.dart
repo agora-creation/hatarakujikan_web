@@ -4,7 +4,6 @@ import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -19,27 +18,19 @@ class SettingInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: SettingInfoPanel(
-        groupProvider: groupProvider,
-        userProvider: userProvider,
-      ),
+      body: SettingInfoPanel(groupProvider: groupProvider),
     );
   }
 }
 
 class SettingInfoPanel extends StatefulWidget {
   final GroupProvider groupProvider;
-  final UserProvider userProvider;
 
-  SettingInfoPanel({
-    @required this.groupProvider,
-    @required this.userProvider,
-  });
+  SettingInfoPanel({@required this.groupProvider});
 
   @override
   _SettingInfoPanelState createState() => _SettingInfoPanelState();
@@ -47,26 +38,19 @@ class SettingInfoPanel extends StatefulWidget {
 
 class _SettingInfoPanelState extends State<SettingInfoPanel> {
   TextEditingController name = TextEditingController();
-  List<UserModel> users = [];
+  List<UserModel> _users = [];
   UserModel adminUser;
 
   void _init() async {
-    setState(() {
-      name.text = widget.groupProvider.group?.name;
+    name.text = widget.groupProvider.group?.name;
+    widget.groupProvider.users.forEach((user) {
+      if (user.smartphone == true) {
+        _users.add(user);
+      }
     });
-    await widget.userProvider
-        .selectListSP(
-      groupId: widget.groupProvider.group?.id,
-      smartphone: true,
-    )
-        .then((value) {
-      setState(() {
-        users = value;
-        adminUser = users.singleWhere(
-          (user) => user.id == widget.groupProvider.group?.adminUserId,
-        );
-      });
-    });
+    adminUser = _users.singleWhere(
+      (user) => user.id == widget.groupProvider.group?.adminUserId,
+    );
   }
 
   @override
@@ -162,7 +146,7 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
                     onChanged: (value) {
                       setState(() => adminUser = value);
                     },
-                    items: users.map((value) {
+                    items: _users.map((value) {
                       return DropdownMenuItem(
                         value: value,
                         child: Text(

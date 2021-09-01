@@ -1,7 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
-import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
@@ -87,9 +86,8 @@ class _UserTableState extends State<UserTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => AddUserDialog(
+                        groupProvider: widget.groupProvider,
                         userProvider: widget.userProvider,
-                        group: widget.groupProvider.group,
-                        usersLen: widget.groupProvider.users.length,
                       ),
                     );
                   },
@@ -124,6 +122,7 @@ class _UserTableState extends State<UserTable> {
                         barrierDismissible: false,
                         context: context,
                         builder: (_) => EditUserDialog(
+                          groupProvider: widget.groupProvider,
                           userProvider: widget.userProvider,
                           user: widget.groupProvider.users[index],
                         ),
@@ -283,14 +282,12 @@ class _MigrationDialogState extends State<MigrationDialog> {
 }
 
 class AddUserDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final UserProvider userProvider;
-  final GroupModel group;
-  final int usersLen;
 
   AddUserDialog({
+    @required this.groupProvider,
     @required this.userProvider,
-    @required this.group,
-    @required this.usersLen,
   });
 
   @override
@@ -354,13 +351,13 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 CustomTextButton(
                   onPressed: () async {
                     if (!await widget.userProvider.create(
-                      group: widget.group,
-                      usersLen: widget.usersLen,
                       name: name.text.trim(),
                       recordPassword: recordPassword.text.trim(),
+                      group: widget.groupProvider.group,
                     )) {
                       return;
                     }
+                    widget.groupProvider.reloadGroupModel();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('スタッフを登録しました')),
                     );
@@ -379,10 +376,12 @@ class _AddUserDialogState extends State<AddUserDialog> {
 }
 
 class EditUserDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final UserProvider userProvider;
   final UserModel user;
 
   EditUserDialog({
+    @required this.groupProvider,
     @required this.userProvider,
     @required this.user,
   });
@@ -396,10 +395,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
   TextEditingController recordPassword = TextEditingController();
 
   void _init() async {
-    setState(() {
-      name.text = widget.user?.name;
-      recordPassword.text = widget.user?.recordPassword;
-    });
+    name.text = widget.user?.name;
+    recordPassword.text = widget.user?.recordPassword;
   }
 
   @override
@@ -468,7 +465,11 @@ class _EditUserDialogState extends State<EditUserDialog> {
                           )
                         : CustomTextButton(
                             onPressed: () {
-                              widget.userProvider.delete(user: widget.user);
+                              widget.userProvider.delete(
+                                user: widget.user,
+                                group: widget.groupProvider.group,
+                              );
+                              widget.groupProvider.reloadGroupModel();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('スタッフを削除しました')),
                               );
@@ -487,6 +488,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         )) {
                           return;
                         }
+                        widget.groupProvider.reloadGroupModel();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('スタッフを修正しました')),
                         );

@@ -148,12 +148,12 @@ class SectionProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    SectionModel section,
+    String id,
     String name,
   }) async {
     try {
       _sectionService.update({
-        'id': section.id,
+        'id': id,
         'name': name,
       });
       return true;

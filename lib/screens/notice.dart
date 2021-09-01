@@ -6,7 +6,6 @@ import 'package:hatarakujikan_web/models/group_notice.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/group_notice.dart';
-import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
@@ -23,7 +22,6 @@ class NoticeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
     final groupNoticeProvider = Provider.of<GroupNoticeProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -31,7 +29,6 @@ class NoticeScreen extends StatelessWidget {
       body: NoticeTable(
         groupProvider: groupProvider,
         groupNoticeProvider: groupNoticeProvider,
-        userProvider: userProvider,
       ),
     );
   }
@@ -40,12 +37,10 @@ class NoticeScreen extends StatelessWidget {
 class NoticeTable extends StatefulWidget {
   final GroupProvider groupProvider;
   final GroupNoticeProvider groupNoticeProvider;
-  final UserProvider userProvider;
 
   NoticeTable({
     @required this.groupProvider,
     @required this.groupNoticeProvider,
-    @required this.userProvider,
   });
 
   @override
@@ -57,9 +52,9 @@ class _NoticeTableState extends State<NoticeTable> {
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
         .collection('group')
-        .doc(widget.groupProvider.group?.id)
+        .doc(widget.groupProvider.group?.id ?? 'error')
         .collection('notice')
-        .where('groupId', isEqualTo: widget.groupProvider.group?.id)
+        .where('groupId', isEqualTo: widget.groupProvider.group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     List<GroupNoticeModel> groupNotices = [];
@@ -106,8 +101,8 @@ class _NoticeTableState extends State<NoticeTable> {
                 return Loading(color: Colors.orange);
               }
               groupNotices.clear();
-              for (DocumentSnapshot groupNotice in snapshot.data.docs) {
-                groupNotices.add(GroupNoticeModel.fromSnapshot(groupNotice));
+              for (DocumentSnapshot doc in snapshot.data.docs) {
+                groupNotices.add(GroupNoticeModel.fromSnapshot(doc));
               }
               if (groupNotices.length > 0) {
                 return DataTable2(
@@ -145,8 +140,8 @@ class _NoticeTableState extends State<NoticeTable> {
                               barrierDismissible: false,
                               context: context,
                               builder: (_) => SendNoticeDialog(
+                                groupProvider: widget.groupProvider,
                                 groupNoticeProvider: widget.groupNoticeProvider,
-                                userProvider: widget.userProvider,
                                 groupNotice: groupNotices[index],
                               ),
                             );
@@ -279,10 +274,8 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
   TextEditingController message = TextEditingController();
 
   void _init() async {
-    setState(() {
-      title.text = widget.groupNotice?.title;
-      message.text = widget.groupNotice?.message;
-    });
+    title.text = widget.groupNotice?.title;
+    message.text = widget.groupNotice?.message;
   }
 
   @override
@@ -383,13 +376,13 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
 }
 
 class SendNoticeDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final GroupNoticeProvider groupNoticeProvider;
-  final UserProvider userProvider;
   final GroupNoticeModel groupNotice;
 
   SendNoticeDialog({
+    @required this.groupProvider,
     @required this.groupNoticeProvider,
-    @required this.userProvider,
     @required this.groupNotice,
   });
 
@@ -403,13 +396,10 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
   List<UserModel> _selected = [];
 
   void _init() async {
-    await widget.userProvider
-        .selectListNotice(
-      groupId: widget.groupNotice?.groupId,
-      noticeId: widget.groupNotice?.id,
-    )
-        .then((value) {
-      setState(() => _users = value);
+    widget.groupProvider.users.forEach((user) {
+      if (user.smartphone == true) {
+        _users.add(user);
+      }
     });
   }
 
@@ -505,11 +495,11 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
                     ? CustomTextButton(
                         onPressed: () async {
                           if (!await widget.groupNoticeProvider.send(
-                            users: _selected,
                             id: widget.groupNotice.id,
                             groupId: widget.groupNotice.groupId,
                             title: widget.groupNotice.title,
                             message: widget.groupNotice.message,
+                            users: _selected,
                           )) {
                             return;
                           }
