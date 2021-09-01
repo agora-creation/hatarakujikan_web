@@ -92,53 +92,13 @@ class SplashController extends StatefulWidget {
 }
 
 class _SplashControllerState extends State<SplashController> {
-  Widget _widget = SplashScreen();
+  bool _mode = true;
 
   void _init() async {
     if (await getPrefs(key: 'groupId') != '') {
-      final groupProvider = Provider.of<GroupProvider>(context);
-      switch (groupProvider.status) {
-        case Status.Uninitialized:
-          _widget = SplashScreen();
-          break;
-        case Status.Unauthenticated:
-        case Status.Authenticating:
-          _widget = LoginScreen();
-          break;
-        case Status.Authenticated:
-          if (groupProvider.group == null) {
-            groupProvider.signOut();
-            _widget = LoginScreen();
-          } else {
-            _widget = WorkScreen();
-          }
-          break;
-        default:
-          _widget = LoginScreen();
-          break;
-      }
+      _mode = true;
     } else if (await getPrefs(key: 'sectionId') != '') {
-      final sectionProvider = Provider.of<SectionProvider>(context);
-      switch (sectionProvider.status) {
-        case SectionStatus.Uninitialized:
-          _widget = SplashScreen();
-          break;
-        case SectionStatus.Unauthenticated:
-        case SectionStatus.Authenticating:
-          _widget = SectionLoginScreen();
-          break;
-        case SectionStatus.Authenticated:
-          if (sectionProvider.section == null) {
-            sectionProvider.signOut();
-            _widget = SectionLoginScreen();
-          } else {
-            _widget = SectionWorkScreen();
-          }
-          break;
-        default:
-          _widget = SectionLoginScreen();
-          break;
-      }
+      _mode = false;
     }
   }
 
@@ -150,6 +110,40 @@ class _SplashControllerState extends State<SplashController> {
 
   @override
   Widget build(BuildContext context) {
-    return _widget;
+    final groupProvider = Provider.of<GroupProvider>(context);
+    final sectionProvider = Provider.of<SectionProvider>(context);
+    if (_mode == true) {
+      switch (groupProvider.status) {
+        case Status.Uninitialized:
+          return SplashScreen();
+        case Status.Unauthenticated:
+        case Status.Authenticating:
+          return LoginScreen();
+        case Status.Authenticated:
+          if (groupProvider.group == null) {
+            groupProvider.signOut();
+            return LoginScreen();
+          }
+          return WorkScreen();
+        default:
+          return LoginScreen();
+      }
+    } else {
+      switch (sectionProvider.status) {
+        case SectionStatus.Uninitialized:
+          return SplashScreen();
+        case SectionStatus.Unauthenticated:
+        case SectionStatus.Authenticating:
+          return SectionLoginScreen();
+        case SectionStatus.Authenticated:
+          if (sectionProvider.section == null) {
+            sectionProvider.signOut();
+            return SectionLoginScreen();
+          }
+          return SectionWorkScreen();
+        default:
+          return SectionLoginScreen();
+      }
+    }
   }
 }
