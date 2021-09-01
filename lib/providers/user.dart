@@ -67,20 +67,20 @@ class UserProvider with ChangeNotifier {
 
   Future<bool> migration({
     String groupId,
-    UserModel befUser,
-    UserModel aftUser,
+    UserModel before,
+    UserModel after,
   }) async {
     if (groupId == '') return false;
-    if (befUser == null) return false;
-    if (aftUser == null) return false;
+    if (before == null) return false;
+    if (after == null) return false;
     try {
       _userService.update({
-        'id': aftUser?.id,
-        'recordPassword': befUser?.recordPassword,
-        'position': befUser?.position,
+        'id': after?.id,
+        'recordPassword': before?.recordPassword,
+        'position': before?.position,
       });
-      await _workService.updateMigration(befUser?.id, aftUser?.id);
-      _userService.delete({'id': befUser?.id});
+      await _workService.updateMigration(before?.id, after?.id);
+      _userService.delete({'id': before?.id});
       return true;
     } catch (e) {
       print(e.toString());

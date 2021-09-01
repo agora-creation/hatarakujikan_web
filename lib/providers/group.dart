@@ -22,12 +22,14 @@ class GroupProvider with ChangeNotifier {
   List<GroupModel> _groups = [];
   GroupModel _group;
   UserModel _adminUser;
+  List<UserModel> _users = [];
 
   Status get status => _status;
   User get fUser => _fUser;
   List<GroupModel> get groups => _groups;
   GroupModel get group => _group;
   UserModel get adminUser => _adminUser;
+  List<UserModel> get users => _users;
 
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
@@ -39,6 +41,8 @@ class GroupProvider with ChangeNotifier {
   Future<void> setGroup(GroupModel group) async {
     _groups.clear();
     _group = group;
+    _users = await _userService.selectList(userIds: _group.userIds);
+    _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     await setPrefs(key: 'groupId', value: group.id);
     notifyListeners();
   }
@@ -59,6 +63,7 @@ class GroupProvider with ChangeNotifier {
         _groups = await _groupService.selectListAdminUser(
           adminUserId: value.user.uid,
         );
+        _users.clear();
       });
       return true;
     } catch (e) {
@@ -74,6 +79,7 @@ class GroupProvider with ChangeNotifier {
     _status = Status.Unauthenticated;
     _groups.clear();
     _group = null;
+    _users.clear();
     await removePrefs(key: 'groupId');
     notifyListeners();
     return Future.delayed(Duration.zero);
@@ -88,6 +94,8 @@ class GroupProvider with ChangeNotifier {
     String _groupId = await getPrefs(key: 'groupId');
     if (_groupId != '') {
       _group = await _groupService.select(id: _groupId);
+      _users = await _userService.selectList(userIds: _group.userIds);
+      _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     }
     _adminUser = await _userService.select(id: _fUser.uid);
     notifyListeners();
@@ -103,10 +111,13 @@ class GroupProvider with ChangeNotifier {
         _status = Status.Unauthenticated;
         _groups.clear();
         _group = null;
+        _users.clear();
       } else {
         _status = Status.Authenticated;
         _groups.clear();
         _group = await _groupService.select(id: _groupId);
+        _users = await _userService.selectList(userIds: _group.userIds);
+        _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
       }
       _adminUser = await _userService.select(id: _fUser.uid);
     }

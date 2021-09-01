@@ -7,8 +7,8 @@ import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
@@ -22,7 +22,6 @@ class ApplyWorkScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final applyWorkProvider = Provider.of<ApplyWorkProvider>(context);
     final groupProvider = Provider.of<GroupProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -30,7 +29,6 @@ class ApplyWorkScreen extends StatelessWidget {
       body: ApplyWorkTable(
         applyWorkProvider: applyWorkProvider,
         groupProvider: groupProvider,
-        userProvider: userProvider,
       ),
     );
   }
@@ -39,12 +37,10 @@ class ApplyWorkScreen extends StatelessWidget {
 class ApplyWorkTable extends StatefulWidget {
   final ApplyWorkProvider applyWorkProvider;
   final GroupProvider groupProvider;
-  final UserProvider userProvider;
 
   ApplyWorkTable({
     @required this.applyWorkProvider,
     @required this.groupProvider,
-    @required this.userProvider,
   });
 
   @override
@@ -52,51 +48,33 @@ class ApplyWorkTable extends StatefulWidget {
 }
 
 class _ApplyWorkTableState extends State<ApplyWorkTable> {
-  List<UserModel> users = [];
-  UserModel searchUser;
-  bool searchApproval = false;
+  UserModel user;
+  bool approval = false;
 
-  void _init() async {
-    await widget.userProvider
-        .selectListSP(
-      groupId: widget.groupProvider.group?.id,
-      smartphone: true,
-    )
-        .then((value) {
-      setState(() => users = value);
-    });
+  void userChange(UserModel userModel) {
+    setState(() => user = userModel);
   }
 
-  void searchUserChange(UserModel user) {
-    setState(() => searchUser = user);
-  }
-
-  void searchApprovalChange(bool approval) {
-    setState(() => searchApproval = approval);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
+  void approvalChange(bool selApproval) {
+    setState(() => approval = selApproval);
   }
 
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream;
-    if (searchUser != null) {
+    if (user != null) {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
           .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-          .where('userId', isEqualTo: searchUser?.id)
-          .where('approval', isEqualTo: searchApproval)
+          .where('userId', isEqualTo: user?.id)
+          .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     } else {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
           .where('groupId', isEqualTo: widget.groupProvider.group?.id)
-          .where('approval', isEqualTo: searchApproval)
+          .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     }
@@ -125,15 +103,15 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => SearchUserDialog(
-                        users: users,
-                        searchUser: searchUser,
-                        searchUserChange: searchUserChange,
+                        users: widget.groupProvider.users,
+                        user: user,
+                        userChange: userChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.person,
-                  label: searchUser?.name ?? '選択してください',
+                  label: user?.name ?? '選択してください',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
@@ -142,14 +120,14 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => SearchApprovalDialog(
-                        searchApproval: searchApproval,
-                        searchApprovalChange: searchApprovalChange,
+                        approval: approval,
+                        approvalChange: approvalChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.approval,
-                  label: searchApproval ? '承認済み' : '承認待ち',
+                  label: approval ? '承認済み' : '承認待ち',
                 ),
               ],
             ),
@@ -165,8 +143,8 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                 return Loading(color: Colors.orange);
               }
               applyWorks.clear();
-              for (DocumentSnapshot applyWork in snapshot.data.docs) {
-                applyWorks.add(ApplyWorkModel.fromSnapshot(applyWork));
+              for (DocumentSnapshot doc in snapshot.data.docs) {
+                applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
               }
               if (applyWorks.length > 0) {
                 return DataTable2(
@@ -222,13 +200,13 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
 
 class SearchUserDialog extends StatelessWidget {
   final List<UserModel> users;
-  final UserModel searchUser;
-  final Function searchUserChange;
+  final UserModel user;
+  final Function userChange;
 
   SearchUserDialog({
     @required this.users,
-    @required this.searchUser,
-    @required this.searchUserChange,
+    @required this.user,
+    @required this.userChange,
   });
 
   @override
@@ -255,18 +233,14 @@ class SearchUserDialog extends StatelessWidget {
                   itemCount: users.length,
                   itemBuilder: (_, index) {
                     UserModel _user = users[index];
-                    return Container(
-                      decoration: kBottomBorderDecoration,
-                      child: RadioListTile(
-                        title: Text('${_user.name}'),
-                        value: _user,
-                        groupValue: searchUser,
-                        activeColor: Colors.blue,
-                        onChanged: (value) {
-                          searchUserChange(value);
-                          Navigator.pop(context);
-                        },
-                      ),
+                    return CustomRadioListTile(
+                      onChanged: (value) {
+                        userChange(value);
+                        Navigator.pop(context);
+                      },
+                      label: '${_user.name}',
+                      value: _user,
+                      groupValue: user,
                     );
                   },
                 ),
@@ -297,12 +271,12 @@ class SearchUserDialog extends StatelessWidget {
 }
 
 class SearchApprovalDialog extends StatelessWidget {
-  final bool searchApproval;
-  final Function searchApprovalChange;
+  final bool approval;
+  final Function approvalChange;
 
   SearchApprovalDialog({
-    @required this.searchApproval,
-    @required this.searchApprovalChange,
+    @required this.approval,
+    @required this.approvalChange,
   });
 
   @override
@@ -315,31 +289,23 @@ class SearchApprovalDialog extends StatelessWidget {
           children: [
             SizedBox(height: 16.0),
             Divider(),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: RadioListTile(
-                title: Text('承認待ち'),
-                value: false,
-                groupValue: searchApproval,
-                activeColor: Colors.blue,
-                onChanged: (value) {
-                  searchApprovalChange(value);
-                  Navigator.pop(context);
-                },
-              ),
+            CustomRadioListTile(
+              onChanged: (value) {
+                approvalChange(value);
+                Navigator.pop(context);
+              },
+              label: '承認待ち',
+              value: false,
+              groupValue: approval,
             ),
-            Container(
-              decoration: kBottomBorderDecoration,
-              child: RadioListTile(
-                title: Text('承認済み'),
-                value: true,
-                groupValue: searchApproval,
-                activeColor: Colors.blue,
-                onChanged: (value) {
-                  searchApprovalChange(value);
-                  Navigator.pop(context);
-                },
-              ),
+            CustomRadioListTile(
+              onChanged: (value) {
+                approvalChange(value);
+                Navigator.pop(context);
+              },
+              label: '承認済み',
+              value: true,
+              groupValue: approval,
             ),
             Divider(),
             SizedBox(height: 16.0),

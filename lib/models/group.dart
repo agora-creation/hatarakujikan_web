@@ -4,6 +4,7 @@ class GroupModel {
   String _id;
   String _name;
   String _adminUserId;
+  List<String> userIds;
   int _usersNum;
   List<String> positions;
   bool _qrSecurity;
@@ -59,6 +60,7 @@ class GroupModel {
     _id = snapshot.data()['id'];
     _name = snapshot.data()['name'];
     _adminUserId = snapshot.data()['adminUserId'];
+    userIds = _convertList(snapshot.data()['userIds']) ?? [];
     _usersNum = snapshot.data()['usersNum'];
     positions = _convertList(snapshot.data()['positions']) ?? [];
     _qrSecurity = snapshot.data()['qrSecurity'];

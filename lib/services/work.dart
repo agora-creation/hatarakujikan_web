@@ -19,15 +19,15 @@ class WorkService {
     _firebaseFirestore.collection(_collection).doc(values['id']).update(values);
   }
 
-  Future<void> updateMigration(String befUserId, String aftUserId) async {
+  Future<void> updateMigration(String before, String after) async {
     await _firebaseFirestore
         .collection(_collection)
-        .where('userId', isEqualTo: befUserId)
+        .where('userId', isEqualTo: before)
         .get()
         .then((value) {
-      for (DocumentSnapshot _work in value.docs) {
-        _firebaseFirestore.collection(_collection).doc(_work.id).update({
-          'userId': aftUserId,
+      for (DocumentSnapshot _doc in value.docs) {
+        _firebaseFirestore.collection(_collection).doc(_doc.id).update({
+          'userId': after,
         });
       }
     });

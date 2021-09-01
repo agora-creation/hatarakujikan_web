@@ -9,7 +9,6 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_state.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
@@ -34,7 +33,6 @@ class WorkScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
     final workProvider = Provider.of<WorkProvider>(context);
     final workStateProvider = Provider.of<WorkStateProvider>(context);
 
@@ -43,7 +41,6 @@ class WorkScreen extends StatelessWidget {
       selectedRoute: id,
       body: WorkTable(
         groupProvider: groupProvider,
-        userProvider: userProvider,
         workProvider: workProvider,
         workStateProvider: workStateProvider,
       ),
@@ -53,13 +50,11 @@ class WorkScreen extends StatelessWidget {
 
 class WorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
-  final UserProvider userProvider;
   final WorkProvider workProvider;
   final WorkStateProvider workStateProvider;
 
   WorkTable({
     @required this.groupProvider,
-    @required this.userProvider,
     @required this.workProvider,
     @required this.workStateProvider,
   });
@@ -70,17 +65,11 @@ class WorkTable extends StatefulWidget {
 
 class _WorkTableState extends State<WorkTable> {
   DateTime month = DateTime.now();
-  List<UserModel> users = [];
   UserModel user;
   List<DateTime> days = [];
 
   void _init() async {
     setState(() => days = generateDays(month));
-    await widget.userProvider
-        .selectList(groupId: widget.groupProvider.group?.id)
-        .then((value) {
-      setState(() => users = value);
-    });
   }
 
   void userChange(UserModel userModel) {
@@ -158,7 +147,7 @@ class _WorkTableState extends State<WorkTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => SearchUserDialog(
-                        users: users,
+                        users: widget.groupProvider.users,
                         user: user,
                         userChange: userChange,
                       ),
@@ -182,7 +171,7 @@ class _WorkTableState extends State<WorkTable> {
                         workStateProvider: widget.workStateProvider,
                         group: widget.groupProvider.group,
                         month: month,
-                        users: users,
+                        users: widget.groupProvider.users,
                       ),
                     );
                   },
@@ -201,7 +190,7 @@ class _WorkTableState extends State<WorkTable> {
                         workStateProvider: widget.workStateProvider,
                         group: widget.groupProvider.group,
                         month: month,
-                        users: users,
+                        users: widget.groupProvider.users,
                         user: user,
                       ),
                     );
@@ -220,7 +209,7 @@ class _WorkTableState extends State<WorkTable> {
                         workProvider: widget.workProvider,
                         workStateProvider: widget.workStateProvider,
                         groupId: widget.groupProvider.group?.id,
-                        users: users,
+                        users: widget.groupProvider.users,
                         user: user,
                       ),
                     );

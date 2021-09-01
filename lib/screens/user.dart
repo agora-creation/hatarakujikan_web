@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
@@ -11,7 +10,6 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
-import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:provider/provider.dart';
 
 class UserScreen extends StatelessWidget {
@@ -49,13 +47,6 @@ class UserTable extends StatefulWidget {
 class _UserTableState extends State<UserTable> {
   @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
-        .collection('user')
-        .where('groups', arrayContains: widget.groupProvider.group?.id)
-        .orderBy('recordPassword', descending: false)
-        .snapshots();
-    List<UserModel> users = [];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -75,33 +66,13 @@ class _UserTableState extends State<UserTable> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () async {
-                    List<UserModel> befUsers = [];
-                    List<UserModel> aftUsers = [];
-                    await widget.userProvider
-                        .selectListSP(
-                      groupId: widget.groupProvider.group?.id,
-                      smartphone: false,
-                    )
-                        .then((value) {
-                      befUsers = value;
-                    });
-                    await widget.userProvider
-                        .selectListSP(
-                      groupId: widget.groupProvider.group?.id,
-                      smartphone: true,
-                    )
-                        .then((value) {
-                      aftUsers = value;
-                    });
+                  onPressed: () {
                     showDialog(
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => MigrationDialog(
-                        befUsers: befUsers,
-                        aftUsers: aftUsers,
+                        groupProvider: widget.groupProvider,
                         userProvider: widget.userProvider,
-                        groupId: widget.groupProvider.group?.id,
                       ),
                     );
                   },
@@ -118,7 +89,7 @@ class _UserTableState extends State<UserTable> {
                       builder: (_) => AddUserDialog(
                         userProvider: widget.userProvider,
                         group: widget.groupProvider.group,
-                        usersLen: users.length,
+                        usersLen: widget.groupProvider.users.length,
                       ),
                     );
                   },
@@ -132,48 +103,37 @@ class _UserTableState extends State<UserTable> {
         ),
         SizedBox(height: 8.0),
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: _stream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Loading(color: Colors.orange);
-              }
-              users.clear();
-              for (DocumentSnapshot user in snapshot.data.docs) {
-                users.add(UserModel.fromSnapshot(user));
-              }
-              return DataTable2(
-                columns: [
-                  DataColumn2(label: Text('スタッフ名')),
-                  DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
-                  DataColumn2(label: Text('メールアドレス')),
-                  DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+          child: DataTable2(
+            columns: [
+              DataColumn2(label: Text('スタッフ名')),
+              DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
+              DataColumn2(label: Text('メールアドレス')),
+              DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+            ],
+            rows: List<DataRow>.generate(
+              widget.groupProvider.users.length,
+              (index) => DataRow(
+                cells: [
+                  DataCell(Text('${widget.groupProvider.users[index].name}')),
+                  DataCell(Text(
+                      '${widget.groupProvider.users[index].recordPassword}')),
+                  DataCell(Text('${widget.groupProvider.users[index].email}')),
+                  DataCell(IconButton(
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => EditUserDialog(
+                          userProvider: widget.userProvider,
+                          user: widget.groupProvider.users[index],
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.edit, color: Colors.blue),
+                  )),
                 ],
-                rows: List<DataRow>.generate(
-                  users.length,
-                  (index) => DataRow(
-                    cells: [
-                      DataCell(Text('${users[index].name}')),
-                      DataCell(Text('${users[index].recordPassword}')),
-                      DataCell(Text('${users[index].email}')),
-                      DataCell(IconButton(
-                        onPressed: () {
-                          showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => EditUserDialog(
-                              userProvider: widget.userProvider,
-                              user: users[index],
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.edit, color: Colors.blue),
-                      )),
-                    ],
-                  ),
-                ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ],
@@ -182,16 +142,12 @@ class _UserTableState extends State<UserTable> {
 }
 
 class MigrationDialog extends StatefulWidget {
-  final List<UserModel> befUsers;
-  final List<UserModel> aftUsers;
+  final GroupProvider groupProvider;
   final UserProvider userProvider;
-  final String groupId;
 
   MigrationDialog({
-    @required this.befUsers,
-    @required this.aftUsers,
+    @required this.groupProvider,
     @required this.userProvider,
-    @required this.groupId,
   });
 
   @override
@@ -199,17 +155,21 @@ class MigrationDialog extends StatefulWidget {
 }
 
 class _MigrationDialogState extends State<MigrationDialog> {
-  List<UserModel> befUsers = [];
-  List<UserModel> aftUsers = [];
-  UserModel selectBefUser;
-  UserModel selectAftUser;
+  List<UserModel> before = [];
+  List<UserModel> after = [];
+  UserModel selectBefore;
+  UserModel selectAfter;
 
   void _init() async {
-    setState(() {
-      befUsers = widget.befUsers;
-      aftUsers = widget.aftUsers;
-      selectBefUser = null;
-      selectAftUser = null;
+    widget.groupProvider.users.forEach((user) {
+      if (user.smartphone == false) {
+        before.add(user);
+      }
+    });
+    widget.groupProvider.users.forEach((user) {
+      if (user.smartphone == true) {
+        after.add(user);
+      }
     });
   }
 
@@ -241,11 +201,11 @@ class _MigrationDialogState extends State<MigrationDialog> {
             Text('移行元スタッフ(未スマホユーザー)', style: TextStyle(fontSize: 14.0)),
             CustomDropdownButton(
               isExpanded: true,
-              value: selectBefUser,
+              value: selectBefore,
               onChanged: (value) {
-                setState(() => selectBefUser = value);
+                setState(() => selectBefore = value);
               },
-              items: befUsers.map((value) {
+              items: before.map((value) {
                 return DropdownMenuItem<UserModel>(
                   value: value,
                   child: Text(
@@ -270,11 +230,11 @@ class _MigrationDialogState extends State<MigrationDialog> {
             Text('移行先スタッフ(スマホユーザー)', style: TextStyle(fontSize: 14.0)),
             CustomDropdownButton(
               isExpanded: false,
-              value: selectAftUser,
+              value: selectAfter,
               onChanged: (value) {
-                setState(() => selectAftUser = value);
+                setState(() => selectAfter = value);
               },
-              items: aftUsers.map((value) {
+              items: after.map((value) {
                 return DropdownMenuItem<UserModel>(
                   value: value,
                   child: Text(
@@ -299,9 +259,9 @@ class _MigrationDialogState extends State<MigrationDialog> {
                 CustomTextButton(
                   onPressed: () async {
                     if (!await widget.userProvider.migration(
-                      groupId: widget.groupId,
-                      befUser: selectBefUser,
-                      aftUser: selectAftUser,
+                      groupId: widget.groupProvider.group.id,
+                      before: selectBefore,
+                      after: selectAfter,
                     )) {
                       return;
                     }
