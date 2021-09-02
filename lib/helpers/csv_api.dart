@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:csv/csv.dart';
+import 'package:euc/jis.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -262,7 +265,10 @@ Future<void> _works02({
 
 void _download({List<List<String>> rows, String fileName}) {
   String csv = const ListToCsvConverter().convert(rows);
-  AnchorElement(href: 'data:text/plain;charset=utf-8,$csv')
+  List<int> encoded = ShiftJIS().encode(csv);
+  Uint8List bytes = Uint8List.fromList(encoded);
+  String encodedCsv = ShiftJIS().decode(bytes);
+  AnchorElement(href: 'data:text/csv;charset=shift_jis,$encodedCsv')
     ..setAttribute('download', fileName)
     ..click();
 }
