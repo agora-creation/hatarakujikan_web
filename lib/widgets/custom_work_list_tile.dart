@@ -822,7 +822,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '深夜時間※2',
+                            '深夜時間(-)※2',
                             style: TextStyle(
                               color: Colors.black54,
                               fontSize: 14.0,
@@ -865,6 +865,40 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                       ),
                     ),
                   ],
+                ),
+              ],
+            ),
+            SizedBox(height: 4.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '※1・・・深夜時間帯外の勤務時間です。',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.0,
+                  ),
+                ),
+                Text(
+                  '※2・・・深夜時間帯の勤務時間です。深夜時間外の分も引いた時間です。',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.0,
+                  ),
+                ),
+                Text(
+                  '※3・・・深夜時間帯外で法定時間を超えた時間です。',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.0,
+                  ),
+                ),
+                Text(
+                  '※4・・・深夜時間帯で法定時間を超えた時間です。',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.0,
+                  ),
                 ),
               ],
             ),

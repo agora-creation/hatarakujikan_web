@@ -238,7 +238,7 @@ class PdfApi {
               _cell(label: '休憩時間'),
               _cell(label: '勤務時間'),
               _cell(label: '通常時間※1'),
-              _cell(label: '深夜時間※2'),
+              _cell(label: '深夜時間(-)※2'),
               _cell(label: '通常時間外※3'),
               _cell(label: '深夜時間外※4'),
               _cell(label: '週間合計※5'),
@@ -292,25 +292,17 @@ class PdfApi {
             String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
             if (_dayWorks.length > 0) {
               for (int j = 0; j < _dayWorks.length; j++) {
-                String _startTime = _dayWorks[j].startTime(group);
-                String _state = '';
-                String _endTime = '---:---';
-                String _breakTime = '---:---';
-                String _workTime = '---:---';
-                String _dayTime = '---:---';
-                String _nightTime = '---:---';
-                String _dayTimeOver = '---:---';
-                String _nightTimeOver = '---:---';
                 if (_dayWorks[j].startedAt != _dayWorks[j].endedAt) {
-                  _state = _dayWorks[j].state;
-                  _endTime = _dayWorks[j].endTime(group);
-                  _breakTime = _dayWorks[j].breakTimes(group)[0];
-                  _workTime = _dayWorks[j].workTime(group);
+                  String _startTime = _dayWorks[j].startTime(group);
+                  String _state = _dayWorks[j].state;
+                  String _endTime = _dayWorks[j].endTime(group);
+                  String _breakTime = _dayWorks[j].breakTimes(group)[0];
+                  String _workTime = _dayWorks[j].workTime(group);
                   List<String> _calTimes = _dayWorks[j].calTimes01(group);
-                  _dayTime = _calTimes[0];
-                  _nightTime = _calTimes[1];
-                  _dayTimeOver = _calTimes[2];
-                  _nightTimeOver = _calTimes[3];
+                  String _dayTime = _calTimes[0];
+                  String _nightTime = _calTimes[1];
+                  String _dayTimeOver = _calTimes[2];
+                  String _nightTimeOver = _calTimes[3];
                   String _key =
                       '${DateFormat('yyyy-MM-dd').format(_dayWorks[j].startedAt)}';
                   count[_key] = '';
@@ -319,25 +311,25 @@ class PdfApi {
                   nightTimes = addTime(nightTimes, _nightTime);
                   dayTimeOvers = addTime(dayTimeOvers, _dayTimeOver);
                   nightTimeOvers = addTime(nightTimeOvers, _nightTimeOver);
+                  _row.add(pw.TableRow(
+                    children: [
+                      _cell(label: _day),
+                      _cell(label: _state),
+                      _cell(label: _startTime),
+                      _cell(label: _endTime),
+                      _cell(label: _breakTime),
+                      _cell(label: _workTime),
+                      _cell(label: _dayTime),
+                      _cell(label: _nightTime),
+                      _cell(label: _dayTimeOver),
+                      _cell(label: _nightTimeOver),
+                      _cell(
+                          label: countW[
+                                  '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
+                              ''),
+                    ],
+                  ));
                 }
-                _row.add(pw.TableRow(
-                  children: [
-                    _cell(label: _day),
-                    _cell(label: _state),
-                    _cell(label: _startTime),
-                    _cell(label: _endTime),
-                    _cell(label: _breakTime),
-                    _cell(label: _workTime),
-                    _cell(label: _dayTime),
-                    _cell(label: _nightTime),
-                    _cell(label: _dayTimeOver),
-                    _cell(label: _nightTimeOver),
-                    _cell(
-                        label: countW[
-                                '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
-                            ''),
-                  ],
-                ));
               }
             } else {
               PdfColor _stateColor = PdfColors.white;
@@ -392,7 +384,7 @@ class PdfApi {
               _cell(label: '総勤務日数 [$workDays日]'),
               _cell(label: '総勤務時間 [$workTimes]'),
               _cell(label: '総通常時間 [$dayTimes]'),
-              _cell(label: '総深夜時間 [$nightTimes]'),
+              _cell(label: '総深夜時間(-) [$nightTimes]'),
               _cell(label: '総通常時間外 [$dayTimeOvers]'),
               _cell(label: '総深夜時間外 [$nightTimeOvers]'),
             ],
@@ -479,7 +471,7 @@ class PdfApi {
             _cell(label: '休憩時間'),
             _cell(label: '勤務時間'),
             _cell(label: '通常時間※1'),
-            _cell(label: '深夜時間※2'),
+            _cell(label: '深夜時間(-)※2'),
             _cell(label: '通常時間外※3'),
             _cell(label: '深夜時間外※4'),
             _cell(label: '週間合計※5'),
@@ -533,25 +525,17 @@ class PdfApi {
           String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
           if (_dayWorks.length > 0) {
             for (int j = 0; j < _dayWorks.length; j++) {
-              String _startTime = _dayWorks[j].startTime(group);
-              String _state = '';
-              String _endTime = '---:---';
-              String _breakTime = '---:---';
-              String _workTime = '---:---';
-              String _dayTime = '---:---';
-              String _nightTime = '---:---';
-              String _dayTimeOver = '---:---';
-              String _nightTimeOver = '---:---';
               if (_dayWorks[j].startedAt != _dayWorks[j].endedAt) {
-                _state = _dayWorks[j].state;
-                _endTime = _dayWorks[j].endTime(group);
-                _breakTime = _dayWorks[j].breakTimes(group)[0];
-                _workTime = _dayWorks[j].workTime(group);
+                String _startTime = _dayWorks[j].startTime(group);
+                String _state = _dayWorks[j].state;
+                String _endTime = _dayWorks[j].endTime(group);
+                String _breakTime = _dayWorks[j].breakTimes(group)[0];
+                String _workTime = _dayWorks[j].workTime(group);
                 List<String> _calTimes = _dayWorks[j].calTimes01(group);
-                _dayTime = _calTimes[0];
-                _nightTime = _calTimes[1];
-                _dayTimeOver = _calTimes[2];
-                _nightTimeOver = _calTimes[3];
+                String _dayTime = _calTimes[0];
+                String _nightTime = _calTimes[1];
+                String _dayTimeOver = _calTimes[2];
+                String _nightTimeOver = _calTimes[3];
                 String _key =
                     '${DateFormat('yyyy-MM-dd').format(_dayWorks[j].startedAt)}';
                 count[_key] = '';
@@ -560,25 +544,25 @@ class PdfApi {
                 nightTimes = addTime(nightTimes, _nightTime);
                 dayTimeOvers = addTime(dayTimeOvers, _dayTimeOver);
                 nightTimeOvers = addTime(nightTimeOvers, _nightTimeOver);
+                _row.add(pw.TableRow(
+                  children: [
+                    _cell(label: _day),
+                    _cell(label: _state),
+                    _cell(label: _startTime),
+                    _cell(label: _endTime),
+                    _cell(label: _breakTime),
+                    _cell(label: _workTime),
+                    _cell(label: _dayTime),
+                    _cell(label: _nightTime),
+                    _cell(label: _dayTimeOver),
+                    _cell(label: _nightTimeOver),
+                    _cell(
+                        label: countW[
+                                '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
+                            ''),
+                  ],
+                ));
               }
-              _row.add(pw.TableRow(
-                children: [
-                  _cell(label: _day),
-                  _cell(label: _state),
-                  _cell(label: _startTime),
-                  _cell(label: _endTime),
-                  _cell(label: _breakTime),
-                  _cell(label: _workTime),
-                  _cell(label: _dayTime),
-                  _cell(label: _nightTime),
-                  _cell(label: _dayTimeOver),
-                  _cell(label: _nightTimeOver),
-                  _cell(
-                      label: countW[
-                              '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
-                          ''),
-                ],
-              ));
             }
           } else {
             PdfColor _stateColor = PdfColors.white;
@@ -633,7 +617,7 @@ class PdfApi {
             _cell(label: '総勤務日数 [$workDays日]'),
             _cell(label: '総勤務時間 [$workTimes]'),
             _cell(label: '総通常時間 [$dayTimes]'),
-            _cell(label: '総深夜時間 [$nightTimes]'),
+            _cell(label: '総深夜時間(-) [$nightTimes]'),
             _cell(label: '総通常時間外 [$dayTimeOvers]'),
             _cell(label: '総深夜時間外 [$nightTimeOvers]'),
           ],

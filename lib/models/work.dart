@@ -211,7 +211,7 @@ class WorkModel {
     return [_time1, _time2];
   }
 
-  // 通常時間/深夜時間/通常時間外/深夜時間外
+  // 通常時間/深夜時間(-深夜時間外)/通常時間外/深夜時間外
   List<String> calTimes01(GroupModel group) {
     String _time1 = '00:00';
     String _time2 = '00:00';
@@ -248,7 +248,7 @@ class WorkModel {
       }
     }
     // ----------------------------------------
-    // 深夜時間
+    // 深夜時間(-深夜時間外)
     if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
       Duration _diff = _nightE.difference(_nightS);
       String _minutes = twoDigits(_diff.inMinutes.remainder(60));
@@ -296,6 +296,8 @@ class WorkModel {
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time4 = '${twoDigits(_diff.inHours)}:$_minutes';
       }
+      // 深夜時間(-深夜時間外)
+      _time2 = subTime(_time2, _time4);
       // ----------------------------------------
     }
     // ----------------------------------------
