@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/work_state.dart';
-import 'package:intl/intl.dart';
 
 class WorkStateService {
   String _collection = 'workState';
@@ -19,15 +19,15 @@ class WorkStateService {
     _firebaseFirestore.collection(_collection).doc(values['id']).update(values);
   }
 
-  Future<void> updateMigration(String befUserId, String aftUserId) async {
+  Future<void> updateMigration(String before, String after) async {
     await _firebaseFirestore
         .collection(_collection)
-        .where('userId', isEqualTo: befUserId)
+        .where('userId', isEqualTo: before)
         .get()
         .then((value) {
-      for (DocumentSnapshot _work in value.docs) {
-        _firebaseFirestore.collection(_collection).doc(_work.id).update({
-          'userId': aftUserId,
+      for (DocumentSnapshot _doc in value.docs) {
+        _firebaseFirestore.collection(_collection).doc(_doc.id).update({
+          'userId': after,
         });
       }
     });
@@ -37,19 +37,15 @@ class WorkStateService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<List<WorkStateModel>> selectListStartEnd({
+  Future<List<WorkStateModel>> selectList({
     String groupId,
     String userId,
     DateTime startAt,
     DateTime endAt,
   }) async {
     List<WorkStateModel> _workStates = [];
-    Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-            '${DateFormat('yyyy-MM-dd').format(startAt)} 00:00:00.000')
-        .millisecondsSinceEpoch);
-    Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(
-        DateTime.parse('${DateFormat('yyyy-MM-dd').format(endAt)} 23:59:59.999')
-            .millisecondsSinceEpoch);
+    Timestamp _startAt = convertTimestamp(startAt, false);
+    Timestamp _endAt = convertTimestamp(endAt, true);
     await _firebaseFirestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)

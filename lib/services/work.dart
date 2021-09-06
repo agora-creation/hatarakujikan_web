@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/work.dart';
-import 'package:intl/intl.dart';
 
 class WorkService {
   String _collection = 'work';
@@ -49,19 +49,15 @@ class WorkService {
     return _work;
   }
 
-  Future<List<WorkModel>> selectListStartEnd({
+  Future<List<WorkModel>> selectList({
     String groupId,
     String userId,
     DateTime startAt,
     DateTime endAt,
   }) async {
     List<WorkModel> _works = [];
-    Timestamp _startAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(startAt)} 00:00:00.000',
-    ).millisecondsSinceEpoch);
-    Timestamp _endAt = Timestamp.fromMillisecondsSinceEpoch(DateTime.parse(
-      '${DateFormat('yyyy-MM-dd').format(endAt)} 23:59:59.999',
-    ).millisecondsSinceEpoch);
+    Timestamp _startAt = convertTimestamp(startAt, false);
+    Timestamp _endAt = convertTimestamp(endAt, true);
     await _firebaseFirestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)

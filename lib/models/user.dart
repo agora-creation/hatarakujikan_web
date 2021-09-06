@@ -9,8 +9,6 @@ class UserModel {
   int _workLv;
   String _lastWorkId;
   String _lastBreakId;
-  List<String> groups;
-  String _position;
   String _token;
   bool _smartphone;
   DateTime _createdAt;
@@ -23,7 +21,6 @@ class UserModel {
   int get workLv => _workLv;
   String get lastWorkId => _lastWorkId;
   String get lastBreakId => _lastBreakId;
-  String get position => _position;
   String get token => _token;
   bool get smartphone => _smartphone;
   DateTime get createdAt => _createdAt;
@@ -37,18 +34,8 @@ class UserModel {
     _workLv = snapshot.data()['workLv'];
     _lastWorkId = snapshot.data()['lastWorkId'] ?? '';
     _lastBreakId = snapshot.data()['lastBreakId'] ?? '';
-    groups = _convertList(snapshot.data()['groups']) ?? [];
-    _position = snapshot.data()['position'] ?? '';
     _token = snapshot.data()['token'] ?? '';
     _smartphone = snapshot.data()['smartphone'];
     _createdAt = snapshot.data()['createdAt'].toDate();
-  }
-
-  List<String> _convertList(List list) {
-    List<String> converted = [];
-    for (String data in list) {
-      converted.add(data);
-    }
-    return converted;
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:intl/intl.dart';
@@ -119,6 +120,17 @@ String roundUpTime(String time, int per) {
     _minuteNew = 0;
   }
   return '$_hour:${_minuteNew.toString().padLeft(2, '0')}';
+}
+
+// DateTime => Timestamp
+Timestamp convertTimestamp(DateTime date, bool end) {
+  String _dateTime = '${DateFormat('yyyy-MM-dd').format(date)} 00:00:00.000';
+  if (end) {
+    _dateTime = '${DateFormat('yyyy-MM-dd').format(date)} 23:59:59.999';
+  }
+  return Timestamp.fromMillisecondsSinceEpoch(
+    DateTime.parse(_dateTime).millisecondsSinceEpoch,
+  );
 }
 
 // 1ヶ月間の配列作成

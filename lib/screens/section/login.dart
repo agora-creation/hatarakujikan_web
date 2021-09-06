@@ -22,7 +22,7 @@ class SectionLoginScreen extends StatelessWidget {
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           decoration: kLoginDecoration,
-          child: sectionProvider.status == SectionStatus.Authenticating
+          child: sectionProvider.status == Status2.Authenticating
               ? Loading(color: Colors.white)
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,

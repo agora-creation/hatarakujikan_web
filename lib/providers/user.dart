@@ -19,8 +19,6 @@ class UserProvider with ChangeNotifier {
     if (group == null) return false;
     try {
       String _id = _userService.id();
-      List<String> _groups = [];
-      _groups.add(group.id);
       _userService.create({
         'id': _id,
         'name': name,
@@ -30,8 +28,6 @@ class UserProvider with ChangeNotifier {
         'workLv': 0,
         'lastWorkId': '',
         'lastBreakId': '',
-        'groups': _groups,
-        'position': '',
         'token': '',
         'smartphone': false,
         'createdAt': DateTime.now(),
@@ -94,7 +90,6 @@ class UserProvider with ChangeNotifier {
       _userService.update({
         'id': after?.id,
         'recordPassword': before?.recordPassword,
-        'position': before?.position,
       });
       await _workService.updateMigration(before?.id, after?.id);
       _userService.delete({'id': before?.id});
@@ -103,61 +98,5 @@ class UserProvider with ChangeNotifier {
       print(e.toString());
       return false;
     }
-  }
-
-  Future<List<UserModel>> selectList({String groupId}) async {
-    List<UserModel> _users = [];
-    await _userService.selectListGroupId(groupId: groupId).then((value) {
-      _users = value;
-    });
-    return _users;
-  }
-
-  Future<List<UserModel>> selectListSP({
-    String groupId,
-    bool smartphone,
-  }) async {
-    List<UserModel> _users = [];
-    await _userService
-        .selectListGroupIdSP(
-      groupId: groupId,
-      smartphone: smartphone,
-    )
-        .then((value) {
-      _users = value;
-    });
-    return _users;
-  }
-
-  Future<List<UserModel>> selectListSmartphone({
-    List<String> userIds,
-    bool smartphone,
-  }) async {
-    List<UserModel> _users = [];
-    await _userService
-        .selectListUserIdsSP(
-      userIds: userIds,
-      smartphone: smartphone,
-    )
-        .then((value) {
-      _users = value;
-    });
-    return _users;
-  }
-
-  Future<List<UserModel>> selectListNotice({
-    String groupId,
-    String noticeId,
-  }) async {
-    List<UserModel> _users = [];
-    await _userService
-        .selectListGroupIdNotice(
-      groupId: groupId,
-      noticeId: noticeId,
-    )
-        .then((value) {
-      _users = value;
-    });
-    return _users;
   }
 }

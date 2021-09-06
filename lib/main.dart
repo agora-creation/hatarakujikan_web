@@ -130,12 +130,12 @@ class _SplashControllerState extends State<SplashController> {
       }
     } else {
       switch (sectionProvider.status) {
-        case SectionStatus.Uninitialized:
+        case Status2.Uninitialized:
           return SplashScreen();
-        case SectionStatus.Unauthenticated:
-        case SectionStatus.Authenticating:
+        case Status2.Unauthenticated:
+        case Status2.Authenticating:
           return SectionLoginScreen();
-        case SectionStatus.Authenticated:
+        case Status2.Authenticated:
           if (sectionProvider.section == null) {
             sectionProvider.signOut();
             return SectionLoginScreen();

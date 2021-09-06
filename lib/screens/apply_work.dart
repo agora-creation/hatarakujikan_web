@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/apply_work.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_apply_work.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -62,11 +64,11 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream;
+    GroupModel _group = widget.groupProvider.group;
     if (user != null) {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
-          .where('groupId',
-              isEqualTo: widget.groupProvider.group?.id ?? 'error')
+          .where('groupId', isEqualTo: _group?.id ?? 'error')
           .where('userId', isEqualTo: user?.id ?? 'error')
           .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
@@ -74,8 +76,7 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
     } else {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
-          .where('groupId',
-              isEqualTo: widget.groupProvider.group?.id ?? 'error')
+          .where('groupId', isEqualTo: _group?.id ?? 'error')
           .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
@@ -356,111 +357,85 @@ class EditApplyWorkDialog extends StatelessWidget {
               style: TextStyle(color: Colors.black54, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '申請日時',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text(
-                  '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.createdAt)}',
-                ),
-              ],
+            CustomApplyWork(
+              label: '申請日時',
+              child: Text(
+                  '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.createdAt)}'),
             ),
             Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '申請者名',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text('${applyWork.userName}'),
-              ],
+            CustomApplyWork(
+              label: '申請者名',
+              child: Text('${applyWork.userName}'),
             ),
             Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '申請内容',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Container(
-                  decoration: kBottomBorderDecoration,
-                  child: ListTile(
-                    leading: Text('出勤時間'),
-                    title: Text(
-                      '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.startedAt)}',
+            CustomApplyWork(
+              label: '申請内容',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: kBottomBorderDecoration,
+                    child: ListTile(
+                      leading: Text('出勤時間'),
+                      title: Text(
+                        '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.startedAt)}',
+                      ),
                     ),
                   ),
-                ),
-                applyWork.breaks.length > 0
-                    ? ListView.builder(
-                        shrinkWrap: true,
-                        physics: ScrollPhysics(),
-                        itemCount: applyWork.breaks.length,
-                        itemBuilder: (_, index) {
-                          BreaksModel _breaks = applyWork.breaks[index];
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                decoration: kBottomBorderDecoration,
-                                child: ListTile(
-                                  leading: Text('休憩開始時間'),
-                                  title: Text(
-                                    '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.startedAt)}',
+                  applyWork.breaks.length > 0
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: applyWork.breaks.length,
+                          itemBuilder: (_, index) {
+                            BreaksModel _breaks = applyWork.breaks[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  decoration: kBottomBorderDecoration,
+                                  child: ListTile(
+                                    leading: Text('休憩開始時間'),
+                                    title: Text(
+                                      '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.startedAt)}',
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                decoration: kBottomBorderDecoration,
-                                child: ListTile(
-                                  leading: Text('休憩終了時間'),
-                                  title: Text(
-                                    '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.endedAt)}',
+                                Container(
+                                  decoration: kBottomBorderDecoration,
+                                  child: ListTile(
+                                    leading: Text('休憩終了時間'),
+                                    title: Text(
+                                      '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.endedAt)}',
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      )
-                    : Container(),
-                Container(
-                  decoration: kBottomBorderDecoration,
-                  child: ListTile(
-                    leading: Text('退勤時間'),
-                    title: Text(
-                      '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.endedAt)}',
+                              ],
+                            );
+                          },
+                        )
+                      : Container(),
+                  Container(
+                    decoration: kBottomBorderDecoration,
+                    child: ListTile(
+                      leading: Text('退勤時間'),
+                      title: Text(
+                        '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.endedAt)}',
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '事由',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text('${applyWork.reason}'),
-              ],
+            CustomApplyWork(
+              label: '事由',
+              child: Text('${applyWork.reason}'),
             ),
             Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '承認状況',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                applyWork.approval ? Text('承認済み') : Text('承認待ち')
-              ],
+            CustomApplyWork(
+              label: '承認状況',
+              child: applyWork.approval ? Text('承認済み') : Text('承認待ち'),
             ),
             Divider(),
             SizedBox(height: 16.0),

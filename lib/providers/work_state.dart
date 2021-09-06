@@ -45,7 +45,7 @@ class WorkStateProvider with ChangeNotifier {
   }) async {
     List<WorkStateModel> _workStates = [];
     await _workStateService
-        .selectListStartEnd(
+        .selectList(
       groupId: groupId,
       userId: userId,
       startAt: startAt,

@@ -52,9 +52,10 @@ class SectionTable extends StatefulWidget {
 class _SectionTableState extends State<SectionTable> {
   @override
   Widget build(BuildContext context) {
+    GroupModel _group = widget.groupProvider.group;
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
         .collection('section')
-        .where('groupId', isEqualTo: widget.groupProvider.group?.id ?? 'error')
+        .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     List<SectionModel> sections = [];
@@ -117,12 +118,12 @@ class _SectionTableState extends State<SectionTable> {
                   rows: List<DataRow>.generate(
                     sections.length,
                     (index) {
+                      List<UserModel> _users = widget.groupProvider.users;
                       String _sectionUsers = '';
                       if (sections[index].userIds != null) {
                         for (String _id in sections[index].userIds) {
                           if (_sectionUsers != '') _sectionUsers += ',';
-                          UserModel _user =
-                              widget.groupProvider.users.singleWhere(
+                          UserModel _user = _users.singleWhere(
                             (e) => e.id == _id,
                           );
                           _sectionUsers += _user.name;
@@ -130,8 +131,7 @@ class _SectionTableState extends State<SectionTable> {
                       }
                       String _sectionAdminUser = '';
                       if (sections[index].adminUserId != '') {
-                        UserModel _user =
-                            widget.groupProvider.users.singleWhere(
+                        UserModel _user = _users.singleWhere(
                           (e) => e.id == sections[index].adminUserId,
                         );
                         _sectionAdminUser = _user.name;

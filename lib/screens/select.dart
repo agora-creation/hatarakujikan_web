@@ -52,8 +52,8 @@ class _SelectScreenState extends State<SelectScreen> {
               ),
               actions: [
                 IconButton(
-                  onPressed: () {
-                    widget.groupProvider.signOut();
+                  onPressed: () async {
+                    await widget.groupProvider.signOut();
                     Navigator.of(context, rootNavigator: true).pop();
                   },
                   icon: Icon(Icons.close, color: Colors.white),

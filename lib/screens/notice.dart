@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/group_notice.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -50,11 +51,12 @@ class NoticeTable extends StatefulWidget {
 class _NoticeTableState extends State<NoticeTable> {
   @override
   Widget build(BuildContext context) {
+    GroupModel _group = widget.groupProvider.group;
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
         .collection('group')
-        .doc(widget.groupProvider.group?.id ?? 'error')
+        .doc(_group?.id ?? 'error')
         .collection('notice')
-        .where('groupId', isEqualTo: widget.groupProvider.group?.id ?? 'error')
+        .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     List<GroupNoticeModel> groupNotices = [];
