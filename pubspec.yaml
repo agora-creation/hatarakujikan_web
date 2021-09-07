@@ -28,7 +28,6 @@ dependencies:
   flutter_admin_scaffold: ^1.0.0
   data_table_2: ^2.0.3
   csv: ^5.0.0
-  euc: ^1.0.6+8
   pdf: ^3.4.2
   universal_html: ^2.0.8
   multiple_stream_builder: ^2.0.0

@@ -39,7 +39,7 @@ class SectionProvider with ChangeNotifier {
   }
 
   Future<void> setSection(SectionModel section) async {
-    _group = await _groupService.select(id: _section.groupId);
+    _group = await _groupService.select(id: section.groupId);
     _sections.clear();
     _section = section;
     _users.clear();

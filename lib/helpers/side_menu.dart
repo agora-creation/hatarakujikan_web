@@ -12,12 +12,24 @@ import 'package:hatarakujikan_web/screens/setting_security.dart';
 import 'package:hatarakujikan_web/screens/setting_work.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
+import 'package:hatarakujikan_web/screens/work_shift.dart';
 
 const List<MenuItem> kSideMenu = [
   MenuItem(
     title: '勤怠の管理',
-    route: WorkScreen.id,
     icon: Icons.history,
+    children: [
+      MenuItem(
+        title: '勤怠の記録',
+        route: WorkScreen.id,
+        icon: Icons.chevron_right,
+      ),
+      MenuItem(
+        title: 'シフト表(仮)',
+        route: WorkShiftScreen.id,
+        icon: Icons.chevron_right,
+      ),
+    ],
   ),
   MenuItem(
     title: '申請/承認の管理',
@@ -91,11 +103,11 @@ const List<MenuItem> kSideMenu2 = [
     icon: Icons.person,
   ),
   MenuItem(
-    title: '会社/組織の設定',
+    title: '部署/事業所の設定',
     icon: Icons.settings,
     children: [
       MenuItem(
-        title: '基本情報の変更',
+        title: '基本情報',
         route: SectionSettingInfoScreen.id,
         icon: Icons.chevron_right,
       ),

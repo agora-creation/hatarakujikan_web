@@ -26,6 +26,7 @@ import 'package:hatarakujikan_web/screens/setting_work.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
+import 'package:hatarakujikan_web/screens/work_shift.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
           SettingWorkScreen.id: (context) => SettingWorkScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),
+          WorkShiftScreen.id: (context) => WorkShiftScreen(),
           SectionApplyWorkScreen.id: (context) => SectionApplyWorkScreen(),
           SectionSettingInfoScreen.id: (context) => SectionSettingInfoScreen(),
           SectionUserScreen.id: (context) => SectionUserScreen(),

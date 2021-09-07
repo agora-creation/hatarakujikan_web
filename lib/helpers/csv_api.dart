@@ -1,7 +1,5 @@
-import 'dart:typed_data';
+import 'dart:convert';
 
-import 'package:csv/csv.dart';
-import 'package:euc/jis.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -264,11 +262,19 @@ Future<void> _works02({
 }
 
 void _download({List<List<String>> rows, String fileName}) {
-  String csv = const ListToCsvConverter().convert(rows);
-  List<int> encoded = ShiftJIS().encode(csv);
-  Uint8List bytes = Uint8List.fromList(encoded);
-  String encodedCsv = ShiftJIS().decode(bytes);
-  AnchorElement(href: 'data:text/csv;charset=shift_jis,$encodedCsv')
-    ..setAttribute('download', fileName)
-    ..click();
+  final bom = '\uFEFF';
+  String text = bom + rows.join('\n');
+  text = text.replaceAll('[', '');
+  text = text.replaceAll(']', '');
+  final bytes = utf8.encode(text);
+  final blob = Blob([bytes]);
+  final url = Url.createObjectUrlFromBlob(blob);
+  final anchor = document.createElement('a') as AnchorElement
+    ..href = url
+    ..style.display = 'none'
+    ..download = fileName;
+  document.body.children.add(anchor);
+  anchor.click();
+  document.body.children.remove(anchor);
+  Url.revokeObjectUrl(url);
 }

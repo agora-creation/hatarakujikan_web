@@ -108,7 +108,7 @@ class _WorkTableState extends State<WorkTable> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '勤怠の管理',
+          '勤怠の記録',
           style: kAdminTitleTextStyle,
         ),
         Text(

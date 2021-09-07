@@ -124,6 +124,13 @@ class GroupProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> reloadUsers() async {
+    _users.clear();
+    _users = await _userService.selectList(userIds: _group.userIds);
+    _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
+    notifyListeners();
+  }
+
   Future<bool> updateInfo({
     String id,
     String name,

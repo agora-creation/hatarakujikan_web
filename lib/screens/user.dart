@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
@@ -66,15 +67,18 @@ class _UserTableState extends State<UserTable> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () {
-                    showDialog(
+                  onPressed: () async {
+                    await showDialog(
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => MigrationDialog(
-                        groupProvider: widget.groupProvider,
                         userProvider: widget.userProvider,
+                        group: widget.groupProvider.group,
+                        users: widget.groupProvider.users,
                       ),
-                    );
+                    ).then((value) {
+                      widget.groupProvider.reloadUsers();
+                    });
                   },
                   color: Colors.cyan,
                   iconData: Icons.smartphone,
@@ -82,15 +86,17 @@ class _UserTableState extends State<UserTable> {
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
-                  onPressed: () {
-                    showDialog(
+                  onPressed: () async {
+                    await showDialog(
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => AddUserDialog(
-                        groupProvider: widget.groupProvider,
                         userProvider: widget.userProvider,
+                        group: widget.groupProvider.group,
                       ),
-                    );
+                    ).then((value) {
+                      widget.groupProvider.reloadUsers();
+                    });
                   },
                   color: Colors.blue,
                   iconData: Icons.add,
@@ -119,16 +125,18 @@ class _UserTableState extends State<UserTable> {
                   )),
                   DataCell(Text('${widget.groupProvider.users[index].email}')),
                   DataCell(IconButton(
-                    onPressed: () {
-                      showDialog(
+                    onPressed: () async {
+                      await showDialog(
                         barrierDismissible: false,
                         context: context,
                         builder: (_) => EditUserDialog(
-                          groupProvider: widget.groupProvider,
                           userProvider: widget.userProvider,
+                          group: widget.groupProvider.group,
                           user: widget.groupProvider.users[index],
                         ),
-                      );
+                      ).then((value) {
+                        widget.groupProvider.reloadUsers();
+                      });
                     },
                     icon: Icon(Icons.edit, color: Colors.blue),
                   )),
@@ -143,12 +151,14 @@ class _UserTableState extends State<UserTable> {
 }
 
 class MigrationDialog extends StatefulWidget {
-  final GroupProvider groupProvider;
   final UserProvider userProvider;
+  final GroupModel group;
+  final List<UserModel> users;
 
   MigrationDialog({
-    @required this.groupProvider,
     @required this.userProvider,
+    @required this.group,
+    @required this.users,
   });
 
   @override
@@ -162,12 +172,12 @@ class _MigrationDialogState extends State<MigrationDialog> {
   UserModel selectAfter;
 
   void _init() async {
-    widget.groupProvider.users.forEach((user) {
+    widget.users.forEach((user) {
       if (user.smartphone == false) {
         before.add(user);
       }
     });
-    widget.groupProvider.users.forEach((user) {
+    widget.users.forEach((user) {
       if (user.smartphone == true) {
         after.add(user);
       }
@@ -258,7 +268,7 @@ class _MigrationDialogState extends State<MigrationDialog> {
                 CustomTextButton(
                   onPressed: () async {
                     if (!await widget.userProvider.migration(
-                      groupId: widget.groupProvider.group.id,
+                      groupId: widget.group.id,
                       before: selectBefore,
                       after: selectAfter,
                     )) {
@@ -282,12 +292,12 @@ class _MigrationDialogState extends State<MigrationDialog> {
 }
 
 class AddUserDialog extends StatefulWidget {
-  final GroupProvider groupProvider;
   final UserProvider userProvider;
+  final GroupModel group;
 
   AddUserDialog({
-    @required this.groupProvider,
     @required this.userProvider,
+    @required this.group,
   });
 
   @override
@@ -347,11 +357,10 @@ class _AddUserDialogState extends State<AddUserDialog> {
                     if (!await widget.userProvider.create(
                       name: name.text.trim(),
                       recordPassword: recordPassword.text.trim(),
-                      group: widget.groupProvider.group,
+                      group: widget.group,
                     )) {
                       return;
                     }
-                    widget.groupProvider.reloadGroupModel();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('スタッフを登録しました')),
                     );
@@ -370,13 +379,13 @@ class _AddUserDialogState extends State<AddUserDialog> {
 }
 
 class EditUserDialog extends StatefulWidget {
-  final GroupProvider groupProvider;
   final UserProvider userProvider;
+  final GroupModel group;
   final UserModel user;
 
   EditUserDialog({
-    @required this.groupProvider,
     @required this.userProvider,
+    @required this.group,
     @required this.user,
   });
 
@@ -455,9 +464,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
                             onPressed: () {
                               widget.userProvider.delete(
                                 user: widget.user,
-                                group: widget.groupProvider.group,
+                                group: widget.group,
                               );
-                              widget.groupProvider.reloadGroupModel();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('スタッフを削除しました')),
                               );
@@ -476,7 +484,6 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         )) {
                           return;
                         }
-                        widget.groupProvider.reloadGroupModel();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('スタッフを修正しました')),
                         );

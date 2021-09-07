@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
-import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/section.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/screens/section/work.dart';
+import 'package:hatarakujikan_web/widgets/custom_select_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 
 class SectionSelectScreen extends StatefulWidget {
@@ -64,20 +64,16 @@ class _SectionSelectScreenState extends State<SectionSelectScreen> {
               itemCount: widget.sectionProvider.sections.length,
               itemBuilder: (_, index) {
                 SectionModel _section = widget.sectionProvider.sections[index];
-                return Container(
-                  decoration: kBottomBorderDecoration,
-                  child: ListTile(
-                    onTap: () async {
-                      setState(() => _isLoading = true);
-                      await widget.sectionProvider.setSection(_section);
-                      setState(() => _isLoading = false);
-                      Navigator.of(context, rootNavigator: true).pop();
-                      changeScreen(context, SectionWorkScreen());
-                    },
-                    title: Text(
-                        '${widget.sectionProvider.group?.name} (${_section.name})'),
-                    trailing: Icon(Icons.chevron_right),
-                  ),
+                return CustomSelectListTile(
+                  onTap: () async {
+                    setState(() => _isLoading = true);
+                    await widget.sectionProvider.setSection(_section);
+                    setState(() => _isLoading = false);
+                    Navigator.of(context, rootNavigator: true).pop();
+                    changeScreen(context, SectionWorkScreen());
+                  },
+                  label:
+                      '${widget.sectionProvider.group?.name} (${_section.name})',
                 );
               },
             ),
