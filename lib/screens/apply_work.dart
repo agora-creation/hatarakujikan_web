@@ -9,7 +9,8 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
-import 'package:hatarakujikan_web/widgets/custom_apply_work.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -354,33 +355,30 @@ class EditApplyWorkDialog extends StatelessWidget {
             SizedBox(height: 16.0),
             Text(
               '申請内容を確認し、「却下する」もしくは「承認する」ボタンを押してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomApplyWork(
+            CustomLabelColumn(
               label: '申請日時',
               child: Text(
-                  '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.createdAt)}'),
+                '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.createdAt)}',
+              ),
             ),
             Divider(),
-            CustomApplyWork(
+            CustomLabelColumn(
               label: '申請者名',
               child: Text('${applyWork.userName}'),
             ),
             Divider(),
-            CustomApplyWork(
+            CustomLabelColumn(
               label: '申請内容',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    decoration: kBottomBorderDecoration,
-                    child: ListTile(
-                      leading: Text('出勤時間'),
-                      title: Text(
+                  CustomLabelListTile(
+                    label: '出勤時間',
+                    value:
                         '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.startedAt)}',
-                      ),
-                    ),
                   ),
                   applyWork.breaks.length > 0
                       ? ListView.builder(
@@ -392,48 +390,36 @@ class EditApplyWorkDialog extends StatelessWidget {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  decoration: kBottomBorderDecoration,
-                                  child: ListTile(
-                                    leading: Text('休憩開始時間'),
-                                    title: Text(
+                                CustomLabelListTile(
+                                  label: '休憩開始時間',
+                                  value:
                                       '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.startedAt)}',
-                                    ),
-                                  ),
                                 ),
-                                Container(
-                                  decoration: kBottomBorderDecoration,
-                                  child: ListTile(
-                                    leading: Text('休憩終了時間'),
-                                    title: Text(
+                                CustomLabelListTile(
+                                  label: '休憩終了時間',
+                                  value:
                                       '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.endedAt)}',
-                                    ),
-                                  ),
                                 ),
                               ],
                             );
                           },
                         )
                       : Container(),
-                  Container(
-                    decoration: kBottomBorderDecoration,
-                    child: ListTile(
-                      leading: Text('退勤時間'),
-                      title: Text(
+                  CustomLabelListTile(
+                    label: '退勤時間',
+                    value:
                         '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.endedAt)}',
-                      ),
-                    ),
                   ),
                 ],
               ),
             ),
             Divider(),
-            CustomApplyWork(
+            CustomLabelColumn(
               label: '事由',
               child: Text('${applyWork.reason}'),
             ),
             Divider(),
-            CustomApplyWork(
+            CustomLabelColumn(
               label: '承認状況',
               child: applyWork.approval ? Text('承認済み') : Text('承認待ち'),
             ),

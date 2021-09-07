@@ -5,6 +5,7 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button2.dart';
@@ -163,56 +164,44 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         ],
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundStartType,
-                            onChanged: (value) {
-                              setState(() => roundStartType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ方',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundStartType,
+                          onChanged: (value) {
+                            setState(() => roundStartType = value);
+                          },
+                          items: roundTypeList.map((value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundStartNum,
-                            onChanged: (value) {
-                              setState(() => roundStartNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ分数',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundStartNum,
+                          onChanged: (value) {
+                            setState(() => roundStartNum = value);
+                          },
+                          items: roundNumList.map((value) {
+                            return DropdownMenuItem<int>(
+                              value: value,
+                              child: Text(
+                                '$value分',
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
@@ -227,56 +216,44 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         ],
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundEndType,
-                            onChanged: (value) {
-                              setState(() => roundEndType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ方',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundEndType,
+                          onChanged: (value) {
+                            setState(() => roundEndType = value);
+                          },
+                          items: roundTypeList.map((value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundEndNum,
-                            onChanged: (value) {
-                              setState(() => roundEndNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ分数',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundEndNum,
+                          onChanged: (value) {
+                            setState(() => roundEndNum = value);
+                          },
+                          items: roundNumList.map((value) {
+                            return DropdownMenuItem<int>(
+                              value: value,
+                              child: Text(
+                                '$value分',
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
@@ -291,56 +268,44 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         ],
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundBreakStartType,
-                            onChanged: (value) {
-                              setState(() => roundBreakStartType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ方',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundBreakStartType,
+                          onChanged: (value) {
+                            setState(() => roundBreakStartType = value);
+                          },
+                          items: roundTypeList.map((value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundBreakStartNum,
-                            onChanged: (value) {
-                              setState(() => roundBreakStartNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ分数',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundBreakStartNum,
+                          onChanged: (value) {
+                            setState(() => roundBreakStartNum = value);
+                          },
+                          items: roundNumList.map((value) {
+                            return DropdownMenuItem<int>(
+                              value: value,
+                              child: Text(
+                                '$value分',
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
@@ -355,56 +320,44 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         ],
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundBreakEndType,
-                            onChanged: (value) {
-                              setState(() => roundBreakEndType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ方',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundBreakEndType,
+                          onChanged: (value) {
+                            setState(() => roundBreakEndType = value);
+                          },
+                          items: roundTypeList.map((value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundBreakEndNum,
-                            onChanged: (value) {
-                              setState(() => roundBreakEndNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ分数',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundBreakEndNum,
+                          onChanged: (value) {
+                            setState(() => roundBreakEndNum = value);
+                          },
+                          items: roundNumList.map((value) {
+                            return DropdownMenuItem<int>(
+                              value: value,
+                              child: Text(
+                                '$value分',
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
@@ -419,56 +372,44 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         ],
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ方', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundWorkType,
-                            onChanged: (value) {
-                              setState(() => roundWorkType = value);
-                            },
-                            items: roundTypeList.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ方',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundWorkType,
+                          onChanged: (value) {
+                            setState(() => roundWorkType = value);
+                          },
+                          items: roundTypeList.map((value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('まるめ分数', style: TextStyle(fontSize: 14.0)),
-                          CustomDropdownButton(
-                            isExpanded: false,
-                            value: roundWorkNum,
-                            onChanged: (value) {
-                              setState(() => roundWorkNum = value);
-                            },
-                            items: roundNumList.map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(
-                                  '$value分',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      CustomLabelColumn(
+                        label: 'まるめ分数',
+                        child: CustomDropdownButton(
+                          isExpanded: false,
+                          value: roundWorkNum,
+                          onChanged: (value) {
+                            setState(() => roundWorkNum = value);
+                          },
+                          items: roundNumList.map((value) {
+                            return DropdownMenuItem<int>(
+                              value: value,
+                              child: Text(
+                                '$value分',
+                                style: kDefaultTextStyle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
@@ -489,10 +430,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         value: value,
                         child: Text(
                           '$value時間',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                          ),
+                          style: kDefaultTextStyle,
                         ),
                       );
                     }).toList(),

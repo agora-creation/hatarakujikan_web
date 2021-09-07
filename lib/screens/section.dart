@@ -11,6 +11,7 @@ import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -231,19 +232,16 @@ class _AddSectionDialogState extends State<AddSectionDialog> {
             SizedBox(height: 16.0),
             Text(
               '項目を全て入力して、最後に「登録する」ボタンを押してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('部署/事業所名', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: name,
-                ),
-              ],
+            CustomLabelColumn(
+              label: '部署/事業所名',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: name,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -316,19 +314,16 @@ class _EditSectionDialogState extends State<EditSectionDialog> {
             SizedBox(height: 16.0),
             Text(
               '部署/事業所の情報を修正できます。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('部署/事業所名', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: name,
-                ),
-              ],
+            CustomLabelColumn(
+              label: '部署/事業所名',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: name,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -425,18 +420,12 @@ class _UserSectionDialogState extends State<UserSectionDialog> {
             SizedBox(height: 16.0),
             Text(
               '登録した部署/事業所情報にスタッフ情報を紐付けします。各スタッフを選択して、登録してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '部署/事業所名',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text('${widget.section?.name}'),
-              ],
+            CustomLabelColumn(
+              label: '部署/事業所名',
+              child: Text('${widget.section?.name}'),
             ),
             Divider(),
             SizedBox(height: 8.0),
@@ -553,18 +542,12 @@ class _AdminUserSectionDialogState extends State<AdminUserSectionDialog> {
             SizedBox(height: 16.0),
             Text(
               '登録したスタッフ情報の中から管理者を一人決めます。部署/事業所の管理者は専用の管理画面とタブレットアプリを利用できます。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '部署/事業所名',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text('${widget.section?.name}'),
-              ],
+            CustomLabelColumn(
+              label: '部署/事業所名',
+              child: Text('${widget.section?.name}'),
             ),
             Divider(),
             SizedBox(height: 8.0),
@@ -587,10 +570,7 @@ class _AdminUserSectionDialogState extends State<AdminUserSectionDialog> {
                             value: value,
                             child: Text(
                               '${value.name}',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14.0,
-                              ),
+                              style: kDefaultTextStyle,
                             ),
                           );
                         }).toList(),

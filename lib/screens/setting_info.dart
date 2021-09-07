@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -113,57 +114,33 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('人数制限', style: TextStyle(fontSize: 14.0)),
-                  Text(
-                    'スタッフを${widget.groupProvider.group?.usersNum}人まで登録可能',
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                ],
+              CustomLabelColumn(
+                label: '会社/組織名',
+                child: CustomTextFormField2(
+                  textInputType: null,
+                  maxLines: 1,
+                  controller: name,
+                ),
               ),
               SizedBox(height: 8.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('会社/組織名', style: TextStyle(fontSize: 14.0)),
-                  CustomTextFormField2(
-                    textInputType: null,
-                    maxLines: 1,
-                    controller: name,
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('管理者を選ぶ', style: TextStyle(fontSize: 14.0)),
-                  CustomDropdownButton(
-                    isExpanded: false,
-                    value: adminUser,
-                    onChanged: (value) {
-                      setState(() => adminUser = value);
-                    },
-                    items: _users.map((value) {
-                      return DropdownMenuItem(
-                        value: value,
-                        child: Text(
-                          '${value.name}',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  Text(
-                    '※会社/組織の管理者は、この管理画面とタブレット端末アプリの使用が可能です。',
-                    style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
-                  ),
-                ],
+              CustomLabelColumn(
+                label: '管理者を選ぶ',
+                child: CustomDropdownButton(
+                  isExpanded: false,
+                  value: adminUser,
+                  onChanged: (value) {
+                    setState(() => adminUser = value);
+                  },
+                  items: _users.map((value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        '${value.name}',
+                        style: kDefaultTextStyle,
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),

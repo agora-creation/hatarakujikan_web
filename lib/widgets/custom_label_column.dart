@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomApplyWork extends StatelessWidget {
+class CustomLabelColumn extends StatelessWidget {
   final String label;
   final Widget child;
 
-  CustomApplyWork({
+  CustomLabelColumn({
     this.label,
     this.child,
   });

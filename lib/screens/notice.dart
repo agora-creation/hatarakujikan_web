@@ -10,6 +10,7 @@ import 'package:hatarakujikan_web/providers/group_notice.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -193,35 +194,29 @@ class _AddNoticeDialogState extends State<AddNoticeDialog> {
             SizedBox(height: 16.0),
             Text(
               '項目を全て入力して、最後に「登録する」ボタンを押してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             Text(
               '※ここでは登録のみで、送信はされません。',
               style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('タイトル', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: title,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'タイトル',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: title,
+              ),
             ),
             SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('メッセージ', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: TextInputType.multiline,
-                  maxLines: null,
-                  controller: message,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'メッセージ',
+              child: CustomTextFormField2(
+                textInputType: TextInputType.multiline,
+                maxLines: null,
+                controller: message,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -297,31 +292,25 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
             SizedBox(height: 16.0),
             Text(
               'お知らせ情報を修正できます。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('タイトル', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: title,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'タイトル',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: title,
+              ),
             ),
             SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('メッセージ', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: TextInputType.multiline,
-                  maxLines: null,
-                  controller: message,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'メッセージ',
+              child: CustomTextFormField2(
+                textInputType: TextInputType.multiline,
+                maxLines: null,
+                controller: message,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -422,29 +411,17 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
             SizedBox(height: 16.0),
             Text(
               'お知らせ情報を送信先スタッフを選択して、送信してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'タイトル',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text('${widget.groupNotice?.title}'),
-              ],
+            CustomLabelColumn(
+              label: 'タイトル',
+              child: Text('${widget.groupNotice?.title}'),
             ),
             Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'メッセージ',
-                  style: TextStyle(color: Colors.black54, fontSize: 14.0),
-                ),
-                Text('${widget.groupNotice?.message}'),
-              ],
+            CustomLabelColumn(
+              label: 'メッセージ',
+              child: Text('${widget.groupNotice?.message}'),
             ),
             Divider(),
             SizedBox(height: 8.0),

@@ -104,6 +104,11 @@ const TextStyle kListTime2TextStyle = TextStyle(
   fontSize: 15.0,
 );
 
+const TextStyle kDefaultTextStyle = TextStyle(
+  color: Colors.black54,
+  fontSize: 14.0,
+);
+
 DateTime kMonthFirstDate = DateTime(DateTime.now().year - 1);
 DateTime kMonthLastDate = DateTime(DateTime.now().year + 1);
 DateTime kDayFirstDate = DateTime.now().subtract(Duration(days: 365));

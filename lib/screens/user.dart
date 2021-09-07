@@ -6,6 +6,7 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -114,7 +115,8 @@ class _UserTableState extends State<UserTable> {
                 cells: [
                   DataCell(Text('${widget.groupProvider.users[index].name}')),
                   DataCell(Text(
-                      '${widget.groupProvider.users[index].recordPassword}')),
+                    '${widget.groupProvider.users[index].recordPassword}',
+                  )),
                   DataCell(Text('${widget.groupProvider.users[index].email}')),
                   DataCell(IconButton(
                     onPressed: () {
@@ -189,33 +191,32 @@ class _MigrationDialogState extends State<MigrationDialog> {
             SizedBox(height: 16.0),
             Text(
               'この機能は、この管理画面から登録したスタッフがスマートフォンアプリの利用を始めた際、スタッフデータが二重に登録されてしまう為、ここでスタッフデータの統一化ができます。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 8.0),
             Text(
               '「移行元スタッフ」と「移行先スタッフ」をそれぞれ選択し、最後に「移行する」ボタンを押してください。移行が完了すると、「移行元」のスタッフデータは削除されます。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
-            Text('移行元スタッフ(未スマホユーザー)', style: TextStyle(fontSize: 14.0)),
-            CustomDropdownButton(
-              isExpanded: true,
-              value: selectBefore,
-              onChanged: (value) {
-                setState(() => selectBefore = value);
-              },
-              items: before.map((value) {
-                return DropdownMenuItem<UserModel>(
-                  value: value,
-                  child: Text(
-                    '${value.name}',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
+            CustomLabelColumn(
+              label: '移行元スタッフ(未スマホユーザー)',
+              child: CustomDropdownButton(
+                isExpanded: true,
+                value: selectBefore,
+                onChanged: (value) {
+                  setState(() => selectBefore = value);
+                },
+                items: before.map((value) {
+                  return DropdownMenuItem<UserModel>(
+                    value: value,
+                    child: Text(
+                      '${value.name}',
+                      style: kDefaultTextStyle,
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
             SizedBox(height: 8.0),
             Center(
@@ -226,25 +227,24 @@ class _MigrationDialogState extends State<MigrationDialog> {
               ),
             ),
             SizedBox(height: 8.0),
-            Text('移行先スタッフ(スマホユーザー)', style: TextStyle(fontSize: 14.0)),
-            CustomDropdownButton(
-              isExpanded: false,
-              value: selectAfter,
-              onChanged: (value) {
-                setState(() => selectAfter = value);
-              },
-              items: after.map((value) {
-                return DropdownMenuItem<UserModel>(
-                  value: value,
-                  child: Text(
-                    '${value.name}',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
+            CustomLabelColumn(
+              label: '移行先スタッフ(スマホユーザー)',
+              child: CustomDropdownButton(
+                isExpanded: false,
+                value: selectAfter,
+                onChanged: (value) {
+                  setState(() => selectAfter = value);
+                },
+                items: after.map((value) {
+                  return DropdownMenuItem<UserModel>(
+                    value: value,
+                    child: Text(
+                      '${value.name}',
+                      style: kDefaultTextStyle,
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -309,35 +309,29 @@ class _AddUserDialogState extends State<AddUserDialog> {
             SizedBox(height: 16.0),
             Text(
               '項目を全て入力して、最後に「登録する」ボタンを押してください。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             Text(
               '※ここで新規登録したスタッフデータではスマートフォンアプリにログインできません。スマートフォンアプリから新規登録して、会社/組織へ加入してください。',
               style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('スタッフ名', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: name,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'スタッフ名',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: name,
+              ),
             ),
             SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('タブレット用暗証番号', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: recordPassword,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'タブレット用暗証番号',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: recordPassword,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -416,35 +410,29 @@ class _EditUserDialogState extends State<EditUserDialog> {
             SizedBox(height: 16.0),
             Text(
               'スタッフの情報を修正できます。',
-              style: TextStyle(color: Colors.black54, fontSize: 14.0),
+              style: kDefaultTextStyle,
             ),
             Text(
               '※スマートフォンアプリから登録している方は、この画面では削除はできません。スマートフォンアプリ内から削除するか、会社/組織から脱退してください。',
               style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
             ),
             SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('スタッフ名', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: name,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'スタッフ名',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: name,
+              ),
             ),
             SizedBox(height: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('タブレット用暗証番号', style: TextStyle(fontSize: 14.0)),
-                CustomTextFormField2(
-                  textInputType: null,
-                  maxLines: 1,
-                  controller: recordPassword,
-                ),
-              ],
+            CustomLabelColumn(
+              label: 'タブレット用暗証番号',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: recordPassword,
+              ),
             ),
             SizedBox(height: 16.0),
             Row(
