@@ -34,6 +34,7 @@ dependencies:
   google_maps_flutter: ^2.0.6
   google_maps_flutter_web: ^0.3.0+2
   http: ^0.13.3
+  syncfusion_flutter_calendar: ^19.2.60
   intl: ^0.16.1
 dependency_overrides:
   intl: ^0.17.0-nullsafety.2
