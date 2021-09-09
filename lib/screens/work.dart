@@ -238,34 +238,36 @@ class _WorkTableState extends State<WorkTable> {
               for (DocumentSnapshot doc in snapshot.item2.data.docs) {
                 workStates.add(WorkStateModel.fromSnapshot(doc));
               }
-              return ListView.builder(
-                itemCount: days.length,
-                itemBuilder: (_, index) {
-                  List<WorkModel> dayWorks = [];
-                  for (WorkModel _work in works) {
-                    String _start =
-                        '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
-                    if (days[index] == DateTime.parse(_start)) {
-                      dayWorks.add(_work);
+              return Scrollbar(
+                child: ListView.builder(
+                  itemCount: days.length,
+                  itemBuilder: (_, index) {
+                    List<WorkModel> dayWorks = [];
+                    for (WorkModel _work in works) {
+                      String _start =
+                          '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+                      if (days[index] == DateTime.parse(_start)) {
+                        dayWorks.add(_work);
+                      }
                     }
-                  }
-                  WorkStateModel dayWorkState;
-                  for (WorkStateModel _workState in workStates) {
-                    String _start =
-                        '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
-                    if (days[index] == DateTime.parse(_start)) {
-                      dayWorkState = _workState;
+                    WorkStateModel dayWorkState;
+                    for (WorkStateModel _workState in workStates) {
+                      String _start =
+                          '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
+                      if (days[index] == DateTime.parse(_start)) {
+                        dayWorkState = _workState;
+                      }
                     }
-                  }
-                  return CustomWorkListTile(
-                    workProvider: widget.workProvider,
-                    workStateProvider: widget.workStateProvider,
-                    day: days[index],
-                    dayWorks: dayWorks,
-                    dayWorkState: dayWorkState,
-                    group: widget.groupProvider.group,
-                  );
-                },
+                    return CustomWorkListTile(
+                      workProvider: widget.workProvider,
+                      workStateProvider: widget.workStateProvider,
+                      day: days[index],
+                      dayWorks: dayWorks,
+                      dayWorkState: dayWorkState,
+                      group: widget.groupProvider.group,
+                    );
+                  },
+                ),
               );
             },
           ),

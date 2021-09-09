@@ -33,11 +33,26 @@ class WorkShiftTable extends StatefulWidget {
 
 class _WorkShiftTableState extends State<WorkShiftTable> {
   final CalendarController _calendarController = CalendarController();
+  final List<Appointment> _shiftCollection = [];
+  final List<CalendarResource> _userCollection = [];
+  _ShiftDataSource _events;
+
+  void _init() async {
+    _calendarController.view = CalendarView.timelineMonth;
+    widget.groupProvider.users.forEach((user) {
+      _userCollection.add(CalendarResource(
+        id: '${user.id}',
+        displayName: '${user.name}',
+        color: Colors.orangeAccent.shade100,
+      ));
+    });
+    _events = _ShiftDataSource(_shiftCollection, _userCollection);
+  }
 
   @override
   void initState() {
     super.initState();
-    _calendarController.view = CalendarView.timelineMonth;
+    _init();
   }
 
   @override
@@ -55,10 +70,22 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
             showDatePickerButton: true,
             controller: _calendarController,
             allowViewNavigation: false,
-            todayHighlightColor: Colors.lightBlue,
+            dataSource: _events,
+            resourceViewSettings: ResourceViewSettings(
+              showAvatar: false,
+              displayNameTextStyle: TextStyle(fontSize: 16.0),
+            ),
           ),
         ),
       ],
     );
+  }
+}
+
+class _ShiftDataSource extends CalendarDataSource {
+  _ShiftDataSource(
+      List<Appointment> source, List<CalendarResource> resourceColl) {
+    appointments = source;
+    resources = resourceColl;
   }
 }
