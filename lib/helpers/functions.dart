@@ -66,6 +66,24 @@ Future<void> removePrefs({String key}) async {
   _prefs.remove(key);
 }
 
+DateTime rebuildDate(DateTime date, DateTime time) {
+  String _date = '${DateFormat('yyyy-MM-dd').format(date)}';
+  String _time = '${DateFormat('HH:mm').format(time)}:00.000';
+  return DateTime.parse('$_date $_time');
+}
+
+DateTime rebuildTime(BuildContext context, DateTime date, TimeOfDay time) {
+  String _date = '${DateFormat('yyyy-MM-dd').format(date)}';
+  String _time = '${time.format(context).padLeft(5, '0')}:00.000';
+  return DateTime.parse('$_date $_time');
+}
+
+List<int> timeToInt(DateTime dateTime) {
+  String _h = '${DateFormat('H').format(dateTime)}';
+  String _m = '${DateFormat('m').format(dateTime)}';
+  return [int.parse(_h), int.parse(_m)];
+}
+
 String twoDigits(int n) => n.toString().padLeft(2, '0');
 
 String addTime(String left, String right) {
