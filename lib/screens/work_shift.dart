@@ -6,6 +6,7 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -15,21 +16,24 @@ import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:intl/intl.dart';
+import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class WorkShiftScreen extends StatelessWidget {
-  static const String id = 'work_shift';
+  static const String id = 'workShift';
 
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    final workShiftProvider = Provider.of<WorkShiftProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
       body: WorkShiftTable(
         groupProvider: groupProvider,
+        workShiftProvider: workShiftProvider,
       ),
     );
   }
@@ -37,8 +41,12 @@ class WorkShiftScreen extends StatelessWidget {
 
 class WorkShiftTable extends StatefulWidget {
   final GroupProvider groupProvider;
+  final WorkShiftProvider workShiftProvider;
 
-  WorkShiftTable({@required this.groupProvider});
+  WorkShiftTable({
+    @required this.groupProvider,
+    @required this.workShiftProvider,
+  });
 
   @override
   _WorkShiftTableState createState() => _WorkShiftTableState();
@@ -67,8 +75,13 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
   @override
   Widget build(BuildContext context) {
     GroupModel _group = widget.groupProvider.group;
-    Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+    Stream<QuerySnapshot> _streamWork = FirebaseFirestore.instance
         .collection('work')
+        .where('groupId', isEqualTo: _group?.id ?? 'error')
+        .orderBy('startedAt', descending: false)
+        .snapshots();
+    Stream<QuerySnapshot> _streamWorkShift = FirebaseFirestore.instance
+        .collection('workShift')
         .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .snapshots();
@@ -86,14 +99,14 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
         ),
         SizedBox(height: 16.0),
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: _stream,
+          child: StreamBuilder2<QuerySnapshot, QuerySnapshot>(
+            streams: Tuple2(_streamWork, _streamWorkShift),
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (!snapshot.item1.hasData) {
                 return Loading(color: Colors.orange);
               }
               _appointments.clear();
-              for (DocumentSnapshot doc in snapshot.data.docs) {
+              for (DocumentSnapshot doc in snapshot.item1.data.docs) {
                 WorkModel _work = WorkModel.fromSnapshot(doc);
                 if (_work.startedAt != _work.endedAt) {
                   _appointments.add(Appointment(
@@ -127,9 +140,11 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                     showDialog(
                       barrierDismissible: false,
                       context: context,
-                      builder: (_) => _AddDialog(
-                        date: details.date,
+                      builder: (_) => AddWorkShiftDialog(
+                        workShiftProvider: widget.workShiftProvider,
+                        group: widget.groupProvider.group,
                         users: widget.groupProvider.users,
+                        date: details.date,
                       ),
                     );
                   }
@@ -153,20 +168,24 @@ class _ShiftDataSource extends CalendarDataSource {
   }
 }
 
-class _AddDialog extends StatefulWidget {
-  final DateTime date;
+class AddWorkShiftDialog extends StatefulWidget {
+  final WorkShiftProvider workShiftProvider;
+  final GroupModel group;
   final List<UserModel> users;
+  final DateTime date;
 
-  _AddDialog({
-    @required this.date,
+  AddWorkShiftDialog({
+    @required this.workShiftProvider,
+    @required this.group,
     @required this.users,
+    @required this.date,
   });
 
   @override
-  _AddDialogState createState() => _AddDialogState();
+  _AddWorkShiftDialogState createState() => _AddWorkShiftDialogState();
 }
 
-class _AddDialogState extends State<_AddDialog> {
+class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
   UserModel _user;
   String _state;
   DateTime _startedAt = DateTime.now();
@@ -174,7 +193,7 @@ class _AddDialogState extends State<_AddDialog> {
 
   void _init() async {
     _startedAt = widget.date;
-    _endedAt = widget.date.add(Duration(hours: 1));
+    _endedAt = widget.date.add(Duration(hours: 8));
   }
 
   @override
@@ -194,7 +213,7 @@ class _AddDialogState extends State<_AddDialog> {
             SizedBox(height: 8.0),
             Center(
               child: Text(
-                '${DateFormat('yyyy/MM/dd (E)', 'ja').format(widget.date)}',
+                '${DateFormat('yyyy/MM/dd(E)', 'ja').format(widget.date)}の予定追加',
                 style: kAdminTitleTextStyle,
               ),
             ),
@@ -227,7 +246,15 @@ class _AddDialogState extends State<_AddDialog> {
                 onChanged: (value) {
                   setState(() => _state = value);
                 },
-                items: [],
+                items: widget.workShiftProvider.states.map((value) {
+                  return DropdownMenuItem(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: kDefaultTextStyle,
+                    ),
+                  );
+                }).toList(),
               ),
             ),
             SizedBox(height: 8.0),
@@ -340,7 +367,21 @@ class _AddDialogState extends State<_AddDialog> {
                   label: 'キャンセル',
                 ),
                 CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () async {
+                    if (!await widget.workShiftProvider.create(
+                      group: widget.group,
+                      user: _user,
+                      startedAt: _startedAt,
+                      endedAt: _endedAt,
+                      state: _state,
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('シフト表に予定を追加しました')),
+                    );
+                    Navigator.pop(context);
+                  },
                   color: Colors.blue,
                   label: '登録する',
                 ),

@@ -10,6 +10,7 @@ import 'package:hatarakujikan_web/providers/group_notice.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: SectionProvider.initialize()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: WorkProvider()),
+        ChangeNotifierProvider.value(value: WorkShiftProvider()),
         ChangeNotifierProvider.value(value: WorkStateProvider()),
       ],
       child: MaterialApp(
@@ -97,9 +99,11 @@ class _SplashControllerState extends State<SplashController> {
   bool _mode = true;
 
   void _init() async {
-    if (await getPrefs(key: 'groupId') != '') {
+    String _groupId = await getPrefs(key: 'groupId');
+    String _sectionId = await getPrefs(key: 'sectionId');
+    if (_groupId != '') {
       _mode = true;
-    } else if (await getPrefs(key: 'sectionId') != '') {
+    } else if (_sectionId != '') {
       _mode = false;
     }
   }
@@ -122,10 +126,6 @@ class _SplashControllerState extends State<SplashController> {
         case Status.Authenticating:
           return LoginScreen();
         case Status.Authenticated:
-          if (groupProvider.group == null) {
-            groupProvider.signOut();
-            return LoginScreen();
-          }
           return WorkScreen();
         default:
           return LoginScreen();
@@ -138,10 +138,6 @@ class _SplashControllerState extends State<SplashController> {
         case Status2.Authenticating:
           return SectionLoginScreen();
         case Status2.Authenticated:
-          if (sectionProvider.section == null) {
-            sectionProvider.signOut();
-            return SectionLoginScreen();
-          }
           return SectionWorkScreen();
         default:
           return SectionLoginScreen();
