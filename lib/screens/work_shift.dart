@@ -94,7 +94,7 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフ毎の予定日時と勤務日時が表示されます。',
+          'スタッフ毎の予定日時と勤務日時が表示されます。予定日時は追加/変更/削除できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -113,6 +113,8 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                       subject: '${_work.state}',
                       color: Colors.grey,
                       resourceIds: [_work.userId],
+                      id: _work.id,
+                      notes: 'work',
                     ));
                   }
                 }
@@ -126,6 +128,8 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                     subject: '${_workShift.state}',
                     color: _workShift.stateColor(),
                     resourceIds: [_workShift.userId],
+                    id: _workShift.id,
+                    notes: 'workShift',
                   ));
                 }
               }
@@ -138,17 +142,19 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                     if (_appointment is Appointment) {
                       _selected = _appointment;
                     }
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => EditShiftDialog(
-                        day: details.date,
-                        resource: details.resource,
-                        appointment: _selected,
-                      ),
-                    );
+                    if (_selected.notes == 'workShift') {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => EditWorkShiftDialog(
+                          workShiftProvider: widget.workShiftProvider,
+                          users: widget.groupProvider.users,
+                          userId: '${details.resource.id}',
+                          appointment: _selected,
+                        ),
+                      );
+                    }
                   } else {
-                    print(details.resource.id);
                     showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -411,16 +417,41 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
   }
 }
 
-class EditShiftDialog extends StatelessWidget {
-  final DateTime day;
-  final CalendarResource resource;
+class EditWorkShiftDialog extends StatefulWidget {
+  final WorkShiftProvider workShiftProvider;
+  final List<UserModel> users;
+  final String userId;
   final Appointment appointment;
 
-  EditShiftDialog({
-    @required this.day,
-    @required this.resource,
+  EditWorkShiftDialog({
+    @required this.workShiftProvider,
+    @required this.users,
+    @required this.userId,
     @required this.appointment,
   });
+
+  @override
+  State<EditWorkShiftDialog> createState() => _EditWorkShiftDialogState();
+}
+
+class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
+  UserModel _user;
+  String _state;
+  DateTime _startedAt = DateTime.now();
+  DateTime _endedAt = DateTime.now();
+
+  void _init() async {
+    _user = widget.users.firstWhere((e) => e.id == widget.userId);
+    _state = widget.appointment.subject;
+    _startedAt = widget.appointment.startTime;
+    _endedAt = widget.appointment.endTime;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -433,32 +464,150 @@ class EditShiftDialog extends StatelessWidget {
             SizedBox(height: 8.0),
             Center(
               child: Text(
-                '${DateFormat('yyyy/MM/dd (E)', 'ja').format(day)}',
+                '${DateFormat('yyyy/MM/dd(E)', 'ja').format(widget.appointment.startTime)}の予定変更',
                 style: kAdminTitleTextStyle,
               ),
             ),
             SizedBox(height: 16.0),
             CustomLabelColumn(
-              label: '勤務状況',
-              child: Text('${appointment.subject}'),
-            ),
-            Divider(),
-            CustomLabelColumn(
-              label: '出勤日時',
-              child:
-                  Text('${DateFormat('HH:mm').format(appointment.startTime)}'),
-            ),
-            Divider(),
-            CustomLabelColumn(
-              label: '退勤日時',
-              child: Text('${DateFormat('HH:mm').format(appointment.endTime)}'),
-            ),
-            Divider(),
-            CustomLabelColumn(
               label: 'スタッフ',
-              child: Text('${resource.displayName}'),
+              child: CustomDropdownButton(
+                isExpanded: true,
+                value: _user,
+                onChanged: (value) {
+                  setState(() => _user = value);
+                },
+                items: widget.users.map((value) {
+                  return DropdownMenuItem(
+                    value: value,
+                    child: Text(
+                      '${value.name}',
+                      style: kDefaultTextStyle,
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-            Divider(),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
+              label: '勤務状況',
+              child: CustomDropdownButton(
+                isExpanded: true,
+                value: _state,
+                onChanged: (value) {
+                  setState(() => _state = value);
+                },
+                items: widget.workShiftProvider.states.map((value) {
+                  return DropdownMenuItem(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: kDefaultTextStyle,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
+              label: '開始日時',
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: CustomDateButton(
+                      onPressed: () async {
+                        DateTime _selected = await showDatePicker(
+                          context: context,
+                          initialDate: _startedAt,
+                          firstDate: kDayFirstDate,
+                          lastDate: kDayLastDate,
+                        );
+                        if (_selected != null) {
+                          _selected = rebuildDate(_selected, _startedAt);
+                          setState(() => _startedAt = _selected);
+                        }
+                      },
+                      label: '${DateFormat('yyyy/MM/dd').format(_startedAt)}',
+                    ),
+                  ),
+                  SizedBox(width: 4.0),
+                  Expanded(
+                    flex: 2,
+                    child: CustomTimeButton(
+                      onPressed: () async {
+                        TimeOfDay _selected = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(
+                            hour: timeToInt(_startedAt)[0],
+                            minute: timeToInt(_startedAt)[1],
+                          ),
+                        );
+                        if (_selected != null) {
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _startedAt,
+                            _selected,
+                          );
+                          setState(() => _startedAt = _dateTime);
+                        }
+                      },
+                      label: '${DateFormat('HH:mm').format(_startedAt)}',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
+              label: '終了日時',
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: CustomDateButton(
+                      onPressed: () async {
+                        DateTime _selected = await showDatePicker(
+                          context: context,
+                          initialDate: _endedAt,
+                          firstDate: kDayFirstDate,
+                          lastDate: kDayLastDate,
+                        );
+                        if (_selected != null) {
+                          _selected = rebuildDate(_selected, _endedAt);
+                          setState(() => _endedAt = _selected);
+                        }
+                      },
+                      label: '${DateFormat('yyyy/MM/dd').format(_endedAt)}',
+                    ),
+                  ),
+                  SizedBox(width: 4.0),
+                  Expanded(
+                    flex: 2,
+                    child: CustomTimeButton(
+                      onPressed: () async {
+                        TimeOfDay _selected = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(
+                            hour: timeToInt(_endedAt)[0],
+                            minute: timeToInt(_endedAt)[1],
+                          ),
+                        );
+                        if (_selected != null) {
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _endedAt,
+                            _selected,
+                          );
+                          setState(() => _endedAt = _dateTime);
+                        }
+                      },
+                      label: '${DateFormat('HH:mm').format(_endedAt)}',
+                    ),
+                  ),
+                ],
+              ),
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -468,10 +617,42 @@ class EditShiftDialog extends StatelessWidget {
                   color: Colors.grey,
                   label: 'キャンセル',
                 ),
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.blue,
-                  label: 'はい',
+                Row(
+                  children: [
+                    CustomTextButton(
+                      onPressed: () {
+                        widget.workShiftProvider.delete(
+                          id: '${widget.appointment.id}',
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('シフト表の予定を削除しました')),
+                        );
+                        Navigator.pop(context);
+                      },
+                      color: Colors.red,
+                      label: '削除する',
+                    ),
+                    SizedBox(width: 4.0),
+                    CustomTextButton(
+                      onPressed: () async {
+                        if (!await widget.workShiftProvider.update(
+                          id: '${widget.appointment.id}',
+                          user: _user,
+                          startedAt: _startedAt,
+                          endedAt: _endedAt,
+                          state: _state,
+                        )) {
+                          return;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('シフト表の予定を変更しました')),
+                        );
+                        Navigator.pop(context);
+                      },
+                      color: Colors.blue,
+                      label: '変更する',
+                    ),
+                  ],
                 ),
               ],
             ),

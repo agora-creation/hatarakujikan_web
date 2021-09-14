@@ -25,7 +25,7 @@ const List<MenuItem> kSideMenu = [
         icon: Icons.chevron_right,
       ),
       MenuItem(
-        title: 'シフト表(仮)',
+        title: 'シフト表',
         route: WorkShiftScreen.id,
         icon: Icons.chevron_right,
       ),

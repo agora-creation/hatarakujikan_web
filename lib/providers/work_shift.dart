@@ -37,16 +37,18 @@ class WorkShiftProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    WorkShiftModel workShift,
+    String id,
+    UserModel user,
     DateTime startedAt,
     DateTime endedAt,
     String state,
   }) async {
-    if (workShift == null) return false;
+    if (user == null) return false;
     if (state == null) return false;
     try {
       _workShiftService.update({
-        'id': workShift.id,
+        'id': id,
+        'userId': user.id,
         'startedAt': startedAt,
         'endedAt': endedAt,
         'state': state,
@@ -58,8 +60,8 @@ class WorkShiftProvider with ChangeNotifier {
     }
   }
 
-  void delete({WorkShiftModel workShift}) {
-    _workShiftService.delete({'id': workShift.id});
+  void delete({String id}) {
+    _workShiftService.delete({'id': id});
   }
 
   Future<List<WorkShiftModel>> selectList({
