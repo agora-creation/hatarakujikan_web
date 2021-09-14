@@ -63,16 +63,16 @@ class WorkShiftProvider with ChangeNotifier {
   }
 
   Future<List<WorkShiftModel>> selectList({
-    String groupId,
-    String userId,
+    GroupModel group,
+    UserModel user,
     DateTime startAt,
     DateTime endAt,
   }) async {
     List<WorkShiftModel> _workShifts = [];
     await _workShiftService
         .selectList(
-      groupId: groupId,
-      userId: userId,
+      groupId: group.id,
+      userId: user.id,
       startAt: startAt,
       endAt: endAt,
     )

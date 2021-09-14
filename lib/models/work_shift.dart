@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class WorkShiftModel {
   String _id;
@@ -25,5 +26,20 @@ class WorkShiftModel {
     _endedAt = snapshot.data()['endedAt'].toDate();
     _state = snapshot.data()['state'];
     _createdAt = snapshot.data()['createdAt'].toDate();
+  }
+
+  Color stateColor() {
+    switch (_state) {
+      case '欠勤':
+        return Colors.red;
+      case '特別休暇':
+        return Colors.green;
+      case '有給休暇':
+        return Colors.teal;
+      case '代休':
+        return Colors.pink;
+      default:
+        return Colors.red;
+    }
   }
 }

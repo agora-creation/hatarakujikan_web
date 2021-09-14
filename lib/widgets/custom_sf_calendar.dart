@@ -28,6 +28,7 @@ class CustomSfCalendar extends StatelessWidget {
         ),
       ),
       onTap: onTap,
+      onViewChanged: null,
     );
   }
 }

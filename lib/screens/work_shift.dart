@@ -5,6 +5,7 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
@@ -14,7 +15,6 @@ import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_sf_calendar.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
-import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:intl/intl.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
@@ -102,19 +102,30 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
           child: StreamBuilder2<QuerySnapshot, QuerySnapshot>(
             streams: Tuple2(_streamWork, _streamWorkShift),
             builder: (context, snapshot) {
-              if (!snapshot.item1.hasData) {
-                return Loading(color: Colors.orange);
-              }
               _appointments.clear();
-              for (DocumentSnapshot doc in snapshot.item1.data.docs) {
-                WorkModel _work = WorkModel.fromSnapshot(doc);
-                if (_work.startedAt != _work.endedAt) {
+              if (snapshot.item1.hasData) {
+                for (DocumentSnapshot doc in snapshot.item1.data.docs) {
+                  WorkModel _work = WorkModel.fromSnapshot(doc);
+                  if (_work.startedAt != _work.endedAt) {
+                    _appointments.add(Appointment(
+                      startTime: _work.startedAt,
+                      endTime: _work.endedAt,
+                      subject: '${_work.state}',
+                      color: Colors.grey,
+                      resourceIds: [_work.userId],
+                    ));
+                  }
+                }
+              }
+              if (snapshot.item2.hasData) {
+                for (DocumentSnapshot doc in snapshot.item2.data.docs) {
+                  WorkShiftModel _workShift = WorkShiftModel.fromSnapshot(doc);
                   _appointments.add(Appointment(
-                    startTime: _work.startedAt,
-                    endTime: _work.endedAt,
-                    subject: '${_work.state}',
-                    color: Colors.grey,
-                    resourceIds: [_work.userId],
+                    startTime: _workShift.startedAt,
+                    endTime: _workShift.endedAt,
+                    subject: '${_workShift.state}',
+                    color: _workShift.stateColor(),
+                    resourceIds: [_workShift.userId],
                   ));
                 }
               }
@@ -137,6 +148,7 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                       ),
                     );
                   } else {
+                    print(details.resource.id);
                     showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -144,6 +156,7 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                         workShiftProvider: widget.workShiftProvider,
                         group: widget.groupProvider.group,
                         users: widget.groupProvider.users,
+                        userId: '${details.resource.id}',
                         date: details.date,
                       ),
                     );
@@ -172,12 +185,14 @@ class AddWorkShiftDialog extends StatefulWidget {
   final WorkShiftProvider workShiftProvider;
   final GroupModel group;
   final List<UserModel> users;
+  final String userId;
   final DateTime date;
 
   AddWorkShiftDialog({
     @required this.workShiftProvider,
     @required this.group,
     @required this.users,
+    @required this.userId,
     @required this.date,
   });
 
@@ -192,6 +207,8 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
   DateTime _endedAt = DateTime.now();
 
   void _init() async {
+    _user = widget.users.firstWhere((e) => e.id == widget.userId);
+    _state = widget.workShiftProvider.states.first;
     _startedAt = widget.date;
     _endedAt = widget.date.add(Duration(hours: 8));
   }
