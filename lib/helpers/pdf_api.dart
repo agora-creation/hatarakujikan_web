@@ -3,9 +3,9 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
-import 'package:hatarakujikan_web/models/work_state.dart';
+import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
-import 'package:hatarakujikan_web/providers/work_state.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -116,7 +116,7 @@ class PdfApi {
   // 勤務状況PDF作成
   static Future<void> works01({
     WorkProvider workProvider,
-    WorkStateProvider workStateProvider,
+    WorkShiftProvider workShiftProvider,
     GroupModel group,
     DateTime month,
     UserModel user,
@@ -182,20 +182,20 @@ class PdfApi {
       for (UserModel _user in users) {
         // 各種データ取得
         List<WorkModel> works = await workProvider.selectList(
-          groupId: group.id,
-          userId: _user.id,
+          group: group,
+          user: _user,
           startAt: days.first,
           endAt: days.last,
         );
         List<WorkModel> worksW = await workProvider.selectList(
-          groupId: group.id,
-          userId: _user.id,
+          group: group,
+          user: _user,
           startAt: daysW.first,
           endAt: daysW.last,
         );
-        List<WorkStateModel> workStates = await workStateProvider.selectList(
-          groupId: group.id,
-          userId: _user.id,
+        List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
+          group: group,
+          user: _user,
           startAt: days.first,
           endAt: days.last,
         );
@@ -244,13 +244,13 @@ class PdfApi {
               _cell(label: '週間合計※5'),
             ],
           ));
+          DateFormat _format = DateFormat('yyyy-MM-dd');
           // 週間合計
           String _tmp = '00:00';
           for (int i = 0; i < daysW.length; i++) {
             List<WorkModel> _dayWorksW = [];
             for (WorkModel _work in worksW) {
-              String _start =
-                  '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+              String _start = '${_format.format(_work.startedAt)}';
               if (daysW[i] == DateTime.parse(_start)) {
                 _dayWorksW.add(_work);
               }
@@ -267,7 +267,7 @@ class PdfApi {
               }
             }
             if (_week == '土') {
-              String _key = '${DateFormat('yyyy-MM-dd').format(daysW[i])}';
+              String _key = '${_format.format(daysW[i])}';
               countW[_key] = _tmp;
             }
           }
@@ -275,18 +275,16 @@ class PdfApi {
           for (int i = 0; i < days.length; i++) {
             List<WorkModel> _dayWorks = [];
             for (WorkModel _work in works) {
-              String _start =
-                  '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+              String _start = '${_format.format(_work.startedAt)}';
               if (days[i] == DateTime.parse(_start)) {
                 _dayWorks.add(_work);
               }
             }
-            WorkStateModel _dayWorkState;
-            for (WorkStateModel _workState in workStates) {
-              String _start =
-                  '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
+            WorkShiftModel _dayWorkShift;
+            for (WorkShiftModel _workShift in workShifts) {
+              String _start = '${_format.format(_workShift.startedAt)}';
               if (days[i] == DateTime.parse(_start)) {
-                _dayWorkState = _workState;
+                _dayWorkShift = _workShift;
               }
             }
             String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
@@ -303,8 +301,7 @@ class PdfApi {
                   String _nightTime = _calTimes[1];
                   String _dayTimeOver = _calTimes[2];
                   String _nightTimeOver = _calTimes[3];
-                  String _key =
-                      '${DateFormat('yyyy-MM-dd').format(_dayWorks[j].startedAt)}';
+                  String _key = '${_format.format(_dayWorks[j].startedAt)}';
                   count[_key] = '';
                   workTimes = addTime(workTimes, _workTime);
                   dayTimes = addTime(dayTimes, _dayTime);
@@ -323,17 +320,14 @@ class PdfApi {
                       _cell(label: _nightTime),
                       _cell(label: _dayTimeOver),
                       _cell(label: _nightTimeOver),
-                      _cell(
-                          label: countW[
-                                  '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
-                              ''),
+                      _cell(label: countW['${_format.format(days[i])}'] ?? ''),
                     ],
                   ));
                 }
               }
             } else {
               PdfColor _stateColor = PdfColors.white;
-              switch (_dayWorkState?.state) {
+              switch (_dayWorkShift?.state) {
                 case '欠勤':
                   _stateColor = PdfColors.red100;
                   break;
@@ -350,7 +344,7 @@ class PdfApi {
               _row.add(pw.TableRow(
                 children: [
                   _cell(label: _day),
-                  _cell(label: _dayWorkState?.state ?? '', color: _stateColor),
+                  _cell(label: _dayWorkShift?.state ?? '', color: _stateColor),
                   _cell(label: ''),
                   _cell(label: ''),
                   _cell(label: ''),
@@ -359,10 +353,7 @@ class PdfApi {
                   _cell(label: ''),
                   _cell(label: ''),
                   _cell(label: ''),
-                  _cell(
-                      label: countW[
-                              '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
-                          ''),
+                  _cell(label: countW['${_format.format(days[i])}'] ?? ''),
                 ],
               ));
             }
@@ -415,20 +406,20 @@ class PdfApi {
       if (user == null) return;
       // 各種データ取得
       List<WorkModel> works = await workProvider.selectList(
-        groupId: group.id,
-        userId: user.id,
+        group: group,
+        user: user,
         startAt: days.first,
         endAt: days.last,
       );
       List<WorkModel> worksW = await workProvider.selectList(
-        groupId: group.id,
-        userId: user.id,
+        group: group,
+        user: user,
         startAt: daysW.first,
         endAt: daysW.last,
       );
-      List<WorkStateModel> workStates = await workStateProvider.selectList(
-        groupId: group.id,
-        userId: user.id,
+      List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
+        group: group,
+        user: user,
         startAt: days.first,
         endAt: days.last,
       );
@@ -477,13 +468,13 @@ class PdfApi {
             _cell(label: '週間合計※5'),
           ],
         ));
+        DateFormat _format = DateFormat('yyyy-MM-dd');
         // 週間合計
         String _tmp = '00:00';
         for (int i = 0; i < daysW.length; i++) {
           List<WorkModel> _dayWorksW = [];
           for (WorkModel _work in worksW) {
-            String _start =
-                '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+            String _start = '${_format.format(_work.startedAt)}';
             if (daysW[i] == DateTime.parse(_start)) {
               _dayWorksW.add(_work);
             }
@@ -500,7 +491,7 @@ class PdfApi {
             }
           }
           if (_week == '土') {
-            String _key = '${DateFormat('yyyy-MM-dd').format(daysW[i])}';
+            String _key = '${_format.format(daysW[i])}';
             countW[_key] = _tmp;
           }
         }
@@ -508,18 +499,16 @@ class PdfApi {
         for (int i = 0; i < days.length; i++) {
           List<WorkModel> _dayWorks = [];
           for (WorkModel _work in works) {
-            String _start =
-                '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+            String _start = '${_format.format(_work.startedAt)}';
             if (days[i] == DateTime.parse(_start)) {
               _dayWorks.add(_work);
             }
           }
-          WorkStateModel _dayWorkState;
-          for (WorkStateModel _workState in workStates) {
-            String _start =
-                '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
+          WorkShiftModel _dayWorkShift;
+          for (WorkShiftModel _workShift in workShifts) {
+            String _start = '${_format.format(_workShift.startedAt)}';
             if (days[i] == DateTime.parse(_start)) {
-              _dayWorkState = _workState;
+              _dayWorkShift = _workShift;
             }
           }
           String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
@@ -536,8 +525,7 @@ class PdfApi {
                 String _nightTime = _calTimes[1];
                 String _dayTimeOver = _calTimes[2];
                 String _nightTimeOver = _calTimes[3];
-                String _key =
-                    '${DateFormat('yyyy-MM-dd').format(_dayWorks[j].startedAt)}';
+                String _key = '${_format.format(_dayWorks[j].startedAt)}';
                 count[_key] = '';
                 workTimes = addTime(workTimes, _workTime);
                 dayTimes = addTime(dayTimes, _dayTime);
@@ -556,17 +544,14 @@ class PdfApi {
                     _cell(label: _nightTime),
                     _cell(label: _dayTimeOver),
                     _cell(label: _nightTimeOver),
-                    _cell(
-                        label: countW[
-                                '${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
-                            ''),
+                    _cell(label: countW['${_format.format(days[i])}'] ?? ''),
                   ],
                 ));
               }
             }
           } else {
             PdfColor _stateColor = PdfColors.white;
-            switch (_dayWorkState?.state) {
+            switch (_dayWorkShift?.state) {
               case '欠勤':
                 _stateColor = PdfColors.red100;
                 break;
@@ -583,7 +568,7 @@ class PdfApi {
             _row.add(pw.TableRow(
               children: [
                 _cell(label: _day),
-                _cell(label: _dayWorkState?.state ?? '', color: _stateColor),
+                _cell(label: _dayWorkShift?.state ?? '', color: _stateColor),
                 _cell(label: ''),
                 _cell(label: ''),
                 _cell(label: ''),
@@ -592,10 +577,7 @@ class PdfApi {
                 _cell(label: ''),
                 _cell(label: ''),
                 _cell(label: ''),
-                _cell(
-                    label:
-                        countW['${DateFormat('yyyy-MM-dd').format(days[i])}'] ??
-                            ''),
+                _cell(label: countW['${_format.format(days[i])}'] ?? ''),
               ],
             ));
           }

@@ -7,10 +7,10 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
-import 'package:hatarakujikan_web/models/work_state.dart';
+import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
-import 'package:hatarakujikan_web/providers/work_state.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
@@ -36,7 +36,7 @@ class WorkScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
     final workProvider = Provider.of<WorkProvider>(context);
-    final workStateProvider = Provider.of<WorkStateProvider>(context);
+    final workShiftProvider = Provider.of<WorkShiftProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -44,7 +44,7 @@ class WorkScreen extends StatelessWidget {
       body: WorkTable(
         groupProvider: groupProvider,
         workProvider: workProvider,
-        workStateProvider: workStateProvider,
+        workShiftProvider: workShiftProvider,
       ),
     );
   }
@@ -53,12 +53,12 @@ class WorkScreen extends StatelessWidget {
 class WorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
   final WorkProvider workProvider;
-  final WorkStateProvider workStateProvider;
+  final WorkShiftProvider workShiftProvider;
 
   WorkTable({
     @required this.groupProvider,
     @required this.workProvider,
-    @required this.workStateProvider,
+    @required this.workShiftProvider,
   });
 
   @override
@@ -66,16 +66,16 @@ class WorkTable extends StatefulWidget {
 }
 
 class _WorkTableState extends State<WorkTable> {
-  DateTime month = DateTime.now();
-  UserModel user;
-  List<DateTime> days = [];
+  DateTime _month = DateTime.now();
+  UserModel _user;
+  List<DateTime> _days = [];
 
   void _init() async {
-    setState(() => days = generateDays(month));
+    setState(() => _days = generateDays(_month));
   }
 
   void userChange(UserModel userModel) {
-    setState(() => user = userModel);
+    setState(() => _user = userModel);
   }
 
   @override
@@ -87,22 +87,22 @@ class _WorkTableState extends State<WorkTable> {
   @override
   Widget build(BuildContext context) {
     GroupModel _group = widget.groupProvider.group;
-    Timestamp _startAt = convertTimestamp(days.first, false);
-    Timestamp _endAt = convertTimestamp(days.last, true);
+    Timestamp _startAt = convertTimestamp(_days.first, false);
+    Timestamp _endAt = convertTimestamp(_days.last, true);
     Stream<QuerySnapshot> _streamWork = FirebaseFirestore.instance
         .collection('work')
         .where('groupId', isEqualTo: _group?.id ?? 'error')
-        .where('userId', isEqualTo: user?.id ?? 'error')
+        .where('userId', isEqualTo: _user?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
-    Stream<QuerySnapshot> _streamWorkState = FirebaseFirestore.instance
-        .collection('workState')
+    Stream<QuerySnapshot> _streamWorkShift = FirebaseFirestore.instance
+        .collection('workShift')
         .where('groupId', isEqualTo: _group?.id ?? 'error')
-        .where('userId', isEqualTo: user?.id ?? 'error')
+        .where('userId', isEqualTo: _user?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
-    List<WorkModel> works = [];
-    List<WorkStateModel> workStates = [];
+    List<WorkModel> _works = [];
+    List<WorkShiftModel> _workShifts = [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +112,7 @@ class _WorkTableState extends State<WorkTable> {
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'スタッフがスマートフォンアプリやタブレットアプリで記録した勤怠時間を年月形式で一覧表示します。この画面から追加や修正ができます。',
+          'スタッフが記録した勤務日時を年月形式で一覧表示します。勤務日時は追加/修正/削除できます。',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -125,19 +125,19 @@ class _WorkTableState extends State<WorkTable> {
                   onPressed: () async {
                     var selected = await showMonthPicker(
                       context: context,
-                      initialDate: month,
+                      initialDate: _month,
                       firstDate: kMonthFirstDate,
                       lastDate: kMonthLastDate,
                     );
                     if (selected == null) return;
                     setState(() {
-                      month = selected;
-                      days = generateDays(month);
+                      _month = selected;
+                      _days = generateDays(_month);
                     });
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.today,
-                  label: '${DateFormat('yyyy年MM月').format(month)}',
+                  label: '${DateFormat('yyyy年MM月').format(_month)}',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
@@ -147,14 +147,14 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => SearchUserDialog(
                         users: widget.groupProvider.users,
-                        user: user,
+                        user: _user,
                         userChange: userChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.person,
-                  label: user?.name ?? '選択してください',
+                  label: _user?.name ?? '選択してください',
                 ),
               ],
             ),
@@ -167,9 +167,9 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => CsvDialog(
                         workProvider: widget.workProvider,
-                        workStateProvider: widget.workStateProvider,
+                        workShiftProvider: widget.workShiftProvider,
                         group: widget.groupProvider.group,
-                        month: month,
+                        month: _month,
                         users: widget.groupProvider.users,
                       ),
                     );
@@ -186,11 +186,11 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => PdfDialog(
                         workProvider: widget.workProvider,
-                        workStateProvider: widget.workStateProvider,
+                        workShiftProvider: widget.workShiftProvider,
                         group: widget.groupProvider.group,
-                        month: month,
+                        month: _month,
                         users: widget.groupProvider.users,
-                        user: user,
+                        user: _user,
                       ),
                     );
                   },
@@ -206,10 +206,9 @@ class _WorkTableState extends State<WorkTable> {
                       context: context,
                       builder: (_) => AddWorkDialog(
                         workProvider: widget.workProvider,
-                        workStateProvider: widget.workStateProvider,
-                        groupId: widget.groupProvider.group?.id,
+                        group: widget.groupProvider.group,
                         users: widget.groupProvider.users,
-                        user: user,
+                        user: _user,
                       ),
                     );
                   },
@@ -225,45 +224,44 @@ class _WorkTableState extends State<WorkTable> {
         CustomWorkHeaderListTile(),
         Expanded(
           child: StreamBuilder2<QuerySnapshot, QuerySnapshot>(
-            streams: Tuple2(_streamWork, _streamWorkState),
+            streams: Tuple2(_streamWork, _streamWorkShift),
             builder: (context, snapshot) {
-              if (!snapshot.item1.hasData || !snapshot.item2.hasData) {
-                return Loading(color: Colors.orange);
+              _works.clear();
+              if (snapshot.item1.hasData) {
+                for (DocumentSnapshot doc in snapshot.item1.data.docs) {
+                  _works.add(WorkModel.fromSnapshot(doc));
+                }
               }
-              works.clear();
-              for (DocumentSnapshot doc in snapshot.item1.data.docs) {
-                works.add(WorkModel.fromSnapshot(doc));
-              }
-              workStates.clear();
-              for (DocumentSnapshot doc in snapshot.item2.data.docs) {
-                workStates.add(WorkStateModel.fromSnapshot(doc));
+              _workShifts.clear();
+              if (snapshot.item2.hasData) {
+                for (DocumentSnapshot doc in snapshot.item2.data.docs) {
+                  _workShifts.add(WorkShiftModel.fromSnapshot(doc));
+                }
               }
               return Scrollbar(
                 child: ListView.builder(
-                  itemCount: days.length,
+                  itemCount: _days.length,
                   itemBuilder: (_, index) {
-                    List<WorkModel> dayWorks = [];
-                    for (WorkModel _work in works) {
-                      String _start =
-                          '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
-                      if (days[index] == DateTime.parse(_start)) {
-                        dayWorks.add(_work);
+                    DateFormat _format = DateFormat('yyyy-MM-dd');
+                    List<WorkModel> _dayWorks = [];
+                    for (WorkModel _work in _works) {
+                      String _start = '${_format.format(_work.startedAt)}';
+                      if (_days[index] == DateTime.parse(_start)) {
+                        _dayWorks.add(_work);
                       }
                     }
-                    WorkStateModel dayWorkState;
-                    for (WorkStateModel _workState in workStates) {
-                      String _start =
-                          '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
-                      if (days[index] == DateTime.parse(_start)) {
-                        dayWorkState = _workState;
+                    WorkShiftModel _dayWorkShift;
+                    for (WorkShiftModel _workShift in _workShifts) {
+                      String _start = '${_format.format(_workShift.startedAt)}';
+                      if (_days[index] == DateTime.parse(_start)) {
+                        _dayWorkShift = _workShift;
                       }
                     }
                     return CustomWorkListTile(
                       workProvider: widget.workProvider,
-                      workStateProvider: widget.workStateProvider,
-                      day: days[index],
-                      dayWorks: dayWorks,
-                      dayWorkState: dayWorkState,
+                      day: _days[index],
+                      dayWorks: _dayWorks,
+                      dayWorkShift: _dayWorkShift,
                       group: widget.groupProvider.group,
                     );
                   },
@@ -275,9 +273,6 @@ class _WorkTableState extends State<WorkTable> {
         StreamBuilder<QuerySnapshot>(
           stream: _streamWork,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Container();
-            }
             Map _count = {};
             int _workCount = 0;
             String _workTime = '00:00';
@@ -285,24 +280,28 @@ class _WorkTableState extends State<WorkTable> {
             String _nonLegalTime = '00:00';
             String _nightTime = '00:00';
             List<WorkModel> _worksTmp = [];
-            for (DocumentSnapshot _workTmp in snapshot.data.docs) {
-              _worksTmp.add(WorkModel.fromSnapshot(_workTmp));
+            if (snapshot.hasData) {
+              for (DocumentSnapshot _workTmp in snapshot.data.docs) {
+                _worksTmp.add(WorkModel.fromSnapshot(_workTmp));
+              }
             }
+            DateFormat _format = DateFormat('yyyy-MM-dd');
             for (WorkModel _work in _worksTmp) {
               if (_work?.startedAt != _work?.endedAt) {
-                String _key =
-                    '${DateFormat('yyyy-MM-dd').format(_work?.startedAt)}';
+                String _key = '${_format.format(_work?.startedAt)}';
                 _count[_key] = '';
                 _workTime = addTime(
                   _workTime,
                   _work?.workTime(widget.groupProvider.group),
                 );
-                List<String> _legalTimes =
-                    _work?.legalTimes(widget.groupProvider.group);
+                List<String> _legalTimes = _work?.legalTimes(
+                  widget.groupProvider.group,
+                );
                 _legalTime = addTime(_legalTime, _legalTimes.first);
                 _nonLegalTime = addTime(_nonLegalTime, _legalTimes.last);
-                List<String> _nightTimes =
-                    _work?.nightTimes(widget.groupProvider.group);
+                List<String> _nightTimes = _work?.nightTimes(
+                  widget.groupProvider.group,
+                );
                 _nightTime = addTime(_nightTime, _nightTimes.last);
               }
             }
@@ -395,14 +394,14 @@ class SearchUserDialog extends StatelessWidget {
 
 class CsvDialog extends StatefulWidget {
   final WorkProvider workProvider;
-  final WorkStateProvider workStateProvider;
+  final WorkShiftProvider workShiftProvider;
   final GroupModel group;
   final DateTime month;
   final List<UserModel> users;
 
   CsvDialog({
     @required this.workProvider,
-    @required this.workStateProvider,
+    @required this.workShiftProvider,
     @required this.group,
     @required this.month,
     @required this.users,
@@ -413,18 +412,14 @@ class CsvDialog extends StatefulWidget {
 }
 
 class _CsvDialogState extends State<CsvDialog> {
-  DateTime month = DateTime.now();
-  List<DateTime> days = [];
+  DateTime _month = DateTime.now();
   bool _isLoading = false;
-  String template;
+  String _template;
 
   void _init() async {
     CsvApi.groupCheck(group: widget.group);
-    setState(() {
-      month = widget.month;
-      template = csvTemplates.first;
-      days = generateDays(month);
-    });
+    _month = widget.month;
+    _template = csvTemplates.first;
   }
 
   @override
@@ -460,9 +455,9 @@ class _CsvDialogState extends State<CsvDialog> {
                     label: 'テンプレート',
                     child: CustomDropdownButton(
                       isExpanded: true,
-                      value: template,
+                      value: _template,
                       onChanged: (value) {
-                        setState(() => template = value);
+                        setState(() => _template = value);
                       },
                       items: csvTemplates.map((value) {
                         return DropdownMenuItem(
@@ -482,17 +477,14 @@ class _CsvDialogState extends State<CsvDialog> {
                       onPressed: () async {
                         var selected = await showMonthPicker(
                           context: context,
-                          initialDate: month,
+                          initialDate: _month,
                           firstDate: kMonthFirstDate,
                           lastDate: kMonthLastDate,
                         );
                         if (selected == null) return;
-                        setState(() {
-                          month = selected;
-                          days = generateDays(month);
-                        });
+                        setState(() => _month = selected);
                       },
-                      label: '${DateFormat('yyyy年MM月').format(month)}',
+                      label: '${DateFormat('yyyy年MM月').format(_month)}',
                     ),
                   ),
                   SizedBox(height: 16.0),
@@ -508,11 +500,11 @@ class _CsvDialogState extends State<CsvDialog> {
                         onPressed: () async {
                           setState(() => _isLoading = true);
                           await CsvApi.download(
-                            template: template,
                             workProvider: widget.workProvider,
-                            workStateProvider: widget.workStateProvider,
+                            workShiftProvider: widget.workShiftProvider,
                             group: widget.group,
-                            month: month,
+                            template: _template,
+                            month: _month,
                             users: widget.users,
                           );
                           setState(() => _isLoading = false);
@@ -532,7 +524,7 @@ class _CsvDialogState extends State<CsvDialog> {
 
 class PdfDialog extends StatefulWidget {
   final WorkProvider workProvider;
-  final WorkStateProvider workStateProvider;
+  final WorkShiftProvider workShiftProvider;
   final GroupModel group;
   final DateTime month;
   final List<UserModel> users;
@@ -540,7 +532,7 @@ class PdfDialog extends StatefulWidget {
 
   PdfDialog({
     @required this.workProvider,
-    @required this.workStateProvider,
+    @required this.workShiftProvider,
     @required this.group,
     @required this.month,
     @required this.users,
@@ -552,18 +544,14 @@ class PdfDialog extends StatefulWidget {
 }
 
 class _PdfDialogState extends State<PdfDialog> {
-  List<DateTime> days = [];
-  DateTime month = DateTime.now();
-  UserModel user;
-  bool isAll = false;
+  DateTime _month = DateTime.now();
+  UserModel _user;
+  bool _isAll = false;
   bool _isLoading = false;
 
   void _init() async {
-    setState(() {
-      month = widget.month;
-      user = widget.user;
-      days = generateDays(month);
-    });
+    _month = widget.month;
+    _user = widget.user;
   }
 
   @override
@@ -601,17 +589,14 @@ class _PdfDialogState extends State<PdfDialog> {
                       onPressed: () async {
                         var selected = await showMonthPicker(
                           context: context,
-                          initialDate: month,
+                          initialDate: _month,
                           firstDate: kMonthFirstDate,
                           lastDate: kMonthLastDate,
                         );
                         if (selected == null) return;
-                        setState(() {
-                          month = selected;
-                          days = generateDays(month);
-                        });
+                        setState(() => _month = selected);
                       },
-                      label: '${DateFormat('yyyy年MM月').format(month)}',
+                      label: '${DateFormat('yyyy年MM月').format(_month)}',
                     ),
                   ),
                   SizedBox(height: 8.0),
@@ -619,9 +604,9 @@ class _PdfDialogState extends State<PdfDialog> {
                     label: 'スタッフ',
                     child: CustomDropdownButton(
                       isExpanded: true,
-                      value: user,
+                      value: _user,
                       onChanged: (value) {
-                        setState(() => user = value);
+                        setState(() => _user = value);
                       },
                       items: widget.users.map((value) {
                         return DropdownMenuItem(
@@ -637,10 +622,10 @@ class _PdfDialogState extends State<PdfDialog> {
                   SizedBox(height: 8.0),
                   CustomCheckboxListTile(
                     onChanged: (value) {
-                      setState(() => isAll = value);
+                      setState(() => _isAll = value);
                     },
                     label: '全スタッフ一括出力',
-                    value: isAll,
+                    value: _isAll,
                   ),
                   SizedBox(height: 16.0),
                   Row(
@@ -656,11 +641,11 @@ class _PdfDialogState extends State<PdfDialog> {
                           setState(() => _isLoading = true);
                           await PdfApi.works01(
                             workProvider: widget.workProvider,
-                            workStateProvider: widget.workStateProvider,
+                            workShiftProvider: widget.workShiftProvider,
                             group: widget.group,
-                            month: month,
-                            user: user,
-                            isAll: isAll,
+                            month: _month,
+                            user: _user,
+                            isAll: _isAll,
                             users: widget.users,
                           );
                           setState(() => _isLoading = false);
@@ -680,15 +665,13 @@ class _PdfDialogState extends State<PdfDialog> {
 
 class AddWorkDialog extends StatefulWidget {
   final WorkProvider workProvider;
-  final WorkStateProvider workStateProvider;
-  final String groupId;
+  final GroupModel group;
   final List<UserModel> users;
   final UserModel user;
 
   AddWorkDialog({
     @required this.workProvider,
-    @required this.workStateProvider,
-    @required this.groupId,
+    @required this.group,
     @required this.users,
     @required this.user,
   });
@@ -698,19 +681,17 @@ class AddWorkDialog extends StatefulWidget {
 }
 
 class _AddWorkDialogState extends State<AddWorkDialog> {
-  UserModel user;
-  String state;
-  DateTime startedAt = DateTime.now();
-  DateTime endedAt = DateTime.now();
-  bool isBreaks = false;
-  DateTime breakStartedAt = DateTime.now();
-  DateTime breakEndedAt = DateTime.now();
+  UserModel _user;
+  String _state;
+  DateTime _startedAt = DateTime.now();
+  DateTime _endedAt = DateTime.now();
+  bool _isBreaks = false;
+  DateTime _breakStartedAt = DateTime.now();
+  DateTime _breakEndedAt = DateTime.now();
 
   void _init() async {
-    setState(() {
-      user = widget.user;
-      state = widget.workStateProvider.states.first;
-    });
+    _user = widget.user;
+    _state = widget.workProvider.states.first;
   }
 
   @override
@@ -737,9 +718,9 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
               label: 'スタッフ',
               child: CustomDropdownButton(
                 isExpanded: true,
-                value: user,
+                value: _user,
                 onChanged: (value) {
-                  setState(() => user = value);
+                  setState(() => _user = value);
                 },
                 items: widget.users.map((value) {
                   return DropdownMenuItem(
@@ -757,11 +738,11 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
               label: '勤務状況',
               child: CustomDropdownButton(
                 isExpanded: true,
-                value: state,
+                value: _state,
                 onChanged: (value) {
-                  setState(() => state = value);
+                  setState(() => _state = value);
                 },
-                items: widget.workStateProvider.states.map((value) {
+                items: widget.workProvider.states.map((value) {
                   return DropdownMenuItem(
                     value: value,
                     child: Text(
@@ -773,12 +754,70 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
               ),
             ),
             SizedBox(height: 8.0),
-            state == '通常勤務' || state == '直行/直帰' || state == 'テレワーク'
+            CustomLabelColumn(
+              label: '出勤日時',
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: CustomDateButton(
+                      onPressed: () async {
+                        DateTime _selected = await showDatePicker(
+                          context: context,
+                          initialDate: _startedAt,
+                          firstDate: kDayFirstDate,
+                          lastDate: kDayLastDate,
+                        );
+                        if (_selected != null) {
+                          _selected = rebuildDate(_selected, _startedAt);
+                          setState(() => _startedAt = _selected);
+                        }
+                      },
+                      label: '${DateFormat('yyyy/MM/dd').format(_startedAt)}',
+                    ),
+                  ),
+                  SizedBox(width: 4.0),
+                  Expanded(
+                    flex: 2,
+                    child: CustomTimeButton(
+                      onPressed: () async {
+                        TimeOfDay _selected = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(
+                            hour: timeToInt(_startedAt)[0],
+                            minute: timeToInt(_startedAt)[1],
+                          ),
+                        );
+                        if (_selected != null) {
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _startedAt,
+                            _selected,
+                          );
+                          setState(() => _startedAt = _dateTime);
+                        }
+                      },
+                      label: '${DateFormat('HH:mm').format(_startedAt)}',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 8.0),
+            CustomCheckboxListTile(
+              onChanged: (value) {
+                setState(() => _isBreaks = value);
+              },
+              label: '休憩を追加する',
+              value: _isBreaks,
+            ),
+            SizedBox(height: 8.0),
+            _isBreaks == true
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomLabelColumn(
-                        label: '出勤日時',
+                        label: '休憩開始日時',
                         child: Row(
                           children: [
                             Expanded(
@@ -787,22 +826,18 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                 onPressed: () async {
                                   DateTime _selected = await showDatePicker(
                                     context: context,
-                                    initialDate: startedAt,
+                                    initialDate: _breakStartedAt,
                                     firstDate: kDayFirstDate,
                                     lastDate: kDayLastDate,
                                   );
                                   if (_selected != null) {
-                                    String _date =
-                                        '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                    String _time =
-                                        '${DateFormat('HH:mm').format(startedAt)}:00.000';
-                                    DateTime _dateTime =
-                                        DateTime.parse('$_date $_time');
-                                    setState(() => startedAt = _dateTime);
+                                    _selected =
+                                        rebuildDate(_selected, _breakStartedAt);
+                                    setState(() => _breakStartedAt = _selected);
                                   }
                                 },
                                 label:
-                                    '${DateFormat('yyyy/MM/dd').format(startedAt)}',
+                                    '${DateFormat('yyyy/MM/dd').format(_breakStartedAt)}',
                               ),
                             ),
                             SizedBox(width: 4.0),
@@ -810,188 +845,32 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                               flex: 2,
                               child: CustomTimeButton(
                                 onPressed: () async {
-                                  String _hour =
-                                      '${DateFormat('H').format(startedAt)}';
-                                  String _minute =
-                                      '${DateFormat('m').format(startedAt)}';
                                   TimeOfDay _selected = await showTimePicker(
                                     context: context,
                                     initialTime: TimeOfDay(
-                                      hour: int.parse(_hour),
-                                      minute: int.parse(_minute),
+                                      hour: timeToInt(_breakStartedAt)[0],
+                                      minute: timeToInt(_breakStartedAt)[1],
                                     ),
                                   );
                                   if (_selected != null) {
-                                    String _date =
-                                        '${DateFormat('yyyy-MM-dd').format(startedAt)}';
-                                    String _time =
-                                        '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                    DateTime _dateTime =
-                                        DateTime.parse('$_date $_time');
-                                    setState(() => startedAt = _dateTime);
+                                    DateTime _dateTime = rebuildTime(
+                                      context,
+                                      _breakStartedAt,
+                                      _selected,
+                                    );
+                                    setState(() => _breakStartedAt = _dateTime);
                                   }
                                 },
                                 label:
-                                    '${DateFormat('HH:mm').format(startedAt)}',
+                                    '${DateFormat('HH:mm').format(_breakStartedAt)}',
                               ),
                             ),
                           ],
                         ),
                       ),
                       SizedBox(height: 8.0),
-                      CustomCheckboxListTile(
-                        onChanged: (value) {
-                          setState(() => isBreaks = value);
-                        },
-                        label: '休憩を追加する',
-                        value: isBreaks,
-                      ),
-                      SizedBox(height: 8.0),
-                      isBreaks == true
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CustomLabelColumn(
-                                  label: '休憩開始日時',
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 3,
-                                        child: CustomDateButton(
-                                          onPressed: () async {
-                                            DateTime _selected =
-                                                await showDatePicker(
-                                              context: context,
-                                              initialDate: breakStartedAt,
-                                              firstDate: kDayFirstDate,
-                                              lastDate: kDayLastDate,
-                                            );
-                                            if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                              String _time =
-                                                  '${DateFormat('HH:mm').format(breakStartedAt)}';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
-                                              setState(() =>
-                                                  breakStartedAt = _dateTime);
-                                            }
-                                          },
-                                          label:
-                                              '${DateFormat('yyyy/MM/dd').format(breakStartedAt)}',
-                                        ),
-                                      ),
-                                      SizedBox(width: 4.0),
-                                      Expanded(
-                                        flex: 2,
-                                        child: CustomTimeButton(
-                                          onPressed: () async {
-                                            String _hour =
-                                                '${DateFormat('H').format(breakStartedAt)}';
-                                            String _minute =
-                                                '${DateFormat('m').format(breakStartedAt)}';
-                                            TimeOfDay _selected =
-                                                await showTimePicker(
-                                              context: context,
-                                              initialTime: TimeOfDay(
-                                                hour: int.parse(_hour),
-                                                minute: int.parse(_minute),
-                                              ),
-                                            );
-                                            if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
-                                              String _time =
-                                                  '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
-                                              setState(() =>
-                                                  breakStartedAt = _dateTime);
-                                            }
-                                          },
-                                          label:
-                                              '${DateFormat('HH:mm').format(breakStartedAt)}',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 8.0),
-                                CustomLabelColumn(
-                                  label: '休憩終了日時',
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 3,
-                                        child: CustomDateButton(
-                                          onPressed: () async {
-                                            DateTime _selected =
-                                                await showDatePicker(
-                                              context: context,
-                                              initialDate: breakEndedAt,
-                                              firstDate: kDayFirstDate,
-                                              lastDate: kDayLastDate,
-                                            );
-                                            if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                              String _time =
-                                                  '${DateFormat('HH:mm').format(breakEndedAt)}:00.000';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
-                                              setState(() =>
-                                                  breakEndedAt = _dateTime);
-                                            }
-                                          },
-                                          label:
-                                              '${DateFormat('yyyy/MM/dd').format(breakEndedAt)}',
-                                        ),
-                                      ),
-                                      SizedBox(width: 4.0),
-                                      Expanded(
-                                        flex: 2,
-                                        child: CustomTimeButton(
-                                          onPressed: () async {
-                                            String _hour =
-                                                '${DateFormat('H').format(breakEndedAt)}';
-                                            String _minute =
-                                                '${DateFormat('m').format(breakEndedAt)}';
-                                            TimeOfDay _selected =
-                                                await showTimePicker(
-                                              context: context,
-                                              initialTime: TimeOfDay(
-                                                hour: int.parse(_hour),
-                                                minute: int.parse(_minute),
-                                              ),
-                                            );
-                                            if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(breakEndedAt)}';
-                                              String _time =
-                                                  '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
-                                              setState(() =>
-                                                  breakEndedAt = _dateTime);
-                                            }
-                                          },
-                                          label:
-                                              '${DateFormat('HH:mm').format(breakEndedAt)}',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Container(),
-                      SizedBox(height: 8.0),
                       CustomLabelColumn(
-                        label: '退勤日時',
+                        label: '休憩終了日時',
                         child: Row(
                           children: [
                             Expanded(
@@ -1000,22 +879,18 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                                 onPressed: () async {
                                   DateTime _selected = await showDatePicker(
                                     context: context,
-                                    initialDate: endedAt,
+                                    initialDate: _breakEndedAt,
                                     firstDate: kDayFirstDate,
                                     lastDate: kDayLastDate,
                                   );
                                   if (_selected != null) {
-                                    String _date =
-                                        '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                    String _time =
-                                        '${DateFormat('HH:mm').format(endedAt)}:00.000';
-                                    DateTime _dateTime =
-                                        DateTime.parse('$_date $_time');
-                                    setState(() => endedAt = _dateTime);
+                                    _selected =
+                                        rebuildDate(_selected, _breakEndedAt);
+                                    setState(() => _breakEndedAt = _selected);
                                   }
                                 },
                                 label:
-                                    '${DateFormat('yyyy/MM/dd').format(endedAt)}',
+                                    '${DateFormat('yyyy/MM/dd').format(_breakEndedAt)}',
                               ),
                             ),
                             SizedBox(width: 4.0),
@@ -1023,28 +898,24 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                               flex: 2,
                               child: CustomTimeButton(
                                 onPressed: () async {
-                                  String _hour =
-                                      '${DateFormat('H').format(endedAt)}';
-                                  String _minute =
-                                      '${DateFormat('m').format(endedAt)}';
                                   TimeOfDay _selected = await showTimePicker(
                                     context: context,
                                     initialTime: TimeOfDay(
-                                      hour: int.parse(_hour),
-                                      minute: int.parse(_minute),
+                                      hour: timeToInt(_breakEndedAt)[0],
+                                      minute: timeToInt(_breakEndedAt)[1],
                                     ),
                                   );
                                   if (_selected != null) {
-                                    String _date =
-                                        '${DateFormat('yyyy-MM-dd').format(endedAt)}';
-                                    String _time =
-                                        '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                    DateTime _dateTime =
-                                        DateTime.parse('$_date $_time');
-                                    setState(() => endedAt = _dateTime);
+                                    DateTime _dateTime = rebuildTime(
+                                      context,
+                                      _breakEndedAt,
+                                      _selected,
+                                    );
+                                    setState(() => _breakEndedAt = _dateTime);
                                   }
                                 },
-                                label: '${DateFormat('HH:mm').format(endedAt)}',
+                                label:
+                                    '${DateFormat('HH:mm').format(_breakEndedAt)}',
                               ),
                             ),
                           ],
@@ -1052,42 +923,57 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                       ),
                     ],
                   )
-                : CustomLabelColumn(
-                    label: '登録日',
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: CustomDateButton(
-                            onPressed: () async {
-                              DateTime _selected = await showDatePicker(
-                                context: context,
-                                initialDate: startedAt,
-                                firstDate: kDayFirstDate,
-                                lastDate: kDayLastDate,
-                              );
-                              if (_selected != null) {
-                                String _date =
-                                    '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                String _time =
-                                    '${DateFormat('HH:mm').format(startedAt)}:00.000';
-                                DateTime _dateTime =
-                                    DateTime.parse('$_date $_time');
-                                setState(() => startedAt = _dateTime);
-                              }
-                            },
-                            label:
-                                '${DateFormat('yyyy/MM/dd').format(startedAt)}',
-                          ),
-                        ),
-                        SizedBox(width: 4.0),
-                        Expanded(
-                          flex: 2,
-                          child: Container(),
-                        ),
-                      ],
+                : Container(),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
+              label: '退勤日時',
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: CustomDateButton(
+                      onPressed: () async {
+                        DateTime _selected = await showDatePicker(
+                          context: context,
+                          initialDate: _endedAt,
+                          firstDate: kDayFirstDate,
+                          lastDate: kDayLastDate,
+                        );
+                        if (_selected != null) {
+                          _selected = rebuildDate(_selected, _endedAt);
+                          setState(() => _endedAt = _selected);
+                        }
+                      },
+                      label: '${DateFormat('yyyy/MM/dd').format(_endedAt)}',
                     ),
                   ),
+                  SizedBox(width: 4.0),
+                  Expanded(
+                    flex: 2,
+                    child: CustomTimeButton(
+                      onPressed: () async {
+                        TimeOfDay _selected = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(
+                            hour: timeToInt(_endedAt)[0],
+                            minute: timeToInt(_endedAt)[1],
+                          ),
+                        );
+                        if (_selected != null) {
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _endedAt,
+                            _selected,
+                          );
+                          setState(() => _endedAt = _dateTime);
+                        }
+                      },
+                      label: '${DateFormat('HH:mm').format(_endedAt)}',
+                    ),
+                  ),
+                ],
+              ),
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1099,39 +985,19 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    if (state == '通常勤務' ||
-                        state == '直行/直帰' ||
-                        state == 'テレワーク') {
-                      if (startedAt == endedAt) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('出勤日時と退勤日時に同じ日時が入力されています')),
-                        );
-                        Navigator.pop(context);
-                        return;
-                      }
-                      if (!await widget.workProvider.create(
-                        groupId: widget.groupId,
-                        userId: user?.id,
-                        startedAt: startedAt,
-                        endedAt: endedAt,
-                        isBreaks: isBreaks,
-                        breakStartedAt: breakStartedAt,
-                        breakEndedAt: breakEndedAt,
-                      )) {
-                        return;
-                      }
-                    } else {
-                      if (!await widget.workStateProvider.create(
-                        groupId: widget.groupId,
-                        userId: user?.id,
-                        startedAt: startedAt,
-                        state: state,
-                      )) {
-                        return;
-                      }
+                    if (!await widget.workProvider.create(
+                      group: widget.group,
+                      user: _user,
+                      startedAt: _startedAt,
+                      endedAt: _endedAt,
+                      isBreaks: _isBreaks,
+                      breakStartedAt: _breakStartedAt,
+                      breakEndedAt: _breakEndedAt,
+                    )) {
+                      return;
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('勤怠情報を登録しました')),
+                      SnackBar(content: Text('勤務データを登録しました')),
                     );
                     Navigator.pop(context);
                   },

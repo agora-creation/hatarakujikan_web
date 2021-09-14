@@ -59,7 +59,7 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
   void _init() async {
     widget.groupProvider.users.forEach((user) {
       _resources.add(CalendarResource(
-        id: '${user.id}',
+        id: user.id,
         displayName: '${user.name}',
         color: Colors.grey.shade100,
       ));

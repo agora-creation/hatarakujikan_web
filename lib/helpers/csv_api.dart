@@ -4,9 +4,9 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
-import 'package:hatarakujikan_web/models/work_state.dart';
+import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
-import 'package:hatarakujikan_web/providers/work_state.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart';
 
@@ -28,10 +28,10 @@ class CsvApi {
   }
 
   static Future<void> download({
-    String template,
     WorkProvider workProvider,
-    WorkStateProvider workStateProvider,
+    WorkShiftProvider workShiftProvider,
     GroupModel group,
+    String template,
     DateTime month,
     List<UserModel> users,
   }) async {
@@ -48,7 +48,7 @@ class CsvApi {
       case '土佐税理士事務所用レイアウト':
         await _works02(
           workProvider: workProvider,
-          workStateProvider: workStateProvider,
+          workShiftProvider: workShiftProvider,
           group: group,
           month: month,
           users: users,
@@ -82,8 +82,8 @@ Future<void> _works01({
     String time1 = '00:00';
     String time2 = '00:00';
     List<WorkModel> _works = await workProvider.selectList(
-      groupId: group.id,
-      userId: _user.id,
+      group: group,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
@@ -109,7 +109,7 @@ Future<void> _works01({
 
 Future<void> _works02({
   WorkProvider workProvider,
-  WorkStateProvider workStateProvider,
+  WorkShiftProvider workShiftProvider,
   GroupModel group,
   DateTime month,
   List<UserModel> users,
@@ -164,14 +164,14 @@ Future<void> _works02({
     String overTime3 = '00:00';
     String overTime4 = '00:00';
     List<WorkModel> _works = await workProvider.selectList(
-      groupId: group.id,
-      userId: _user.id,
+      group: group,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
-    List<WorkStateModel> _workStates = await workStateProvider.selectList(
-      groupId: group.id,
-      userId: _user.id,
+    List<WorkShiftModel> _workShifts = await workShiftProvider.selectList(
+      group: group,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
@@ -204,9 +204,9 @@ Future<void> _works02({
     int workDays = count.length;
     int holidayDays = holidayCount.length;
     int overDays = overCount.length;
-    for (WorkStateModel _workState in _workStates) {
-      String _key = '${DateFormat('yyyy-MM-dd').format(_workState.startedAt)}';
-      switch (_workState.state) {
+    for (WorkShiftModel _workShift in _workShifts) {
+      String _key = '${DateFormat('yyyy-MM-dd').format(_workShift.startedAt)}';
+      switch (_workShift.state) {
         case '欠勤':
           state1Count[_key] = '';
           break;

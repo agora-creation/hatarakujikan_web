@@ -1,53 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/work.dart';
-import 'package:hatarakujikan_web/models/work_state.dart';
+import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
-import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_work_table.dart';
 import 'package:intl/intl.dart';
 
 class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
-  final WorkStateProvider workStateProvider;
   final DateTime day;
   final List<WorkModel> dayWorks;
-  final WorkStateModel dayWorkState;
+  final WorkShiftModel dayWorkShift;
   final GroupModel group;
 
   CustomWorkListTile({
     this.workProvider,
-    this.workStateProvider,
     this.day,
     this.dayWorks,
-    this.dayWorkState,
+    this.dayWorkShift,
     this.group,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color _chipColor = Colors.grey.shade300;
-    switch (dayWorkState?.state) {
-      case '欠勤':
-        _chipColor = Colors.red.shade300;
-        break;
-      case '特別休暇':
-        _chipColor = Colors.green.shade300;
-        break;
-      case '有給休暇':
-        _chipColor = Colors.teal.shade300;
-        break;
-      case '代休':
-        _chipColor = Colors.pink.shade300;
-        break;
-    }
     return Container(
       decoration: kBottomBorderDecoration,
       child: ListTile(
@@ -75,7 +59,7 @@ class CustomWorkListTile extends StatelessWidget {
                     String _nightTime = _nightTimes.last;
                     return ListTile(
                       leading: Chip(
-                        backgroundColor: _chipColor,
+                        backgroundColor: Colors.grey.shade300,
                         label: Text(
                           '${_work.state}',
                           style: TextStyle(fontSize: 12.0),
@@ -84,34 +68,13 @@ class CustomWorkListTile extends StatelessWidget {
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            _startTime,
-                            style: kListTimeTextStyle,
-                          ),
-                          Text(
-                            _endTime,
-                            style: kListTimeTextStyle,
-                          ),
-                          Text(
-                            _breakTime,
-                            style: kListTimeTextStyle,
-                          ),
-                          Text(
-                            _workTime,
-                            style: kListTimeTextStyle,
-                          ),
-                          Text(
-                            _legalTime,
-                            style: kListTimeTextStyle,
-                          ),
-                          Text(
-                            _nonLegalTime,
-                            style: kListTimeTextStyle,
-                          ),
-                          Text(
-                            _nightTime,
-                            style: kListTimeTextStyle,
-                          ),
+                          Text(_startTime, style: kListTimeTextStyle),
+                          Text(_endTime, style: kListTimeTextStyle),
+                          Text(_breakTime, style: kListTimeTextStyle),
+                          Text(_workTime, style: kListTimeTextStyle),
+                          Text(_legalTime, style: kListTimeTextStyle),
+                          Text(_nonLegalTime, style: kListTimeTextStyle),
+                          Text(_nightTime, style: kListTimeTextStyle),
                           IconButton(
                             onPressed: () => showDialog(
                               barrierDismissible: false,
@@ -128,9 +91,7 @@ class CustomWorkListTile extends StatelessWidget {
                             onPressed: () => showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => LocationWorkDialog(
-                                work: _work,
-                              ),
+                              builder: (_) => LocationWorkDialog(work: _work),
                             ),
                             icon: Icon(Icons.location_on, color: Colors.blue),
                           ),
@@ -142,56 +103,31 @@ class CustomWorkListTile extends StatelessWidget {
                   }
                 },
               )
-            : dayWorkState != null
+            : dayWorkShift != null
                 ? ListTile(
                     leading: Chip(
-                      backgroundColor: _chipColor,
+                      backgroundColor: dayWorkShift.stateColor(),
                       label: Text(
-                        '${dayWorkState.state}',
+                        '${dayWorkShift.state}',
                         style: TextStyle(fontSize: 12.0),
                       ),
                     ),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
-                        Text(
-                          '00:00',
-                          style: kListTime2TextStyle,
-                        ),
+                        Text('00:00', style: kListTime2TextStyle),
+                        Text('00:00', style: kListTime2TextStyle),
+                        Text('00:00', style: kListTime2TextStyle),
+                        Text('00:00', style: kListTime2TextStyle),
+                        Text('00:00', style: kListTime2TextStyle),
+                        Text('00:00', style: kListTime2TextStyle),
+                        Text('00:00', style: kListTime2TextStyle),
                         IconButton(
-                          onPressed: () => showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => EditWorkStateDialog(
-                              workStateProvider: workStateProvider,
-                              workState: dayWorkState,
-                            ),
+                          onPressed: null,
+                          icon: Icon(
+                            Icons.edit,
+                            color: Colors.transparent,
                           ),
-                          icon: Icon(Icons.edit, color: Colors.blue),
                         ),
                         IconButton(
                           onPressed: null,
@@ -225,16 +161,16 @@ class EditWorkDialog extends StatefulWidget {
 }
 
 class _EditWorkDialogState extends State<EditWorkDialog> {
-  WorkModel work;
-  bool isBreaks = false;
-  DateTime breakStartedAt = DateTime.now();
-  DateTime breakEndedAt = DateTime.now();
+  WorkModel _work;
+  bool _isBreaks = false;
+  DateTime _breakStartedAt = DateTime.now();
+  DateTime _breakEndedAt = DateTime.now();
 
   void _init() async {
     setState(() {
-      work = widget.work;
-      breakStartedAt = widget.work.startedAt;
-      breakEndedAt = widget.work.startedAt;
+      _work = widget.work;
+      _breakStartedAt = widget.work.startedAt;
+      _breakEndedAt = widget.work.startedAt;
     });
   }
 
@@ -248,7 +184,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Container(
-        width: 550.0,
+        width: 450.0,
         child: ListView(
           shrinkWrap: true,
           children: [
@@ -266,9 +202,10 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
               label: '勤務状況',
               child: Chip(
                 backgroundColor: Colors.grey.shade300,
-                label: Text('${work.state}'),
+                label: Text('${_work.state}'),
               ),
             ),
+            Divider(),
             SizedBox(height: 8.0),
             CustomLabelColumn(
               label: '出勤日時',
@@ -280,21 +217,17 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                       onPressed: () async {
                         DateTime _selected = await showDatePicker(
                           context: context,
-                          initialDate: work.startedAt,
+                          initialDate: _work.startedAt,
                           firstDate: kDayFirstDate,
                           lastDate: kDayLastDate,
                         );
                         if (_selected != null) {
-                          String _date =
-                              '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                          String _time =
-                              '${DateFormat('HH:mm').format(work.startedAt)}:00.000';
-                          DateTime _dateTime = DateTime.parse('$_date $_time');
-                          setState(() => work.startedAt = _dateTime);
+                          _selected = rebuildDate(_selected, _work.startedAt);
+                          setState(() => _work.startedAt = _selected);
                         }
                       },
                       label:
-                          '${DateFormat('yyyy/MM/dd').format(work.startedAt)}',
+                          '${DateFormat('yyyy/MM/dd').format(_work.startedAt)}',
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -302,40 +235,36 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        String _hour =
-                            '${DateFormat('H').format(work.startedAt)}';
-                        String _minute =
-                            '${DateFormat('m').format(work.startedAt)}';
                         TimeOfDay _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
-                            hour: int.parse(_hour),
-                            minute: int.parse(_minute),
+                            hour: timeToInt(_work.startedAt)[0],
+                            minute: timeToInt(_work.startedAt)[1],
                           ),
                         );
                         if (_selected != null) {
-                          String _date =
-                              '${DateFormat('yyyy-MM-dd').format(work.startedAt)}';
-                          String _time =
-                              '${_selected.format(context).padLeft(5, '0')}:00.000';
-                          DateTime _dateTime = DateTime.parse('$_date $_time');
-                          setState(() => work.startedAt = _dateTime);
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _work.startedAt,
+                            _selected,
+                          );
+                          setState(() => _work.startedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(work.startedAt)}',
+                      label: '${DateFormat('HH:mm').format(_work.startedAt)}',
                     ),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 8.0),
-            work.breaks.length > 0
+            _work.breaks.length > 0
                 ? ListView.builder(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    itemCount: work.breaks.length,
+                    itemCount: _work.breaks.length,
                     itemBuilder: (_, index) {
-                      BreaksModel _breaks = work.breaks[index];
+                      BreaksModel _breaks = _work.breaks[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -354,14 +283,10 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         lastDate: kDayLastDate,
                                       );
                                       if (_selected != null) {
-                                        String _date =
-                                            '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                        String _time =
-                                            '${DateFormat('HH:mm').format(_breaks.startedAt)}:00.000';
-                                        DateTime _dateTime =
-                                            DateTime.parse('$_date $_time');
+                                        _selected = rebuildDate(
+                                            _selected, _breaks.startedAt);
                                         setState(() =>
-                                            _breaks.startedAt = _dateTime);
+                                            _breaks.startedAt = _selected);
                                       }
                                     },
                                     label:
@@ -373,25 +298,21 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                   flex: 2,
                                   child: CustomTimeButton(
                                     onPressed: () async {
-                                      String _hour =
-                                          '${DateFormat('H').format(_breaks.startedAt)}';
-                                      String _minute =
-                                          '${DateFormat('m').format(_breaks.startedAt)}';
                                       TimeOfDay _selected =
                                           await showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay(
-                                          hour: int.parse(_hour),
-                                          minute: int.parse(_minute),
+                                          hour: timeToInt(_breaks.startedAt)[0],
+                                          minute:
+                                              timeToInt(_breaks.startedAt)[1],
                                         ),
                                       );
                                       if (_selected != null) {
-                                        String _date =
-                                            '${DateFormat('yyyy-MM-dd').format(_breaks.startedAt)}';
-                                        String _time =
-                                            '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                        DateTime _dateTime =
-                                            DateTime.parse('$_date $_time');
+                                        DateTime _dateTime = rebuildTime(
+                                          context,
+                                          _breaks.startedAt,
+                                          _selected,
+                                        );
                                         setState(() =>
                                             _breaks.startedAt = _dateTime);
                                       }
@@ -419,14 +340,10 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         lastDate: kDayLastDate,
                                       );
                                       if (_selected != null) {
-                                        String _date =
-                                            '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                        String _time =
-                                            '${DateFormat('HH:mm').format(_breaks.endedAt)}:00.000';
-                                        DateTime _dateTime =
-                                            DateTime.parse('$_date $_time');
+                                        _selected = rebuildDate(
+                                            _selected, _breaks.endedAt);
                                         setState(
-                                            () => _breaks.endedAt = _dateTime);
+                                            () => _breaks.endedAt = _selected);
                                       }
                                     },
                                     label:
@@ -438,25 +355,20 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                   flex: 2,
                                   child: CustomTimeButton(
                                     onPressed: () async {
-                                      String _hour =
-                                          '${DateFormat('H').format(_breaks.endedAt)}';
-                                      String _minute =
-                                          '${DateFormat('m').format(_breaks.endedAt)}';
                                       TimeOfDay _selected =
                                           await showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay(
-                                          hour: int.parse(_hour),
-                                          minute: int.parse(_minute),
+                                          hour: timeToInt(_breaks.endedAt)[0],
+                                          minute: timeToInt(_breaks.endedAt)[1],
                                         ),
                                       );
                                       if (_selected != null) {
-                                        String _date =
-                                            '${DateFormat('yyyy-MM-dd').format(_breaks.endedAt)}';
-                                        String _time =
-                                            '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                        DateTime _dateTime =
-                                            DateTime.parse('$_date $_time');
+                                        DateTime _dateTime = rebuildTime(
+                                          context,
+                                          _breaks.endedAt,
+                                          _selected,
+                                        );
                                         setState(
                                             () => _breaks.endedAt = _dateTime);
                                       }
@@ -477,13 +389,13 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     children: [
                       CustomCheckboxListTile(
                         onChanged: (value) {
-                          setState(() => isBreaks = value);
+                          setState(() => _isBreaks = value);
                         },
                         label: '休憩を追加する',
-                        value: isBreaks,
+                        value: _isBreaks,
                       ),
                       SizedBox(height: 8.0),
-                      isBreaks == true
+                      _isBreaks == true
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -498,24 +410,19 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                             DateTime _selected =
                                                 await showDatePicker(
                                               context: context,
-                                              initialDate: breakStartedAt,
+                                              initialDate: _breakStartedAt,
                                               firstDate: kDayFirstDate,
                                               lastDate: kDayLastDate,
                                             );
                                             if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                              String _time =
-                                                  '${DateFormat('HH:mm').format(breakStartedAt)}';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
+                                              _selected = rebuildDate(
+                                                  _selected, _breakStartedAt);
                                               setState(() =>
-                                                  breakStartedAt = _dateTime);
+                                                  _breakStartedAt = _selected);
                                             }
                                           },
                                           label:
-                                              '${DateFormat('yyyy/MM/dd').format(breakStartedAt)}',
+                                              '${DateFormat('yyyy/MM/dd').format(_breakStartedAt)}',
                                         ),
                                       ),
                                       SizedBox(width: 4.0),
@@ -523,32 +430,28 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         flex: 2,
                                         child: CustomTimeButton(
                                           onPressed: () async {
-                                            String _hour =
-                                                '${DateFormat('H').format(breakStartedAt)}';
-                                            String _minute =
-                                                '${DateFormat('m').format(breakStartedAt)}';
                                             TimeOfDay _selected =
                                                 await showTimePicker(
                                               context: context,
                                               initialTime: TimeOfDay(
-                                                hour: int.parse(_hour),
-                                                minute: int.parse(_minute),
+                                                hour: timeToInt(
+                                                    _breakStartedAt)[0],
+                                                minute: timeToInt(
+                                                    _breakStartedAt)[1],
                                               ),
                                             );
                                             if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(breakStartedAt)}';
-                                              String _time =
-                                                  '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
+                                              DateTime _dateTime = rebuildTime(
+                                                context,
+                                                _breakStartedAt,
+                                                _selected,
+                                              );
                                               setState(() =>
-                                                  breakStartedAt = _dateTime);
+                                                  _breakStartedAt = _dateTime);
                                             }
                                           },
                                           label:
-                                              '${DateFormat('HH:mm').format(breakStartedAt)}',
+                                              '${DateFormat('HH:mm').format(_breakStartedAt)}',
                                         ),
                                       ),
                                     ],
@@ -566,24 +469,19 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                             DateTime _selected =
                                                 await showDatePicker(
                                               context: context,
-                                              initialDate: breakEndedAt,
+                                              initialDate: _breakEndedAt,
                                               firstDate: kDayFirstDate,
                                               lastDate: kDayLastDate,
                                             );
                                             if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                                              String _time =
-                                                  '${DateFormat('HH:mm').format(breakEndedAt)}:00.000';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
+                                              _selected = rebuildDate(
+                                                  _selected, _breakEndedAt);
                                               setState(() =>
-                                                  breakEndedAt = _dateTime);
+                                                  _breakEndedAt = _selected);
                                             }
                                           },
                                           label:
-                                              '${DateFormat('yyyy/MM/dd').format(breakEndedAt)}',
+                                              '${DateFormat('yyyy/MM/dd').format(_breakEndedAt)}',
                                         ),
                                       ),
                                       SizedBox(width: 4.0),
@@ -591,32 +489,28 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         flex: 2,
                                         child: CustomTimeButton(
                                           onPressed: () async {
-                                            String _hour =
-                                                '${DateFormat('H').format(breakEndedAt)}';
-                                            String _minute =
-                                                '${DateFormat('m').format(breakEndedAt)}';
                                             TimeOfDay _selected =
                                                 await showTimePicker(
                                               context: context,
                                               initialTime: TimeOfDay(
-                                                hour: int.parse(_hour),
-                                                minute: int.parse(_minute),
+                                                hour:
+                                                    timeToInt(_breakEndedAt)[0],
+                                                minute:
+                                                    timeToInt(_breakEndedAt)[1],
                                               ),
                                             );
                                             if (_selected != null) {
-                                              String _date =
-                                                  '${DateFormat('yyyy-MM-dd').format(breakEndedAt)}';
-                                              String _time =
-                                                  '${_selected.format(context).padLeft(5, '0')}:00.000';
-                                              DateTime _dateTime =
-                                                  DateTime.parse(
-                                                      '$_date $_time');
+                                              DateTime _dateTime = rebuildTime(
+                                                context,
+                                                _breakEndedAt,
+                                                _selected,
+                                              );
                                               setState(() =>
-                                                  breakEndedAt = _dateTime);
+                                                  _breakEndedAt = _dateTime);
                                             }
                                           },
                                           label:
-                                              '${DateFormat('HH:mm').format(breakEndedAt)}',
+                                              '${DateFormat('HH:mm').format(_breakEndedAt)}',
                                         ),
                                       ),
                                     ],
@@ -638,20 +532,17 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                       onPressed: () async {
                         DateTime _selected = await showDatePicker(
                           context: context,
-                          initialDate: work.endedAt,
+                          initialDate: _work.endedAt,
                           firstDate: kDayFirstDate,
                           lastDate: kDayLastDate,
                         );
                         if (_selected != null) {
-                          String _date =
-                              '${DateFormat('yyyy-MM-dd').format(_selected)}';
-                          String _time =
-                              '${DateFormat('HH:mm').format(work.endedAt)}:00.000';
-                          DateTime _dateTime = DateTime.parse('$_date $_time');
-                          setState(() => work.endedAt = _dateTime);
+                          _selected = rebuildDate(_selected, _work.endedAt);
+                          setState(() => _work.endedAt = _selected);
                         }
                       },
-                      label: '${DateFormat('yyyy/MM/dd').format(work.endedAt)}',
+                      label:
+                          '${DateFormat('yyyy/MM/dd').format(_work.endedAt)}',
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -659,171 +550,32 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        String _hour =
-                            '${DateFormat('H').format(work.endedAt)}';
-                        String _minute =
-                            '${DateFormat('m').format(work.endedAt)}';
                         TimeOfDay _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
-                            hour: int.parse(_hour),
-                            minute: int.parse(_minute),
+                            hour: timeToInt(_work.endedAt)[0],
+                            minute: timeToInt(_work.endedAt)[1],
                           ),
                         );
                         if (_selected != null) {
-                          String _date =
-                              '${DateFormat('yyyy-MM-dd').format(work.endedAt)}';
-                          String _time =
-                              '${_selected.format(context).padLeft(5, '0')}:00.000';
-                          DateTime _dateTime = DateTime.parse('$_date $_time');
-                          setState(() => work.endedAt = _dateTime);
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _work.endedAt,
+                            _selected,
+                          );
+                          setState(() => _work.endedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(work.endedAt)}',
+                      label: '${DateFormat('HH:mm').format(_work.endedAt)}',
                     ),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 8.0),
-            Table(
-              border: TableBorder.all(color: Colors.grey.shade300),
-              children: [
-                TableRow(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '勤務時間',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.workTime(widget.group)}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '法定内時間',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.legalTimes(widget.group).first}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '法定外時間',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.legalTimes(widget.group).last}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '深夜時間',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.nightTimes(widget.group).last}'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '通常時間※1',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.calTimes01(widget.group)[0]}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '深夜時間(-)※2',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.calTimes01(widget.group)[1]}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '通常時間外※3',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.calTimes01(widget.group)[2]}'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '深夜時間外※4',
-                            style: kDefaultTextStyle,
-                          ),
-                          Text('${work.calTimes01(widget.group)[3]}'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 4.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '※1・・・深夜時間帯外の勤務時間です。',
-                  style: kDefaultTextStyle,
-                ),
-                Text(
-                  '※2・・・深夜時間帯の勤務時間です。深夜時間外の分も引いた時間です。',
-                  style: kDefaultTextStyle,
-                ),
-                Text(
-                  '※3・・・深夜時間帯外で法定時間を超えた時間です。',
-                  style: kDefaultTextStyle,
-                ),
-                Text(
-                  '※4・・・深夜時間帯で法定時間を超えた時間です。',
-                  style: kDefaultTextStyle,
-                ),
-              ],
+            CustomWorkTable(
+              group: widget.group,
+              work: _work,
             ),
             SizedBox(height: 16.0),
             Row(
@@ -838,9 +590,9 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                   children: [
                     CustomTextButton(
                       onPressed: () {
-                        widget.workProvider.delete(work: work);
+                        widget.workProvider.delete(id: _work.id);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('勤怠情報を削除しました')),
+                          SnackBar(content: Text('勤務データを削除しました')),
                         );
                         Navigator.pop(context);
                       },
@@ -851,15 +603,15 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     CustomTextButton(
                       onPressed: () async {
                         if (!await widget.workProvider.update(
-                          work: work,
-                          isBreaks: isBreaks,
-                          breakStartedAt: breakStartedAt,
-                          breakEndedAt: breakEndedAt,
+                          work: _work,
+                          isBreaks: _isBreaks,
+                          breakStartedAt: _breakStartedAt,
+                          breakEndedAt: _breakEndedAt,
                         )) {
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('勤怠情報を修正しました')),
+                          SnackBar(content: Text('勤務データを修正しました')),
                         );
                         Navigator.pop(context);
                       },
@@ -992,87 +744,6 @@ class _LocationWorkDialogState extends State<LocationWorkDialog> {
                   onPressed: () => Navigator.pop(context),
                   color: Colors.blue,
                   label: 'OK',
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class EditWorkStateDialog extends StatelessWidget {
-  final WorkStateProvider workStateProvider;
-  final WorkStateModel workState;
-
-  EditWorkStateDialog({
-    @required this.workStateProvider,
-    @required this.workState,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Color _chipColor = Colors.grey.shade300;
-    switch (workState.state) {
-      case '欠勤':
-        _chipColor = Colors.red.shade300;
-        break;
-      case '特別休暇':
-        _chipColor = Colors.green.shade300;
-        break;
-      case '有給休暇':
-        _chipColor = Colors.teal.shade300;
-        break;
-      case '代休':
-        _chipColor = Colors.pink.shade300;
-        break;
-    }
-    return AlertDialog(
-      content: Container(
-        width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            SizedBox(height: 16.0),
-            Text(
-              'この記録を削除したい場合は、「削除する」ボタンを押してください。',
-              style: kDefaultTextStyle,
-            ),
-            SizedBox(height: 16.0),
-            CustomLabelColumn(
-              label: '勤務状況',
-              child: Chip(
-                backgroundColor: _chipColor,
-                label: Text('${workState.state}'),
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: '登録日',
-              child: Text(
-                '${DateFormat('yyyy/MM/dd').format(workState.startedAt)}',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
-                  label: 'キャンセル',
-                ),
-                CustomTextButton(
-                  onPressed: () {
-                    workStateProvider.delete(workState: workState);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('勤怠情報を削除しました')),
-                    );
-                    Navigator.pop(context);
-                  },
-                  color: Colors.red,
-                  label: '削除する',
                 ),
               ],
             ),
