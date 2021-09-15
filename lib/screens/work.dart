@@ -692,6 +692,8 @@ class _AddWorkDialogState extends State<AddWorkDialog> {
   void _init() async {
     _user = widget.user;
     _state = widget.workProvider.states.first;
+    _endedAt = _startedAt.add(Duration(hours: 8));
+    _breakEndedAt = _breakStartedAt.add(Duration(hours: 1));
   }
 
   @override
