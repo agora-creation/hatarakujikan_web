@@ -11,7 +11,6 @@ import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
-import 'package:hatarakujikan_web/providers/work_state.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
@@ -55,7 +54,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: WorkProvider()),
         ChangeNotifierProvider.value(value: WorkShiftProvider()),
-        ChangeNotifierProvider.value(value: WorkStateProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
