@@ -106,7 +106,7 @@ class CustomWorkListTile extends StatelessWidget {
             : dayWorkShift != null
                 ? ListTile(
                     leading: Chip(
-                      backgroundColor: dayWorkShift.stateColor(),
+                      backgroundColor: dayWorkShift.stateColor2(),
                       label: Text(
                         '${dayWorkShift.state}',
                         style: TextStyle(fontSize: 12.0),

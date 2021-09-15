@@ -9,6 +9,8 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
@@ -35,6 +37,8 @@ class WorkScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    final positionProvider = Provider.of<PositionProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final workProvider = Provider.of<WorkProvider>(context);
     final workShiftProvider = Provider.of<WorkShiftProvider>(context);
 
@@ -43,6 +47,8 @@ class WorkScreen extends StatelessWidget {
       selectedRoute: id,
       body: WorkTable(
         groupProvider: groupProvider,
+        positionProvider: positionProvider,
+        userProvider: userProvider,
         workProvider: workProvider,
         workShiftProvider: workShiftProvider,
       ),
@@ -52,11 +58,15 @@ class WorkScreen extends StatelessWidget {
 
 class WorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
+  final PositionProvider positionProvider;
+  final UserProvider userProvider;
   final WorkProvider workProvider;
   final WorkShiftProvider workShiftProvider;
 
   WorkTable({
     @required this.groupProvider,
+    @required this.positionProvider,
+    @required this.userProvider,
     @required this.workProvider,
     @required this.workShiftProvider,
   });
@@ -166,6 +176,8 @@ class _WorkTableState extends State<WorkTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => CsvDialog(
+                        positionProvider: widget.positionProvider,
+                        userProvider: widget.userProvider,
                         workProvider: widget.workProvider,
                         workShiftProvider: widget.workShiftProvider,
                         group: widget.groupProvider.group,
@@ -393,6 +405,8 @@ class SearchUserDialog extends StatelessWidget {
 }
 
 class CsvDialog extends StatefulWidget {
+  final PositionProvider positionProvider;
+  final UserProvider userProvider;
   final WorkProvider workProvider;
   final WorkShiftProvider workShiftProvider;
   final GroupModel group;
@@ -400,6 +414,8 @@ class CsvDialog extends StatefulWidget {
   final List<UserModel> users;
 
   CsvDialog({
+    @required this.positionProvider,
+    @required this.userProvider,
     @required this.workProvider,
     @required this.workShiftProvider,
     @required this.group,
@@ -500,6 +516,8 @@ class _CsvDialogState extends State<CsvDialog> {
                         onPressed: () async {
                           setState(() => _isLoading = true);
                           await CsvApi.download(
+                            positionProvider: widget.positionProvider,
+                            userProvider: widget.userProvider,
                             workProvider: widget.workProvider,
                             workShiftProvider: widget.workShiftProvider,
                             group: widget.group,

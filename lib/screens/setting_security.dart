@@ -34,23 +34,23 @@ class SettingSecurityPanel extends StatefulWidget {
 }
 
 class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
-  GoogleMapController mapController;
-  bool qrSecurity;
-  bool areaSecurity;
-  double areaLat;
-  double areaLon;
-  double areaRange;
+  GoogleMapController _mapController;
+  bool _qrSecurity;
+  bool _areaSecurity;
+  double _areaLat;
+  double _areaLon;
+  double _areaRange;
 
   void _init() async {
-    qrSecurity = widget.groupProvider.group?.qrSecurity;
-    areaSecurity = widget.groupProvider.group?.areaSecurity;
-    areaLat = widget.groupProvider.group?.areaLat;
-    areaLon = widget.groupProvider.group?.areaLon;
-    areaRange = widget.groupProvider.group?.areaRange;
+    _qrSecurity = widget.groupProvider.group?.qrSecurity;
+    _areaSecurity = widget.groupProvider.group?.areaSecurity;
+    _areaLat = widget.groupProvider.group?.areaLat;
+    _areaLon = widget.groupProvider.group?.areaLon;
+    _areaRange = widget.groupProvider.group?.areaRange;
   }
 
   void _onMapCreated(GoogleMapController controller) {
-    setState(() => mapController = controller);
+    setState(() => _mapController = controller);
   }
 
   @override
@@ -95,11 +95,11 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
                       context: context,
                       builder: (_) => ConfirmDialog(
                         groupProvider: widget.groupProvider,
-                        qrSecurity: qrSecurity,
-                        areaSecurity: areaSecurity,
-                        areaLat: areaLat,
-                        areaLon: areaLon,
-                        areaRange: areaRange,
+                        qrSecurity: _qrSecurity,
+                        areaSecurity: _areaSecurity,
+                        areaLat: _areaLat,
+                        areaLon: _areaLon,
+                        areaRange: _areaRange,
                       ),
                     );
                   },
@@ -114,17 +114,17 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
         SizedBox(height: 8.0),
         CustomCheckboxListTile(
           onChanged: (value) {
-            setState(() => qrSecurity = value);
+            setState(() => _qrSecurity = value);
           },
           label: 'QRコードで記録制限',
-          value: qrSecurity,
+          value: _qrSecurity,
         ),
         CustomCheckboxListTile(
           onChanged: (value) {
-            setState(() => areaSecurity = value);
+            setState(() => _areaSecurity = value);
           },
           label: '記録可能な範囲を制限',
-          value: areaSecurity,
+          value: _areaSecurity,
         ),
         SizedBox(height: 8.0),
         Expanded(
@@ -135,22 +135,22 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
                 child: GoogleMap(
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: CameraPosition(
-                    target: LatLng(areaLat, areaLon),
+                    target: LatLng(_areaLat, _areaLon),
                     zoom: 17.0,
                   ),
                   circles: Set.from([
                     Circle(
                       circleId: CircleId('area'),
-                      center: LatLng(areaLat, areaLon),
-                      radius: areaRange,
+                      center: LatLng(_areaLat, _areaLon),
+                      radius: _areaRange,
                       fillColor: Colors.red.withOpacity(0.3),
                       strokeColor: Colors.transparent,
                     ),
                   ]),
                   onTap: (latLng) {
                     setState(() {
-                      areaLat = latLng.latitude;
-                      areaLon = latLng.longitude;
+                      _areaLat = latLng.latitude;
+                      _areaLon = latLng.longitude;
                     });
                   },
                 ),
@@ -158,18 +158,18 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
               SizedBox(height: 8.0),
               Row(
                 children: [
-                  Text('半径: $areaRange m'),
+                  Text('半径: $_areaRange m'),
                   Expanded(
                     child: Slider(
-                      label: '$areaRange',
+                      label: '$_areaRange',
                       min: 0,
                       max: 500,
                       divisions: 500,
-                      value: areaRange,
+                      value: _areaRange,
                       activeColor: Colors.red,
                       inactiveColor: Colors.grey.shade300,
                       onChanged: (value) {
-                        setState(() => areaRange = value);
+                        setState(() => _areaRange = value);
                       },
                     ),
                   ),

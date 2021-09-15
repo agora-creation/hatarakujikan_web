@@ -14,7 +14,6 @@ import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
-import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -51,38 +50,38 @@ class ApplyWorkTable extends StatefulWidget {
 }
 
 class _ApplyWorkTableState extends State<ApplyWorkTable> {
-  UserModel user;
-  bool approval = false;
+  UserModel _user;
+  bool _approval = false;
 
   void userChange(UserModel userModel) {
-    setState(() => user = userModel);
+    setState(() => _user = userModel);
   }
 
-  void approvalChange(bool selApproval) {
-    setState(() => approval = selApproval);
+  void approvalChange(bool app) {
+    setState(() => _approval = app);
   }
 
   @override
   Widget build(BuildContext context) {
     Stream<QuerySnapshot> _stream;
     GroupModel _group = widget.groupProvider.group;
-    if (user != null) {
+    if (_user != null) {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
           .where('groupId', isEqualTo: _group?.id ?? 'error')
-          .where('userId', isEqualTo: user?.id ?? 'error')
-          .where('approval', isEqualTo: approval)
+          .where('userId', isEqualTo: _user?.id ?? 'error')
+          .where('approval', isEqualTo: _approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     } else {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
           .where('groupId', isEqualTo: _group?.id ?? 'error')
-          .where('approval', isEqualTo: approval)
+          .where('approval', isEqualTo: _approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     }
-    List<ApplyWorkModel> applyWorks = [];
+    List<ApplyWorkModel> _applyWorks = [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,14 +107,14 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                       context: context,
                       builder: (_) => SearchUserDialog(
                         users: widget.groupProvider.users,
-                        user: user,
+                        user: _user,
                         userChange: userChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.person,
-                  label: user?.name ?? '選択してください',
+                  label: _user?.name ?? '選択してください',
                 ),
                 SizedBox(width: 4.0),
                 CustomTextIconButton(
@@ -124,14 +123,14 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => SearchApprovalDialog(
-                        approval: approval,
+                        approval: _approval,
                         approvalChange: approvalChange,
                       ),
                     );
                   },
                   color: Colors.lightBlueAccent,
                   iconData: Icons.approval,
-                  label: approval ? '承認済み' : '承認待ち',
+                  label: _approval ? '承認済み' : '承認待ち',
                 ),
               ],
             ),
@@ -143,57 +142,52 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
           child: StreamBuilder<QuerySnapshot>(
             stream: _stream,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Loading(color: Colors.orange);
+              _applyWorks.clear();
+              if (snapshot.hasData) {
+                for (DocumentSnapshot doc in snapshot.data.docs) {
+                  _applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
+                }
               }
-              applyWorks.clear();
-              for (DocumentSnapshot doc in snapshot.data.docs) {
-                applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
-              }
-              if (applyWorks.length > 0) {
-                return DataTable2(
-                  columns: [
-                    DataColumn2(label: Text('申請日時')),
-                    DataColumn2(label: Text('申請者名')),
-                    DataColumn2(label: Text('事由'), size: ColumnSize.L),
-                    DataColumn2(label: Text('承認状況')),
-                    DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
-                  ],
-                  rows: List<DataRow>.generate(
-                    applyWorks.length,
-                    (index) => DataRow(
-                      cells: [
-                        DataCell(Text(
-                          '${DateFormat('yyyy/MM/dd HH:mm').format(applyWorks[index].createdAt)}',
-                        )),
-                        DataCell(Text('${applyWorks[index].userName}')),
-                        DataCell(Text(
-                          '${applyWorks[index].reason}',
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                        applyWorks[index].approval
-                            ? DataCell(Text('承認済み'))
-                            : DataCell(Text('承認待ち')),
-                        DataCell(IconButton(
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => EditApplyWorkDialog(
-                                applyWorkProvider: widget.applyWorkProvider,
-                                applyWork: applyWorks[index],
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                        )),
-                      ],
-                    ),
+              return DataTable2(
+                columns: [
+                  DataColumn2(label: Text('申請日時')),
+                  DataColumn2(label: Text('申請者名')),
+                  DataColumn2(label: Text('事由'), size: ColumnSize.L),
+                  DataColumn2(label: Text('承認状況')),
+                  DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
+                ],
+                rows: List<DataRow>.generate(
+                  _applyWorks.length,
+                  (index) => DataRow(
+                    cells: [
+                      DataCell(Text(
+                        '${DateFormat('yyyy/MM/dd HH:mm').format(_applyWorks[index].createdAt)}',
+                      )),
+                      DataCell(Text('${_applyWorks[index].userName}')),
+                      DataCell(Text(
+                        '${_applyWorks[index].reason}',
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                      _applyWorks[index].approval
+                          ? DataCell(Text('承認済み'))
+                          : DataCell(Text('承認待ち')),
+                      DataCell(IconButton(
+                        onPressed: () {
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => EditApplyWorkDialog(
+                              applyWorkProvider: widget.applyWorkProvider,
+                              applyWork: _applyWorks[index],
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                      )),
+                    ],
                   ),
-                );
-              } else {
-                return Text('現在申請/承認データはありません');
-              }
+                ),
+              );
             },
           ),
         ),

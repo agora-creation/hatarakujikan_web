@@ -99,4 +99,12 @@ class UserProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<List<UserModel>> selectList({List<String> userIds}) async {
+    List<UserModel> _users = [];
+    await _userService.selectList(userIds: userIds).then((value) {
+      _users = value;
+    });
+    return _users;
+  }
 }

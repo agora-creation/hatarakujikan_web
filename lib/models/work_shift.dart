@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
 
 class WorkShiftModel {
   String _id;
@@ -40,6 +41,36 @@ class WorkShiftModel {
         return Colors.pink;
       default:
         return Colors.red;
+    }
+  }
+
+  Color stateColor2() {
+    switch (_state) {
+      case '欠勤':
+        return Colors.red.shade300;
+      case '特別休暇':
+        return Colors.green.shade300;
+      case '有給休暇':
+        return Colors.teal.shade300;
+      case '代休':
+        return Colors.pink.shade300;
+      default:
+        return Colors.red.shade300;
+    }
+  }
+
+  PdfColor stateColor3() {
+    switch (_state) {
+      case '欠勤':
+        return PdfColors.red100;
+      case '特別休暇':
+        return PdfColors.green100;
+      case '有給休暇':
+        return PdfColors.teal100;
+      case '代休':
+        return PdfColors.pink100;
+      default:
+        return PdfColors.red100;
     }
   }
 }

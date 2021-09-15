@@ -166,20 +166,20 @@ class MigrationDialog extends StatefulWidget {
 }
 
 class _MigrationDialogState extends State<MigrationDialog> {
-  List<UserModel> before = [];
-  List<UserModel> after = [];
-  UserModel selectBefore;
-  UserModel selectAfter;
+  List<UserModel> _before = [];
+  List<UserModel> _after = [];
+  UserModel _selectBefore;
+  UserModel _selectAfter;
 
   void _init() async {
     widget.users.forEach((user) {
       if (user.smartphone == false) {
-        before.add(user);
+        _before.add(user);
       }
     });
     widget.users.forEach((user) {
       if (user.smartphone == true) {
-        after.add(user);
+        _after.add(user);
       }
     });
   }
@@ -213,11 +213,11 @@ class _MigrationDialogState extends State<MigrationDialog> {
               label: '移行元スタッフ(未スマホユーザー)',
               child: CustomDropdownButton(
                 isExpanded: true,
-                value: selectBefore,
+                value: _selectBefore,
                 onChanged: (value) {
-                  setState(() => selectBefore = value);
+                  setState(() => _selectBefore = value);
                 },
-                items: before.map((value) {
+                items: _before.map((value) {
                   return DropdownMenuItem<UserModel>(
                     value: value,
                     child: Text(
@@ -241,11 +241,11 @@ class _MigrationDialogState extends State<MigrationDialog> {
               label: '移行先スタッフ(スマホユーザー)',
               child: CustomDropdownButton(
                 isExpanded: false,
-                value: selectAfter,
+                value: _selectAfter,
                 onChanged: (value) {
-                  setState(() => selectAfter = value);
+                  setState(() => _selectAfter = value);
                 },
-                items: after.map((value) {
+                items: _after.map((value) {
                   return DropdownMenuItem<UserModel>(
                     value: value,
                     child: Text(
@@ -269,8 +269,8 @@ class _MigrationDialogState extends State<MigrationDialog> {
                   onPressed: () async {
                     if (!await widget.userProvider.migration(
                       groupId: widget.group.id,
-                      before: selectBefore,
-                      after: selectAfter,
+                      before: _selectBefore,
+                      after: _selectAfter,
                     )) {
                       return;
                     }

@@ -3,10 +3,10 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
-import 'package:hatarakujikan_web/models/group_notice.dart';
+import 'package:hatarakujikan_web/models/position.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/providers/group_notice.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
@@ -16,60 +16,58 @@ import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:provider/provider.dart';
 
-class NoticeScreen extends StatelessWidget {
-  static const String id = 'group_notice';
+class PositionScreen extends StatelessWidget {
+  static const String id = 'position';
 
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    final groupNoticeProvider = Provider.of<GroupNoticeProvider>(context);
+    final positionProvider = Provider.of<PositionProvider>(context);
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: NoticeTable(
+      body: PositionTable(
         groupProvider: groupProvider,
-        groupNoticeProvider: groupNoticeProvider,
+        positionProvider: positionProvider,
       ),
     );
   }
 }
 
-class NoticeTable extends StatefulWidget {
+class PositionTable extends StatefulWidget {
   final GroupProvider groupProvider;
-  final GroupNoticeProvider groupNoticeProvider;
+  final PositionProvider positionProvider;
 
-  NoticeTable({
+  PositionTable({
     @required this.groupProvider,
-    @required this.groupNoticeProvider,
+    @required this.positionProvider,
   });
 
   @override
-  _NoticeTableState createState() => _NoticeTableState();
+  _PositionTableState createState() => _PositionTableState();
 }
 
-class _NoticeTableState extends State<NoticeTable> {
+class _PositionTableState extends State<PositionTable> {
   @override
   Widget build(BuildContext context) {
     GroupModel _group = widget.groupProvider.group;
     Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
-        .collection('group')
-        .doc(_group?.id ?? 'error')
-        .collection('notice')
+        .collection('position')
         .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
-    List<GroupNoticeModel> _groupNotices = [];
+    List<PositionModel> _positions = [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'お知らせの管理',
+          '雇用形態の管理',
           style: kAdminTitleTextStyle,
         ),
         Text(
-          'お知らせを一覧表示します。このお知らせはスマートフォンアプリのスタッフにのみ送信できます。',
+          '雇用形態を一覧表示します。雇用形態毎にスタッフを登録してください',
           style: kAdminSubTitleTextStyle,
         ),
         SizedBox(height: 16.0),
@@ -82,9 +80,9 @@ class _NoticeTableState extends State<NoticeTable> {
                 showDialog(
                   barrierDismissible: false,
                   context: context,
-                  builder: (_) => AddNoticeDialog(
-                    groupNoticeProvider: widget.groupNoticeProvider,
-                    groupId: widget.groupProvider.group?.id,
+                  builder: (_) => AddPositionDialog(
+                    positionProvider: widget.positionProvider,
+                    group: widget.groupProvider.group,
                   ),
                 );
               },
@@ -99,57 +97,70 @@ class _NoticeTableState extends State<NoticeTable> {
           child: StreamBuilder<QuerySnapshot>(
             stream: _stream,
             builder: (context, snapshot) {
-              _groupNotices.clear();
+              _positions.clear();
               if (snapshot.hasData) {
                 for (DocumentSnapshot doc in snapshot.data.docs) {
-                  _groupNotices.add(GroupNoticeModel.fromSnapshot(doc));
+                  _positions.add(PositionModel.fromSnapshot(doc));
                 }
               }
               return DataTable2(
                 columns: [
-                  DataColumn2(label: Text('タイトル')),
-                  DataColumn2(label: Text('メッセージ'), size: ColumnSize.L),
+                  DataColumn2(label: Text('雇用形態名')),
+                  DataColumn2(label: Text('現在の登録スタッフ'), size: ColumnSize.L),
                   DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
-                  DataColumn2(label: Text('送信'), size: ColumnSize.S),
+                  DataColumn2(label: Text('スタッフ登録'), size: ColumnSize.S),
                 ],
                 rows: List<DataRow>.generate(
-                  _groupNotices.length,
-                  (index) => DataRow(
-                    cells: [
-                      DataCell(Text('${_groupNotices[index].title}')),
-                      DataCell(Text(
-                        '${_groupNotices[index].message}',
-                        overflow: TextOverflow.ellipsis,
-                      )),
-                      DataCell(IconButton(
-                        onPressed: () {
-                          showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => EditNoticeDialog(
-                              groupNoticeProvider: widget.groupNoticeProvider,
-                              groupNotice: _groupNotices[index],
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.edit, color: Colors.blue),
-                      )),
-                      DataCell(IconButton(
-                        onPressed: () {
-                          showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => SendNoticeDialog(
-                              groupProvider: widget.groupProvider,
-                              groupNoticeProvider: widget.groupNoticeProvider,
-                              groupNotice: _groupNotices[index],
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.send, color: Colors.blue),
-                      )),
-                    ],
-                  ),
+                  _positions.length,
+                  (index) {
+                    List<UserModel> _users = widget.groupProvider.users;
+                    String _positionUsers = '';
+                    if (_positions[index].userIds != null) {
+                      for (String _id in _positions[index].userIds) {
+                        if (_positionUsers != '') _positionUsers += ',';
+                        UserModel _user = _users.singleWhere(
+                          (e) => e.id == _id,
+                        );
+                        _positionUsers += _user.name;
+                      }
+                    }
+                    return DataRow(
+                      cells: [
+                        DataCell(Text('${_positions[index].name}')),
+                        DataCell(Text(
+                          '$_positionUsers',
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditPositionDialog(
+                                positionProvider: widget.positionProvider,
+                                position: _positions[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                        )),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => UserPositionDialog(
+                                groupProvider: widget.groupProvider,
+                                positionProvider: widget.positionProvider,
+                                position: _positions[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.person, color: Colors.blue),
+                        )),
+                      ],
+                    );
+                  },
                 ),
               );
             },
@@ -160,22 +171,21 @@ class _NoticeTableState extends State<NoticeTable> {
   }
 }
 
-class AddNoticeDialog extends StatefulWidget {
-  final GroupNoticeProvider groupNoticeProvider;
-  final String groupId;
+class AddPositionDialog extends StatefulWidget {
+  final PositionProvider positionProvider;
+  final GroupModel group;
 
-  AddNoticeDialog({
-    @required this.groupNoticeProvider,
-    @required this.groupId,
+  AddPositionDialog({
+    @required this.positionProvider,
+    @required this.group,
   });
 
   @override
-  _AddNoticeDialogState createState() => _AddNoticeDialogState();
+  _AddPositionDialogState createState() => _AddPositionDialogState();
 }
 
-class _AddNoticeDialogState extends State<AddNoticeDialog> {
-  TextEditingController title = TextEditingController();
-  TextEditingController message = TextEditingController();
+class _AddPositionDialogState extends State<AddPositionDialog> {
+  TextEditingController name = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -190,26 +200,13 @@ class _AddNoticeDialogState extends State<AddNoticeDialog> {
               '項目を全て入力して、最後に「登録する」ボタンを押してください。',
               style: kDefaultTextStyle,
             ),
-            Text(
-              '※ここでは登録のみで、送信はされません。',
-              style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
-            ),
             SizedBox(height: 16.0),
             CustomLabelColumn(
-              label: 'タイトル',
+              label: '雇用形態名',
               child: CustomTextFormField2(
                 textInputType: null,
                 maxLines: 1,
-                controller: title,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: 'メッセージ',
-              child: CustomTextFormField2(
-                textInputType: TextInputType.multiline,
-                maxLines: null,
-                controller: message,
+                controller: name,
               ),
             ),
             SizedBox(height: 16.0),
@@ -223,15 +220,14 @@ class _AddNoticeDialogState extends State<AddNoticeDialog> {
                 ),
                 CustomTextButton(
                   onPressed: () async {
-                    if (!await widget.groupNoticeProvider.create(
-                      groupId: widget.groupId,
-                      title: title.text.trim(),
-                      message: message.text,
+                    if (!await widget.positionProvider.create(
+                      groupId: widget.group.id,
+                      name: name.text.trim(),
                     )) {
                       return;
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('お知らせを登録しました')),
+                      SnackBar(content: Text('雇用形態を登録しました')),
                     );
                     Navigator.pop(context);
                   },
@@ -247,26 +243,24 @@ class _AddNoticeDialogState extends State<AddNoticeDialog> {
   }
 }
 
-class EditNoticeDialog extends StatefulWidget {
-  final GroupNoticeProvider groupNoticeProvider;
-  final GroupNoticeModel groupNotice;
+class EditPositionDialog extends StatefulWidget {
+  final PositionProvider positionProvider;
+  final PositionModel position;
 
-  EditNoticeDialog({
-    @required this.groupNoticeProvider,
-    @required this.groupNotice,
+  EditPositionDialog({
+    @required this.positionProvider,
+    @required this.position,
   });
 
   @override
-  _EditNoticeDialogState createState() => _EditNoticeDialogState();
+  _EditPositionDialogState createState() => _EditPositionDialogState();
 }
 
-class _EditNoticeDialogState extends State<EditNoticeDialog> {
-  TextEditingController title = TextEditingController();
-  TextEditingController message = TextEditingController();
+class _EditPositionDialogState extends State<EditPositionDialog> {
+  TextEditingController name = TextEditingController();
 
   void _init() async {
-    title.text = widget.groupNotice?.title;
-    message.text = widget.groupNotice?.message;
+    name.text = widget.position?.name;
   }
 
   @override
@@ -285,25 +279,16 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              'お知らせ情報を修正できます。',
+              '雇用形態の情報を修正できます。',
               style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
             CustomLabelColumn(
-              label: 'タイトル',
+              label: '雇用形態名',
               child: CustomTextFormField2(
                 textInputType: null,
                 maxLines: 1,
-                controller: title,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: 'メッセージ',
-              child: CustomTextFormField2(
-                textInputType: TextInputType.multiline,
-                maxLines: null,
-                controller: message,
+                controller: name,
               ),
             ),
             SizedBox(height: 16.0),
@@ -319,11 +304,11 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
                   children: [
                     CustomTextButton(
                       onPressed: () {
-                        widget.groupNoticeProvider.delete(
-                          groupNotice: widget.groupNotice,
+                        widget.positionProvider.delete(
+                          id: '${widget.position.id}',
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('お知らせを削除しました')),
+                          SnackBar(content: Text('雇用形態を削除しました')),
                         );
                         Navigator.pop(context);
                       },
@@ -333,16 +318,14 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
                     SizedBox(width: 4.0),
                     CustomTextButton(
                       onPressed: () async {
-                        if (!await widget.groupNoticeProvider.update(
-                          id: widget.groupNotice.id,
-                          groupId: widget.groupNotice.groupId,
-                          title: title.text.trim(),
-                          message: message.text,
+                        if (!await widget.positionProvider.update(
+                          id: widget.position?.id,
+                          name: name.text.trim(),
                         )) {
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('お知らせを修正しました')),
+                          SnackBar(content: Text('雇用形態を修正しました')),
                         );
                         Navigator.pop(context);
                       },
@@ -360,32 +343,32 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
   }
 }
 
-class SendNoticeDialog extends StatefulWidget {
+class UserPositionDialog extends StatefulWidget {
   final GroupProvider groupProvider;
-  final GroupNoticeProvider groupNoticeProvider;
-  final GroupNoticeModel groupNotice;
+  final PositionProvider positionProvider;
+  final PositionModel position;
 
-  SendNoticeDialog({
+  UserPositionDialog({
     @required this.groupProvider,
-    @required this.groupNoticeProvider,
-    @required this.groupNotice,
+    @required this.positionProvider,
+    @required this.position,
   });
 
   @override
-  _SendNoticeDialogState createState() => _SendNoticeDialogState();
+  _UserPositionDialogState createState() => _UserPositionDialogState();
 }
 
-class _SendNoticeDialogState extends State<SendNoticeDialog> {
+class _UserPositionDialogState extends State<UserPositionDialog> {
   final ScrollController _scrollController = ScrollController();
-  List<UserModel> _users = [];
   List<UserModel> _selected = [];
 
   void _init() async {
-    widget.groupProvider.users.forEach((user) {
-      if (user.smartphone == true) {
-        _users.add(user);
-      }
-    });
+    for (String _id in widget.position?.userIds) {
+      UserModel _user = widget.groupProvider.users.singleWhere(
+        (e) => e.id == _id,
+      );
+      _selected.add(_user);
+    }
   }
 
   @override
@@ -404,27 +387,22 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
           children: [
             SizedBox(height: 16.0),
             Text(
-              'お知らせ情報を送信先スタッフを選択して、送信してください。',
+              '登録した雇用形態情報にスタッフ情報を紐付けします。各スタッフを選択して、登録してください。',
               style: kDefaultTextStyle,
             ),
             SizedBox(height: 16.0),
             CustomLabelColumn(
-              label: 'タイトル',
-              child: Text('${widget.groupNotice?.title}'),
-            ),
-            Divider(),
-            CustomLabelColumn(
-              label: 'メッセージ',
-              child: Text('${widget.groupNotice?.message}'),
+              label: '雇用形態名',
+              child: Text('${widget.position?.name}'),
             ),
             Divider(),
             SizedBox(height: 8.0),
             CustomIconLabel(
               iconData: Icons.person,
-              label: '送信先スタッフ',
+              label: 'スタッフ',
             ),
             Container(
-              height: 350.0,
+              width: 250.0,
               child: Scrollbar(
                 isAlwaysShown: true,
                 controller: _scrollController,
@@ -432,9 +410,9 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   controller: _scrollController,
-                  itemCount: _users.length,
+                  itemCount: widget.groupProvider.users.length,
                   itemBuilder: (_, index) {
-                    UserModel _user = _users[index];
+                    UserModel _user = widget.groupProvider.users[index];
                     var contain = _selected.where((e) => e.id == _user.id);
                     return CustomCheckboxListTile(
                       onChanged: (value) {
@@ -464,31 +442,22 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
                   color: Colors.grey,
                   label: 'キャンセル',
                 ),
-                _selected.length > 0
-                    ? CustomTextButton(
-                        onPressed: () async {
-                          if (!await widget.groupNoticeProvider.send(
-                            id: widget.groupNotice.id,
-                            groupId: widget.groupNotice.groupId,
-                            title: widget.groupNotice.title,
-                            message: widget.groupNotice.message,
-                            users: _selected,
-                          )) {
-                            return;
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('お知らせを送信しました')),
-                          );
-                          Navigator.pop(context);
-                        },
-                        color: Colors.cyan,
-                        label: '送信する',
-                      )
-                    : CustomTextButton(
-                        onPressed: null,
-                        color: Colors.grey,
-                        label: '送信する',
-                      ),
+                CustomTextButton(
+                  onPressed: () async {
+                    if (!await widget.positionProvider.updateUsers(
+                      position: widget.position,
+                      users: _selected,
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('雇用形態情報にスタッフ情報を登録しました')),
+                    );
+                    Navigator.pop(context);
+                  },
+                  color: Colors.blue,
+                  label: '登録する',
+                ),
               ],
             ),
           ],

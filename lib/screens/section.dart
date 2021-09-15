@@ -15,7 +15,6 @@ import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
-import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:provider/provider.dart';
 
 class SectionScreen extends StatelessWidget {
@@ -59,7 +58,7 @@ class _SectionTableState extends State<SectionTable> {
         .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
-    List<SectionModel> sections = [];
+    List<SectionModel> _sections = [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,104 +98,99 @@ class _SectionTableState extends State<SectionTable> {
           child: StreamBuilder<QuerySnapshot>(
             stream: _stream,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Loading(color: Colors.orange);
+              _sections.clear();
+              if (snapshot.hasData) {
+                for (DocumentSnapshot doc in snapshot.data.docs) {
+                  _sections.add(SectionModel.fromSnapshot(doc));
+                }
               }
-              sections.clear();
-              for (DocumentSnapshot doc in snapshot.data.docs) {
-                sections.add(SectionModel.fromSnapshot(doc));
-              }
-              if (sections.length > 0) {
-                return DataTable2(
-                  columns: [
-                    DataColumn2(label: Text('部署/事業所名')),
-                    DataColumn2(label: Text('現在の登録スタッフ'), size: ColumnSize.L),
-                    DataColumn2(label: Text('現在の管理者')),
-                    DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
-                    DataColumn2(label: Text('スタッフ登録'), size: ColumnSize.S),
-                    DataColumn2(label: Text('管理者登録'), size: ColumnSize.S),
-                  ],
-                  rows: List<DataRow>.generate(
-                    sections.length,
-                    (index) {
-                      List<UserModel> _users = widget.groupProvider.users;
-                      String _sectionUsers = '';
-                      if (sections[index].userIds != null) {
-                        for (String _id in sections[index].userIds) {
-                          if (_sectionUsers != '') _sectionUsers += ',';
-                          UserModel _user = _users.singleWhere(
-                            (e) => e.id == _id,
-                          );
-                          _sectionUsers += _user.name;
-                        }
-                      }
-                      String _sectionAdminUser = '';
-                      if (sections[index].adminUserId != '') {
+              return DataTable2(
+                columns: [
+                  DataColumn2(label: Text('部署/事業所名')),
+                  DataColumn2(label: Text('現在の登録スタッフ'), size: ColumnSize.L),
+                  DataColumn2(label: Text('現在の管理者')),
+                  DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+                  DataColumn2(label: Text('スタッフ登録'), size: ColumnSize.S),
+                  DataColumn2(label: Text('管理者登録'), size: ColumnSize.S),
+                ],
+                rows: List<DataRow>.generate(
+                  _sections.length,
+                  (index) {
+                    List<UserModel> _users = widget.groupProvider.users;
+                    String _sectionUsers = '';
+                    if (_sections[index].userIds != null) {
+                      for (String _id in _sections[index].userIds) {
+                        if (_sectionUsers != '') _sectionUsers += ',';
                         UserModel _user = _users.singleWhere(
-                          (e) => e.id == sections[index].adminUserId,
+                          (e) => e.id == _id,
                         );
-                        _sectionAdminUser = _user.name;
+                        _sectionUsers += _user.name;
                       }
-                      return DataRow(
-                        cells: [
-                          DataCell(Text('${sections[index].name}')),
-                          DataCell(Text(
-                            '$_sectionUsers',
-                            overflow: TextOverflow.ellipsis,
-                          )),
-                          DataCell(Text('$_sectionAdminUser')),
-                          DataCell(IconButton(
-                            onPressed: () {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (_) => EditSectionDialog(
-                                  sectionProvider: widget.sectionProvider,
-                                  section: sections[index],
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.edit, color: Colors.blue),
-                          )),
-                          DataCell(IconButton(
-                            onPressed: () {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (_) => UserSectionDialog(
-                                  groupProvider: widget.groupProvider,
-                                  sectionProvider: widget.sectionProvider,
-                                  section: sections[index],
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.person, color: Colors.blue),
-                          )),
-                          DataCell(IconButton(
-                            onPressed: () {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (_) => AdminUserSectionDialog(
-                                  groupProvider: widget.groupProvider,
-                                  sectionProvider: widget.sectionProvider,
-                                  section: sections[index],
-                                ),
-                              );
-                            },
-                            icon: Icon(
-                              Icons.manage_accounts,
-                              color: Colors.blue,
-                            ),
-                          )),
-                        ],
+                    }
+                    String _sectionAdminUser = '';
+                    if (_sections[index].adminUserId != '') {
+                      UserModel _user = _users.singleWhere(
+                        (e) => e.id == _sections[index].adminUserId,
                       );
-                    },
-                  ),
-                );
-              } else {
-                return Text('現在登録されている部署/事業所はありません');
-              }
+                      _sectionAdminUser = _user.name;
+                    }
+                    return DataRow(
+                      cells: [
+                        DataCell(Text('${_sections[index].name}')),
+                        DataCell(Text(
+                          '$_sectionUsers',
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                        DataCell(Text('$_sectionAdminUser')),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditSectionDialog(
+                                sectionProvider: widget.sectionProvider,
+                                section: _sections[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                        )),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => UserSectionDialog(
+                                groupProvider: widget.groupProvider,
+                                sectionProvider: widget.sectionProvider,
+                                section: _sections[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.person, color: Colors.blue),
+                        )),
+                        DataCell(IconButton(
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => AdminUserSectionDialog(
+                                groupProvider: widget.groupProvider,
+                                sectionProvider: widget.sectionProvider,
+                                section: _sections[index],
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.manage_accounts,
+                            color: Colors.blue,
+                          ),
+                        )),
+                      ],
+                    );
+                  },
+                ),
+              );
             },
           ),
         ),

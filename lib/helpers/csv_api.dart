@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
+import 'package:hatarakujikan_web/models/position.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:intl/intl.dart';
@@ -28,6 +31,8 @@ class CsvApi {
   }
 
   static Future<void> download({
+    PositionProvider positionProvider,
+    UserProvider userProvider,
     WorkProvider workProvider,
     WorkShiftProvider workShiftProvider,
     GroupModel group,
@@ -39,10 +44,11 @@ class CsvApi {
     switch (template) {
       case 'ひろめカンパニー用レイアウト':
         await _works01(
+          positionProvider: positionProvider,
+          userProvider: userProvider,
           workProvider: workProvider,
           group: group,
           month: month,
-          users: users,
         );
         return;
       case '土佐税理士事務所用レイアウト':
@@ -61,10 +67,11 @@ class CsvApi {
 }
 
 Future<void> _works01({
+  PositionProvider positionProvider,
+  UserProvider userProvider,
   WorkProvider workProvider,
   GroupModel group,
   DateTime month,
-  List<UserModel> users,
 }) async {
   List<List<String>> rows = [];
   List<String> row = [];
@@ -75,34 +82,49 @@ Future<void> _works01({
   row.add('支給項目2');
   rows.add(row);
   List<DateTime> days = generateDays(month);
-  for (UserModel _user in users) {
-    String recordPassword = _user.recordPassword;
-    String name = _user.name;
-    Map count = {};
-    String time1 = '00:00';
-    String time2 = '00:00';
-    List<WorkModel> _works = await workProvider.selectList(
-      group: group,
-      user: _user,
-      startAt: days.first,
-      endAt: days.last,
+  List<PositionModel> _positions = await positionProvider.selectList(
+    groupId: group.id,
+  );
+  for (PositionModel _position in _positions) {
+    List<UserModel> _users = await userProvider.selectList(
+      userIds: _position.userIds,
     );
-    for (WorkModel _work in _works) {
-      if (_work.startedAt != _work.endedAt) {
-        String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
-        count[_key] = '';
-        time1 = addTime(time1, _work.calTimes01(group)[0]);
-        time2 = addTime(time2, _work.calTimes01(group)[1]);
+    for (UserModel _user in _users) {
+      String recordPassword = _user.recordPassword;
+      String name = _user.name;
+      Map count = {};
+      String time = '00:00';
+      String time1 = '00:00';
+      String time2 = '00:00';
+      List<WorkModel> _works = await workProvider.selectList(
+        group: group,
+        user: _user,
+        startAt: days.first,
+        endAt: days.last,
+      );
+      for (WorkModel _work in _works) {
+        if (_work.startedAt != _work.endedAt) {
+          String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+          count[_key] = '';
+          time = addTime(time, _work.workTime(group));
+          time1 = addTime(time1, _work.calTimes01(group)[0]);
+          time2 = addTime(time2, _work.calTimes01(group)[1]);
+        }
       }
+      int workDays = count.length;
+      List<String> _row = [];
+      _row.add('$recordPassword');
+      _row.add('$name');
+      _row.add('$workDays');
+      if (_position.name == '正社員') {
+        _row.add('$time');
+        _row.add('00:00');
+      } else {
+        _row.add('$time1');
+        _row.add('$time2');
+      }
+      rows.add(_row);
     }
-    int workDays = count.length;
-    List<String> _row = [];
-    _row.add('$recordPassword');
-    _row.add('$name');
-    _row.add('$workDays');
-    _row.add('$time1');
-    _row.add('$time2');
-    rows.add(_row);
   }
   _download(rows: rows, fileName: 'works.csv');
 }

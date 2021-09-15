@@ -40,7 +40,7 @@ class SettingInfoPanel extends StatefulWidget {
 class _SettingInfoPanelState extends State<SettingInfoPanel> {
   TextEditingController name = TextEditingController();
   List<UserModel> _users = [];
-  UserModel adminUser;
+  UserModel _adminUser;
 
   void _init() async {
     name.text = widget.groupProvider.group?.name;
@@ -49,7 +49,7 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
         _users.add(user);
       }
     });
-    adminUser = _users.singleWhere(
+    _adminUser = _users.singleWhere(
       (user) => user.id == widget.groupProvider.group?.adminUserId,
     );
   }
@@ -97,7 +97,7 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
                       builder: (_) => ConfirmDialog(
                         groupProvider: widget.groupProvider,
                         name: name.text.trim(),
-                        adminUserId: adminUser?.id,
+                        adminUserId: _adminUser?.id,
                       ),
                     );
                   },
@@ -127,9 +127,9 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
                 label: '管理者を選ぶ',
                 child: CustomDropdownButton(
                   isExpanded: false,
-                  value: adminUser,
+                  value: _adminUser,
                   onChanged: (value) {
-                    setState(() => adminUser = value);
+                    setState(() => _adminUser = value);
                   },
                   items: _users.map((value) {
                     return DropdownMenuItem(

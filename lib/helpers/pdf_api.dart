@@ -326,25 +326,13 @@ class PdfApi {
                 }
               }
             } else {
-              PdfColor _stateColor = PdfColors.white;
-              switch (_dayWorkShift?.state) {
-                case '欠勤':
-                  _stateColor = PdfColors.red100;
-                  break;
-                case '特別休暇':
-                  _stateColor = PdfColors.green100;
-                  break;
-                case '有給休暇':
-                  _stateColor = PdfColors.teal100;
-                  break;
-                case '代休':
-                  _stateColor = PdfColors.pink100;
-                  break;
-              }
               _row.add(pw.TableRow(
                 children: [
                   _cell(label: _day),
-                  _cell(label: _dayWorkShift?.state ?? '', color: _stateColor),
+                  _cell(
+                    label: _dayWorkShift?.state ?? '',
+                    color: _dayWorkShift?.stateColor3(),
+                  ),
                   _cell(label: ''),
                   _cell(label: ''),
                   _cell(label: ''),
@@ -550,25 +538,13 @@ class PdfApi {
               }
             }
           } else {
-            PdfColor _stateColor = PdfColors.white;
-            switch (_dayWorkShift?.state) {
-              case '欠勤':
-                _stateColor = PdfColors.red100;
-                break;
-              case '特別休暇':
-                _stateColor = PdfColors.green100;
-                break;
-              case '有給休暇':
-                _stateColor = PdfColors.teal100;
-                break;
-              case '代休':
-                _stateColor = PdfColors.pink100;
-                break;
-            }
             _row.add(pw.TableRow(
               children: [
                 _cell(label: _day),
-                _cell(label: _dayWorkShift?.state ?? '', color: _stateColor),
+                _cell(
+                  label: _dayWorkShift?.state ?? '',
+                  color: _dayWorkShift?.stateColor3(),
+                ),
                 _cell(label: ''),
                 _cell(label: ''),
                 _cell(label: ''),

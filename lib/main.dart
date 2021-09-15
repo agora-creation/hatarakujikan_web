@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/group_notice.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/providers/section.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
@@ -14,6 +15,7 @@ import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
+import 'package:hatarakujikan_web/screens/position.dart';
 import 'package:hatarakujikan_web/screens/section.dart';
 import 'package:hatarakujikan_web/screens/section/apply_work.dart';
 import 'package:hatarakujikan_web/screens/section/login.dart';
@@ -50,6 +52,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: ApplyWorkProvider()),
         ChangeNotifierProvider.value(value: GroupProvider.initialize()),
         ChangeNotifierProvider.value(value: GroupNoticeProvider()),
+        ChangeNotifierProvider.value(value: PositionProvider()),
         ChangeNotifierProvider.value(value: SectionProvider.initialize()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: WorkProvider()),
@@ -71,6 +74,7 @@ class MyApp extends StatelessWidget {
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
           NoticeScreen.id: (context) => NoticeScreen(),
+          PositionScreen.id: (context) => PositionScreen(),
           SectionScreen.id: (context) => SectionScreen(),
           SettingInfoScreen.id: (context) => SettingInfoScreen(),
           SettingSecurityScreen.id: (context) => SettingSecurityScreen(),

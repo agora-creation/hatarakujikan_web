@@ -37,40 +37,40 @@ class SettingWorkPanel extends StatefulWidget {
 }
 
 class _SettingWorkPanelState extends State<SettingWorkPanel> {
-  String roundStartType;
-  int roundStartNum;
-  String roundEndType;
-  int roundEndNum;
-  String roundBreakStartType;
-  int roundBreakStartNum;
-  String roundBreakEndType;
-  int roundBreakEndNum;
-  String roundWorkType;
-  int roundWorkNum;
-  int legal;
-  String nightStart;
-  String nightEnd;
-  String workStart;
-  String workEnd;
-  List<String> holidays;
+  String _roundStartType;
+  int _roundStartNum;
+  String _roundEndType;
+  int _roundEndNum;
+  String _roundBreakStartType;
+  int _roundBreakStartNum;
+  String _roundBreakEndType;
+  int _roundBreakEndNum;
+  String _roundWorkType;
+  int _roundWorkNum;
+  int _legal;
+  String _nightStart;
+  String _nightEnd;
+  String _workStart;
+  String _workEnd;
+  List<String> _holidays;
 
   void _init() async {
-    roundStartType = widget.groupProvider.group?.roundStartType;
-    roundStartNum = widget.groupProvider.group?.roundStartNum;
-    roundEndType = widget.groupProvider.group?.roundEndType;
-    roundEndNum = widget.groupProvider.group?.roundEndNum;
-    roundBreakStartType = widget.groupProvider.group?.roundBreakStartType;
-    roundBreakStartNum = widget.groupProvider.group?.roundBreakStartNum;
-    roundBreakEndType = widget.groupProvider.group?.roundBreakEndType;
-    roundBreakEndNum = widget.groupProvider.group?.roundBreakEndNum;
-    roundWorkType = widget.groupProvider.group?.roundWorkType;
-    roundWorkNum = widget.groupProvider.group?.roundWorkNum;
-    legal = widget.groupProvider.group?.legal;
-    nightStart = widget.groupProvider.group?.nightStart;
-    nightEnd = widget.groupProvider.group?.nightEnd;
-    workStart = widget.groupProvider.group?.workStart;
-    workEnd = widget.groupProvider.group?.workEnd;
-    holidays = widget.groupProvider.group?.holidays;
+    _roundStartType = widget.groupProvider.group?.roundStartType;
+    _roundStartNum = widget.groupProvider.group?.roundStartNum;
+    _roundEndType = widget.groupProvider.group?.roundEndType;
+    _roundEndNum = widget.groupProvider.group?.roundEndNum;
+    _roundBreakStartType = widget.groupProvider.group?.roundBreakStartType;
+    _roundBreakStartNum = widget.groupProvider.group?.roundBreakStartNum;
+    _roundBreakEndType = widget.groupProvider.group?.roundBreakEndType;
+    _roundBreakEndNum = widget.groupProvider.group?.roundBreakEndNum;
+    _roundWorkType = widget.groupProvider.group?.roundWorkType;
+    _roundWorkNum = widget.groupProvider.group?.roundWorkNum;
+    _legal = widget.groupProvider.group?.legal;
+    _nightStart = widget.groupProvider.group?.nightStart;
+    _nightEnd = widget.groupProvider.group?.nightEnd;
+    _workStart = widget.groupProvider.group?.workStart;
+    _workEnd = widget.groupProvider.group?.workEnd;
+    _holidays = widget.groupProvider.group?.holidays;
   }
 
   @override
@@ -115,22 +115,22 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                       context: context,
                       builder: (_) => ConfirmDialog(
                         groupProvider: widget.groupProvider,
-                        roundStartType: roundStartType,
-                        roundStartNum: roundStartNum,
-                        roundEndType: roundEndType,
-                        roundEndNum: roundEndNum,
-                        roundBreakStartType: roundBreakStartType,
-                        roundBreakStartNum: roundBreakStartNum,
-                        roundBreakEndType: roundBreakEndType,
-                        roundBreakEndNum: roundBreakEndNum,
-                        roundWorkType: roundWorkType,
-                        roundWorkNum: roundWorkNum,
-                        legal: legal,
-                        nightStart: nightStart,
-                        nightEnd: nightEnd,
-                        workStart: workStart,
-                        workEnd: workEnd,
-                        holidays: holidays,
+                        roundStartType: _roundStartType,
+                        roundStartNum: _roundStartNum,
+                        roundEndType: _roundEndType,
+                        roundEndNum: _roundEndNum,
+                        roundBreakStartType: _roundBreakStartType,
+                        roundBreakStartNum: _roundBreakStartNum,
+                        roundBreakEndType: _roundBreakEndType,
+                        roundBreakEndNum: _roundBreakEndNum,
+                        roundWorkType: _roundWorkType,
+                        roundWorkNum: _roundWorkNum,
+                        legal: _legal,
+                        nightStart: _nightStart,
+                        nightEnd: _nightEnd,
+                        workStart: _workStart,
+                        workEnd: _workEnd,
+                        holidays: _holidays,
                       ),
                     );
                   },
@@ -168,9 +168,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ方',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundStartType,
+                          value: _roundStartType,
                           onChanged: (value) {
-                            setState(() => roundStartType = value);
+                            setState(() => _roundStartType = value);
                           },
                           items: roundTypeList.map((value) {
                             return DropdownMenuItem<String>(
@@ -188,9 +188,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ分数',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundStartNum,
+                          value: _roundStartNum,
                           onChanged: (value) {
-                            setState(() => roundStartNum = value);
+                            setState(() => _roundStartNum = value);
                           },
                           items: roundNumList.map((value) {
                             return DropdownMenuItem<int>(
@@ -220,9 +220,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ方',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundEndType,
+                          value: _roundEndType,
                           onChanged: (value) {
-                            setState(() => roundEndType = value);
+                            setState(() => _roundEndType = value);
                           },
                           items: roundTypeList.map((value) {
                             return DropdownMenuItem<String>(
@@ -240,9 +240,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ分数',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundEndNum,
+                          value: _roundEndNum,
                           onChanged: (value) {
-                            setState(() => roundEndNum = value);
+                            setState(() => _roundEndNum = value);
                           },
                           items: roundNumList.map((value) {
                             return DropdownMenuItem<int>(
@@ -272,9 +272,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ方',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundBreakStartType,
+                          value: _roundBreakStartType,
                           onChanged: (value) {
-                            setState(() => roundBreakStartType = value);
+                            setState(() => _roundBreakStartType = value);
                           },
                           items: roundTypeList.map((value) {
                             return DropdownMenuItem<String>(
@@ -292,9 +292,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ分数',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundBreakStartNum,
+                          value: _roundBreakStartNum,
                           onChanged: (value) {
-                            setState(() => roundBreakStartNum = value);
+                            setState(() => _roundBreakStartNum = value);
                           },
                           items: roundNumList.map((value) {
                             return DropdownMenuItem<int>(
@@ -324,9 +324,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ方',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundBreakEndType,
+                          value: _roundBreakEndType,
                           onChanged: (value) {
-                            setState(() => roundBreakEndType = value);
+                            setState(() => _roundBreakEndType = value);
                           },
                           items: roundTypeList.map((value) {
                             return DropdownMenuItem<String>(
@@ -344,9 +344,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ分数',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundBreakEndNum,
+                          value: _roundBreakEndNum,
                           onChanged: (value) {
-                            setState(() => roundBreakEndNum = value);
+                            setState(() => _roundBreakEndNum = value);
                           },
                           items: roundNumList.map((value) {
                             return DropdownMenuItem<int>(
@@ -376,9 +376,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ方',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundWorkType,
+                          value: _roundWorkType,
                           onChanged: (value) {
-                            setState(() => roundWorkType = value);
+                            setState(() => _roundWorkType = value);
                           },
                           items: roundTypeList.map((value) {
                             return DropdownMenuItem<String>(
@@ -396,9 +396,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         label: 'まるめ分数',
                         child: CustomDropdownButton(
                           isExpanded: false,
-                          value: roundWorkNum,
+                          value: _roundWorkNum,
                           onChanged: (value) {
-                            setState(() => roundWorkNum = value);
+                            setState(() => _roundWorkNum = value);
                           },
                           items: roundNumList.map((value) {
                             return DropdownMenuItem<int>(
@@ -421,9 +421,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                   SizedBox(height: 8.0),
                   CustomDropdownButton(
                     isExpanded: false,
-                    value: legal,
+                    value: _legal,
                     onChanged: (value) {
-                      setState(() => legal = value);
+                      setState(() => _legal = value);
                     },
                     items: legalList.map((value) {
                       return DropdownMenuItem<int>(
@@ -449,7 +449,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           Text('開始', style: TextStyle(fontSize: 14.0)),
                           CustomTextIconButton2(
                             onPressed: () async {
-                              List<String> _hm = nightStart.split(':');
+                              List<String> _hm = _nightStart.split(':');
                               TimeOfDay _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
@@ -459,11 +459,11 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                               );
                               if (_selected != null) {
                                 String _time = '${_selected.format(context)}';
-                                setState(() => nightStart = _time);
+                                setState(() => _nightStart = _time);
                               }
                             },
                             iconData: Icons.access_time,
-                            label: nightStart,
+                            label: _nightStart,
                           ),
                         ],
                       ),
@@ -481,7 +481,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           Text('終了', style: TextStyle(fontSize: 14.0)),
                           CustomTextIconButton2(
                             onPressed: () async {
-                              List<String> _hm = nightEnd.split(':');
+                              List<String> _hm = _nightEnd.split(':');
                               TimeOfDay _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
@@ -491,11 +491,11 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                               );
                               if (_selected != null) {
                                 String _time = '${_selected.format(context)}';
-                                setState(() => nightEnd = _time);
+                                setState(() => _nightEnd = _time);
                               }
                             },
                             iconData: Icons.access_time,
-                            label: nightEnd,
+                            label: _nightEnd,
                           ),
                         ],
                       ),
@@ -515,7 +515,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           Text('開始', style: TextStyle(fontSize: 14.0)),
                           CustomTextIconButton2(
                             onPressed: () async {
-                              List<String> _hm = workStart.split(':');
+                              List<String> _hm = _workStart.split(':');
                               TimeOfDay _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
@@ -525,11 +525,11 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                               );
                               if (_selected != null) {
                                 String _time = '${_selected.format(context)}';
-                                setState(() => workStart = _time);
+                                setState(() => _workStart = _time);
                               }
                             },
                             iconData: Icons.access_time,
-                            label: workStart,
+                            label: _workStart,
                           ),
                         ],
                       ),
@@ -547,7 +547,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           Text('終了', style: TextStyle(fontSize: 14.0)),
                           CustomTextIconButton2(
                             onPressed: () async {
-                              List<String> _hm = workEnd.split(':');
+                              List<String> _hm = _workEnd.split(':');
                               TimeOfDay _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
@@ -557,11 +557,11 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                               );
                               if (_selected != null) {
                                 String _time = '${_selected.format(context)}';
-                                setState(() => workEnd = _time);
+                                setState(() => _workEnd = _time);
                               }
                             },
                             iconData: Icons.access_time,
-                            label: workEnd,
+                            label: _workEnd,
                           ),
                         ],
                       ),
@@ -583,14 +583,14 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         child: CustomWeekCheckbox(
                           onChanged: (value) {
                             setState(() {
-                              if (holidays.contains(e)) {
-                                holidays.remove(e);
+                              if (_holidays.contains(e)) {
+                                _holidays.remove(e);
                               } else {
-                                holidays.add(e);
+                                _holidays.add(e);
                               }
                             });
                           },
-                          value: holidays.contains(e),
+                          value: _holidays.contains(e),
                           label: e,
                         ),
                       );
