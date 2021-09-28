@@ -209,7 +209,7 @@ class PdfApi {
                 style: _headStyle,
               ),
               pw.Text(
-                '${_user.name} (${_user.recordPassword})',
+                '${_user.name} (${_user.number})',
                 style: _headStyle,
               ),
             ],
@@ -421,7 +421,7 @@ class PdfApi {
               style: _headStyle,
             ),
             pw.Text(
-              '${user.name} (${user.recordPassword})',
+              '${user.name} (${user.number})',
               style: _headStyle,
             ),
           ],

@@ -11,16 +11,19 @@ class UserProvider with ChangeNotifier {
   WorkService _workService = WorkService();
 
   Future<bool> create({
+    String number,
     String name,
     String recordPassword,
     GroupModel group,
   }) async {
+    if (number == '') return false;
     if (name == '') return false;
     if (group == null) return false;
     try {
       String _id = _userService.id();
       _userService.create({
         'id': _id,
+        'number': number,
         'name': name,
         'email': '',
         'password': '',
@@ -48,12 +51,14 @@ class UserProvider with ChangeNotifier {
 
   Future<bool> update({
     String id,
+    String number,
     String name,
     String recordPassword,
   }) async {
     try {
       _userService.update({
         'id': id,
+        'number': number,
         'name': name,
         'recordPassword': recordPassword,
       });
@@ -89,6 +94,7 @@ class UserProvider with ChangeNotifier {
     try {
       _userService.update({
         'id': after?.id,
+        'number': before?.number,
         'recordPassword': before?.recordPassword,
       });
       await _workService.updateMigration(before?.id, after?.id);

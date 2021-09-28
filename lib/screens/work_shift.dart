@@ -155,17 +155,19 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                       );
                     }
                   } else {
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => AddWorkShiftDialog(
-                        workShiftProvider: widget.workShiftProvider,
-                        group: widget.groupProvider.group,
-                        users: widget.groupProvider.users,
-                        userId: '${details.resource.id}',
-                        date: details.date,
-                      ),
-                    );
+                    if (details.resource != null) {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => AddWorkShiftDialog(
+                          workShiftProvider: widget.workShiftProvider,
+                          group: widget.groupProvider.group,
+                          users: widget.groupProvider.users,
+                          userId: '${details.resource.id}',
+                          date: details.date,
+                        ),
+                      );
+                    }
                   }
                 },
               );

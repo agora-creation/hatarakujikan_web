@@ -34,7 +34,7 @@ class SettingSecurityPanel extends StatefulWidget {
 }
 
 class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
-  GoogleMapController _mapController;
+  GoogleMapController mapController;
   bool _qrSecurity;
   bool _areaSecurity;
   double _areaLat;
@@ -50,7 +50,7 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
   }
 
   void _onMapCreated(GoogleMapController controller) {
-    setState(() => _mapController = controller);
+    setState(() => mapController = controller);
   }
 
   @override

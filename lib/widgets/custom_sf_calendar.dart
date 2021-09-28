@@ -17,6 +17,7 @@ class CustomSfCalendar extends StatelessWidget {
 
     return SfCalendar(
       showDatePickerButton: true,
+      showNavigationArrow: true,
       controller: _calendarController,
       allowViewNavigation: false,
       dataSource: dataSource,

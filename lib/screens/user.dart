@@ -110,6 +110,7 @@ class _UserTableState extends State<UserTable> {
         Expanded(
           child: DataTable2(
             columns: [
+              DataColumn2(label: Text('スタッフ番号'), size: ColumnSize.L),
               DataColumn2(label: Text('スタッフ名')),
               DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
               DataColumn2(label: Text('メールアドレス')),
@@ -119,6 +120,7 @@ class _UserTableState extends State<UserTable> {
               widget.groupProvider.users.length,
               (index) => DataRow(
                 cells: [
+                  DataCell(Text('${widget.groupProvider.users[index].number}')),
                   DataCell(Text('${widget.groupProvider.users[index].name}')),
                   DataCell(Text(
                     '${widget.groupProvider.users[index].recordPassword}',
@@ -305,6 +307,7 @@ class AddUserDialog extends StatefulWidget {
 }
 
 class _AddUserDialogState extends State<AddUserDialog> {
+  TextEditingController number = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
 
@@ -327,11 +330,24 @@ class _AddUserDialogState extends State<AddUserDialog> {
             ),
             SizedBox(height: 16.0),
             CustomLabelColumn(
+              label: 'スタッフ番号',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: number,
+                onChanged: (value) {
+                  recordPassword.text = value;
+                },
+              ),
+            ),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
               label: 'スタッフ名',
               child: CustomTextFormField2(
                 textInputType: null,
                 maxLines: 1,
                 controller: name,
+                onChanged: (value) {},
               ),
             ),
             SizedBox(height: 8.0),
@@ -341,6 +357,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 textInputType: null,
                 maxLines: 1,
                 controller: recordPassword,
+                onChanged: (value) {},
               ),
             ),
             SizedBox(height: 16.0),
@@ -355,6 +372,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 CustomTextButton(
                   onPressed: () async {
                     if (!await widget.userProvider.create(
+                      number: number.text.trim(),
                       name: name.text.trim(),
                       recordPassword: recordPassword.text.trim(),
                       group: widget.group,
@@ -394,10 +412,12 @@ class EditUserDialog extends StatefulWidget {
 }
 
 class _EditUserDialogState extends State<EditUserDialog> {
+  TextEditingController number = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
 
   void _init() async {
+    number.text = widget.user?.number;
     name.text = widget.user?.name;
     recordPassword.text = widget.user?.recordPassword;
   }
@@ -427,11 +447,22 @@ class _EditUserDialogState extends State<EditUserDialog> {
             ),
             SizedBox(height: 16.0),
             CustomLabelColumn(
+              label: 'スタッフ番号',
+              child: CustomTextFormField2(
+                textInputType: null,
+                maxLines: 1,
+                controller: number,
+                onChanged: (value) {},
+              ),
+            ),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
               label: 'スタッフ名',
               child: CustomTextFormField2(
                 textInputType: null,
                 maxLines: 1,
                 controller: name,
+                onChanged: (value) {},
               ),
             ),
             SizedBox(height: 8.0),
@@ -441,6 +472,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                 textInputType: null,
                 maxLines: 1,
                 controller: recordPassword,
+                onChanged: (value) {},
               ),
             ),
             SizedBox(height: 16.0),
@@ -479,6 +511,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                       onPressed: () async {
                         if (!await widget.userProvider.update(
                           id: widget.user.id,
+                          number: number.text.trim(),
                           name: name.text.trim(),
                           recordPassword: recordPassword.text.trim(),
                         )) {

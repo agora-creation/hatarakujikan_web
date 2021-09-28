@@ -90,7 +90,7 @@ Future<void> _works01({
       userIds: _position.userIds,
     );
     for (UserModel _user in _users) {
-      String recordPassword = _user.recordPassword;
+      String number = _user.number;
       String name = _user.name;
       Map count = {};
       String time = '00:00';
@@ -113,7 +113,7 @@ Future<void> _works01({
       }
       int workDays = count.length;
       List<String> _row = [];
-      _row.add('$recordPassword');
+      _row.add('$number');
       _row.add('$name');
       _row.add('$workDays');
       if (_position.name == '正社員') {
@@ -171,7 +171,7 @@ Future<void> _works02({
   rows.add(row);
   List<DateTime> days = generateDays(month);
   for (UserModel _user in users) {
-    String recordPassword = _user.recordPassword;
+    String number = _user.number;
     Map count = {};
     Map state1Count = {};
     Map state2Count = {};
@@ -248,7 +248,7 @@ Future<void> _works02({
     int state3Days = state3Count.length;
     int state4Days = state4Count.length;
     List<String> _row = [];
-    _row.add('$recordPassword');
+    _row.add('$number');
     _row.add('$workDays');
     _row.add('$workDays');
     _row.add('$state1Days');

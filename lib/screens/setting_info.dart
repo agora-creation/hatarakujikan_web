@@ -120,6 +120,7 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
                   textInputType: null,
                   maxLines: 1,
                   controller: name,
+                  onChanged: (value) {},
                 ),
               ),
               SizedBox(height: 8.0),
