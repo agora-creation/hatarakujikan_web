@@ -180,7 +180,6 @@ Future<void> _works02({
     Map holidayCount = {};
     Map overCount = {};
     String workTime = '00:00';
-    String overTime = '00:00';
     String overTime1 = '00:00';
     String overTime2 = '00:00';
     String overTime3 = '00:00';
@@ -215,8 +214,6 @@ Future<void> _works02({
           overCount[_key2] = '';
         }
         workTime = addTime(workTime, _work.workTime(group));
-        overTime = addTime(overTime, _work.overTimes(group).first);
-        overTime = addTime(overTime, _work.overTimes(group).last);
         overTime1 = addTime(overTime1, _work.calTimes02(group)[0]);
         overTime2 = addTime(overTime2, _work.calTimes02(group)[1]);
         overTime3 = addTime(overTime3, _work.calTimes02(group)[2]);
@@ -258,7 +255,7 @@ Future<void> _works02({
     _row.add('$state4Days');
     _row.add('$overDays');
     _row.add('$workTime');
-    _row.add('$overTime');
+    _row.add('0');
     _row.add('$overTime1');
     _row.add('$overTime2');
     _row.add('$overTime3');
