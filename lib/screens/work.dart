@@ -182,7 +182,6 @@ class _WorkTableState extends State<WorkTable> {
                         workShiftProvider: widget.workShiftProvider,
                         group: widget.groupProvider.group,
                         month: _month,
-                        users: widget.groupProvider.users,
                       ),
                     );
                   },
@@ -411,7 +410,6 @@ class CsvDialog extends StatefulWidget {
   final WorkShiftProvider workShiftProvider;
   final GroupModel group;
   final DateTime month;
-  final List<UserModel> users;
 
   CsvDialog({
     @required this.positionProvider,
@@ -420,7 +418,6 @@ class CsvDialog extends StatefulWidget {
     @required this.workShiftProvider,
     @required this.group,
     @required this.month,
-    @required this.users,
   });
 
   @override
@@ -523,7 +520,6 @@ class _CsvDialogState extends State<CsvDialog> {
                             group: widget.group,
                             template: _template,
                             month: _month,
-                            users: widget.users,
                           );
                           setState(() => _isLoading = false);
                           Navigator.pop(context);

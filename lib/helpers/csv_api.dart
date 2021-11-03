@@ -36,9 +36,8 @@ class CsvApi {
     WorkProvider workProvider,
     WorkShiftProvider workShiftProvider,
     GroupModel group,
-    String template,
     DateTime month,
-    List<UserModel> users,
+    String template,
   }) async {
     if (template == null) return;
     switch (template) {
@@ -53,11 +52,12 @@ class CsvApi {
         return;
       case '土佐税理士事務所用レイアウト':
         await _works02(
+          positionProvider: positionProvider,
+          userProvider: userProvider,
           workProvider: workProvider,
           workShiftProvider: workShiftProvider,
           group: group,
           month: month,
-          users: users,
         );
         return;
       default:
@@ -130,11 +130,12 @@ Future<void> _works01({
 }
 
 Future<void> _works02({
+  PositionProvider positionProvider,
+  UserProvider userProvider,
   WorkProvider workProvider,
   WorkShiftProvider workShiftProvider,
   GroupModel group,
   DateTime month,
-  List<UserModel> users,
 }) async {
   List<List<String>> rows = [];
   List<String> row = [];
@@ -171,113 +172,130 @@ Future<void> _works02({
   row.add('休憩時間');
   rows.add(row);
   List<DateTime> days = generateDays(month);
-  for (UserModel _user in users) {
-    String number = _user.number;
-    Map count = {};
-    Map state1Count = {};
-    Map state2Count = {};
-    Map state3Count = {};
-    Map state4Count = {};
-    Map holidayCount = {};
-    Map overCount = {};
-    String workTime = '00:00';
-    String overTime1 = '00:00';
-    String overTime2 = '00:00';
-    String overTime3 = '00:00';
-    String overTime4 = '00:00';
-    List<WorkModel> _works = await workProvider.selectList(
-      group: group,
-      user: _user,
-      startAt: days.first,
-      endAt: days.last,
+  List<PositionModel> _positions = await positionProvider.selectList(
+    groupId: group.id,
+  );
+  for (PositionModel _position in _positions) {
+    List<UserModel> _users = await userProvider.selectList(
+      userIds: _position.userIds,
     );
-    List<WorkShiftModel> _workShifts = await workShiftProvider.selectList(
-      group: group,
-      user: _user,
-      startAt: days.first,
-      endAt: days.last,
-    );
-    for (WorkModel _work in _works) {
-      if (_work.startedAt != _work.endedAt) {
-        String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
-        count[_key] = '';
-        String _week = '${DateFormat('E', 'ja').format(_work.startedAt)}';
-        if (group.holidays.contains(_week)) {
-          holidayCount[_key] = '';
+    for (UserModel _user in _users) {
+      String number = _user.number;
+      Map count = {};
+      Map state1Count = {};
+      Map state2Count = {};
+      Map state3Count = {};
+      Map state4Count = {};
+      Map holidayCount = {};
+      Map overCount = {};
+      String workTime = '00:00';
+      String overTime1 = '00:00';
+      String overTime2 = '00:00';
+      String overTime3 = '00:00';
+      String overTime4 = '00:00';
+      List<WorkModel> _works = await workProvider.selectList(
+        group: group,
+        user: _user,
+        startAt: days.first,
+        endAt: days.last,
+      );
+      List<WorkShiftModel> _workShifts = await workShiftProvider.selectList(
+        group: group,
+        user: _user,
+        startAt: days.first,
+        endAt: days.last,
+      );
+      for (WorkModel _work in _works) {
+        if (_work.startedAt != _work.endedAt) {
+          String _key = '${DateFormat('yyyy-MM-dd').format(_work.startedAt)}';
+          count[_key] = '';
+          String _week = '${DateFormat('E', 'ja').format(_work.startedAt)}';
+          if (group.holidays.contains(_week)) {
+            holidayCount[_key] = '';
+          }
+          DateFormat _keyFormat = DateFormat('yyyyMMddHHmm');
+          if (_work.overTimes(group).first != '00:00') {
+            String _key1 = '${_keyFormat.format(_work.startedAt)}_1';
+            overCount[_key1] = '';
+          }
+          if (_work.overTimes(group).last != '00:00') {
+            String _key2 = '${_keyFormat.format(_work.startedAt)}_2';
+            overCount[_key2] = '';
+          }
+          if (_position.name == 'Aグループ') {
+            workTime = addTime(workTime, _work.calTimes02(group, 'a')[0]);
+            overTime1 = addTime(overTime1, _work.calTimes02(group, 'a')[1]);
+            overTime2 = addTime(overTime2, _work.calTimes02(group, 'a')[2]);
+            overTime3 = addTime(overTime3, _work.calTimes02(group, 'a')[3]);
+            overTime4 = addTime(overTime4, _work.calTimes02(group, 'a')[4]);
+          } else {
+            workTime = addTime(workTime, _work.calTimes02(group, 'b')[0]);
+            overTime1 = addTime(overTime1, _work.calTimes02(group, 'b')[1]);
+            overTime2 = addTime(overTime2, _work.calTimes02(group, 'b')[2]);
+            overTime3 = addTime(overTime3, _work.calTimes02(group, 'b')[3]);
+            overTime4 = addTime(overTime4, _work.calTimes02(group, 'b')[4]);
+          }
         }
-        DateFormat _keyFormat = DateFormat('yyyyMMddHHmm');
-        if (_work.overTimes(group).first != '00:00') {
-          String _key1 = '${_keyFormat.format(_work.startedAt)}_1';
-          overCount[_key1] = '';
-        }
-        if (_work.overTimes(group).last != '00:00') {
-          String _key2 = '${_keyFormat.format(_work.startedAt)}_2';
-          overCount[_key2] = '';
-        }
-        workTime = addTime(workTime, _work.workTime(group));
-        overTime1 = addTime(overTime1, _work.calTimes02(group)[0]);
-        overTime2 = addTime(overTime2, _work.calTimes02(group)[1]);
-        overTime3 = addTime(overTime3, _work.calTimes02(group)[2]);
-        overTime4 = addTime(overTime4, _work.calTimes02(group)[3]);
       }
-    }
-    int workDays = count.length;
-    int holidayDays = holidayCount.length;
-    int overDays = overCount.length;
-    for (WorkShiftModel _workShift in _workShifts) {
-      String _key = '${DateFormat('yyyy-MM-dd').format(_workShift.startedAt)}';
-      switch (_workShift.state) {
-        case '欠勤':
-          state1Count[_key] = '';
-          break;
-        case '特別休暇':
-          state2Count[_key] = '';
-          break;
-        case '有給休暇':
-          state3Count[_key] = '';
-          break;
-        case '代休':
-          state4Count[_key] = '';
-          break;
+      int workDays = count.length;
+      int holidayDays = holidayCount.length;
+      int overDays = overCount.length;
+      for (WorkShiftModel _workShift in _workShifts) {
+        String _key =
+            '${DateFormat('yyyy-MM-dd').format(_workShift.startedAt)}';
+        switch (_workShift.state) {
+          case '欠勤':
+            state1Count[_key] = '';
+            break;
+          case '特別休暇':
+            state2Count[_key] = '';
+            break;
+          case '有給休暇':
+            state3Count[_key] = '';
+            break;
+          case '代休':
+            state4Count[_key] = '';
+            break;
+        }
       }
+      int state1Days = state1Count.length;
+      int state2Days = state2Count.length;
+      int state3Days = state3Count.length;
+      int state4Days = state4Count.length;
+      List<String> _row = [];
+      _row.add('$number');
+      _row.add('$workDays');
+      _row.add('$workDays');
+      _row.add('$state1Days');
+      _row.add('$state3Days');
+      _row.add('$state2Days');
+      _row.add('$holidayDays');
+      _row.add('$state4Days');
+      _row.add('$overDays');
+      _row.add('$workTime');
+      _row.add('0');
+      _row.add('$overTime1');
+      _row.add('$overTime2');
+      _row.add('$overTime3');
+      _row.add('$overTime4');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('');
+      _row.add('01:00');
+      rows.add(_row);
     }
-    int state1Days = state1Count.length;
-    int state2Days = state2Count.length;
-    int state3Days = state3Count.length;
-    int state4Days = state4Count.length;
-    List<String> _row = [];
-    _row.add('$number');
-    _row.add('$workDays');
-    _row.add('$workDays');
-    _row.add('$state1Days');
-    _row.add('$state3Days');
-    _row.add('$state2Days');
-    _row.add('$holidayDays');
-    _row.add('$state4Days');
-    _row.add('$overDays');
-    _row.add('$workTime');
-    _row.add('0');
-    _row.add('$overTime1');
-    _row.add('$overTime2');
-    _row.add('$overTime3');
-    _row.add('$overTime4');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('');
-    _row.add('01:00');
-    rows.add(_row);
   }
   _download(rows: rows, fileName: 'works.csv');
 }

@@ -304,15 +304,39 @@ class WorkModel {
     return [_time1, _time2, _time3, _time4];
   }
 
-  // 平日普通残業時間/平日深夜残業時間/休日普通残業時間/休日深夜残業時間
-  List<String> calTimes02(GroupModel group) {
+  // 勤務時間/平日普通残業時間/平日深夜残業時間/休日普通残業時間/休日深夜残業時間
+  List<String> calTimes02(GroupModel group, String type) {
+    String _time0 = '00:00';
     String _time1 = '00:00';
     String _time2 = '00:00';
     String _time3 = '00:00';
     String _time4 = '00:00';
+    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedTime = '${startTime(group)}:00.000';
+    DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
+    String _workStart = '${group.workStart}:00.000';
+    DateTime _startedAtTmp = DateTime.parse('$_startedDate $_workStart');
+    if (_startedAt.millisecondsSinceEpoch <
+        _startedAtTmp.millisecondsSinceEpoch) {
+      _startedAt = _startedAtTmp;
+    }
     String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
+    // ----------------------------------------
+    // 出勤時間と退勤時間の差を求める
+    Duration _diff = _endedAt.difference(_startedAt);
+    String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+    _time0 = '${twoDigits(_diff.inHours)}:$_minutes';
+    // 休憩の合計時間を求める
+    String _breakTime = '00:00';
+    if (breaks.length > 0) {
+      for (BreaksModel _break in breaks) {
+        _breakTime = addTime(_breakTime, _break.breakTimes(group)[0]);
+      }
+    }
+    // 勤務時間と休憩の合計時間の差を求める
+    _time0 = subTime(_time0, _breakTime);
     // ----------------------------------------
     String _workEnd = '${group.workEnd}:00.000';
     DateTime _overS;
@@ -368,6 +392,6 @@ class WorkModel {
       }
     }
     // ----------------------------------------
-    return [_time1, _time2, _time3, _time4];
+    return [_time0, _time1, _time2, _time3, _time4];
   }
 }
