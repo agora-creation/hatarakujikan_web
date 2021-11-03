@@ -168,6 +168,7 @@ Future<void> _works02({
   row.add('予備項目');
   row.add('予備項目');
   row.add('予備項目');
+  row.add('休憩時間');
   rows.add(row);
   List<DateTime> days = generateDays(month);
   for (UserModel _user in users) {
@@ -275,6 +276,7 @@ Future<void> _works02({
     _row.add('');
     _row.add('');
     _row.add('');
+    _row.add('01:00');
     rows.add(_row);
   }
   _download(rows: rows, fileName: 'works.csv');
