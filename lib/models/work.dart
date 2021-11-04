@@ -328,13 +328,8 @@ class WorkModel {
     Duration _diff = _endedAt.difference(_startedAt);
     String _minutes = twoDigits(_diff.inMinutes.remainder(60));
     _time0 = '${twoDigits(_diff.inHours)}:$_minutes';
-    // 休憩の合計時間を求める
-    String _breakTime = '00:00';
-    if (breaks.length > 0) {
-      for (BreaksModel _break in breaks) {
-        _breakTime = addTime(_breakTime, _break.breakTimes(group)[0]);
-      }
-    }
+    // 休憩の合計時間を強制的に1時間とする
+    String _breakTime = '01:00';
     // 勤務時間と休憩の合計時間の差を求める
     _time0 = subTime(_time0, _breakTime);
     // ----------------------------------------
