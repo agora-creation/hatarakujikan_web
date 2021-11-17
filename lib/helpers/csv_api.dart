@@ -150,8 +150,8 @@ Future<void> _works02({
   row.add('遅早回数');
   row.add('出勤時間');
   row.add('遅早時間');
-  row.add('平日普通残業時間');
-  row.add('平日深夜残業時間');
+  row.add('時間外1');
+  row.add('時間外2');
   row.add('休日普通残業時間');
   row.add('休日深夜残業時間');
   row.add('予備項目');
@@ -186,12 +186,9 @@ Future<void> _works02({
       Map state3Count = {};
       Map state4Count = {};
       Map holidayCount = {};
-      Map overCount = {};
       String workTime = '00:00';
       String overTime1 = '00:00';
       String overTime2 = '00:00';
-      String overTime3 = '00:00';
-      String overTime4 = '00:00';
       List<WorkModel> _works = await workProvider.selectList(
         group: group,
         user: _user,
@@ -212,33 +209,27 @@ Future<void> _works02({
           if (group.holidays.contains(_week)) {
             holidayCount[_key] = '';
           }
-          DateFormat _keyFormat = DateFormat('yyyyMMddHHmm');
-          if (_work.overTimes(group).first != '00:00') {
-            String _key1 = '${_keyFormat.format(_work.startedAt)}_1';
-            overCount[_key1] = '';
-          }
-          if (_work.overTimes(group).last != '00:00') {
-            String _key2 = '${_keyFormat.format(_work.startedAt)}_2';
-            overCount[_key2] = '';
-          }
           if (_position.name == 'Aグループ') {
-            workTime = addTime(workTime, _work.calTimes02(group, 'a')[0]);
-            overTime1 = addTime(overTime1, _work.calTimes02(group, 'a')[1]);
-            overTime2 = addTime(overTime2, _work.calTimes02(group, 'a')[2]);
-            overTime3 = addTime(overTime3, _work.calTimes02(group, 'a')[3]);
-            overTime4 = addTime(overTime4, _work.calTimes02(group, 'a')[4]);
+            workTime = addTime(workTime, _work.calTimes02(group, 'A')[0]);
+            overTime1 = addTime(overTime1, _work.calTimes02(group, 'A')[1]);
+            overTime2 = addTime(overTime2, _work.calTimes02(group, 'A')[2]);
+          } else if (_position.name == 'Bグループ') {
+            workTime = addTime(workTime, _work.calTimes02(group, 'B')[0]);
+            overTime1 = addTime(overTime1, _work.calTimes02(group, 'B')[1]);
+            overTime2 = addTime(overTime2, _work.calTimes02(group, 'B')[2]);
+          } else if (_position.name == 'Cグループ') {
+            workTime = addTime(workTime, _work.calTimes02(group, 'C')[0]);
+            overTime1 = addTime(overTime1, _work.calTimes02(group, 'C')[1]);
+            overTime2 = addTime(overTime2, _work.calTimes02(group, 'C')[2]);
           } else {
-            workTime = addTime(workTime, _work.calTimes02(group, 'b')[0]);
-            overTime1 = addTime(overTime1, _work.calTimes02(group, 'b')[1]);
-            overTime2 = addTime(overTime2, _work.calTimes02(group, 'b')[2]);
-            overTime3 = addTime(overTime3, _work.calTimes02(group, 'b')[3]);
-            overTime4 = addTime(overTime4, _work.calTimes02(group, 'b')[4]);
+            workTime = addTime(workTime, _work.calTimes02(group, 'A')[0]);
+            overTime1 = addTime(overTime1, _work.calTimes02(group, 'A')[1]);
+            overTime2 = addTime(overTime2, _work.calTimes02(group, 'A')[2]);
           }
         }
       }
       int workDays = count.length;
       int holidayDays = holidayCount.length;
-      int overDays = overCount.length;
       for (WorkShiftModel _workShift in _workShifts) {
         String _key =
             '${DateFormat('yyyy-MM-dd').format(_workShift.startedAt)}';
@@ -270,13 +261,13 @@ Future<void> _works02({
       _row.add('$state2Days');
       _row.add('$holidayDays');
       _row.add('$state4Days');
-      _row.add('$overDays');
+      _row.add('0');
       _row.add('$workTime');
       _row.add('0');
       _row.add('$overTime1');
       _row.add('$overTime2');
-      _row.add('$overTime3');
-      _row.add('$overTime4');
+      _row.add('00:00');
+      _row.add('00:00');
       _row.add('');
       _row.add('');
       _row.add('');

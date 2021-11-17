@@ -304,21 +304,22 @@ class WorkModel {
     return [_time1, _time2, _time3, _time4];
   }
 
-  // 勤務時間/平日普通残業時間/平日深夜残業時間/休日普通残業時間/休日深夜残業時間
+  // 勤務時間/時間外1/時間外2
   List<String> calTimes02(GroupModel group, String type) {
     String _time0 = '00:00';
     String _time1 = '00:00';
     String _time2 = '00:00';
-    String _time3 = '00:00';
-    String _time4 = '00:00';
     String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
     String _workStart = '${group.workStart}:00.000';
-    DateTime _startedAtTmp = DateTime.parse('$_startedDate $_workStart');
-    if (_startedAt.millisecondsSinceEpoch <
-        _startedAtTmp.millisecondsSinceEpoch) {
-      _startedAt = _startedAtTmp;
+    // AグループかBグループ
+    if (type == 'A' || type == 'B') {
+      DateTime _startedAtTmp = DateTime.parse('$_startedDate $_workStart');
+      if (_startedAt.millisecondsSinceEpoch <
+          _startedAtTmp.millisecondsSinceEpoch) {
+        _startedAt = _startedAtTmp;
+      }
     }
     String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
     String _endedTime = '${endTime(group)}:00.000';
@@ -333,60 +334,61 @@ class WorkModel {
     // 勤務時間と休憩の合計時間の差を求める
     _time0 = subTime(_time0, _breakTime);
     // ----------------------------------------
-    String _workEnd = '${group.workEnd}:00.000';
-    DateTime _overS;
-    DateTime _overE;
-    DateTime _e = DateTime.parse('$_endedDate $_workEnd');
-    // 退勤時間が所定労働時間帯の終了時間を超えている
-    if (_endedAt.millisecondsSinceEpoch > _e.millisecondsSinceEpoch) {
-      _overS = _e;
-      _overE = _endedAt;
-    } else {
-      _overS = _e;
-      _overE = _e;
-    }
-    // ----------------------------------------
-    // 通常時間と深夜時間に分ける
-    List<DateTime> _dayNightList = separateDayNight(
-      startedAt: _overS,
-      endedAt: _overE,
-      nightStart: group.nightStart,
-      nightEnd: group.nightEnd,
-    );
-    DateTime _dayS = _dayNightList[0];
-    DateTime _dayE = _dayNightList[1];
-    DateTime _nightS = _dayNightList[2];
-    DateTime _nightE = _dayNightList[3];
-    // ----------------------------------------
-    String week = '${DateFormat('E', 'ja').format(_overS)}';
-    if (group.holidays.contains(week)) {
-      // 休日普通残業時間
-      if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
-        Duration _diff = _dayE.difference(_dayS);
-        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-        _time3 = '${twoDigits(_diff.inHours)}:$_minutes';
-      }
-      // 休日深夜残業時間
-      if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
-        Duration _diff = _nightE.difference(_nightS);
-        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-        _time4 = '${twoDigits(_diff.inHours)}:$_minutes';
-      }
-    } else {
-      // 平日普通残業時間
-      if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
-        Duration _diff = _dayE.difference(_dayS);
+    // Aグループ
+    if (type == 'A') {
+      String _workEnd = '${group.workEnd}:00.000';
+      DateTime _time1start = DateTime.parse('$_endedDate $_workEnd');
+      DateTime _time1end = _endedAt;
+      if (_time1start.millisecondsSinceEpoch <
+          _time1end.millisecondsSinceEpoch) {
+        Duration _diff = _time1end.difference(_time1start);
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
       }
-      // 平日深夜残業時間
-      if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
-        Duration _diff = _nightE.difference(_nightS);
+      _time0 = subTime(_time0, _time1);
+    }
+    // ----------------------------------------
+    // Bグループ
+    if (type == 'B') {
+      String _workEnd = '${group.workEnd}:00.000';
+      DateTime _time1start = DateTime.parse('$_endedDate $_workEnd');
+      DateTime _time1end = _time1start.add(Duration(hours: 1));
+      if (_time1start.millisecondsSinceEpoch <
+          _time1end.millisecondsSinceEpoch) {
+        Duration _diff = _time1end.difference(_time1start);
+        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+        _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
+      }
+      _time0 = subTime(_time0, _time1);
+      DateTime _time2start = _time1end;
+      DateTime _time2end = _endedAt;
+      if (_time2start.millisecondsSinceEpoch <
+          _time2end.millisecondsSinceEpoch) {
+        Duration _diff = _time2end.difference(_time2start);
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
       }
+      _time0 = subTime(_time0, _time2);
     }
     // ----------------------------------------
-    return [_time0, _time1, _time2, _time3, _time4];
+    // Cグループ
+    if (type == 'C') {
+      List<String> _time0s = _time0.split(':');
+      if (group.legal <= int.parse(_time0s.first)) {
+        String _tmp = subTime(_time0, '0${group.legal}:00');
+        _time2 = addTime(_time2, _tmp);
+      } else {
+        _time2 = '00:00';
+      }
+      _time0 = subTime(_time0, _time2);
+    }
+    // ----------------------------------------
+    String week = '${DateFormat('E', 'ja').format(_startedAt)}';
+    if (group.holidays.contains(week)) {
+      _time2 = _time0;
+      _time0 = '00:00';
+    }
+    // ----------------------------------------
+    return [_time0, _time1, _time2];
   }
 }
