@@ -105,7 +105,7 @@ class _PositionTableState extends State<PositionTable> {
               }
               return DataTable2(
                 columns: [
-                  DataColumn2(label: Text('雇用形態名')),
+                  DataColumn2(label: Text('雇用形態名'), size: ColumnSize.S),
                   DataColumn2(label: Text('現在の登録スタッフ'), size: ColumnSize.L),
                   DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
                   DataColumn2(label: Text('スタッフ登録'), size: ColumnSize.S),
