@@ -694,23 +694,15 @@ Future<void> _works02({
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          '※1・・・深夜時間帯外の勤務時間です。',
+          '※1・・・',
           style: _listStyle,
         ),
         pw.Text(
-          '※2・・・深夜時間帯の勤務時間です。深夜時間外の分も引いた時間です。',
+          '※2・・・',
           style: _listStyle,
         ),
         pw.Text(
-          '※3・・・深夜時間帯外で法定時間を超えた時間です。',
-          style: _listStyle,
-        ),
-        pw.Text(
-          '※4・・・深夜時間帯で法定時間を超えた時間です。',
-          style: _listStyle,
-        ),
-        pw.Text(
-          '※5・・・日〜土曜日までの総勤務時間です。',
+          '※3・・・',
           style: _listStyle,
         ),
       ],
@@ -744,7 +736,7 @@ Future<void> _works02({
               style: _headStyle,
             ),
             pw.Text(
-              '${_user.name} (${_user.number})',
+              '${_user.name} (${_user.number}) 【】',
               style: _headStyle,
             ),
           ],
@@ -771,10 +763,8 @@ Future<void> _works02({
             _cell(label: '退勤時間'),
             _cell(label: '休憩時間'),
             _cell(label: '勤務時間'),
-            _cell(label: '通常時間※1'),
-            _cell(label: '深夜時間(-)※2'),
-            _cell(label: '通常時間外※3'),
-            _cell(label: '深夜時間外※4'),
+            _cell(label: '時間外1 ※1'),
+            _cell(label: '時間外2 ※2'),
           ],
         ));
         DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -825,8 +815,6 @@ Future<void> _works02({
                     _cell(label: _workTime),
                     _cell(label: _dayTime),
                     _cell(label: _nightTime),
-                    _cell(label: _dayTimeOver),
-                    _cell(label: _nightTimeOver),
                   ],
                 ));
               }
@@ -845,32 +833,22 @@ Future<void> _works02({
                 _cell(label: ''),
                 _cell(label: ''),
                 _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
               ],
             ));
           }
         }
-        return pw.Table(
-          border: pw.TableBorder.all(color: PdfColors.grey),
-          children: _row,
-        );
-      }
-
-      // 1ヶ月間の合計の表を作成
-      pw.Widget _buildTotal() {
-        List<pw.TableRow> _row = [];
-        // 勤務日数
-        int workDays = count.length;
+        // 最終行目
         _row.add(pw.TableRow(
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            _cell(label: '総勤務日数 [$workDays日]'),
-            _cell(label: '総勤務時間 [$workTimes]'),
-            _cell(label: '総通常時間 [$dayTimes]'),
-            _cell(label: '総深夜時間(-) [$nightTimes]'),
-            _cell(label: '総通常時間外 [$dayTimeOvers]'),
-            _cell(label: '総深夜時間外 [$nightTimeOvers]'),
+            _cell(label: ''),
+            _cell(label: ''),
+            _cell(label: ''),
+            _cell(label: ''),
+            _cell(label: ''),
+            _cell(label: '00:00'),
+            _cell(label: '00:00'),
+            _cell(label: '00:00'),
           ],
         ));
         return pw.Table(
@@ -888,7 +866,6 @@ Future<void> _works02({
             _buildHeader(),
             pw.SizedBox(height: 4.0),
             _buildDays(),
-            _buildTotal(),
             pw.SizedBox(height: 4.0),
             _buildDescription(),
           ],
@@ -920,7 +897,7 @@ Future<void> _works02({
             style: _headStyle,
           ),
           pw.Text(
-            '${user.name} (${user.number})',
+            '${user.name} (${user.number}) 【】',
             style: _headStyle,
           ),
         ],
@@ -947,10 +924,8 @@ Future<void> _works02({
           _cell(label: '退勤時間'),
           _cell(label: '休憩時間'),
           _cell(label: '勤務時間'),
-          _cell(label: '通常時間※1'),
-          _cell(label: '深夜時間(-)※2'),
-          _cell(label: '通常時間外※3'),
-          _cell(label: '深夜時間外※4'),
+          _cell(label: '時間外1 ※1'),
+          _cell(label: '時間外2 ※2'),
         ],
       ));
       DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -1001,8 +976,6 @@ Future<void> _works02({
                   _cell(label: _workTime),
                   _cell(label: _dayTime),
                   _cell(label: _nightTime),
-                  _cell(label: _dayTimeOver),
-                  _cell(label: _nightTimeOver),
                 ],
               ));
             }
@@ -1021,32 +994,22 @@ Future<void> _works02({
               _cell(label: ''),
               _cell(label: ''),
               _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
             ],
           ));
         }
       }
-      return pw.Table(
-        border: pw.TableBorder.all(color: PdfColors.grey),
-        children: _row,
-      );
-    }
-
-    // 1ヶ月間の合計の表を作成
-    pw.Widget _buildTotal() {
-      List<pw.TableRow> _row = [];
-      // 勤務日数
-      int workDays = count.length;
+      // 最終行目
       _row.add(pw.TableRow(
         decoration: pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          _cell(label: '総勤務日数 [$workDays日]'),
-          _cell(label: '総勤務時間 [$workTimes]'),
-          _cell(label: '総通常時間 [$dayTimes]'),
-          _cell(label: '総深夜時間(-) [$nightTimes]'),
-          _cell(label: '総通常時間外 [$dayTimeOvers]'),
-          _cell(label: '総深夜時間外 [$nightTimeOvers]'),
+          _cell(label: ''),
+          _cell(label: ''),
+          _cell(label: ''),
+          _cell(label: ''),
+          _cell(label: ''),
+          _cell(label: '00:00'),
+          _cell(label: '00:00'),
+          _cell(label: '00:00'),
         ],
       ));
       return pw.Table(
@@ -1064,7 +1027,6 @@ Future<void> _works02({
           _buildHeader(),
           pw.SizedBox(height: 4.0),
           _buildDays(),
-          _buildTotal(),
           pw.SizedBox(height: 4.0),
           _buildDescription(),
         ],
