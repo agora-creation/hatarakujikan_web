@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/csv_api.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
-import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -635,15 +634,6 @@ class _PdfDialogState extends State<PdfDialog> {
                       CustomTextButton(
                         onPressed: () async {
                           setState(() => _isLoading = true);
-                          await PdfApi.works01(
-                            workProvider: widget.workProvider,
-                            workShiftProvider: widget.workShiftProvider,
-                            group: widget.group,
-                            month: _month,
-                            user: _user,
-                            isAll: _isAll,
-                            users: widget.users,
-                          );
                           setState(() => _isLoading = false);
                           Navigator.pop(context);
                         },

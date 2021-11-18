@@ -148,7 +148,7 @@ Future<void> _works02({
   row.add('休出日数');
   row.add('代休日数');
   row.add('遅早回数');
-  row.add('出勤時間');
+  row.add('勤務時間');
   row.add('遅早時間');
   row.add('時間外1');
   row.add('時間外2');
@@ -228,6 +228,24 @@ Future<void> _works02({
           }
         }
       }
+      // 時間外を30分四捨五入
+      List<String> _overTime1s = overTime1.split(':');
+      if (30 <= int.parse(_overTime1s.last)) {
+        overTime1 = '${twoDigits(int.parse(_overTime1s.first))}:00';
+        overTime1 = addTime(overTime1, '01:00');
+      } else {
+        overTime1 = '${twoDigits(int.parse(_overTime1s.first))}:00';
+      }
+      List<String> _overTime2s = overTime2.split(':');
+      if (30 <= int.parse(_overTime2s.last)) {
+        overTime2 = '${twoDigits(int.parse(_overTime2s.first))}:00';
+        overTime2 = addTime(overTime2, '01:00');
+      } else {
+        overTime2 = '${twoDigits(int.parse(_overTime2s.first))}:00';
+      }
+      // 勤務時間から時間外分を引く
+      workTime = subTime(workTime, overTime1);
+      workTime = subTime(workTime, overTime2);
       int workDays = count.length;
       int holidayDays = holidayCount.length;
       for (WorkShiftModel _workShift in _workShifts) {

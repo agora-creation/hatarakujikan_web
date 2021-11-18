@@ -562,10 +562,13 @@ class _PdfDialogState extends State<PdfDialog> {
   UserModel _user;
   bool _isAll = false;
   bool _isLoading = false;
+  String _template;
 
   void _init() async {
+    PdfApi.groupCheck(group: widget.group);
     _month = widget.month;
     _user = widget.user;
+    _template = pdfTemplates.first;
   }
 
   @override
@@ -597,6 +600,26 @@ class _PdfDialogState extends State<PdfDialog> {
                     style: kDefaultTextStyle,
                   ),
                   SizedBox(height: 16.0),
+                  CustomLabelColumn(
+                    label: 'テンプレート',
+                    child: CustomDropdownButton(
+                      isExpanded: true,
+                      value: _template,
+                      onChanged: (value) {
+                        setState(() => _template = value);
+                      },
+                      items: pdfTemplates.map((value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(
+                            value,
+                            style: kDefaultTextStyle,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
                   CustomLabelColumn(
                     label: '年月',
                     child: CustomDateButton(
@@ -653,7 +676,7 @@ class _PdfDialogState extends State<PdfDialog> {
                       CustomTextButton(
                         onPressed: () async {
                           setState(() => _isLoading = true);
-                          await PdfApi.works01(
+                          await PdfApi.download(
                             workProvider: widget.workProvider,
                             workShiftProvider: widget.workShiftProvider,
                             group: widget.group,
@@ -661,6 +684,7 @@ class _PdfDialogState extends State<PdfDialog> {
                             user: _user,
                             isAll: _isAll,
                             users: widget.users,
+                            template: _template,
                           );
                           setState(() => _isLoading = false);
                           Navigator.pop(context);

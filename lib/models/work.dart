@@ -345,7 +345,6 @@ class WorkModel {
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
       }
-      _time0 = subTime(_time0, _time1);
     }
     // ----------------------------------------
     // Bグループ
@@ -359,7 +358,6 @@ class WorkModel {
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
       }
-      _time0 = subTime(_time0, _time1);
       DateTime _time2start = _time1end;
       DateTime _time2end = _endedAt;
       if (_time2start.millisecondsSinceEpoch <
@@ -368,7 +366,6 @@ class WorkModel {
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
       }
-      _time0 = subTime(_time0, _time2);
     }
     // ----------------------------------------
     // Cグループ
@@ -380,13 +377,12 @@ class WorkModel {
       } else {
         _time2 = '00:00';
       }
-      _time0 = subTime(_time0, _time2);
     }
     // ----------------------------------------
     String week = '${DateFormat('E', 'ja').format(_startedAt)}';
     if (group.holidays.contains(week)) {
       _time2 = _time0;
-      _time0 = '00:00';
+      _time1 = '00:00';
     }
     // ----------------------------------------
     return [_time0, _time1, _time2];

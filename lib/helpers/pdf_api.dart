@@ -13,6 +13,8 @@ import 'package:universal_html/html.dart' as html;
 
 const String fontPath = 'assets/fonts/GenShinGothic-Regular.ttf';
 
+List<String> pdfTemplates = ['ひろめカンパニー用レイアウト', '土佐税理士事務所用レイアウト'];
+
 class PdfApi {
   // 会社/組織QRコードPDF作成
   static Future<void> qrcode({GroupModel group}) async {
@@ -113,8 +115,52 @@ class PdfApi {
     return;
   }
 
+  static void groupCheck({GroupModel group}) {
+    String _id = group.id;
+    switch (_id) {
+      case 'UryZHGotsjyR0Zb6g06J':
+        pdfTemplates.removeWhere((e) => e != 'ひろめカンパニー用レイアウト');
+        return;
+      case 'h74zqng5i59qHdMG16Cb':
+        pdfTemplates.removeWhere((e) => e != '土佐税理士事務所用レイアウト');
+        return;
+      default:
+        return;
+    }
+  }
+
+  static Future<void> download({
+    WorkProvider workProvider,
+    WorkShiftProvider workShiftProvider,
+    GroupModel group,
+    DateTime month,
+    UserModel user,
+    bool isAll,
+    List<UserModel> users,
+    String template,
+  }) async {
+    if (template == null) return;
+    switch (template) {
+      case 'ひろめカンパニー用レイアウト':
+        await _works01(
+          workProvider: workProvider,
+          workShiftProvider: workShiftProvider,
+          group: group,
+          month: month,
+          user: user,
+          isAll: isAll,
+          users: users,
+        );
+        return;
+      case '土佐税理士事務所用レイアウト':
+        return;
+      default:
+        return;
+    }
+  }
+
   // 勤務状況PDF作成
-  static Future<void> works01({
+  static Future<void> _works01({
     WorkProvider workProvider,
     WorkShiftProvider workShiftProvider,
     GroupModel group,
