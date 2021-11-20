@@ -196,6 +196,7 @@ class _WorkTableState extends State<WorkTable> {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => PdfDialog(
+                        positionProvider: widget.positionProvider,
                         workProvider: widget.workProvider,
                         workShiftProvider: widget.workShiftProvider,
                         group: widget.groupProvider.group,
@@ -537,6 +538,7 @@ class _CsvDialogState extends State<CsvDialog> {
 }
 
 class PdfDialog extends StatefulWidget {
+  final PositionProvider positionProvider;
   final WorkProvider workProvider;
   final WorkShiftProvider workShiftProvider;
   final GroupModel group;
@@ -545,6 +547,7 @@ class PdfDialog extends StatefulWidget {
   final UserModel user;
 
   PdfDialog({
+    @required this.positionProvider,
     @required this.workProvider,
     @required this.workShiftProvider,
     @required this.group,
@@ -677,6 +680,7 @@ class _PdfDialogState extends State<PdfDialog> {
                         onPressed: () async {
                           setState(() => _isLoading = true);
                           await PdfApi.download(
+                            positionProvider: widget.positionProvider,
                             workProvider: widget.workProvider,
                             workShiftProvider: widget.workShiftProvider,
                             group: widget.group,

@@ -1,9 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
+import 'package:hatarakujikan_web/models/position.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:intl/intl.dart';
@@ -130,6 +132,7 @@ class PdfApi {
   }
 
   static Future<void> download({
+    PositionProvider positionProvider,
     WorkProvider workProvider,
     WorkShiftProvider workShiftProvider,
     GroupModel group,
@@ -154,6 +157,7 @@ class PdfApi {
         return;
       case '土佐税理士事務所用レイアウト':
         await _works02(
+          positionProvider: positionProvider,
           workProvider: workProvider,
           workShiftProvider: workShiftProvider,
           group: group,
@@ -662,6 +666,7 @@ Future<void> _works01({
 }
 
 Future<void> _works02({
+  PositionProvider positionProvider,
   WorkProvider workProvider,
   WorkShiftProvider workShiftProvider,
   GroupModel group,
@@ -678,6 +683,11 @@ Future<void> _works02({
 
   // 日付配列作成
   List<DateTime> days = generateDays(month);
+
+  // 雇用形態配列作成
+  List<PositionModel> positions = await positionProvider.selectList(
+    groupId: group.id,
+  );
 
   // セル作成
   pw.Widget _cell({String label, PdfColor color}) {
@@ -714,6 +724,14 @@ Future<void> _works02({
     if (users == null) return;
     for (UserModel _user in users) {
       // 各種データ取得
+      String _positionName = '';
+      for (PositionModel _position in positions) {
+        List<String> _userIds = _position.userIds;
+        if (_userIds.contains(_user.id)) {
+          _positionName = _position.name;
+          break;
+        }
+      }
       List<WorkModel> works = await workProvider.selectList(
         group: group,
         user: _user,
@@ -736,7 +754,7 @@ Future<void> _works02({
               style: _headStyle,
             ),
             pw.Text(
-              '${_user.name} (${_user.number}) 【】',
+              '${_user.name} (${_user.number}) 【$_positionName】',
               style: _headStyle,
             ),
           ],
@@ -746,10 +764,8 @@ Future<void> _works02({
       // 合計値初期化
       Map count = {};
       String workTimes = '00:00';
-      String dayTimes = '00:00';
-      String nightTimes = '00:00';
-      String dayTimeOvers = '00:00';
-      String nightTimeOvers = '00:00';
+      String overTime1s = '00:00';
+      String overTime2s = '00:00';
       // 1ヶ月間の表を作成
       pw.Widget _buildDays() {
         List<pw.TableRow> _row = [];
@@ -792,19 +808,31 @@ Future<void> _works02({
                 String _state = _dayWorks[j].state;
                 String _endTime = _dayWorks[j].endTime(group);
                 String _breakTime = _dayWorks[j].breakTimes(group)[0];
-                String _workTime = _dayWorks[j].workTime(group);
-                List<String> _calTimes = _dayWorks[j].calTimes01(group);
-                String _dayTime = _calTimes[0];
-                String _nightTime = _calTimes[1];
-                String _dayTimeOver = _calTimes[2];
-                String _nightTimeOver = _calTimes[3];
+                String _workTime = '00:00';
+                String _overTime1 = '00:00';
+                String _overTime2 = '00:00';
+                if (_positionName == 'Aグループ') {
+                  _workTime = _dayWorks[j].calTimes02(group, 'A')[0];
+                  _overTime1 = _dayWorks[j].calTimes02(group, 'A')[1];
+                  _overTime2 = _dayWorks[j].calTimes02(group, 'A')[2];
+                } else if (_positionName == 'Bグループ') {
+                  _workTime = _dayWorks[j].calTimes02(group, 'B')[0];
+                  _overTime1 = _dayWorks[j].calTimes02(group, 'B')[1];
+                  _overTime2 = _dayWorks[j].calTimes02(group, 'B')[2];
+                } else if (_positionName == 'Cグループ') {
+                  _workTime = _dayWorks[j].calTimes02(group, 'C')[0];
+                  _overTime1 = _dayWorks[j].calTimes02(group, 'C')[1];
+                  _overTime2 = _dayWorks[j].calTimes02(group, 'C')[2];
+                } else {
+                  _workTime = _dayWorks[j].calTimes02(group, 'A')[0];
+                  _overTime1 = _dayWorks[j].calTimes02(group, 'A')[1];
+                  _overTime2 = _dayWorks[j].calTimes02(group, 'A')[2];
+                }
                 String _key = '${_format.format(_dayWorks[j].startedAt)}';
                 count[_key] = '';
                 workTimes = addTime(workTimes, _workTime);
-                dayTimes = addTime(dayTimes, _dayTime);
-                nightTimes = addTime(nightTimes, _nightTime);
-                dayTimeOvers = addTime(dayTimeOvers, _dayTimeOver);
-                nightTimeOvers = addTime(nightTimeOvers, _nightTimeOver);
+                overTime1s = addTime(overTime1s, _overTime1);
+                overTime2s = addTime(overTime2s, _overTime2);
                 _row.add(pw.TableRow(
                   children: [
                     _cell(label: _day),
@@ -813,8 +841,8 @@ Future<void> _works02({
                     _cell(label: _endTime),
                     _cell(label: _breakTime),
                     _cell(label: _workTime),
-                    _cell(label: _dayTime),
-                    _cell(label: _nightTime),
+                    _cell(label: _overTime1),
+                    _cell(label: _overTime2),
                   ],
                 ));
               }
@@ -841,14 +869,14 @@ Future<void> _works02({
         _row.add(pw.TableRow(
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
+            _cell(label: '合計'),
             _cell(label: ''),
             _cell(label: ''),
             _cell(label: ''),
             _cell(label: ''),
-            _cell(label: ''),
-            _cell(label: '00:00'),
-            _cell(label: '00:00'),
-            _cell(label: '00:00'),
+            _cell(label: workTimes),
+            _cell(label: overTime1s),
+            _cell(label: overTime2s),
           ],
         ));
         return pw.Table(
