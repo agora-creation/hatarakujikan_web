@@ -704,15 +704,15 @@ Future<void> _works02({
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          '※1・・・',
+          '※Aグループ・・・9時以前は「勤務時間」に該当させない。17時以降は「時間外1」に該当させる。休日出勤の場合は全ての時間を「時間外2」に該当させる。',
           style: _listStyle,
         ),
         pw.Text(
-          '※2・・・',
+          '※Bグループ・・・9時以前は「勤務時間」に該当させない。17時以降18時以前は「時間外1」に該当させる。18時以降は「時間外2」に該当させる。休日出勤の場合は全ての時間を「時間外2」に該当させる。',
           style: _listStyle,
         ),
         pw.Text(
-          '※3・・・',
+          '※Cグループ・・・勤務時間が8時間を超えた分の時間を「時間外2」に該当させる。休日出勤の場合は全ての時間を「時間外2」に該当させる。',
           style: _listStyle,
         ),
       ],
@@ -779,8 +779,8 @@ Future<void> _works02({
             _cell(label: '退勤時間'),
             _cell(label: '休憩時間'),
             _cell(label: '勤務時間'),
-            _cell(label: '時間外1 ※1'),
-            _cell(label: '時間外2 ※2'),
+            _cell(label: '時間外1'),
+            _cell(label: '時間外2'),
           ],
         ));
         DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -958,8 +958,8 @@ Future<void> _works02({
           _cell(label: '退勤時間'),
           _cell(label: '休憩時間'),
           _cell(label: '勤務時間'),
-          _cell(label: '時間外1 ※1'),
-          _cell(label: '時間外2 ※2'),
+          _cell(label: '時間外1'),
+          _cell(label: '時間外2'),
         ],
       ));
       DateFormat _format = DateFormat('yyyy-MM-dd');
