@@ -243,9 +243,6 @@ Future<void> _works02({
       } else {
         overTime2 = '${twoDigits(int.parse(_overTime2s.first))}:00';
       }
-      // 勤務時間から時間外分を引く
-      workTime = subTime(workTime, overTime1);
-      workTime = subTime(workTime, overTime2);
       int workDays = count.length;
       int holidayDays = holidayCount.length;
       for (WorkShiftModel _workShift in _workShifts) {
