@@ -26,6 +26,7 @@ class GroupModel {
   String _workStart;
   String _workEnd;
   List<String> holidays;
+  bool _autoBreak;
   DateTime _createdAt;
 
   String get id => _id;
@@ -51,6 +52,7 @@ class GroupModel {
   String get nightEnd => _nightEnd;
   String get workStart => _workStart;
   String get workEnd => _workEnd;
+  bool get autoBreak => _autoBreak;
   DateTime get createdAt => _createdAt;
 
   GroupModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -79,6 +81,7 @@ class GroupModel {
     _workStart = snapshot.data()['workStart'];
     _workEnd = snapshot.data()['workEnd'];
     holidays = _convertList(snapshot.data()['holidays']) ?? [];
+    _autoBreak = snapshot.data()['autoBreak'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
 

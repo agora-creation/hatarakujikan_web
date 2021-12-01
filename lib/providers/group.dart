@@ -191,6 +191,7 @@ class GroupProvider with ChangeNotifier {
     String workStart,
     String workEnd,
     List<String> holidays,
+    bool autoBreak,
   }) async {
     try {
       _groupService.update({
@@ -211,6 +212,7 @@ class GroupProvider with ChangeNotifier {
         'workStart': workStart,
         'workEnd': workEnd,
         'holidays': holidays,
+        'autoBreak': autoBreak,
       });
       return true;
     } catch (e) {

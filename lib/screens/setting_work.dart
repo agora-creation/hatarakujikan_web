@@ -3,6 +3,7 @@ import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
@@ -53,6 +54,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
   String _workStart;
   String _workEnd;
   List<String> _holidays;
+  bool _autoBreak;
 
   void _init() async {
     _roundStartType = widget.groupProvider.group?.roundStartType;
@@ -71,6 +73,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
     _workStart = widget.groupProvider.group?.workStart;
     _workEnd = widget.groupProvider.group?.workEnd;
     _holidays = widget.groupProvider.group?.holidays;
+    _autoBreak = widget.groupProvider.group?.autoBreak;
   }
 
   @override
@@ -131,6 +134,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         workStart: _workStart,
                         workEnd: _workEnd,
                         holidays: _holidays,
+                        autoBreak: _autoBreak,
                       ),
                     );
                   },
@@ -596,6 +600,19 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                       );
                     }).toList(),
                   ),
+                  SizedBox(height: 16.0),
+                  CustomIconLabel(
+                    iconData: Icons.access_time,
+                    label: '自動休憩時間',
+                  ),
+                  SizedBox(height: 8.0),
+                  CustomCheckboxListTile(
+                    onChanged: (value) {
+                      setState(() => _autoBreak = value);
+                    },
+                    label: 'ここにチェックを入れると、退勤時に「01:00」分の休憩時間を登録します',
+                    value: _autoBreak,
+                  ),
                 ],
               ),
             ],
@@ -624,6 +641,7 @@ class ConfirmDialog extends StatelessWidget {
   final String workStart;
   final String workEnd;
   final List<String> holidays;
+  final bool autoBreak;
 
   ConfirmDialog({
     @required this.groupProvider,
@@ -643,6 +661,7 @@ class ConfirmDialog extends StatelessWidget {
     @required this.workStart,
     @required this.workEnd,
     @required this.holidays,
+    @required this.autoBreak,
   });
 
   @override
@@ -686,6 +705,7 @@ class ConfirmDialog extends StatelessWidget {
                     workStart: workStart,
                     workEnd: workEnd,
                     holidays: holidays,
+                    autoBreak: autoBreak,
                   )) {
                     return;
                   }
