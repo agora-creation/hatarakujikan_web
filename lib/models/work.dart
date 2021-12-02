@@ -329,8 +329,13 @@ class WorkModel {
     Duration _diff = _endedAt.difference(_startedAt);
     String _minutes = twoDigits(_diff.inMinutes.remainder(60));
     _time0 = '${twoDigits(_diff.inHours)}:$_minutes';
-    // 休憩の合計時間を強制的に1時間とする
-    String _breakTime = '01:00';
+    // 休憩の合計時間を求める
+    String _breakTime = '00:00';
+    if (breaks.length > 0) {
+      for (BreaksModel _break in breaks) {
+        _breakTime = addTime(_breakTime, _break.breakTimes(group)[0]);
+      }
+    }
     // 勤務時間と休憩の合計時間の差を求める
     _time0 = subTime(_time0, _breakTime);
     // ----------------------------------------
@@ -350,21 +355,30 @@ class WorkModel {
     // Bグループ
     if (type == 'B') {
       String _workEnd = '${group.workEnd}:00.000';
-      DateTime _time1start = DateTime.parse('$_endedDate $_workEnd');
-      DateTime _time1end = _time1start.add(Duration(hours: 1));
-      if (_time1start.millisecondsSinceEpoch <
-          _time1end.millisecondsSinceEpoch) {
-        Duration _diff = _time1end.difference(_time1start);
-        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-        _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
-      }
-      DateTime _time2start = _time1end;
-      DateTime _time2end = _endedAt;
-      if (_time2start.millisecondsSinceEpoch <
-          _time2end.millisecondsSinceEpoch) {
-        Duration _diff = _time2end.difference(_time2start);
-        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-        _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
+      DateTime _time1start = DateTime.parse('$_endedDate $_workEnd'); //17:00
+      DateTime _time1end = _time1start.add(Duration(hours: 1)); //18:00
+      if (_time1end.millisecondsSinceEpoch < _endedAt.millisecondsSinceEpoch) {
+        if (_time1start.millisecondsSinceEpoch <
+            _endedAt.millisecondsSinceEpoch) {
+          Duration _diff = _endedAt.difference(_time1start);
+          String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+          _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
+        }
+      } else {
+        if (_time1start.millisecondsSinceEpoch <
+            _time1end.millisecondsSinceEpoch) {
+          Duration _diff = _time1end.difference(_time1start);
+          String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+          _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
+        }
+        DateTime _time2start = _time1end;
+        DateTime _time2end = _endedAt;
+        if (_time2start.millisecondsSinceEpoch <
+            _time2end.millisecondsSinceEpoch) {
+          Duration _diff = _time2end.difference(_time2start);
+          String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+          _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
+        }
       }
     }
     // ----------------------------------------
