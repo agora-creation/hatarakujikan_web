@@ -357,7 +357,7 @@ class WorkModel {
       String _workEnd = '${group.workEnd}:00.000';
       DateTime _time1start = DateTime.parse('$_endedDate $_workEnd'); //17:00
       DateTime _time1end = _time1start.add(Duration(hours: 1)); //18:00
-      if (_time1end.millisecondsSinceEpoch < _endedAt.millisecondsSinceEpoch) {
+      if (_endedAt.millisecondsSinceEpoch < _time1end.millisecondsSinceEpoch) {
         if (_time1start.millisecondsSinceEpoch <
             _endedAt.millisecondsSinceEpoch) {
           Duration _diff = _endedAt.difference(_time1start);
