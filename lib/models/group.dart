@@ -82,7 +82,7 @@ class GroupModel {
     _workStart = snapshot.data()['workStart'];
     _workEnd = snapshot.data()['workEnd'];
     holidays = _convertList(snapshot.data()['holidays']) ?? [];
-    holidays2 = _convertList2(snapshot.data()['holidays2'].toDate()) ?? [];
+    holidays2 = _convertList2(snapshot.data()['holidays2']) ?? [];
     _autoBreak = snapshot.data()['autoBreak'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
@@ -95,11 +95,12 @@ class GroupModel {
     return converted;
   }
 
-  List<DateTime> _convertList2(List<DateTime> list) {
+  List<DateTime> _convertList2(List list) {
     List<DateTime> converted = [];
-    for (DateTime data in list) {
-      converted.add(data);
-    }
+    list.forEach((value) {
+      DateTime dateTime = value.toDate();
+      converted.add(dateTime);
+    });
     return converted;
   }
 }
