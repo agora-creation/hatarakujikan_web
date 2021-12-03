@@ -191,6 +191,7 @@ class GroupProvider with ChangeNotifier {
     String workStart,
     String workEnd,
     List<String> holidays,
+    List<DateTime> holidays2,
     bool autoBreak,
   }) async {
     try {
@@ -212,6 +213,7 @@ class GroupProvider with ChangeNotifier {
         'workStart': workStart,
         'workEnd': workEnd,
         'holidays': holidays,
+        'holidays2': holidays2,
         'autoBreak': autoBreak,
       });
       return true;

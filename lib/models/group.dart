@@ -26,6 +26,7 @@ class GroupModel {
   String _workStart;
   String _workEnd;
   List<String> holidays;
+  List<DateTime> holidays2;
   bool _autoBreak;
   DateTime _createdAt;
 
@@ -81,6 +82,7 @@ class GroupModel {
     _workStart = snapshot.data()['workStart'];
     _workEnd = snapshot.data()['workEnd'];
     holidays = _convertList(snapshot.data()['holidays']) ?? [];
+    holidays2 = _convertList2(snapshot.data()['holidays2'].toDate()) ?? [];
     _autoBreak = snapshot.data()['autoBreak'];
     _createdAt = snapshot.data()['createdAt'].toDate();
   }
@@ -88,6 +90,14 @@ class GroupModel {
   List<String> _convertList(List list) {
     List<String> converted = [];
     for (String data in list) {
+      converted.add(data);
+    }
+    return converted;
+  }
+
+  List<DateTime> _convertList2(List<DateTime> list) {
+    List<DateTime> converted = [];
+    for (DateTime data in list) {
       converted.add(data);
     }
     return converted;

@@ -12,6 +12,7 @@ import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button2.dart';
 import 'package:hatarakujikan_web/widgets/custom_week_checkbox.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SettingWorkScreen extends StatelessWidget {
   static const String id = 'group_work';
@@ -54,6 +55,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
   String _workStart;
   String _workEnd;
   List<String> _holidays;
+  List<DateTime> _holidays2;
   bool _autoBreak;
 
   void _init() async {
@@ -73,6 +75,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
     _workStart = widget.groupProvider.group?.workStart;
     _workEnd = widget.groupProvider.group?.workEnd;
     _holidays = widget.groupProvider.group?.holidays;
+    _holidays2 = widget.groupProvider.group?.holidays2;
     _autoBreak = widget.groupProvider.group?.autoBreak;
   }
 
@@ -134,6 +137,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         workStart: _workStart,
                         workEnd: _workEnd,
                         holidays: _holidays,
+                        holidays2: _holidays2,
                         autoBreak: _autoBreak,
                       ),
                     );
@@ -574,7 +578,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                   SizedBox(height: 16.0),
                   CustomIconLabel(
                     iconData: Icons.calendar_view_week,
-                    label: '平日/休日',
+                    label: '休日設定(曜日指定/日付指定)',
                   ),
                   SizedBox(height: 8.0),
                   Text(
@@ -599,6 +603,32 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                         ),
                       );
                     }).toList(),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    '※休日とする日付に選んでください。',
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black38),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: SfDateRangePicker(
+                        view: DateRangePickerView.month,
+                        selectionMode: DateRangePickerSelectionMode.multiple,
+                        initialSelectedDates: _holidays2,
+                        selectionColor: Colors.redAccent,
+                        onSelectionChanged: (value) {
+                          _holidays2.clear();
+                          for (DateTime date in value.value) {
+                            _holidays2.add(date);
+                          }
+                        },
+                      ),
+                    ),
                   ),
                   SizedBox(height: 16.0),
                   CustomIconLabel(
@@ -641,6 +671,7 @@ class ConfirmDialog extends StatelessWidget {
   final String workStart;
   final String workEnd;
   final List<String> holidays;
+  final List<DateTime> holidays2;
   final bool autoBreak;
 
   ConfirmDialog({
@@ -661,6 +692,7 @@ class ConfirmDialog extends StatelessWidget {
     @required this.workStart,
     @required this.workEnd,
     @required this.holidays,
+    @required this.holidays2,
     @required this.autoBreak,
   });
 
@@ -705,6 +737,7 @@ class ConfirmDialog extends StatelessWidget {
                     workStart: workStart,
                     workEnd: workEnd,
                     holidays: holidays,
+                    holidays2: holidays2,
                     autoBreak: autoBreak,
                   )) {
                     return;
