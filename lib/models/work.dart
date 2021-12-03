@@ -398,6 +398,12 @@ class WorkModel {
       _time2 = _time0;
       _time1 = '00:00';
     }
+    String key = '${DateFormat('yyyy-MM-dd').format(_startedAt)}';
+    DateTime day = DateTime.parse(key);
+    if (group.holidays2.contains(day)) {
+      _time2 = _time0;
+      _time1 = '00:00';
+    }
     // ----------------------------------------
     // 勤務時間から時間外分を引く
     if (_time1 != '00:00') {
