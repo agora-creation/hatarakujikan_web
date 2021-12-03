@@ -209,6 +209,10 @@ Future<void> _works02({
           if (group.holidays.contains(_week)) {
             holidayCount[_key] = '';
           }
+          DateTime _day = DateTime.parse(_key);
+          if (group.holidays2.contains(_day)) {
+            holidayCount[_key] = '';
+          }
           if (_position.name == 'Aグループ') {
             workTime = addTime(workTime, _work.calTimes02(group, 'A')[0]);
             overTime1 = addTime(overTime1, _work.calTimes02(group, 'A')[1]);
