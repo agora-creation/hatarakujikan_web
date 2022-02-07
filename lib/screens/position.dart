@@ -120,8 +120,11 @@ class _PositionTableState extends State<PositionTable> {
                         if (_positionUsers != '') _positionUsers += ',';
                         UserModel _user = _users.singleWhere(
                           (e) => e.id == _id,
+                          orElse: () => null,
                         );
-                        _positionUsers += _user.name;
+                        if (_user != null) {
+                          _positionUsers += _user.name;
+                        }
                       }
                     }
                     return DataRow(
@@ -368,8 +371,11 @@ class _UserPositionDialogState extends State<UserPositionDialog> {
     for (String _id in widget.position?.userIds) {
       UserModel _user = widget.groupProvider.users.singleWhere(
         (e) => e.id == _id,
+        orElse: () => null,
       );
-      _selected.add(_user);
+      if (_user != null) {
+        _selected.add(_user);
+      }
     }
   }
 
