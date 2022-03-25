@@ -17,13 +17,13 @@ import 'package:intl/intl.dart';
 
 class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
-  final DateTime day;
-  final List<WorkModel> dayWorks;
-  final WorkShiftModel dayWorkShift;
-  final GroupModel group;
+  final DateTime? day;
+  final List<WorkModel>? dayWorks;
+  final WorkShiftModel? dayWorkShift;
+  final GroupModel? group;
 
   CustomWorkListTile({
-    this.workProvider,
+    required this.workProvider,
     this.day,
     this.dayWorks,
     this.dayWorkShift,
@@ -36,17 +36,17 @@ class CustomWorkListTile extends StatelessWidget {
       decoration: kBottomBorderDecoration,
       child: ListTile(
         leading: Text(
-          '${DateFormat('dd (E)', 'ja').format(day)}',
+          dateText('dd (E)', day),
           style: kListDayTextStyle,
         ),
-        title: dayWorks.length > 0
+        title: dayWorks!.length > 0
             ? ListView.separated(
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 separatorBuilder: (_, index) => Divider(height: 0.0),
-                itemCount: dayWorks.length,
+                itemCount: dayWorks!.length,
                 itemBuilder: (_, index) {
-                  WorkModel _work = dayWorks[index];
+                  WorkModel _work = dayWorks![index];
                   if (_work.startedAt != _work.endedAt) {
                     String _startTime = _work.startTime(group);
                     String _endTime = _work.endTime(group);
@@ -61,7 +61,7 @@ class CustomWorkListTile extends StatelessWidget {
                       leading: Chip(
                         backgroundColor: Colors.grey.shade300,
                         label: Text(
-                          '${_work.state}',
+                          _work.state,
                           style: TextStyle(fontSize: 12.0),
                         ),
                       ),
@@ -82,7 +82,7 @@ class CustomWorkListTile extends StatelessWidget {
                               builder: (_) => EditWorkDialog(
                                 workProvider: workProvider,
                                 work: _work,
-                                group: group,
+                                group: group!,
                               ),
                             ),
                             icon: Icon(Icons.edit, color: Colors.blue),
@@ -106,9 +106,9 @@ class CustomWorkListTile extends StatelessWidget {
             : dayWorkShift != null
                 ? ListTile(
                     leading: Chip(
-                      backgroundColor: dayWorkShift.stateColor2(),
+                      backgroundColor: dayWorkShift?.stateColor2(),
                       label: Text(
-                        '${dayWorkShift.state}',
+                        dayWorkShift!.state,
                         style: TextStyle(fontSize: 12.0),
                       ),
                     ),
@@ -151,9 +151,9 @@ class EditWorkDialog extends StatefulWidget {
   final GroupModel group;
 
   EditWorkDialog({
-    @required this.workProvider,
-    @required this.work,
-    @required this.group,
+    required this.workProvider,
+    required this.work,
+    required this.group,
   });
 
   @override
@@ -161,7 +161,7 @@ class EditWorkDialog extends StatefulWidget {
 }
 
 class _EditWorkDialogState extends State<EditWorkDialog> {
-  WorkModel _work;
+  WorkModel? _work;
   bool _isBreaks = false;
   DateTime _breakStartedAt = DateTime.now();
   DateTime _breakEndedAt = DateTime.now();
@@ -202,7 +202,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
               label: '勤務状況',
               child: Chip(
                 backgroundColor: Colors.grey.shade300,
-                label: Text('${_work.state}'),
+                label: Text(_work?.state ?? ''),
               ),
             ),
             Divider(),
@@ -215,9 +215,9 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     flex: 3,
                     child: CustomDateButton(
                       onPressed: () async {
-                        DateTime _selected = await showDatePicker(
+                        DateTime? _selected = await showDatePicker(
                           context: context,
-                          initialDate: _work.startedAt,
+                          initialDate: _work?.startedAt ?? DateTime.now(),
                           firstDate: kDayFirstDate,
                           lastDate: kDayLastDate,
                         );

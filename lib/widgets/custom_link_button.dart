@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomLinkButton extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Function onTap;
+  final String? label;
+  final Color? color;
+  final Function()? onTap;
 
   CustomLinkButton({
     this.label,
@@ -16,7 +16,7 @@ class CustomLinkButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Text(
-        label,
+        label ?? '',
         style: TextStyle(
           color: color,
           decoration: TextDecoration.underline,

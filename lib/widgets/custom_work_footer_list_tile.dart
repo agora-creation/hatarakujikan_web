@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 
 class CustomWorkFooterListTile extends StatelessWidget {
-  final int workCount;
-  final String workTime;
-  final String legalTime;
-  final String nonLegalTime;
-  final String nightTime;
+  final int? workCount;
+  final String? workTime;
+  final String? legalTime;
+  final String? nonLegalTime;
+  final String? nightTime;
 
   CustomWorkFooterListTile({
     this.workCount,

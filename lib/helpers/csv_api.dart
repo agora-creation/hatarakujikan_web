@@ -16,7 +16,8 @@ import 'package:universal_html/html.dart';
 List<String> csvTemplates = ['ひろめカンパニー用レイアウト', '土佐税理士事務所用レイアウト'];
 
 class CsvApi {
-  static void groupCheck({GroupModel group}) {
+  // 会社/組織をチェックし、配列から消す
+  static void groupCheck({required GroupModel group}) {
     String _id = group.id;
     switch (_id) {
       case 'UryZHGotsjyR0Zb6g06J':
@@ -26,20 +27,22 @@ class CsvApi {
         csvTemplates.removeWhere((e) => e != '土佐税理士事務所用レイアウト');
         return;
       default:
+        csvTemplates.clear();
         return;
     }
   }
 
+  // ダウンロード
   static Future<void> download({
-    PositionProvider positionProvider,
-    UserProvider userProvider,
-    WorkProvider workProvider,
-    WorkShiftProvider workShiftProvider,
-    GroupModel group,
-    DateTime month,
-    String template,
+    required PositionProvider positionProvider,
+    required UserProvider userProvider,
+    required WorkProvider workProvider,
+    required WorkShiftProvider workShiftProvider,
+    GroupModel? group,
+    DateTime? month,
+    String? template,
   }) async {
-    if (template == null) return;
+    if (template == '') return;
     switch (template) {
       case 'ひろめカンパニー用レイアウト':
         await _works01(
@@ -67,11 +70,11 @@ class CsvApi {
 }
 
 Future<void> _works01({
-  PositionProvider positionProvider,
-  UserProvider userProvider,
-  WorkProvider workProvider,
-  GroupModel group,
-  DateTime month,
+  required PositionProvider positionProvider,
+  required UserProvider userProvider,
+  required WorkProvider workProvider,
+  GroupModel? group,
+  DateTime? month,
 }) async {
   List<List<String>> rows = [];
   List<String> row = [];

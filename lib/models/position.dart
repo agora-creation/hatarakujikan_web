@@ -1,23 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PositionModel {
-  String _id;
-  String _groupId;
-  String _name;
-  List<String> userIds;
-  DateTime _createdAt;
+  String _id = '';
+  String _groupId = '';
+  String _name = '';
+  List<String> userIds = [];
+  DateTime _createdAt = DateTime.now();
 
   String get id => _id;
   String get groupId => _groupId;
   String get name => _name;
   DateTime get createdAt => _createdAt;
 
-  PositionModel.fromSnapshot(DocumentSnapshot snapshot) {
-    _id = snapshot.data()['id'];
-    _groupId = snapshot.data()['groupId'];
-    _name = snapshot.data()['name'];
-    userIds = _convertList(snapshot.data()['userIds']) ?? [];
-    _createdAt = snapshot.data()['createdAt'].toDate();
+  PositionModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    _id = snapshot.data()!['id'] ?? '';
+    _groupId = snapshot.data()!['groupId'] ?? '';
+    _name = snapshot.data()!['name'] ?? '';
+    userIds = _convertList(snapshot.data()!['userIds']);
+    _createdAt = snapshot.data()!['createdAt'].toDate() ?? DateTime.now();
   }
 
   List<String> _convertList(List list) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomTimeButton extends StatelessWidget {
-  final String label;
-  final Function onPressed;
+  final String? label;
+  final Function()? onPressed;
 
   CustomTimeButton({
     this.label,
@@ -19,7 +19,7 @@ class CustomTimeButton extends StatelessWidget {
         size: 16.0,
       ),
       label: Text(
-        label,
+        label ?? '',
         style: TextStyle(
           color: Colors.black54,
           fontSize: 16.0,

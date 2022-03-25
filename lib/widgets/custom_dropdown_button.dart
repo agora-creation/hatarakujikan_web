@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class CustomDropdownButton extends StatelessWidget {
   final dynamic value;
-  final Function(dynamic) onChanged;
-  final List<DropdownMenuItem<dynamic>> items;
-  final bool isExpanded;
+  final Function(dynamic)? onChanged;
+  final List<DropdownMenuItem<dynamic>>? items;
+  final bool? isExpanded;
 
   CustomDropdownButton({
     this.value,
@@ -23,7 +23,7 @@ class CustomDropdownButton extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton(
-          isExpanded: isExpanded,
+          isExpanded: isExpanded ?? false,
           value: value,
           onChanged: onChanged,
           items: items,

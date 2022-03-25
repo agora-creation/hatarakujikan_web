@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CustomTextIconButton extends StatelessWidget {
-  final IconData iconData;
-  final String label;
-  final Color color;
-  final Function onPressed;
+  final IconData? iconData;
+  final String? label;
+  final Color? color;
+  final Function()? onPressed;
 
   CustomTextIconButton({
     this.iconData,
@@ -23,7 +23,7 @@ class CustomTextIconButton extends StatelessWidget {
         size: 18.0,
       ),
       label: Text(
-        label,
+        label ?? '',
         style: TextStyle(
           color: Colors.white,
           fontSize: 16.0,

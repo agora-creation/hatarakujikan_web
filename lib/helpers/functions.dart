@@ -51,37 +51,49 @@ String randomString(int length) {
   return String.fromCharCodes(codeUnits);
 }
 
-Future<String> getPrefs({String key}) async {
+Future<String> getPrefs({required String key}) async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
   return _prefs.getString(key) ?? '';
 }
 
-Future<void> setPrefs({String key, String value}) async {
+Future<void> setPrefs({required String key, required String value}) async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
   _prefs.setString(key, value);
 }
 
-Future<void> removePrefs({String key}) async {
+Future<void> removePrefs({required String key}) async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
   _prefs.remove(key);
 }
 
-DateTime rebuildDate(DateTime date, DateTime time) {
-  String _date = '${DateFormat('yyyy-MM-dd').format(date)}';
-  String _time = '${DateFormat('HH:mm').format(time)}:00.000';
-  return DateTime.parse('$_date $_time');
+DateTime rebuildDate(DateTime? date, DateTime? time) {
+  DateTime _ret = DateTime.now();
+  if (date != null && time != null) {
+    String _date = dateText('yyyy-MM-dd', date);
+    String _time = '${dateText('HH:mm', time)}:00.000';
+    _ret = DateTime.parse('$_date $_time');
+  }
+  return _ret;
 }
 
-DateTime rebuildTime(BuildContext context, DateTime date, TimeOfDay time) {
-  String _date = '${DateFormat('yyyy-MM-dd').format(date)}';
-  String _time = '${time.format(context).padLeft(5, '0')}:00.000';
-  return DateTime.parse('$_date $_time');
+DateTime rebuildTime(BuildContext context, DateTime? date, TimeOfDay? time) {
+  DateTime _ret = DateTime.now();
+  if (date != null && time != null) {
+    String _date = dateText('yyyy-MM-dd', date);
+    String _time = '${time.format(context).padLeft(5, '0')}:00.000';
+    _ret = DateTime.parse('$_date $_time');
+  }
+  return _ret;
 }
 
-List<int> timeToInt(DateTime dateTime) {
-  String _h = '${DateFormat('H').format(dateTime)}';
-  String _m = '${DateFormat('m').format(dateTime)}';
-  return [int.parse(_h), int.parse(_m)];
+List<int> timeToInt(DateTime? dateTime) {
+  List<int> _ret = [0, 0];
+  if (dateTime != null) {
+    String _h = dateText('H', dateTime);
+    String _m = dateText('m', dateTime);
+    _ret = [int.parse(_h), int.parse(_m)];
+  }
+  return _ret;
 }
 
 String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -142,9 +154,9 @@ String roundUpTime(String time, int per) {
 
 // DateTime => Timestamp
 Timestamp convertTimestamp(DateTime date, bool end) {
-  String _dateTime = '${DateFormat('yyyy-MM-dd').format(date)} 00:00:00.000';
-  if (end) {
-    _dateTime = '${DateFormat('yyyy-MM-dd').format(date)} 23:59:59.999';
+  String _dateTime = '${dateText('yyyy-MM-dd', date)} 00:00:00.000';
+  if (end == true) {
+    _dateTime = '${dateText('yyyy-MM-dd', date)} 23:59:59.999';
   }
   return Timestamp.fromMillisecondsSinceEpoch(
     DateTime.parse(_dateTime).millisecondsSinceEpoch,
@@ -165,17 +177,17 @@ List<DateTime> generateDays(DateTime month) {
 
 // 通常時間と深夜時間に分ける関数
 List<DateTime> separateDayNight({
-  DateTime startedAt,
-  DateTime endedAt,
-  String nightStart,
-  String nightEnd,
+  required DateTime startedAt,
+  required DateTime endedAt,
+  required String nightStart,
+  required String nightEnd,
 }) {
-  DateTime _dayS;
-  DateTime _dayE;
-  DateTime _nightS;
-  DateTime _nightE;
-  String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
-  String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+  DateTime? _dayS;
+  DateTime? _dayE;
+  DateTime? _nightS;
+  DateTime? _nightE;
+  String _startedDate = dateText('yyyy-MM-dd', startedAt);
+  String _endedDate = dateText('yyyy-MM-dd', endedAt);
   DateTime _ss = DateTime.parse('$_startedDate $nightStart:00.000');
   DateTime _se = DateTime.parse('$_startedDate $nightEnd:00.000');
   DateTime _es = DateTime.parse('$_endedDate $nightStart:00.000');
@@ -249,4 +261,12 @@ List<DateTime> separateDayNight({
     }
   }
   return [_dayS, _dayE, _nightS, _nightE];
+}
+
+String dateText(String format, DateTime? date) {
+  String _ret = '';
+  if (date != null) {
+    _ret = DateFormat(format, 'ja').format(date);
+  }
+  return _ret;
 }

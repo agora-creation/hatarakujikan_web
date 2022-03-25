@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomWeekCheckbox extends StatelessWidget {
-  final String label;
-  final bool value;
-  final Function(bool) onChanged;
+  final String? label;
+  final bool? value;
+  final Function(bool?)? onChanged;
 
   CustomWeekCheckbox({
     this.label,
@@ -24,7 +24,7 @@ class CustomWeekCheckbox extends StatelessWidget {
           onChanged: onChanged,
           value: value,
           title: Text(
-            label,
+            label ?? '',
             style: TextStyle(
               color: Colors.black54,
               fontSize: 16.0,

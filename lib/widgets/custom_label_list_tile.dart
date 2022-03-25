@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 
 class CustomLabelListTile extends StatelessWidget {
-  final String label;
-  final String value;
+  final String? label;
+  final String? value;
 
   CustomLabelListTile({
     this.label,
@@ -15,8 +15,8 @@ class CustomLabelListTile extends StatelessWidget {
     return Container(
       decoration: kBottomBorderDecoration,
       child: ListTile(
-        leading: Text(label),
-        title: Text(value),
+        leading: Text(label ?? ''),
+        title: Text(value ?? ''),
       ),
     );
   }

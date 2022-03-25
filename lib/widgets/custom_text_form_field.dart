@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  final TextEditingController controller;
-  final bool obscureText;
-  final TextInputType textInputType;
-  final int maxLines;
-  final String label;
-  final Color color;
-  final IconData prefix;
-  final IconData suffix;
-  final Function onTap;
+  final TextEditingController? controller;
+  final bool? obscureText;
+  final TextInputType? textInputType;
+  final int? maxLines;
+  final String? label;
+  final Color? color;
+  final IconData? prefix;
+  final IconData? suffix;
+  final Function()? onTap;
 
   CustomTextFormField({
     this.controller,
@@ -27,7 +27,7 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      obscureText: obscureText,
+      obscureText: obscureText ?? false,
       keyboardType: textInputType,
       maxLines: maxLines,
       style: TextStyle(
@@ -57,7 +57,7 @@ class CustomTextFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.0),
-          borderSide: BorderSide(color: color),
+          borderSide: BorderSide(color: color!),
         ),
         labelStyle: TextStyle(color: color),
         focusColor: color,

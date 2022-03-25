@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 
 class CustomCheckboxListTile extends StatelessWidget {
-  final String label;
-  final bool value;
-  final Function(bool) onChanged;
+  final String? label;
+  final bool? value;
+  final Function(bool?)? onChanged;
 
   CustomCheckboxListTile({
     this.label,
@@ -17,7 +17,7 @@ class CustomCheckboxListTile extends StatelessWidget {
     return Container(
       decoration: kBottomBorderDecoration,
       child: CheckboxListTile(
-        title: Text(label),
+        title: Text(label ?? ''),
         value: value,
         activeColor: Colors.blue,
         controlAffinity: ListTileControlAffinity.leading,

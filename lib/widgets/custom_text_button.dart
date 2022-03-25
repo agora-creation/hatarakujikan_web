@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomTextButton extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Function onPressed;
+  final String? label;
+  final Color? color;
+  final Function()? onPressed;
 
   CustomTextButton({
     this.label,
@@ -16,7 +16,7 @@ class CustomTextButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       child: Text(
-        label,
+        label ?? '',
         style: TextStyle(
           color: Colors.white,
           fontSize: 16.0,

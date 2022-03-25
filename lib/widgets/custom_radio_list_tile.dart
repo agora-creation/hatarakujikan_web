@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 
 class CustomRadioListTile extends StatelessWidget {
-  final String label;
+  final String? label;
   final dynamic value;
   final dynamic groupValue;
-  final Function(dynamic) onChanged;
+  final Function(dynamic)? onChanged;
 
   CustomRadioListTile({
     this.label,
@@ -19,7 +19,7 @@ class CustomRadioListTile extends StatelessWidget {
     return Container(
       decoration: kBottomBorderDecoration,
       child: RadioListTile(
-        title: Text(label),
+        title: Text(label ?? ''),
         value: value,
         groupValue: groupValue,
         activeColor: Colors.blue,

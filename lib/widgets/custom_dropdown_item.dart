@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomDropdownItem extends StatelessWidget {
-  final String label;
+  final String? label;
   final dynamic value;
 
   CustomDropdownItem({
@@ -14,7 +14,7 @@ class CustomDropdownItem extends StatelessWidget {
     return DropdownMenuItem(
       value: value,
       child: Text(
-        label,
+        label ?? '',
         style: TextStyle(
           color: Colors.black54,
           fontSize: 14.0,

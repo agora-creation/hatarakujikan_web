@@ -2,21 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
-import 'package:intl/intl.dart';
 
 class WorkModel {
-  String _id;
-  String _groupId;
-  String _userId;
-  DateTime startedAt;
-  double startedLat;
-  double startedLon;
-  DateTime endedAt;
-  double endedLat;
-  double endedLon;
-  List<BreaksModel> breaks;
-  String _state;
-  DateTime _createdAt;
+  String _id = '';
+  String _groupId = '';
+  String _userId = '';
+  DateTime startedAt = DateTime.now();
+  double startedLat = 0;
+  double startedLon = 0;
+  DateTime endedAt = DateTime.now();
+  double endedLat = 0;
+  double endedLon = 0;
+  List<BreaksModel> breaks = [];
+  String _state = '';
+  DateTime _createdAt = DateTime.now();
 
   String get id => _id;
   String get groupId => _groupId;
@@ -24,19 +23,19 @@ class WorkModel {
   String get state => _state;
   DateTime get createdAt => _createdAt;
 
-  WorkModel.fromSnapshot(DocumentSnapshot snapshot) {
-    _id = snapshot.data()['id'];
-    _groupId = snapshot.data()['groupId'];
-    _userId = snapshot.data()['userId'];
-    startedAt = snapshot.data()['startedAt'].toDate();
-    startedLat = snapshot.data()['startedLat'].toDouble();
-    startedLon = snapshot.data()['startedLon'].toDouble();
-    endedAt = snapshot.data()['endedAt'].toDate();
-    endedLat = snapshot.data()['endedLat'].toDouble();
-    endedLon = snapshot.data()['endedLon'].toDouble();
-    breaks = _convertBreaks(snapshot.data()['breaks']) ?? [];
-    _state = snapshot.data()['state'] ?? '';
-    _createdAt = snapshot.data()['createdAt'].toDate();
+  WorkModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    _id = snapshot.data()!['id'] ?? '';
+    _groupId = snapshot.data()!['groupId'] ?? '';
+    _userId = snapshot.data()!['userId'] ?? '';
+    startedAt = snapshot.data()!['startedAt'].toDate() ?? DateTime.now();
+    startedLat = snapshot.data()!['startedLat'].toDouble() ?? 0;
+    startedLon = snapshot.data()!['startedLon'].toDouble() ?? 0;
+    endedAt = snapshot.data()!['endedAt'].toDate() ?? DateTime.now();
+    endedLat = snapshot.data()!['endedLat'].toDouble() ?? 0;
+    endedLon = snapshot.data()!['endedLon'].toDouble() ?? 0;
+    breaks = _convertBreaks(snapshot.data()!['breaks']);
+    _state = snapshot.data()!['state'] ?? '';
+    _createdAt = snapshot.data()!['createdAt'].toDate() ?? DateTime.now();
   }
 
   List<BreaksModel> _convertBreaks(List breaks) {
@@ -47,27 +46,41 @@ class WorkModel {
     return converted;
   }
 
-  String startTime(GroupModel group) {
-    String _time = '${DateFormat('HH:mm').format(startedAt)}';
-    if (group.roundStartType == '切捨') {
-      _time = roundDownTime(_time, group.roundStartNum);
-    } else if (group.roundStartType == '切上') {
-      _time = roundUpTime(_time, group.roundStartNum);
+  String startTime(GroupModel? group) {
+    String _time = dateText('HH:mm', startedAt);
+    if (group != null) {
+      switch (group.roundStartType) {
+        case '切捨':
+          _time = roundDownTime(_time, group.roundStartNum);
+          break;
+        case '切上':
+          _time = roundUpTime(_time, group.roundStartNum);
+          break;
+        default:
+          break;
+      }
     }
     return _time;
   }
 
-  String endTime(GroupModel group) {
-    String _time = '${DateFormat('HH:mm').format(endedAt)}';
-    if (group.roundEndType == '切捨') {
-      _time = roundDownTime(_time, group.roundEndNum);
-    } else if (group.roundEndType == '切上') {
-      _time = roundUpTime(_time, group.roundEndNum);
+  String endTime(GroupModel? group) {
+    String _time = dateText('HH:mm', endedAt);
+    if (group != null) {
+      switch (group.roundEndType) {
+        case '切捨':
+          _time = roundDownTime(_time, group.roundEndNum);
+          break;
+        case '切上':
+          _time = roundUpTime(_time, group.roundEndNum);
+          break;
+        default:
+          break;
+      }
     }
     return _time;
   }
 
-  List<String> breakTimes(GroupModel group) {
+  List<String> breakTimes(GroupModel? group) {
     String _time1 = '00:00';
     String _time2 = '00:00';
     String _time3 = '00:00';
@@ -81,12 +94,12 @@ class WorkModel {
     return [_time1, _time2, _time3];
   }
 
-  String workTime(GroupModel group) {
+  String workTime(GroupModel? group) {
     String _time = '00:00';
-    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedDate = dateText('yyyy-MM-dd', startedAt);
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
-    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedDate = dateText('yyyy-MM-dd', endedAt);
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
     // 出勤時間と退勤時間の差を求める
@@ -106,29 +119,31 @@ class WorkModel {
   }
 
   // 法定内時間/法定外時間
-  List<String> legalTimes(GroupModel group) {
+  List<String> legalTimes(GroupModel? group) {
     String _time1 = '00:00';
     String _time2 = '00:00';
-    List<String> _times = workTime(group).split(':');
-    if (group.legal <= int.parse(_times.first)) {
-      _time1 = addTime(_time1, '0${group.legal}:00');
-      String _tmp = subTime(workTime(group), '0${group.legal}:00');
-      _time2 = addTime(_time2, _tmp);
-    } else {
-      _time1 = addTime(_time1, workTime(group));
-      _time2 = addTime(_time2, '00:00');
+    if (group != null) {
+      List<String> _times = workTime(group).split(':');
+      if (group.legal <= int.parse(_times.first)) {
+        _time1 = addTime(_time1, '0${group.legal}:00');
+        String _tmp = subTime(workTime(group), '0${group.legal}:00');
+        _time2 = addTime(_time2, _tmp);
+      } else {
+        _time1 = addTime(_time1, workTime(group));
+        _time2 = addTime(_time2, '00:00');
+      }
     }
     return [_time1, _time2];
   }
 
   // 深夜時間/深夜時間外
-  List<String> nightTimes(GroupModel group) {
+  List<String> nightTimes(GroupModel? group) {
     String _time1 = '00:00';
     String _time2 = '00:00';
-    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedDate = dateText('yyyy-MM-dd', startedAt);
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
-    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedDate = dateText('yyyy-MM-dd', endedAt);
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
     // ----------------------------------------
@@ -136,13 +151,13 @@ class WorkModel {
     List<DateTime> _dayNightList = separateDayNight(
       startedAt: _startedAt,
       endedAt: _endedAt,
-      nightStart: group.nightStart,
-      nightEnd: group.nightEnd,
+      nightStart: group?.nightStart ?? '22:00',
+      nightEnd: group?.nightEnd ?? '05:00',
     );
-    DateTime _dayS = _dayNightList[0];
-    DateTime _dayE = _dayNightList[1];
-    DateTime _nightS = _dayNightList[2];
-    DateTime _nightE = _dayNightList[3];
+    DateTime? _dayS = _dayNightList[0];
+    DateTime? _dayE = _dayNightList[1];
+    DateTime? _nightS = _dayNightList[2];
+    DateTime? _nightE = _dayNightList[3];
     // ----------------------------------------
     // 深夜時間外
     if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
@@ -161,24 +176,24 @@ class WorkModel {
   }
 
   // 早出時間/残業時間
-  List<String> overTimes(GroupModel group) {
+  List<String> overTimes(GroupModel? group) {
     String _time1 = '00:00';
     String _time2 = '00:00';
-    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedDate = dateText('yyyy-MM-dd', startedAt);
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
-    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedDate = dateText('yyyy-MM-dd', endedAt);
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
     // ----------------------------------------
-    String _workStart = '${group.workStart}:00.000';
-    String _workEnd = '${group.workEnd}:00.000';
-    DateTime _over1S;
-    DateTime _over1E;
-    DateTime _over2S;
-    DateTime _over2E;
-    DateTime _s = DateTime.parse('$_startedDate $_workStart');
-    DateTime _e = DateTime.parse('$_endedDate $_workEnd');
+    String _workStart = '${group?.workStart}:00.000';
+    String _workEnd = '${group?.workEnd}:00.000';
+    DateTime? _over1S;
+    DateTime? _over1E;
+    DateTime? _over2S;
+    DateTime? _over2E;
+    DateTime? _s = DateTime.parse('$_startedDate $_workStart');
+    DateTime? _e = DateTime.parse('$_endedDate $_workEnd');
     if (_startedAt.millisecondsSinceEpoch < _s.millisecondsSinceEpoch) {
       _over1S = _startedAt;
       _over1E = _s;
@@ -212,29 +227,30 @@ class WorkModel {
   }
 
   // 通常時間/深夜時間(-深夜時間外)/通常時間外/深夜時間外
-  List<String> calTimes01(GroupModel group) {
+  List<String> calTimes01(GroupModel? group) {
     String _time1 = '00:00';
     String _time2 = '00:00';
     String _time3 = '00:00';
     String _time4 = '00:00';
-    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedDate = dateText('yyyy-MM-dd', startedAt);
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
-    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedDate = dateText('yyyy-MM-dd', endedAt);
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
+    int _legal = group?.legal ?? 8;
     // ----------------------------------------
     // 通常時間と深夜時間に分ける
     List<DateTime> _dayNightList = separateDayNight(
       startedAt: _startedAt,
       endedAt: _endedAt,
-      nightStart: group.nightStart,
-      nightEnd: group.nightEnd,
+      nightStart: group?.nightStart ?? '22:00',
+      nightEnd: group?.nightEnd ?? '05:00',
     );
-    DateTime _dayS = _dayNightList[0];
-    DateTime _dayE = _dayNightList[1];
-    DateTime _nightS = _dayNightList[2];
-    DateTime _nightE = _dayNightList[3];
+    DateTime? _dayS = _dayNightList[0];
+    DateTime? _dayE = _dayNightList[1];
+    DateTime? _nightS = _dayNightList[2];
+    DateTime? _nightE = _dayNightList[3];
     // ----------------------------------------
     // 通常時間
     if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
@@ -243,8 +259,8 @@ class WorkModel {
       _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
       _time1 = subTime(_time1, breakTimes(group)[1]);
       List<String> _time1List = _time1.split(':');
-      if (group.legal <= int.parse(_time1List.first)) {
-        _time1 = '0${group.legal}:00';
+      if (_legal <= int.parse(_time1List.first)) {
+        _time1 = '0$_legal:00';
       }
     }
     // ----------------------------------------
@@ -255,16 +271,16 @@ class WorkModel {
       _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
       _time2 = subTime(_time2, breakTimes(group)[2]);
       List<String> _time2List = _time2.split(':');
-      if (group.legal <= int.parse(_time2List.first)) {
-        _time2 = '0${group.legal}:00';
+      if (_legal <= int.parse(_time2List.first)) {
+        _time2 = '0$_legal:00';
       }
     }
     // ----------------------------------------
     List<String> _workTimes = workTime(group).split(':');
-    if (group.legal <= int.parse(_workTimes.first)) {
+    if (_legal <= int.parse(_workTimes.first)) {
       // 法定時間を超えた時点の時間
       DateTime _overS = _startedAt;
-      _overS = _overS.add(Duration(hours: group.legal));
+      _overS = _overS.add(Duration(hours: _legal));
       // 休憩時間を足す
       List<String> _breakTimes = breakTimes(group)[0].split(':');
       _overS = _overS.add(Duration(hours: int.parse(_breakTimes.first)));
@@ -274,13 +290,13 @@ class WorkModel {
       List<DateTime> _dayNightOverList = separateDayNight(
         startedAt: _overS,
         endedAt: _endedAt,
-        nightStart: group.nightStart,
-        nightEnd: group.nightEnd,
+        nightStart: group?.nightStart ?? '22:00',
+        nightEnd: group?.nightEnd ?? '05:00',
       );
-      DateTime _dayOverS = _dayNightOverList[0];
-      DateTime _dayOverE = _dayNightOverList[1];
-      DateTime _nightOverS = _dayNightOverList[2];
-      DateTime _nightOverE = _dayNightOverList[3];
+      DateTime? _dayOverS = _dayNightOverList[0];
+      DateTime? _dayOverE = _dayNightOverList[1];
+      DateTime? _nightOverS = _dayNightOverList[2];
+      DateTime? _nightOverE = _dayNightOverList[3];
       // ----------------------------------------
       // 通常時間外
       if (_dayOverS.millisecondsSinceEpoch < _dayOverE.millisecondsSinceEpoch) {
@@ -305,14 +321,14 @@ class WorkModel {
   }
 
   // 勤務時間/時間外1/時間外2
-  List<String> calTimes02(GroupModel group, String type) {
+  List<String> calTimes02(GroupModel? group, String? type) {
     String _time0 = '00:00';
     String _time1 = '00:00';
     String _time2 = '00:00';
-    String _startedDate = '${DateFormat('yyyy-MM-dd').format(startedAt)}';
+    String _startedDate = dateText('yyyy-MM-dd', startedAt);
     String _startedTime = '${startTime(group)}:00.000';
     DateTime _startedAt = DateTime.parse('$_startedDate $_startedTime');
-    String _workStart = '${group.workStart}:00.000';
+    String _workStart = '${group?.workStart}:00.000';
     // AグループかBグループ
     if (type == 'A' || type == 'B') {
       DateTime _startedAtTmp = DateTime.parse('$_startedDate $_workStart');
@@ -321,7 +337,7 @@ class WorkModel {
         _startedAt = _startedAtTmp;
       }
     }
-    String _endedDate = '${DateFormat('yyyy-MM-dd').format(endedAt)}';
+    String _endedDate = dateText('yyyy-MM-dd', endedAt);
     String _endedTime = '${endTime(group)}:00.000';
     DateTime _endedAt = DateTime.parse('$_endedDate $_endedTime');
     // ----------------------------------------
@@ -341,7 +357,7 @@ class WorkModel {
     // ----------------------------------------
     // Aグループ
     if (type == 'A') {
-      String _workEnd = '${group.workEnd}:00.000';
+      String _workEnd = '${group?.workEnd}:00.000';
       DateTime _time1start = DateTime.parse('$_endedDate $_workEnd');
       DateTime _time1end = _endedAt;
       if (_time1start.millisecondsSinceEpoch <
@@ -354,7 +370,7 @@ class WorkModel {
     // ----------------------------------------
     // Bグループ
     if (type == 'B') {
-      String _workEnd = '${group.workEnd}:00.000';
+      String _workEnd = '${group?.workEnd}:00.000';
       DateTime _time1start = DateTime.parse('$_endedDate $_workEnd'); //17:00
       DateTime _time1end = _time1start.add(Duration(hours: 1)); //18:00
       if (_endedAt.millisecondsSinceEpoch < _time1end.millisecondsSinceEpoch) {
@@ -385,20 +401,21 @@ class WorkModel {
     // Cグループ
     if (type == 'C') {
       List<String> _time0s = _time0.split(':');
-      if (group.legal <= int.parse(_time0s.first)) {
-        String _tmp = subTime(_time0, '0${group.legal}:00');
+      int _legal = group?.legal ?? 0;
+      if (_legal <= int.parse(_time0s.first)) {
+        String _tmp = subTime(_time0, '0$_legal:00');
         _time2 = addTime(_time2, _tmp);
       } else {
         _time2 = '00:00';
       }
     }
     // ----------------------------------------
-    String week = '${DateFormat('E', 'ja').format(_startedAt)}';
-    if (group.holidays.contains(week)) {
+    String week = dateText('E', _startedAt);
+    if (group!.holidays.contains(week)) {
       _time2 = _time0;
       _time1 = '00:00';
     }
-    String key = '${DateFormat('yyyy-MM-dd').format(_startedAt)}';
+    String key = dateText('yyyy-MM-dd', _startedAt);
     DateTime day = DateTime.parse(key);
     if (group.holidays2.contains(day)) {
       _time2 = _time0;

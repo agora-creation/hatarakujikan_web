@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CustomSfCalendar extends StatelessWidget {
-  final CalendarDataSource dataSource;
-  final Function(CalendarTapDetails) onTap;
+  final CalendarDataSource? dataSource;
+  final Function(CalendarTapDetails)? onTap;
 
   CustomSfCalendar({
     this.dataSource,

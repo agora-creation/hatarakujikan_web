@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CustomTextFormField2 extends StatelessWidget {
-  final TextEditingController controller;
-  final TextInputType textInputType;
-  final int maxLines;
+  final TextEditingController? controller;
+  final TextInputType? textInputType;
+  final int? maxLines;
   final Function(String) onChanged;
 
   CustomTextFormField2({
     this.controller,
     this.textInputType,
     this.maxLines,
-    @required this.onChanged,
+    required this.onChanged,
   });
 
   @override

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomTextIconButton2 extends StatelessWidget {
-  final IconData iconData;
-  final String label;
-  final Function onPressed;
+  final IconData? iconData;
+  final String? label;
+  final Function()? onPressed;
 
   CustomTextIconButton2({
     this.iconData,
@@ -21,7 +21,7 @@ class CustomTextIconButton2 extends StatelessWidget {
         size: 18.0,
       ),
       label: Text(
-        label,
+        label ?? '',
         style: TextStyle(
           color: Colors.black54,
           fontSize: 16.0,

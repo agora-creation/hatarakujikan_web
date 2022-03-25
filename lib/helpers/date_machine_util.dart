@@ -21,20 +21,22 @@ class DateMachineUtil {
         '-' +
         '01';
     dateMap['start'] = DateUtil.formatDate(
-        DateTime.fromMillisecondsSinceEpoch(turnTimestamp(dateMap['start'])),
-        format: 'yyyy-MM-dd');
+      DateTime.fromMillisecondsSinceEpoch(turnTimestamp(dateMap['start']!)),
+      format: 'yyyy-MM-dd',
+    );
     String endMonth = '$yearTime' +
         '-' +
         ((monthTime + 1) < 10
-            ? '0' + (monthTime + 1).toString()
-            : (monthTime + 1))
+                ? '0' + (monthTime + 1).toString()
+                : (monthTime + 1))
             .toString() +
         '-' +
         '00';
     var endMonthTimeStamp = turnTimestamp(endMonth);
     endMonth = DateUtil.formatDate(
-        DateTime.fromMillisecondsSinceEpoch(endMonthTimeStamp),
-        format: 'yyyy-MM-dd');
+      DateTime.fromMillisecondsSinceEpoch(endMonthTimeStamp),
+      format: 'yyyy-MM-dd',
+    );
     dateMap['end'] = endMonth;
     return dateMap;
   }

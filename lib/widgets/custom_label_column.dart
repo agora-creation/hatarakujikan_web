@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomLabelColumn extends StatelessWidget {
-  final String label;
-  final Widget child;
+  final String? label;
+  final Widget? child;
 
   CustomLabelColumn({
     this.label,
@@ -15,10 +15,10 @@ class CustomLabelColumn extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          label ?? '',
           style: TextStyle(color: Colors.black54, fontSize: 14.0),
         ),
-        child,
+        child!,
       ],
     );
   }
