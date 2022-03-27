@@ -4,8 +4,8 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 
 class CustomWorkTable extends StatelessWidget {
-  final GroupModel group;
-  final WorkModel work;
+  final GroupModel? group;
+  final WorkModel? work;
 
   CustomWorkTable({
     this.group,
@@ -31,7 +31,7 @@ class CustomWorkTable extends StatelessWidget {
                         '勤務時間',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.workTime(group)}'),
+                      Text('${work?.workTime(group)}'),
                     ],
                   ),
                 ),
@@ -44,7 +44,7 @@ class CustomWorkTable extends StatelessWidget {
                         '法定内時間',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.legalTimes(group).first}'),
+                      Text('${work?.legalTimes(group).first}'),
                     ],
                   ),
                 ),
@@ -57,7 +57,7 @@ class CustomWorkTable extends StatelessWidget {
                         '法定外時間',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.legalTimes(group).last}'),
+                      Text('${work?.legalTimes(group).last}'),
                     ],
                   ),
                 ),
@@ -70,7 +70,7 @@ class CustomWorkTable extends StatelessWidget {
                         '深夜時間',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.nightTimes(group).last}'),
+                      Text('${work?.nightTimes(group).last}'),
                     ],
                   ),
                 ),
@@ -87,7 +87,7 @@ class CustomWorkTable extends StatelessWidget {
                         '通常時間※1',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.calTimes01(group)[0]}'),
+                      Text('${work?.calTimes01(group)[0]}'),
                     ],
                   ),
                 ),
@@ -100,7 +100,7 @@ class CustomWorkTable extends StatelessWidget {
                         '深夜時間(-)※2',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.calTimes01(group)[1]}'),
+                      Text('${work?.calTimes01(group)[1]}'),
                     ],
                   ),
                 ),
@@ -113,7 +113,7 @@ class CustomWorkTable extends StatelessWidget {
                         '通常時間外※3',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.calTimes01(group)[2]}'),
+                      Text('${work?.calTimes01(group)[2]}'),
                     ],
                   ),
                 ),
@@ -126,7 +126,7 @@ class CustomWorkTable extends StatelessWidget {
                         '深夜時間外※4',
                         style: kDefaultTextStyle,
                       ),
-                      Text('${work.calTimes01(group)[3]}'),
+                      Text('${work?.calTimes01(group)[3]}'),
                     ],
                   ),
                 ),

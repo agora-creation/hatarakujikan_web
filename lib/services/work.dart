@@ -7,8 +7,7 @@ class WorkService {
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   String id() {
-    String _id = _firebaseFirestore.collection(_collection).doc().id;
-    return _id;
+    return _firebaseFirestore.collection(_collection).doc().id;
   }
 
   void create(Map<String, dynamic> values) {
@@ -19,15 +18,18 @@ class WorkService {
     _firebaseFirestore.collection(_collection).doc(values['id']).update(values);
   }
 
-  Future<void> updateMigration(String before, String after) async {
+  Future<void> updateMigration({
+    required String beforeUserId,
+    required String afterUserId,
+  }) async {
     await _firebaseFirestore
         .collection(_collection)
-        .where('userId', isEqualTo: before)
+        .where('userId', isEqualTo: beforeUserId)
         .get()
         .then((value) {
       for (DocumentSnapshot _doc in value.docs) {
         _firebaseFirestore.collection(_collection).doc(_doc.id).update({
-          'userId': after,
+          'userId': afterUserId,
         });
       }
     });
@@ -37,8 +39,8 @@ class WorkService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<WorkModel> select({String id}) async {
-    WorkModel _work;
+  Future<WorkModel?> select({String? id}) async {
+    WorkModel? _work;
     await _firebaseFirestore
         .collection(_collection)
         .doc(id)
@@ -50,14 +52,14 @@ class WorkService {
   }
 
   Future<List<WorkModel>> selectList({
-    String groupId,
-    String userId,
-    DateTime startAt,
-    DateTime endAt,
+    String? groupId,
+    String? userId,
+    DateTime? startAt,
+    DateTime? endAt,
   }) async {
     List<WorkModel> _works = [];
-    Timestamp _startAt = convertTimestamp(startAt, false);
-    Timestamp _endAt = convertTimestamp(endAt, true);
+    Timestamp _startAt = convertTimestamp(startAt!, false);
+    Timestamp _endAt = convertTimestamp(endAt!, true);
     await _firebaseFirestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)
@@ -67,7 +69,7 @@ class WorkService {
         .endAt([_endAt])
         .get()
         .then((value) {
-          for (DocumentSnapshot _work in value.docs) {
+          for (DocumentSnapshot<Map<String, dynamic>> _work in value.docs) {
             _works.add(WorkModel.fromSnapshot(_work));
           }
         });

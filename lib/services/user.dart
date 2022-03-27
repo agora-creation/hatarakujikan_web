@@ -6,8 +6,7 @@ class UserService {
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   String id() {
-    String _id = _firebaseFirestore.collection(_collection).doc().id;
-    return _id;
+    return _firebaseFirestore.collection(_collection).doc().id;
   }
 
   void create(Map<String, dynamic> values) {
@@ -22,8 +21,8 @@ class UserService {
     _firebaseFirestore.collection(_collection).doc(values['id']).delete();
   }
 
-  Future<UserModel> select({String id}) async {
-    UserModel _user;
+  Future<UserModel?> select({String? id}) async {
+    UserModel? _user;
     await _firebaseFirestore
         .collection(_collection)
         .doc(id)
@@ -34,19 +33,21 @@ class UserService {
     return _user;
   }
 
-  Future<List<UserModel>> selectList({List<String> userIds}) async {
+  Future<List<UserModel>> selectList({required List<String> userIds}) async {
     List<UserModel> _users = [];
-    for (String _id in userIds) {
-      await _firebaseFirestore
-          .collection(_collection)
-          .where('id', isEqualTo: _id)
-          .orderBy('recordPassword', descending: false)
-          .get()
-          .then((value) {
-        for (DocumentSnapshot _user in value.docs) {
-          _users.add(UserModel.fromSnapshot(_user));
-        }
-      });
+    if (userIds.length > 0) {
+      for (String _id in userIds) {
+        await _firebaseFirestore
+            .collection(_collection)
+            .where('id', isEqualTo: _id)
+            .orderBy('recordPassword', descending: false)
+            .get()
+            .then((value) {
+          for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
+            _users.add(UserModel.fromSnapshot(_user));
+          }
+        });
+      }
     }
     return _users;
   }

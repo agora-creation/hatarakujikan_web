@@ -21,7 +21,11 @@ class UserNoticeService {
         .set(values);
   }
 
-  void send({String token, String title, String body}) {
+  void send({
+    required String token,
+    required String title,
+    required String body,
+  }) {
     try {
       http.post(
         Uri.parse(serverUrl),

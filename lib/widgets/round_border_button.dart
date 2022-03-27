@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class RoundBorderButton extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Color borderColor;
-  final Function onPressed;
+  final String? label;
+  final Color? color;
+  final Color? borderColor;
+  final Function()? onPressed;
 
   RoundBorderButton({
     this.label,
@@ -20,14 +20,14 @@ class RoundBorderButton extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         child: Text(
-          label,
+          label ?? '',
           style: TextStyle(
             color: color,
             fontSize: 16.0,
           ),
         ),
         style: TextButton.styleFrom(
-          side: BorderSide(color: borderColor, width: 1),
+          side: BorderSide(color: borderColor!, width: 1),
           shape: StadiumBorder(),
           padding: EdgeInsets.symmetric(vertical: 16.0),
         ),

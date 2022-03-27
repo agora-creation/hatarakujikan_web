@@ -6,54 +6,49 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/group.dart';
 import 'package:hatarakujikan_web/services/user.dart';
 
-const List<String> roundTypeList = ['切捨', '切上'];
-const List<int> roundNumList = [1, 5, 10, 15, 30];
-const List<int> legalList = [8];
-const List<String> weekList = ['日', '月', '火', '水', '木', '金', '土'];
-
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
 class GroupProvider with ChangeNotifier {
   Status _status = Status.Uninitialized;
-  FirebaseAuth _auth;
-  User _fUser;
+  FirebaseAuth? _auth;
+  User? _fUser;
   GroupService _groupService = GroupService();
   UserService _userService = UserService();
   List<GroupModel> _groups = [];
-  GroupModel _group;
-  UserModel _adminUser;
+  GroupModel? _group;
+  UserModel? _adminUser;
   List<UserModel> _users = [];
 
   Status get status => _status;
-  User get fUser => _fUser;
+  User? get fUser => _fUser;
   List<GroupModel> get groups => _groups;
-  GroupModel get group => _group;
-  UserModel get adminUser => _adminUser;
+  GroupModel? get group => _group;
+  UserModel? get adminUser => _adminUser;
   List<UserModel> get users => _users;
 
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
   GroupProvider.initialize() : _auth = FirebaseAuth.instance {
-    _auth.authStateChanges().listen(_onStateChanged);
+    _auth?.authStateChanges().listen(_onStateChanged);
   }
 
-  Future<void> setGroup(GroupModel group) async {
+  Future<void> setGroup(GroupModel? group) async {
     _groups.clear();
     _group = group;
-    _users = await _userService.selectList(userIds: _group.userIds);
+    _users = await _userService.selectList(userIds: _group?.userIds ?? []);
     _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
-    await setPrefs(key: 'groupId', value: group.id);
+    await setPrefs(key: 'groupId', value: group?.id ?? '');
     notifyListeners();
   }
 
   Future<bool> signIn() async {
-    if (email.text == null) return false;
-    if (password.text == null) return false;
+    if (email.text == '') return false;
+    if (password.text == '') return false;
     try {
       _status = Status.Authenticating;
       notifyListeners();
-      await _auth
+      await _auth!
           .signInWithEmailAndPassword(
         email: email.text.trim(),
         password: password.text.trim(),
@@ -61,7 +56,7 @@ class GroupProvider with ChangeNotifier {
           .then((value) async {
         _groups.clear();
         _groups = await _groupService.selectListAdminUser(
-          adminUserId: value.user.uid,
+          adminUserId: value.user?.uid,
         );
         _users.clear();
       });

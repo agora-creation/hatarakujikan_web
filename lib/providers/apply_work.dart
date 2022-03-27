@@ -8,20 +8,20 @@ class ApplyWorkProvider with ChangeNotifier {
   ApplyWorkService _applyWorkService = ApplyWorkService();
   WorkService _workService = WorkService();
 
-  Future<bool> update({ApplyWorkModel applyWork}) async {
+  Future<bool> update({required ApplyWorkModel applyWork}) async {
     try {
       _applyWorkService.update({
-        'id': applyWork?.id,
+        'id': applyWork.id,
         'approval': true,
       });
       List<Map> _breaks = [];
-      for (BreaksModel breaks in applyWork?.breaks) {
+      for (BreaksModel breaks in applyWork.breaks) {
         _breaks.add(breaks.toMap());
       }
       _workService.update({
-        'id': applyWork?.workId,
-        'startedAt': applyWork?.startedAt,
-        'endedAt': applyWork?.endedAt,
+        'id': applyWork.workId,
+        'startedAt': applyWork.startedAt,
+        'endedAt': applyWork.endedAt,
         'breaks': _breaks,
       });
       return true;
@@ -31,7 +31,7 @@ class ApplyWorkProvider with ChangeNotifier {
     }
   }
 
-  void delete({ApplyWorkModel applyWork}) {
-    _applyWorkService.delete({'id': applyWork?.id});
+  void delete({required ApplyWorkModel applyWork}) {
+    _applyWorkService.delete({'id': applyWork.id});
   }
 }

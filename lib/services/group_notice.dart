@@ -5,14 +5,13 @@ class GroupNoticeService {
   String _subCollection = 'notice';
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  String id(String groupId) {
-    String _id = _firebaseFirestore
+  String id(String? groupId) {
+    return _firebaseFirestore
         .collection(_collection)
         .doc(groupId)
         .collection(_subCollection)
         .doc()
         .id;
-    return _id;
   }
 
   void create(Map<String, dynamic> values) {

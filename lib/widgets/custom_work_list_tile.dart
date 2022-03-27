@@ -13,7 +13,6 @@ import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_table.dart';
-import 'package:intl/intl.dart';
 
 class CustomWorkListTile extends StatelessWidget {
   final WorkProvider workProvider;
@@ -222,12 +221,11 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                           lastDate: kDayLastDate,
                         );
                         if (_selected != null) {
-                          _selected = rebuildDate(_selected, _work.startedAt);
-                          setState(() => _work.startedAt = _selected);
+                          _selected = rebuildDate(_selected, _work?.startedAt);
+                          setState(() => _work?.startedAt = _selected!);
                         }
                       },
-                      label:
-                          '${DateFormat('yyyy/MM/dd').format(_work.startedAt)}',
+                      label: dateText('yyyy/MM/dd', _work?.startedAt),
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -235,36 +233,36 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        TimeOfDay _selected = await showTimePicker(
+                        TimeOfDay? _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
-                            hour: timeToInt(_work.startedAt)[0],
-                            minute: timeToInt(_work.startedAt)[1],
+                            hour: timeToInt(_work?.startedAt)[0],
+                            minute: timeToInt(_work?.startedAt)[1],
                           ),
                         );
                         if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
+                          DateTime? _dateTime = rebuildTime(
                             context,
-                            _work.startedAt,
+                            _work?.startedAt,
                             _selected,
                           );
-                          setState(() => _work.startedAt = _dateTime);
+                          setState(() => _work?.startedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(_work.startedAt)}',
+                      label: dateText('HH:mm', _work?.startedAt),
                     ),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 8.0),
-            _work.breaks.length > 0
+            _work!.breaks.length > 0
                 ? ListView.builder(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    itemCount: _work.breaks.length,
+                    itemCount: _work!.breaks.length,
                     itemBuilder: (_, index) {
-                      BreaksModel _breaks = _work.breaks[index];
+                      BreaksModel _breaks = _work!.breaks[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -276,7 +274,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                   flex: 3,
                                   child: CustomDateButton(
                                     onPressed: () async {
-                                      DateTime _selected = await showDatePicker(
+                                      DateTime? _selected =
+                                          await showDatePicker(
                                         context: context,
                                         initialDate: _breaks.startedAt,
                                         firstDate: kDayFirstDate,
@@ -286,11 +285,11 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         _selected = rebuildDate(
                                             _selected, _breaks.startedAt);
                                         setState(() =>
-                                            _breaks.startedAt = _selected);
+                                            _breaks.startedAt = _selected!);
                                       }
                                     },
-                                    label:
-                                        '${DateFormat('yyyy/MM/dd').format(_breaks.startedAt)}',
+                                    label: dateText(
+                                        'yyyy/MM/dd', _breaks.startedAt),
                                   ),
                                 ),
                                 SizedBox(width: 4.0),
@@ -298,7 +297,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                   flex: 2,
                                   child: CustomTimeButton(
                                     onPressed: () async {
-                                      TimeOfDay _selected =
+                                      TimeOfDay? _selected =
                                           await showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay(
@@ -317,8 +316,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                             _breaks.startedAt = _dateTime);
                                       }
                                     },
-                                    label:
-                                        '${DateFormat('HH:mm').format(_breaks.startedAt)}',
+                                    label: dateText('HH:mm', _breaks.startedAt),
                                   ),
                                 ),
                               ],
@@ -333,7 +331,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                   flex: 3,
                                   child: CustomDateButton(
                                     onPressed: () async {
-                                      DateTime _selected = await showDatePicker(
+                                      DateTime? _selected =
+                                          await showDatePicker(
                                         context: context,
                                         initialDate: _breaks.endedAt,
                                         firstDate: kDayFirstDate,
@@ -343,11 +342,11 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         _selected = rebuildDate(
                                             _selected, _breaks.endedAt);
                                         setState(
-                                            () => _breaks.endedAt = _selected);
+                                            () => _breaks.endedAt = _selected!);
                                       }
                                     },
                                     label:
-                                        '${DateFormat('yyyy/MM/dd').format(_breaks.endedAt)}',
+                                        dateText('yyyy/MM/dd', _breaks.endedAt),
                                   ),
                                 ),
                                 SizedBox(width: 4.0),
@@ -355,7 +354,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                   flex: 2,
                                   child: CustomTimeButton(
                                     onPressed: () async {
-                                      TimeOfDay _selected =
+                                      TimeOfDay? _selected =
                                           await showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay(
@@ -364,7 +363,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         ),
                                       );
                                       if (_selected != null) {
-                                        DateTime _dateTime = rebuildTime(
+                                        DateTime? _dateTime = rebuildTime(
                                           context,
                                           _breaks.endedAt,
                                           _selected,
@@ -373,8 +372,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                             () => _breaks.endedAt = _dateTime);
                                       }
                                     },
-                                    label:
-                                        '${DateFormat('HH:mm').format(_breaks.endedAt)}',
+                                    label: dateText('HH:mm', _breaks.endedAt),
                                   ),
                                 ),
                               ],
@@ -389,7 +387,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     children: [
                       CustomCheckboxListTile(
                         onChanged: (value) {
-                          setState(() => _isBreaks = value);
+                          setState(() => _isBreaks = value!);
                         },
                         label: '休憩を追加する',
                         value: _isBreaks,
@@ -407,7 +405,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         flex: 3,
                                         child: CustomDateButton(
                                           onPressed: () async {
-                                            DateTime _selected =
+                                            DateTime? _selected =
                                                 await showDatePicker(
                                               context: context,
                                               initialDate: _breakStartedAt,
@@ -418,11 +416,11 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                               _selected = rebuildDate(
                                                   _selected, _breakStartedAt);
                                               setState(() =>
-                                                  _breakStartedAt = _selected);
+                                                  _breakStartedAt = _selected!);
                                             }
                                           },
-                                          label:
-                                              '${DateFormat('yyyy/MM/dd').format(_breakStartedAt)}',
+                                          label: dateText(
+                                              'yyyy/MM/dd', _breakStartedAt),
                                         ),
                                       ),
                                       SizedBox(width: 4.0),
@@ -430,7 +428,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         flex: 2,
                                         child: CustomTimeButton(
                                           onPressed: () async {
-                                            TimeOfDay _selected =
+                                            TimeOfDay? _selected =
                                                 await showTimePicker(
                                               context: context,
                                               initialTime: TimeOfDay(
@@ -450,8 +448,8 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                                   _breakStartedAt = _dateTime);
                                             }
                                           },
-                                          label:
-                                              '${DateFormat('HH:mm').format(_breakStartedAt)}',
+                                          label: dateText(
+                                              'HH:mm', _breakStartedAt),
                                         ),
                                       ),
                                     ],
@@ -466,7 +464,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         flex: 3,
                                         child: CustomDateButton(
                                           onPressed: () async {
-                                            DateTime _selected =
+                                            DateTime? _selected =
                                                 await showDatePicker(
                                               context: context,
                                               initialDate: _breakEndedAt,
@@ -477,11 +475,11 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                               _selected = rebuildDate(
                                                   _selected, _breakEndedAt);
                                               setState(() =>
-                                                  _breakEndedAt = _selected);
+                                                  _breakEndedAt = _selected!);
                                             }
                                           },
-                                          label:
-                                              '${DateFormat('yyyy/MM/dd').format(_breakEndedAt)}',
+                                          label: dateText(
+                                              'yyyy/MM/dd', _breakEndedAt),
                                         ),
                                       ),
                                       SizedBox(width: 4.0),
@@ -489,7 +487,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         flex: 2,
                                         child: CustomTimeButton(
                                           onPressed: () async {
-                                            TimeOfDay _selected =
+                                            TimeOfDay? _selected =
                                                 await showTimePicker(
                                               context: context,
                                               initialTime: TimeOfDay(
@@ -510,7 +508,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                             }
                                           },
                                           label:
-                                              '${DateFormat('HH:mm').format(_breakEndedAt)}',
+                                              dateText('HH:mm', _breakEndedAt),
                                         ),
                                       ),
                                     ],
@@ -530,19 +528,18 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     flex: 3,
                     child: CustomDateButton(
                       onPressed: () async {
-                        DateTime _selected = await showDatePicker(
+                        DateTime? _selected = await showDatePicker(
                           context: context,
-                          initialDate: _work.endedAt,
+                          initialDate: _work?.endedAt ?? DateTime.now(),
                           firstDate: kDayFirstDate,
                           lastDate: kDayLastDate,
                         );
                         if (_selected != null) {
-                          _selected = rebuildDate(_selected, _work.endedAt);
-                          setState(() => _work.endedAt = _selected);
+                          _selected = rebuildDate(_selected, _work?.endedAt);
+                          setState(() => _work?.endedAt = _selected!);
                         }
                       },
-                      label:
-                          '${DateFormat('yyyy/MM/dd').format(_work.endedAt)}',
+                      label: dateText('yyyy/MM/dd', _work?.endedAt),
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -550,23 +547,23 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        TimeOfDay _selected = await showTimePicker(
+                        TimeOfDay? _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
-                            hour: timeToInt(_work.endedAt)[0],
-                            minute: timeToInt(_work.endedAt)[1],
+                            hour: timeToInt(_work?.endedAt)[0],
+                            minute: timeToInt(_work?.endedAt)[1],
                           ),
                         );
                         if (_selected != null) {
                           DateTime _dateTime = rebuildTime(
                             context,
-                            _work.endedAt,
+                            _work?.endedAt,
                             _selected,
                           );
-                          setState(() => _work.endedAt = _dateTime);
+                          setState(() => _work?.endedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(_work.endedAt)}',
+                      label: dateText('HH:mm', _work?.endedAt),
                     ),
                   ),
                 ],
@@ -575,7 +572,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
             SizedBox(height: 8.0),
             CustomWorkTable(
               group: widget.group,
-              work: _work,
+              work: _work!,
             ),
             SizedBox(height: 16.0),
             Row(
@@ -590,7 +587,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                   children: [
                     CustomTextButton(
                       onPressed: () {
-                        widget.workProvider.delete(id: _work.id);
+                        widget.workProvider.delete(id: _work?.id ?? '');
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('勤務データを削除しました')),
                         );
@@ -603,7 +600,7 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     CustomTextButton(
                       onPressed: () async {
                         if (!await widget.workProvider.update(
-                          work: _work,
+                          work: _work!,
                           isBreaks: _isBreaks,
                           breakStartedAt: _breakStartedAt,
                           breakEndedAt: _breakEndedAt,
@@ -632,18 +629,18 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
 class LocationWorkDialog extends StatefulWidget {
   final WorkModel work;
 
-  LocationWorkDialog({@required this.work});
+  LocationWorkDialog({required this.work});
 
   @override
   _LocationWorkDialogState createState() => _LocationWorkDialogState();
 }
 
 class _LocationWorkDialogState extends State<LocationWorkDialog> {
-  GoogleMapController mapController;
+  GoogleMapController? mapController;
   Set<Marker> markers = {};
 
   void _init() async {
-    WorkModel _work = widget.work;
+    WorkModel? _work = widget.work;
     setState(() {
       markers.add(Marker(
         markerId: MarkerId('start_${_work.id}'),
@@ -653,7 +650,7 @@ class _LocationWorkDialogState extends State<LocationWorkDialog> {
         ),
         infoWindow: InfoWindow(
           title: '出勤日時',
-          snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(_work.startedAt)}',
+          snippet: dateText('yyyy/MM/dd HH:mm', _work.startedAt),
         ),
       ));
       _work.breaks.forEach((e) {
@@ -665,7 +662,7 @@ class _LocationWorkDialogState extends State<LocationWorkDialog> {
           ),
           infoWindow: InfoWindow(
             title: '休憩開始日時',
-            snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(e.startedAt)}',
+            snippet: dateText('yyyy/MM/dd HH:mm', e.startedAt),
           ),
         ));
         markers.add(Marker(
@@ -676,7 +673,7 @@ class _LocationWorkDialogState extends State<LocationWorkDialog> {
           ),
           infoWindow: InfoWindow(
             title: '休憩終了日時',
-            snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(e.endedAt)}',
+            snippet: dateText('yyyy/MM/dd HH:mm', e.endedAt),
           ),
         ));
       });
@@ -688,7 +685,7 @@ class _LocationWorkDialogState extends State<LocationWorkDialog> {
         ),
         infoWindow: InfoWindow(
           title: '退勤日時',
-          snippet: '${DateFormat('yyyy/MM/dd HH:mm').format(_work.endedAt)}',
+          snippet: dateText('yyyy/MM/dd HH:mm', _work.endedAt),
         ),
       ));
     });
