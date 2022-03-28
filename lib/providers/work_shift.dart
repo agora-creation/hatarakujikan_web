@@ -6,18 +6,17 @@ import 'package:hatarakujikan_web/services/work_shift.dart';
 
 class WorkShiftProvider with ChangeNotifier {
   WorkShiftService _workShiftService = WorkShiftService();
-  List<String> states = ['欠勤', '特別休暇', '有給休暇', '代休'];
 
   Future<bool> create({
-    GroupModel group,
-    UserModel user,
-    DateTime startedAt,
-    DateTime endedAt,
-    String state,
+    required GroupModel group,
+    required UserModel user,
+    required DateTime startedAt,
+    required DateTime endedAt,
+    required String state,
   }) async {
-    if (group == null) return false;
-    if (user == null) return false;
-    if (state == null) return false;
+    if (group.id == '') return false;
+    if (user.id == '') return false;
+    if (state == '') return false;
     try {
       String _id = _workShiftService.id();
       _workShiftService.create({
@@ -37,14 +36,14 @@ class WorkShiftProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    String id,
-    UserModel user,
-    DateTime startedAt,
-    DateTime endedAt,
-    String state,
+    required String id,
+    required UserModel user,
+    required DateTime startedAt,
+    required DateTime endedAt,
+    required String state,
   }) async {
-    if (user == null) return false;
-    if (state == null) return false;
+    if (user.id == '') return false;
+    if (state == '') return false;
     try {
       _workShiftService.update({
         'id': id,
@@ -60,15 +59,15 @@ class WorkShiftProvider with ChangeNotifier {
     }
   }
 
-  void delete({String id}) {
+  void delete({required String id}) {
     _workShiftService.delete({'id': id});
   }
 
   Future<List<WorkShiftModel>> selectList({
-    GroupModel group,
-    UserModel user,
-    DateTime startAt,
-    DateTime endAt,
+    required GroupModel group,
+    required UserModel user,
+    required DateTime startAt,
+    required DateTime endAt,
   }) async {
     List<WorkShiftModel> _workShifts = [];
     await _workShiftService

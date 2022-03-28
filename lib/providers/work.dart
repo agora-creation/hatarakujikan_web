@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -8,19 +9,18 @@ import 'package:hatarakujikan_web/services/work.dart';
 
 class WorkProvider with ChangeNotifier {
   WorkService _workService = WorkService();
-  List<String> states = ['通常勤務', '直行/直帰', 'テレワーク'];
 
   Future<bool> create({
-    GroupModel group,
-    UserModel user,
-    DateTime startedAt,
-    DateTime endedAt,
-    bool isBreaks,
-    DateTime breakStartedAt,
-    DateTime breakEndedAt,
+    required GroupModel group,
+    required UserModel user,
+    required DateTime startedAt,
+    required DateTime endedAt,
+    required bool isBreaks,
+    required DateTime breakStartedAt,
+    required DateTime breakEndedAt,
   }) async {
-    if (group == null) return false;
-    if (user == null) return false;
+    if (group.id == '') return false;
+    if (user.id == '') return false;
     try {
       String _id = _workService.id();
       List<Map> _breaks = [];
@@ -47,7 +47,7 @@ class WorkProvider with ChangeNotifier {
         'endedLat': 0.0,
         'endedLon': 0.0,
         'breaks': _breaks,
-        'state': states.first,
+        'state': workStates.first,
         'createdAt': DateTime.now(),
       });
       return true;
@@ -58,10 +58,10 @@ class WorkProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    WorkModel work,
-    bool isBreaks,
-    DateTime breakStartedAt,
-    DateTime breakEndedAt,
+    required WorkModel work,
+    required bool isBreaks,
+    required DateTime breakStartedAt,
+    required DateTime breakEndedAt,
   }) async {
     try {
       List<Map> _breaks = [];
@@ -93,15 +93,15 @@ class WorkProvider with ChangeNotifier {
     }
   }
 
-  void delete({String id}) {
+  void delete({required String id}) {
     _workService.delete({'id': id});
   }
 
   Future<List<WorkModel>> selectList({
-    GroupModel group,
-    UserModel user,
-    DateTime startAt,
-    DateTime endAt,
+    required GroupModel group,
+    required UserModel user,
+    required DateTime startAt,
+    required DateTime endAt,
   }) async {
     List<WorkModel> _works = [];
     await _workService

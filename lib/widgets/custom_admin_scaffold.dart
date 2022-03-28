@@ -25,7 +25,7 @@ class CustomAdminScaffold extends StatelessWidget {
         backgroundColor: Colors.orange,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          groupProvider.group.name,
+          groupProvider.group?.name ?? '',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
@@ -40,7 +40,7 @@ class CustomAdminScaffold extends StatelessWidget {
                 );
               },
               color: Colors.grey,
-              label: '${groupProvider.adminUser.name}がログイン中',
+              label: '${groupProvider.adminUser?.name}がログイン中',
             ),
           ),
         ],

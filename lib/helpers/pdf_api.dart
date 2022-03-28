@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/position.dart';
@@ -15,11 +16,9 @@ import 'package:universal_html/html.dart' as html;
 
 const String fontPath = 'assets/fonts/GenShinGothic-Regular.ttf';
 
-List<String> pdfTemplates = ['ひろめカンパニー用レイアウト', '土佐税理士事務所用レイアウト'];
-
 class PdfApi {
   // 会社/組織QRコードPDF作成
-  static Future<void> qrcode({GroupModel group}) async {
+  static Future<void> qrcode({required GroupModel group}) async {
     final pdf = pw.Document();
     final font = await rootBundle.load(fontPath);
     final ttf = pw.Font.ttf(font);
@@ -117,7 +116,7 @@ class PdfApi {
     return;
   }
 
-  static void groupCheck({GroupModel group}) {
+  static void groupCheck({required GroupModel group}) {
     String _id = group.id;
     switch (_id) {
       case 'UryZHGotsjyR0Zb6g06J':
@@ -132,17 +131,17 @@ class PdfApi {
   }
 
   static Future<void> download({
-    PositionProvider positionProvider,
-    WorkProvider workProvider,
-    WorkShiftProvider workShiftProvider,
-    GroupModel group,
-    DateTime month,
-    UserModel user,
-    bool isAll,
-    List<UserModel> users,
-    String template,
+    required PositionProvider positionProvider,
+    required WorkProvider workProvider,
+    required WorkShiftProvider workShiftProvider,
+    required GroupModel group,
+    required DateTime month,
+    required UserModel user,
+    required bool isAll,
+    required List<UserModel> users,
+    required String template,
   }) async {
-    if (template == null) return;
+    if (template == '') return;
     switch (template) {
       case 'ひろめカンパニー用レイアウト':
         await _works01(
@@ -174,13 +173,13 @@ class PdfApi {
 }
 
 Future<void> _works01({
-  WorkProvider workProvider,
-  WorkShiftProvider workShiftProvider,
-  GroupModel group,
-  DateTime month,
-  UserModel user,
-  bool isAll,
-  List<UserModel> users,
+  required WorkProvider workProvider,
+  required WorkShiftProvider workShiftProvider,
+  required GroupModel group,
+  required DateTime month,
+  required UserModel user,
+  required bool isAll,
+  required List<UserModel> users,
 }) async {
   final pdf = pw.Document();
   final font = await rootBundle.load(fontPath);
@@ -198,10 +197,10 @@ Future<void> _works01({
   }
 
   // セル作成
-  pw.Widget _cell({String label, PdfColor color}) {
+  pw.Widget _cell(String label, PdfColor? color) {
     return pw.Container(
       padding: pw.EdgeInsets.all(4.0),
-      color: color ?? null,
+      color: color,
       child: pw.Text(label, style: _listStyle),
     );
   }
@@ -237,7 +236,7 @@ Future<void> _works01({
 
   // 全スタッフ一括出力フラグ
   if (isAll) {
-    if (users == null) return;
+    if (users.length == 0) return;
     for (UserModel _user in users) {
       // 各種データ取得
       List<WorkModel> works = await workProvider.selectList(
@@ -290,17 +289,17 @@ Future<void> _works01({
         _row.add(pw.TableRow(
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            _cell(label: '日付'),
-            _cell(label: '勤務状況'),
-            _cell(label: '出勤時間'),
-            _cell(label: '退勤時間'),
-            _cell(label: '休憩時間'),
-            _cell(label: '勤務時間'),
-            _cell(label: '通常時間※1'),
-            _cell(label: '深夜時間(-)※2'),
-            _cell(label: '通常時間外※3'),
-            _cell(label: '深夜時間外※4'),
-            _cell(label: '週間合計※5'),
+            _cell('日付', null),
+            _cell('勤務状況', null),
+            _cell('出勤時間', null),
+            _cell('退勤時間', null),
+            _cell('休憩時間', null),
+            _cell('勤務時間', null),
+            _cell('通常時間※1', null),
+            _cell('深夜時間(-)※2', null),
+            _cell('通常時間外※3', null),
+            _cell('深夜時間外※4', null),
+            _cell('週間合計※5', null),
           ],
         ));
         DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -314,7 +313,7 @@ Future<void> _works01({
               _dayWorksW.add(_work);
             }
           }
-          String _week = '${DateFormat('E', 'ja').format(daysW[i])}';
+          String _week = dateText('E', daysW[i]);
           if (_week == '日') {
             _tmp = '00:00';
           }
@@ -339,14 +338,14 @@ Future<void> _works01({
               _dayWorks.add(_work);
             }
           }
-          WorkShiftModel _dayWorkShift;
+          WorkShiftModel? _dayWorkShift;
           for (WorkShiftModel _workShift in workShifts) {
             String _start = '${_format.format(_workShift.startedAt)}';
             if (days[i] == DateTime.parse(_start)) {
               _dayWorkShift = _workShift;
             }
           }
-          String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
+          String _day = dateText('dd (E)', days[i]);
           if (_dayWorks.length > 0) {
             for (int j = 0; j < _dayWorks.length; j++) {
               if (_dayWorks[j].startedAt != _dayWorks[j].endedAt) {
@@ -369,17 +368,17 @@ Future<void> _works01({
                 nightTimeOvers = addTime(nightTimeOvers, _nightTimeOver);
                 _row.add(pw.TableRow(
                   children: [
-                    _cell(label: _day),
-                    _cell(label: _state),
-                    _cell(label: _startTime),
-                    _cell(label: _endTime),
-                    _cell(label: _breakTime),
-                    _cell(label: _workTime),
-                    _cell(label: _dayTime),
-                    _cell(label: _nightTime),
-                    _cell(label: _dayTimeOver),
-                    _cell(label: _nightTimeOver),
-                    _cell(label: countW['${_format.format(days[i])}'] ?? ''),
+                    _cell(_day, null),
+                    _cell(_state, null),
+                    _cell(_startTime, null),
+                    _cell(_endTime, null),
+                    _cell(_breakTime, null),
+                    _cell(_workTime, null),
+                    _cell(_dayTime, null),
+                    _cell(_nightTime, null),
+                    _cell(_dayTimeOver, null),
+                    _cell(_nightTimeOver, null),
+                    _cell(countW['${_format.format(days[i])}'] ?? '', null),
                   ],
                 ));
               }
@@ -387,20 +386,20 @@ Future<void> _works01({
           } else {
             _row.add(pw.TableRow(
               children: [
-                _cell(label: _day),
+                _cell(_day, null),
                 _cell(
-                  label: _dayWorkShift?.state ?? '',
-                  color: _dayWorkShift?.stateColor3(),
+                  _dayWorkShift?.state ?? '',
+                  _dayWorkShift?.stateColor3(),
                 ),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: countW['${_format.format(days[i])}'] ?? ''),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell(countW['${_format.format(days[i])}'] ?? '', null),
               ],
             ));
           }
@@ -419,12 +418,12 @@ Future<void> _works01({
         _row.add(pw.TableRow(
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            _cell(label: '総勤務日数 [$workDays日]'),
-            _cell(label: '総勤務時間 [$workTimes]'),
-            _cell(label: '総通常時間 [$dayTimes]'),
-            _cell(label: '総深夜時間(-) [$nightTimes]'),
-            _cell(label: '総通常時間外 [$dayTimeOvers]'),
-            _cell(label: '総深夜時間外 [$nightTimeOvers]'),
+            _cell('総勤務日数 [$workDays日]', null),
+            _cell('総勤務時間 [$workTimes]', null),
+            _cell('総通常時間 [$dayTimes]', null),
+            _cell('総深夜時間(-) [$nightTimes]', null),
+            _cell('総通常時間外 [$dayTimeOvers]', null),
+            _cell('総深夜時間外 [$nightTimeOvers]', null),
           ],
         ));
         return pw.Table(
@@ -450,7 +449,7 @@ Future<void> _works01({
       ));
     }
   } else {
-    if (user == null) return;
+    if (user.id == '') return;
     // 各種データ取得
     List<WorkModel> works = await workProvider.selectList(
       group: group,
@@ -476,7 +475,7 @@ Future<void> _works01({
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            '${DateFormat('yyyy年MM月').format(month)}',
+            dateText('yyyy年MM月', month),
             style: _headStyle,
           ),
           pw.Text(
@@ -502,17 +501,17 @@ Future<void> _works01({
       _row.add(pw.TableRow(
         decoration: pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          _cell(label: '日付'),
-          _cell(label: '勤務状況'),
-          _cell(label: '出勤時間'),
-          _cell(label: '退勤時間'),
-          _cell(label: '休憩時間'),
-          _cell(label: '勤務時間'),
-          _cell(label: '通常時間※1'),
-          _cell(label: '深夜時間(-)※2'),
-          _cell(label: '通常時間外※3'),
-          _cell(label: '深夜時間外※4'),
-          _cell(label: '週間合計※5'),
+          _cell('日付', null),
+          _cell('勤務状況', null),
+          _cell('出勤時間', null),
+          _cell('退勤時間', null),
+          _cell('休憩時間', null),
+          _cell('勤務時間', null),
+          _cell('通常時間※1', null),
+          _cell('深夜時間(-)※2', null),
+          _cell('通常時間外※3', null),
+          _cell('深夜時間外※4', null),
+          _cell('週間合計※5', null),
         ],
       ));
       DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -526,7 +525,7 @@ Future<void> _works01({
             _dayWorksW.add(_work);
           }
         }
-        String _week = '${DateFormat('E', 'ja').format(daysW[i])}';
+        String _week = dateText('E', daysW[i]);
         if (_week == '日') {
           _tmp = '00:00';
         }
@@ -551,14 +550,14 @@ Future<void> _works01({
             _dayWorks.add(_work);
           }
         }
-        WorkShiftModel _dayWorkShift;
+        WorkShiftModel? _dayWorkShift;
         for (WorkShiftModel _workShift in workShifts) {
           String _start = '${_format.format(_workShift.startedAt)}';
           if (days[i] == DateTime.parse(_start)) {
             _dayWorkShift = _workShift;
           }
         }
-        String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
+        String _day = dateText('dd (E)', days[i]);
         if (_dayWorks.length > 0) {
           for (int j = 0; j < _dayWorks.length; j++) {
             if (_dayWorks[j].startedAt != _dayWorks[j].endedAt) {
@@ -581,17 +580,17 @@ Future<void> _works01({
               nightTimeOvers = addTime(nightTimeOvers, _nightTimeOver);
               _row.add(pw.TableRow(
                 children: [
-                  _cell(label: _day),
-                  _cell(label: _state),
-                  _cell(label: _startTime),
-                  _cell(label: _endTime),
-                  _cell(label: _breakTime),
-                  _cell(label: _workTime),
-                  _cell(label: _dayTime),
-                  _cell(label: _nightTime),
-                  _cell(label: _dayTimeOver),
-                  _cell(label: _nightTimeOver),
-                  _cell(label: countW['${_format.format(days[i])}'] ?? ''),
+                  _cell(_day, null),
+                  _cell(_state, null),
+                  _cell(_startTime, null),
+                  _cell(_endTime, null),
+                  _cell(_breakTime, null),
+                  _cell(_workTime, null),
+                  _cell(_dayTime, null),
+                  _cell(_nightTime, null),
+                  _cell(_dayTimeOver, null),
+                  _cell(_nightTimeOver, null),
+                  _cell(countW['${_format.format(days[i])}'] ?? '', null),
                 ],
               ));
             }
@@ -599,20 +598,20 @@ Future<void> _works01({
         } else {
           _row.add(pw.TableRow(
             children: [
-              _cell(label: _day),
+              _cell(_day, null),
               _cell(
-                label: _dayWorkShift?.state ?? '',
-                color: _dayWorkShift?.stateColor3(),
+                _dayWorkShift?.state ?? '',
+                _dayWorkShift?.stateColor3(),
               ),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: countW['${_format.format(days[i])}'] ?? ''),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell(countW['${_format.format(days[i])}'] ?? '', null),
             ],
           ));
         }
@@ -631,12 +630,12 @@ Future<void> _works01({
       _row.add(pw.TableRow(
         decoration: pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          _cell(label: '総勤務日数 [$workDays日]'),
-          _cell(label: '総勤務時間 [$workTimes]'),
-          _cell(label: '総通常時間 [$dayTimes]'),
-          _cell(label: '総深夜時間(-) [$nightTimes]'),
-          _cell(label: '総通常時間外 [$dayTimeOvers]'),
-          _cell(label: '総深夜時間外 [$nightTimeOvers]'),
+          _cell('総勤務日数 [$workDays日]', null),
+          _cell('総勤務時間 [$workTimes]', null),
+          _cell('総通常時間 [$dayTimes]', null),
+          _cell('総深夜時間(-) [$nightTimes]', null),
+          _cell('総通常時間外 [$dayTimeOvers]', null),
+          _cell('総深夜時間外 [$nightTimeOvers]', null),
         ],
       ));
       return pw.Table(
@@ -666,8 +665,8 @@ Future<void> _works01({
 }
 
 Future<void> _works02({
-  PositionProvider positionProvider,
-  WorkProvider workProvider,
+  required PositionProvider positionProvider,
+  required WorkProvider workProvider,
   WorkShiftProvider workShiftProvider,
   GroupModel group,
   DateTime month,
@@ -1087,15 +1086,16 @@ Future<void> _works02({
   return;
 }
 
-Future<void> _download({pw.Document pdf, String fileName}) async {
+Future<void> _download(
+    {required pw.Document pdf, required String fileName}) async {
   final bytes = await pdf.save();
   final blob = html.Blob([bytes], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
   final anchor = html.document.createElement('a') as html.AnchorElement
     ..href = url
     ..download = fileName;
-  html.document.body.children.add(anchor);
+  html.document.body?.children.add(anchor);
   anchor.click();
-  html.document.body.children.remove(anchor);
+  html.document.body?.children.remove(anchor);
   html.Url.revokeObjectUrl(url);
 }

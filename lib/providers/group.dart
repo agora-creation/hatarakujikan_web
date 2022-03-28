@@ -70,7 +70,7 @@ class GroupProvider with ChangeNotifier {
   }
 
   Future signOut() async {
-    await _auth.signOut();
+    await _auth!.signOut();
     _status = Status.Unauthenticated;
     _groups.clear();
     _group = null;
@@ -89,14 +89,14 @@ class GroupProvider with ChangeNotifier {
     String _groupId = await getPrefs(key: 'groupId');
     if (_groupId != '') {
       _group = await _groupService.select(id: _groupId);
-      _users = await _userService.selectList(userIds: _group.userIds);
+      _users = await _userService.selectList(userIds: _group?.userIds ?? []);
       _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     }
-    _adminUser = await _userService.select(id: _fUser.uid);
+    _adminUser = await _userService.select(id: _fUser?.uid);
     notifyListeners();
   }
 
-  Future<void> _onStateChanged(User firebaseUser) async {
+  Future<void> _onStateChanged(User? firebaseUser) async {
     if (firebaseUser == null) {
       _status = Status.Unauthenticated;
     } else {
@@ -111,25 +111,25 @@ class GroupProvider with ChangeNotifier {
         _status = Status.Authenticated;
         _groups.clear();
         _group = await _groupService.select(id: _groupId);
-        _users = await _userService.selectList(userIds: _group.userIds);
+        _users = await _userService.selectList(userIds: _group?.userIds ?? []);
         _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
       }
-      _adminUser = await _userService.select(id: _fUser.uid);
+      _adminUser = await _userService.select(id: _fUser?.uid);
     }
     notifyListeners();
   }
 
   Future<void> reloadUsers() async {
     _users.clear();
-    _users = await _userService.selectList(userIds: _group.userIds);
+    _users = await _userService.selectList(userIds: _group?.userIds ?? []);
     _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     notifyListeners();
   }
 
   Future<bool> updateInfo({
-    String id,
-    String name,
-    String adminUserId,
+    required String id,
+    required String name,
+    required String adminUserId,
   }) async {
     try {
       _groupService.update({
@@ -145,12 +145,12 @@ class GroupProvider with ChangeNotifier {
   }
 
   Future<bool> updateSecurity({
-    String id,
-    bool qrSecurity,
-    bool areaSecurity,
-    double areaLat,
-    double areaLon,
-    double areaRange,
+    required String id,
+    required bool qrSecurity,
+    required bool areaSecurity,
+    required double areaLat,
+    required double areaLon,
+    required double areaRange,
   }) async {
     try {
       _groupService.update({
@@ -169,25 +169,25 @@ class GroupProvider with ChangeNotifier {
   }
 
   Future<bool> updateWork({
-    String id,
-    String roundStartType,
-    int roundStartNum,
-    String roundEndType,
-    int roundEndNum,
-    String roundBreakStartType,
-    int roundBreakStartNum,
-    String roundBreakEndType,
-    int roundBreakEndNum,
-    String roundWorkType,
-    int roundWorkNum,
-    int legal,
-    String nightStart,
-    String nightEnd,
-    String workStart,
-    String workEnd,
-    List<String> holidays,
-    List<DateTime> holidays2,
-    bool autoBreak,
+    required String id,
+    required String roundStartType,
+    required int roundStartNum,
+    required String roundEndType,
+    required int roundEndNum,
+    required String roundBreakStartType,
+    required int roundBreakStartNum,
+    required String roundBreakEndType,
+    required int roundBreakEndNum,
+    required String roundWorkType,
+    required int roundWorkNum,
+    required int legal,
+    required String nightStart,
+    required String nightEnd,
+    required String workStart,
+    required String workEnd,
+    required List<String> holidays,
+    required List<DateTime> holidays2,
+    required bool autoBreak,
   }) async {
     try {
       _groupService.update({

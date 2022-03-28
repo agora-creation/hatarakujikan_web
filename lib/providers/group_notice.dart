@@ -9,9 +9,9 @@ class GroupNoticeProvider with ChangeNotifier {
   UserNoticeService _userNoticeService = UserNoticeService();
 
   Future<bool> create({
-    String groupId,
-    String title,
-    String message,
+    required String groupId,
+    required String title,
+    required String message,
   }) async {
     if (groupId == '') return false;
     if (title == '') return false;
@@ -32,10 +32,10 @@ class GroupNoticeProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    String id,
-    String groupId,
-    String title,
-    String message,
+    required String id,
+    required String groupId,
+    required String title,
+    required String message,
   }) async {
     try {
       _groupNoticeService.update({
@@ -51,7 +51,7 @@ class GroupNoticeProvider with ChangeNotifier {
     }
   }
 
-  void delete({GroupNoticeModel groupNotice}) {
+  void delete({required GroupNoticeModel groupNotice}) {
     _groupNoticeService.delete({
       'id': groupNotice.id,
       'groupId': groupNotice.groupId,
@@ -59,11 +59,11 @@ class GroupNoticeProvider with ChangeNotifier {
   }
 
   Future<bool> send({
-    String id,
-    String groupId,
-    String title,
-    String message,
-    List<UserModel> users,
+    required String id,
+    required String groupId,
+    required String title,
+    required String message,
+    required List<UserModel> users,
   }) async {
     try {
       for (UserModel _user in users) {

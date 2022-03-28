@@ -38,9 +38,9 @@ class CsvApi {
     required UserProvider userProvider,
     required WorkProvider workProvider,
     required WorkShiftProvider workShiftProvider,
-    GroupModel? group,
-    DateTime? month,
-    String? template,
+    required GroupModel group,
+    required DateTime month,
+    required String template,
   }) async {
     if (template == '') return;
     switch (template) {
@@ -73,8 +73,8 @@ Future<void> _works01({
   required PositionProvider positionProvider,
   required UserProvider userProvider,
   required WorkProvider workProvider,
-  GroupModel? group,
-  DateTime? month,
+  required GroupModel group,
+  required DateTime month,
 }) async {
   List<List<String>> rows = [];
   List<String> row = [];
@@ -133,12 +133,12 @@ Future<void> _works01({
 }
 
 Future<void> _works02({
-  PositionProvider positionProvider,
-  UserProvider userProvider,
-  WorkProvider workProvider,
-  WorkShiftProvider workShiftProvider,
-  GroupModel group,
-  DateTime month,
+  required PositionProvider positionProvider,
+  required UserProvider userProvider,
+  required WorkProvider workProvider,
+  required WorkShiftProvider workShiftProvider,
+  required GroupModel group,
+  required DateTime month,
 }) async {
   List<List<String>> rows = [];
   List<String> row = [];
@@ -311,7 +311,10 @@ Future<void> _works02({
   _download(rows: rows, fileName: 'works.csv');
 }
 
-void _download({List<List<String>> rows, String fileName}) {
+void _download({
+  required List<List<String>> rows,
+  required String fileName,
+}) {
   final bom = '\uFEFF';
   String text = bom + rows.join('\n');
   text = text.replaceAll('[', '');
@@ -323,8 +326,8 @@ void _download({List<List<String>> rows, String fileName}) {
     ..href = url
     ..style.display = 'none'
     ..download = fileName;
-  document.body.children.add(anchor);
+  document.body?.children.add(anchor);
   anchor.click();
-  document.body.children.remove(anchor);
+  document.body?.children.remove(anchor);
   Url.revokeObjectUrl(url);
 }

@@ -11,14 +11,13 @@ class UserProvider with ChangeNotifier {
   WorkService _workService = WorkService();
 
   Future<bool> create({
-    String number,
-    String name,
-    String recordPassword,
-    GroupModel group,
+    required String number,
+    required String name,
+    required String recordPassword,
+    required GroupModel group,
   }) async {
     if (number == '') return false;
     if (name == '') return false;
-    if (group == null) return false;
     try {
       String _id = _userService.id();
       _userService.create({
@@ -50,10 +49,10 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    String id,
-    String number,
-    String name,
-    String recordPassword,
+    required String id,
+    required String number,
+    required String name,
+    required String recordPassword,
   }) async {
     try {
       _userService.update({
@@ -70,8 +69,8 @@ class UserProvider with ChangeNotifier {
   }
 
   void delete({
-    UserModel user,
-    GroupModel group,
+    required UserModel user,
+    required GroupModel group,
   }) {
     _userService.delete({'id': user.id});
     List<String> _userIds = [];
@@ -84,21 +83,24 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<bool> migration({
-    String groupId,
-    UserModel before,
-    UserModel after,
+    required String groupId,
+    required UserModel before,
+    required UserModel after,
   }) async {
     if (groupId == '') return false;
-    if (before == null) return false;
-    if (after == null) return false;
+    if (before.id == '') return false;
+    if (after.id == '') return false;
     try {
       _userService.update({
-        'id': after?.id,
-        'number': before?.number,
-        'recordPassword': before?.recordPassword,
+        'id': after.id,
+        'number': before.number,
+        'recordPassword': before.recordPassword,
       });
-      await _workService.updateMigration(before?.id, after?.id);
-      _userService.delete({'id': before?.id});
+      await _workService.updateMigration(
+        beforeUserId: before.id,
+        afterUserId: after.id,
+      );
+      _userService.delete({'id': before.id});
       return true;
     } catch (e) {
       print(e.toString());
@@ -106,7 +108,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<List<UserModel>> selectList({List<String> userIds}) async {
+  Future<List<UserModel>> selectList({required List<String> userIds}) async {
     List<UserModel> _users = [];
     await _userService.selectList(userIds: userIds).then((value) {
       _users = value;

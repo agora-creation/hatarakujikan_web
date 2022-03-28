@@ -7,8 +7,8 @@ class PositionProvider with ChangeNotifier {
   PositionService _positionService = PositionService();
 
   Future<bool> create({
-    String groupId,
-    String name,
+    required String groupId,
+    required String name,
   }) async {
     if (groupId == '') return false;
     if (name == '') return false;
@@ -29,8 +29,8 @@ class PositionProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    String id,
-    String name,
+    required String id,
+    required String name,
   }) async {
     try {
       _positionService.update({
@@ -45,8 +45,8 @@ class PositionProvider with ChangeNotifier {
   }
 
   Future<bool> updateUsers({
-    PositionModel position,
-    List<UserModel> users,
+    required PositionModel position,
+    required List<UserModel> users,
   }) async {
     try {
       List<String> _userIds = [];
@@ -64,11 +64,11 @@ class PositionProvider with ChangeNotifier {
     }
   }
 
-  void delete({String id}) {
+  void delete({required String id}) {
     _positionService.delete({'id': id});
   }
 
-  Future<List<PositionModel>> selectList({String groupId}) async {
+  Future<List<PositionModel>> selectList({required String groupId}) async {
     List<PositionModel> _positions = [];
     await _positionService.selectList(groupId: groupId).then((value) {
       _positions = value;
