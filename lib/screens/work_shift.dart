@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -15,7 +16,6 @@ import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_sf_calendar.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
-import 'package:intl/intl.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -44,8 +44,8 @@ class WorkShiftTable extends StatefulWidget {
   final WorkShiftProvider workShiftProvider;
 
   WorkShiftTable({
-    @required this.groupProvider,
-    @required this.workShiftProvider,
+    required this.groupProvider,
+    required this.workShiftProvider,
   });
 
   @override
@@ -74,17 +74,19 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
 
   @override
   Widget build(BuildContext context) {
-    GroupModel _group = widget.groupProvider.group;
-    Stream<QuerySnapshot> _streamWork = FirebaseFirestore.instance
+    GroupModel? _group = widget.groupProvider.group;
+    Stream<QuerySnapshot<Map<String, dynamic>>> _streamWork = FirebaseFirestore
+        .instance
         .collection('work')
         .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .snapshots();
-    Stream<QuerySnapshot> _streamWorkShift = FirebaseFirestore.instance
-        .collection('workShift')
-        .where('groupId', isEqualTo: _group?.id ?? 'error')
-        .orderBy('startedAt', descending: false)
-        .snapshots();
+    Stream<QuerySnapshot<Map<String, dynamic>>> _streamWorkShift =
+        FirebaseFirestore.instance
+            .collection('workShift')
+            .where('groupId', isEqualTo: _group?.id ?? 'error')
+            .orderBy('startedAt', descending: false)
+            .snapshots();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,12 +101,14 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
         ),
         SizedBox(height: 16.0),
         Expanded(
-          child: StreamBuilder2<QuerySnapshot, QuerySnapshot>(
+          child: StreamBuilder2<QuerySnapshot<Map<String, dynamic>>,
+              QuerySnapshot<Map<String, dynamic>>>(
             streams: Tuple2(_streamWork, _streamWorkShift),
             builder: (context, snapshot) {
               _appointments.clear();
               if (snapshot.item1.hasData) {
-                for (DocumentSnapshot doc in snapshot.item1.data.docs) {
+                for (DocumentSnapshot<Map<String, dynamic>> doc
+                    in snapshot.item1.data!.docs) {
                   WorkModel _work = WorkModel.fromSnapshot(doc);
                   if (_work.startedAt != _work.endedAt) {
                     _appointments.add(Appointment(
@@ -120,7 +124,8 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                 }
               }
               if (snapshot.item2.hasData) {
-                for (DocumentSnapshot doc in snapshot.item2.data.docs) {
+                for (DocumentSnapshot<Map<String, dynamic>> doc
+                    in snapshot.item2.data!.docs) {
                   WorkShiftModel _workShift = WorkShiftModel.fromSnapshot(doc);
                   _appointments.add(Appointment(
                     startTime: _workShift.startedAt,
@@ -137,20 +142,20 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                 dataSource: _ShiftDataSource(_appointments, _resources),
                 onTap: (CalendarTapDetails details) {
                   if (details.appointments != null) {
-                    dynamic _appointment = details.appointments[0];
-                    Appointment _selected;
+                    dynamic _appointment = details.appointments![0];
+                    Appointment? _selected;
                     if (_appointment is Appointment) {
                       _selected = _appointment;
                     }
-                    if (_selected.notes == 'workShift') {
+                    if (_selected?.notes == 'workShift') {
                       showDialog(
                         barrierDismissible: false,
                         context: context,
                         builder: (_) => EditWorkShiftDialog(
                           workShiftProvider: widget.workShiftProvider,
                           users: widget.groupProvider.users,
-                          userId: '${details.resource.id}',
-                          appointment: _selected,
+                          userId: '${details.resource?.id}',
+                          appointment: _selected!,
                         ),
                       );
                     }
@@ -161,10 +166,10 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
                         context: context,
                         builder: (_) => AddWorkShiftDialog(
                           workShiftProvider: widget.workShiftProvider,
-                          group: widget.groupProvider.group,
+                          group: widget.groupProvider.group!,
                           users: widget.groupProvider.users,
-                          userId: '${details.resource.id}',
-                          date: details.date,
+                          userId: '${details.resource?.id}',
+                          date: details.date!,
                         ),
                       );
                     }
@@ -197,11 +202,11 @@ class AddWorkShiftDialog extends StatefulWidget {
   final DateTime date;
 
   AddWorkShiftDialog({
-    @required this.workShiftProvider,
-    @required this.group,
-    @required this.users,
-    @required this.userId,
-    @required this.date,
+    required this.workShiftProvider,
+    required this.group,
+    required this.users,
+    required this.userId,
+    required this.date,
   });
 
   @override
@@ -209,14 +214,14 @@ class AddWorkShiftDialog extends StatefulWidget {
 }
 
 class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
-  UserModel _user;
-  String _state;
+  UserModel? _user;
+  String _state = '';
   DateTime _startedAt = DateTime.now();
   DateTime _endedAt = DateTime.now();
 
   void _init() async {
     _user = widget.users.firstWhere((e) => e.id == widget.userId);
-    _state = widget.workShiftProvider.states.first;
+    _state = workShiftStates.first;
     _startedAt = widget.date;
     _endedAt = widget.date.add(Duration(hours: 8));
   }
@@ -238,7 +243,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
             SizedBox(height: 8.0),
             Center(
               child: Text(
-                '${DateFormat('yyyy/MM/dd(E)', 'ja').format(widget.date)}の予定追加',
+                '${dateText('yyyy/MM/dd(E)', widget.date)}の予定追加',
                 style: kAdminTitleTextStyle,
               ),
             ),
@@ -271,7 +276,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                 onChanged: (value) {
                   setState(() => _state = value);
                 },
-                items: widget.workShiftProvider.states.map((value) {
+                items: workShiftStates.map((value) {
                   return DropdownMenuItem(
                     value: value,
                     child: Text(
@@ -291,7 +296,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                     flex: 3,
                     child: CustomDateButton(
                       onPressed: () async {
-                        DateTime _selected = await showDatePicker(
+                        DateTime? _selected = await showDatePicker(
                           context: context,
                           initialDate: _startedAt,
                           firstDate: kDayFirstDate,
@@ -299,10 +304,10 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                         );
                         if (_selected != null) {
                           _selected = rebuildDate(_selected, _startedAt);
-                          setState(() => _startedAt = _selected);
+                          setState(() => _startedAt = _selected!);
                         }
                       },
-                      label: '${DateFormat('yyyy/MM/dd').format(_startedAt)}',
+                      label: dateText('yyyy/MM/dd', _startedAt),
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -310,7 +315,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        TimeOfDay _selected = await showTimePicker(
+                        TimeOfDay? _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
                             hour: timeToInt(_startedAt)[0],
@@ -326,7 +331,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                           setState(() => _startedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(_startedAt)}',
+                      label: dateText('HH:mm', _startedAt),
                     ),
                   ),
                 ],
@@ -341,7 +346,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                     flex: 3,
                     child: CustomDateButton(
                       onPressed: () async {
-                        DateTime _selected = await showDatePicker(
+                        DateTime? _selected = await showDatePicker(
                           context: context,
                           initialDate: _endedAt,
                           firstDate: kDayFirstDate,
@@ -349,10 +354,10 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                         );
                         if (_selected != null) {
                           _selected = rebuildDate(_selected, _endedAt);
-                          setState(() => _endedAt = _selected);
+                          setState(() => _endedAt = _selected!);
                         }
                       },
-                      label: '${DateFormat('yyyy/MM/dd').format(_endedAt)}',
+                      label: dateText('yyyy/MM/dd', _endedAt),
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -360,7 +365,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        TimeOfDay _selected = await showTimePicker(
+                        TimeOfDay? _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
                             hour: timeToInt(_endedAt)[0],
@@ -376,7 +381,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                           setState(() => _endedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(_endedAt)}',
+                      label: dateText('HH:mm', _endedAt),
                     ),
                   ),
                 ],
@@ -395,7 +400,7 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                   onPressed: () async {
                     if (!await widget.workShiftProvider.create(
                       group: widget.group,
-                      user: _user,
+                      user: _user!,
                       startedAt: _startedAt,
                       endedAt: _endedAt,
                       state: _state,
@@ -426,10 +431,10 @@ class EditWorkShiftDialog extends StatefulWidget {
   final Appointment appointment;
 
   EditWorkShiftDialog({
-    @required this.workShiftProvider,
-    @required this.users,
-    @required this.userId,
-    @required this.appointment,
+    required this.workShiftProvider,
+    required this.users,
+    required this.userId,
+    required this.appointment,
   });
 
   @override
@@ -437,8 +442,8 @@ class EditWorkShiftDialog extends StatefulWidget {
 }
 
 class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
-  UserModel _user;
-  String _state;
+  UserModel? _user;
+  String _state = '';
   DateTime _startedAt = DateTime.now();
   DateTime _endedAt = DateTime.now();
 
@@ -466,7 +471,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
             SizedBox(height: 8.0),
             Center(
               child: Text(
-                '${DateFormat('yyyy/MM/dd(E)', 'ja').format(widget.appointment.startTime)}の予定変更',
+                '${dateText('yyyy/MM/dd(E)', widget.appointment.startTime)}の予定変更',
                 style: kAdminTitleTextStyle,
               ),
             ),
@@ -499,7 +504,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                 onChanged: (value) {
                   setState(() => _state = value);
                 },
-                items: widget.workShiftProvider.states.map((value) {
+                items: workShiftStates.map((value) {
                   return DropdownMenuItem(
                     value: value,
                     child: Text(
@@ -519,7 +524,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                     flex: 3,
                     child: CustomDateButton(
                       onPressed: () async {
-                        DateTime _selected = await showDatePicker(
+                        DateTime? _selected = await showDatePicker(
                           context: context,
                           initialDate: _startedAt,
                           firstDate: kDayFirstDate,
@@ -527,10 +532,10 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                         );
                         if (_selected != null) {
                           _selected = rebuildDate(_selected, _startedAt);
-                          setState(() => _startedAt = _selected);
+                          setState(() => _startedAt = _selected!);
                         }
                       },
-                      label: '${DateFormat('yyyy/MM/dd').format(_startedAt)}',
+                      label: dateText('yyyy/MM/dd', _startedAt),
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -538,7 +543,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        TimeOfDay _selected = await showTimePicker(
+                        TimeOfDay? _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
                             hour: timeToInt(_startedAt)[0],
@@ -554,7 +559,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                           setState(() => _startedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(_startedAt)}',
+                      label: dateText('HH:mm', _startedAt),
                     ),
                   ),
                 ],
@@ -569,7 +574,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                     flex: 3,
                     child: CustomDateButton(
                       onPressed: () async {
-                        DateTime _selected = await showDatePicker(
+                        DateTime? _selected = await showDatePicker(
                           context: context,
                           initialDate: _endedAt,
                           firstDate: kDayFirstDate,
@@ -577,10 +582,10 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                         );
                         if (_selected != null) {
                           _selected = rebuildDate(_selected, _endedAt);
-                          setState(() => _endedAt = _selected);
+                          setState(() => _endedAt = _selected!);
                         }
                       },
-                      label: '${DateFormat('yyyy/MM/dd').format(_endedAt)}',
+                      label: dateText('yyyy/MM/dd', _endedAt),
                     ),
                   ),
                   SizedBox(width: 4.0),
@@ -588,7 +593,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                     flex: 2,
                     child: CustomTimeButton(
                       onPressed: () async {
-                        TimeOfDay _selected = await showTimePicker(
+                        TimeOfDay? _selected = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay(
                             hour: timeToInt(_endedAt)[0],
@@ -604,7 +609,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                           setState(() => _endedAt = _dateTime);
                         }
                       },
-                      label: '${DateFormat('HH:mm').format(_endedAt)}',
+                      label: dateText('HH:mm', _endedAt),
                     ),
                   ),
                 ],
@@ -639,7 +644,7 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                       onPressed: () async {
                         if (!await widget.workShiftProvider.update(
                           id: '${widget.appointment.id}',
-                          user: _user,
+                          user: _user!,
                           startedAt: _startedAt,
                           endedAt: _endedAt,
                           state: _state,

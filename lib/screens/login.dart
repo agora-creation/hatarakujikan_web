@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/screens/section/login.dart';
 import 'package:hatarakujikan_web/screens/select.dart';
-import 'package:hatarakujikan_web/widgets/custom_link_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field.dart';
 import 'package:hatarakujikan_web/widgets/error_dialog.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
@@ -102,15 +100,6 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 32.0),
-                    Center(
-                      child: CustomLinkButton(
-                        onTap: () {
-                          nextScreen(context, SectionLoginScreen());
-                        },
-                        label: '部署/事業所の管理者はここをクリック',
-                        color: Colors.white,
-                      ),
-                    ),
                   ],
                 ),
         ),

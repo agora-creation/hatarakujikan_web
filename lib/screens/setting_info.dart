@@ -31,7 +31,7 @@ class SettingInfoScreen extends StatelessWidget {
 class SettingInfoPanel extends StatefulWidget {
   final GroupProvider groupProvider;
 
-  SettingInfoPanel({@required this.groupProvider});
+  SettingInfoPanel({required this.groupProvider});
 
   @override
   _SettingInfoPanelState createState() => _SettingInfoPanelState();
@@ -40,10 +40,10 @@ class SettingInfoPanel extends StatefulWidget {
 class _SettingInfoPanelState extends State<SettingInfoPanel> {
   TextEditingController name = TextEditingController();
   List<UserModel> _users = [];
-  UserModel _adminUser;
+  UserModel? _adminUser;
 
   void _init() async {
-    name.text = widget.groupProvider.group?.name;
+    name.text = widget.groupProvider.group?.name ?? '';
     widget.groupProvider.users.forEach((user) {
       if (user.smartphone == true) {
         _users.add(user);
@@ -82,7 +82,7 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
               children: [
                 CustomTextIconButton(
                   onPressed: () async {
-                    await PdfApi.qrcode(group: widget.groupProvider.group);
+                    await PdfApi.qrcode(group: widget.groupProvider.group!);
                   },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
@@ -97,7 +97,7 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
                       builder: (_) => ConfirmDialog(
                         groupProvider: widget.groupProvider,
                         name: name.text.trim(),
-                        adminUserId: _adminUser?.id,
+                        adminUserId: _adminUser?.id ?? '',
                       ),
                     );
                   },
@@ -157,9 +157,9 @@ class ConfirmDialog extends StatelessWidget {
   final String adminUserId;
 
   ConfirmDialog({
-    @required this.groupProvider,
-    @required this.name,
-    @required this.adminUserId,
+    required this.groupProvider,
+    required this.name,
+    required this.adminUserId,
   });
 
   @override
@@ -190,7 +190,7 @@ class ConfirmDialog extends StatelessWidget {
               CustomTextButton(
                 onPressed: () async {
                   if (!await groupProvider.updateInfo(
-                    id: groupProvider.group?.id,
+                    id: groupProvider.group?.id ?? '',
                     name: name,
                     adminUserId: adminUserId,
                   )) {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/position.dart';
@@ -12,8 +13,6 @@ import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart';
-
-List<String> csvTemplates = ['ひろめカンパニー用レイアウト', '土佐税理士事務所用レイアウト'];
 
 class CsvApi {
   // 会社/組織をチェックし、配列から消す

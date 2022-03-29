@@ -3,7 +3,6 @@ import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/position.dart';
-import 'package:hatarakujikan_web/screens/section.dart';
 import 'package:hatarakujikan_web/screens/setting_info.dart';
 import 'package:hatarakujikan_web/screens/setting_security.dart';
 import 'package:hatarakujikan_web/screens/setting_work.dart';
@@ -43,11 +42,6 @@ const List<MenuItem> kSideMenu = [
     title: 'スタッフの管理',
     route: UserScreen.id,
     icon: Icons.person,
-  ),
-  MenuItem(
-    title: '部署/事業所の管理',
-    route: SectionScreen.id,
-    icon: Icons.account_tree,
   ),
   MenuItem(
     title: '雇用形態の管理',

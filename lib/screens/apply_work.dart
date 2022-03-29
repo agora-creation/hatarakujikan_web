@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/apply_work.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
@@ -41,8 +42,8 @@ class ApplyWorkTable extends StatefulWidget {
   final GroupProvider groupProvider;
 
   ApplyWorkTable({
-    @required this.applyWorkProvider,
-    @required this.groupProvider,
+    required this.applyWorkProvider,
+    required this.groupProvider,
   });
 
   @override
@@ -50,7 +51,7 @@ class ApplyWorkTable extends StatefulWidget {
 }
 
 class _ApplyWorkTableState extends State<ApplyWorkTable> {
-  UserModel _user;
+  UserModel? _user;
   bool _approval = false;
 
   void userChange(UserModel userModel) {
@@ -63,8 +64,8 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
 
   @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> _stream;
-    GroupModel _group = widget.groupProvider.group;
+    Stream<QuerySnapshot<Map<String, dynamic>>> _stream;
+    GroupModel? _group = widget.groupProvider.group;
     if (_user != null) {
       _stream = FirebaseFirestore.instance
           .collection('applyWork')
@@ -107,7 +108,7 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                       context: context,
                       builder: (_) => SearchUserDialog(
                         users: widget.groupProvider.users,
-                        user: _user,
+                        user: _user!,
                         userChange: userChange,
                       ),
                     );
@@ -139,12 +140,13 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
         ),
         SizedBox(height: 8.0),
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: _stream,
             builder: (context, snapshot) {
               _applyWorks.clear();
               if (snapshot.hasData) {
-                for (DocumentSnapshot doc in snapshot.data.docs) {
+                for (DocumentSnapshot<Map<String, dynamic>> doc
+                    in snapshot.data!.docs) {
                   _applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
                 }
               }
@@ -161,7 +163,10 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
                   (index) => DataRow(
                     cells: [
                       DataCell(Text(
-                        '${DateFormat('yyyy/MM/dd HH:mm').format(_applyWorks[index].createdAt)}',
+                        dateText(
+                          'yyyy/MM/dd HH:mm',
+                          _applyWorks[index].createdAt,
+                        ),
                       )),
                       DataCell(Text('${_applyWorks[index].userName}')),
                       DataCell(Text(
@@ -202,9 +207,9 @@ class SearchUserDialog extends StatelessWidget {
   final Function userChange;
 
   SearchUserDialog({
-    @required this.users,
-    @required this.user,
-    @required this.userChange,
+    required this.users,
+    required this.user,
+    required this.userChange,
   });
 
   @override
@@ -273,8 +278,8 @@ class SearchApprovalDialog extends StatelessWidget {
   final Function approvalChange;
 
   SearchApprovalDialog({
-    @required this.approval,
-    @required this.approvalChange,
+    required this.approval,
+    required this.approvalChange,
   });
 
   @override
@@ -334,8 +339,8 @@ class EditApplyWorkDialog extends StatelessWidget {
   final ApplyWorkModel applyWork;
 
   EditApplyWorkDialog({
-    @required this.applyWorkProvider,
-    @required this.applyWork,
+    required this.applyWorkProvider,
+    required this.applyWork,
   });
 
   @override
@@ -355,7 +360,7 @@ class EditApplyWorkDialog extends StatelessWidget {
             CustomLabelColumn(
               label: '申請日時',
               child: Text(
-                '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.createdAt)}',
+                dateText('yyyy/MM/dd HH:mm', applyWork.createdAt),
               ),
             ),
             Divider(),
@@ -371,8 +376,7 @@ class EditApplyWorkDialog extends StatelessWidget {
                 children: [
                   CustomLabelListTile(
                     label: '出勤時間',
-                    value:
-                        '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.startedAt)}',
+                    value: dateText('yyyy/MM/dd HH:mm', applyWork.startedAt),
                   ),
                   applyWork.breaks.length > 0
                       ? ListView.builder(
@@ -386,13 +390,17 @@ class EditApplyWorkDialog extends StatelessWidget {
                               children: [
                                 CustomLabelListTile(
                                   label: '休憩開始時間',
-                                  value:
-                                      '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.startedAt)}',
+                                  value: dateText(
+                                    'yyyy/MM/dd HH:mm',
+                                    _breaks.startedAt,
+                                  ),
                                 ),
                                 CustomLabelListTile(
                                   label: '休憩終了時間',
-                                  value:
-                                      '${DateFormat('yyyy/MM/dd HH:mm').format(_breaks.endedAt)}',
+                                  value: dateText(
+                                    'yyyy/MM/dd HH:mm',
+                                    _breaks.endedAt,
+                                  ),
                                 ),
                               ],
                             );

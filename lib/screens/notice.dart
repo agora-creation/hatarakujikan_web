@@ -40,8 +40,8 @@ class NoticeTable extends StatefulWidget {
   final GroupNoticeProvider groupNoticeProvider;
 
   NoticeTable({
-    @required this.groupProvider,
-    @required this.groupNoticeProvider,
+    required this.groupProvider,
+    required this.groupNoticeProvider,
   });
 
   @override
@@ -51,8 +51,9 @@ class NoticeTable extends StatefulWidget {
 class _NoticeTableState extends State<NoticeTable> {
   @override
   Widget build(BuildContext context) {
-    GroupModel _group = widget.groupProvider.group;
-    Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+    GroupModel? _group = widget.groupProvider.group;
+    Stream<QuerySnapshot<Map<String, dynamic>>> _stream = FirebaseFirestore
+        .instance
         .collection('group')
         .doc(_group?.id ?? 'error')
         .collection('notice')
@@ -84,7 +85,7 @@ class _NoticeTableState extends State<NoticeTable> {
                   context: context,
                   builder: (_) => AddNoticeDialog(
                     groupNoticeProvider: widget.groupNoticeProvider,
-                    groupId: widget.groupProvider.group?.id,
+                    groupId: widget.groupProvider.group?.id ?? '',
                   ),
                 );
               },
@@ -96,12 +97,13 @@ class _NoticeTableState extends State<NoticeTable> {
         ),
         SizedBox(height: 8.0),
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: _stream,
             builder: (context, snapshot) {
               _groupNotices.clear();
               if (snapshot.hasData) {
-                for (DocumentSnapshot doc in snapshot.data.docs) {
+                for (DocumentSnapshot<Map<String, dynamic>> doc
+                    in snapshot.data!.docs) {
                   _groupNotices.add(GroupNoticeModel.fromSnapshot(doc));
                 }
               }
@@ -165,8 +167,8 @@ class AddNoticeDialog extends StatefulWidget {
   final String groupId;
 
   AddNoticeDialog({
-    @required this.groupNoticeProvider,
-    @required this.groupId,
+    required this.groupNoticeProvider,
+    required this.groupId,
   });
 
   @override
@@ -254,8 +256,8 @@ class EditNoticeDialog extends StatefulWidget {
   final GroupNoticeModel groupNotice;
 
   EditNoticeDialog({
-    @required this.groupNoticeProvider,
-    @required this.groupNotice,
+    required this.groupNoticeProvider,
+    required this.groupNotice,
   });
 
   @override
@@ -267,8 +269,8 @@ class _EditNoticeDialogState extends State<EditNoticeDialog> {
   TextEditingController message = TextEditingController();
 
   void _init() async {
-    title.text = widget.groupNotice?.title;
-    message.text = widget.groupNotice?.message;
+    title.text = widget.groupNotice.title;
+    message.text = widget.groupNotice.message;
   }
 
   @override
@@ -370,9 +372,9 @@ class SendNoticeDialog extends StatefulWidget {
   final GroupNoticeModel groupNotice;
 
   SendNoticeDialog({
-    @required this.groupProvider,
-    @required this.groupNoticeProvider,
-    @required this.groupNotice,
+    required this.groupProvider,
+    required this.groupNoticeProvider,
+    required this.groupNotice,
   });
 
   @override
@@ -414,12 +416,12 @@ class _SendNoticeDialogState extends State<SendNoticeDialog> {
             SizedBox(height: 16.0),
             CustomLabelColumn(
               label: 'タイトル',
-              child: Text('${widget.groupNotice?.title}'),
+              child: Text(widget.groupNotice.title),
             ),
             Divider(),
             CustomLabelColumn(
               label: 'メッセージ',
-              child: Text('${widget.groupNotice?.message}'),
+              child: Text(widget.groupNotice.message),
             ),
             Divider(),
             SizedBox(height: 8.0),

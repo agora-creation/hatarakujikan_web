@@ -40,8 +40,8 @@ class PositionTable extends StatefulWidget {
   final PositionProvider positionProvider;
 
   PositionTable({
-    @required this.groupProvider,
-    @required this.positionProvider,
+    required this.groupProvider,
+    required this.positionProvider,
   });
 
   @override
@@ -51,8 +51,9 @@ class PositionTable extends StatefulWidget {
 class _PositionTableState extends State<PositionTable> {
   @override
   Widget build(BuildContext context) {
-    GroupModel _group = widget.groupProvider.group;
-    Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+    GroupModel? _group = widget.groupProvider.group;
+    Stream<QuerySnapshot<Map<String, dynamic>>> _stream = FirebaseFirestore
+        .instance
         .collection('position')
         .where('groupId', isEqualTo: _group?.id ?? 'error')
         .orderBy('createdAt', descending: true)
@@ -82,7 +83,7 @@ class _PositionTableState extends State<PositionTable> {
                   context: context,
                   builder: (_) => AddPositionDialog(
                     positionProvider: widget.positionProvider,
-                    group: widget.groupProvider.group,
+                    group: widget.groupProvider.group!,
                   ),
                 );
               },
@@ -94,12 +95,13 @@ class _PositionTableState extends State<PositionTable> {
         ),
         SizedBox(height: 8.0),
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: _stream,
             builder: (context, snapshot) {
               _positions.clear();
               if (snapshot.hasData) {
-                for (DocumentSnapshot doc in snapshot.data.docs) {
+                for (DocumentSnapshot<Map<String, dynamic>> doc
+                    in snapshot.data!.docs) {
                   _positions.add(PositionModel.fromSnapshot(doc));
                 }
               }
@@ -113,13 +115,13 @@ class _PositionTableState extends State<PositionTable> {
                 rows: List<DataRow>.generate(
                   _positions.length,
                   (index) {
-                    List<UserModel> _users = widget.groupProvider.users;
+                    List<UserModel?> _users = widget.groupProvider.users;
                     String _positionUsers = '';
-                    if (_positions[index].userIds != null) {
+                    if (_positions[index].userIds.length != 0) {
                       for (String _id in _positions[index].userIds) {
                         if (_positionUsers != '') _positionUsers += ',';
-                        UserModel _user = _users.singleWhere(
-                          (e) => e.id == _id,
+                        UserModel? _user = _users.singleWhere(
+                          (e) => e?.id == _id,
                           orElse: () => null,
                         );
                         if (_user != null) {
@@ -179,8 +181,8 @@ class AddPositionDialog extends StatefulWidget {
   final GroupModel group;
 
   AddPositionDialog({
-    @required this.positionProvider,
-    @required this.group,
+    required this.positionProvider,
+    required this.group,
   });
 
   @override
@@ -252,8 +254,8 @@ class EditPositionDialog extends StatefulWidget {
   final PositionModel position;
 
   EditPositionDialog({
-    @required this.positionProvider,
-    @required this.position,
+    required this.positionProvider,
+    required this.position,
   });
 
   @override
@@ -264,7 +266,7 @@ class _EditPositionDialogState extends State<EditPositionDialog> {
   TextEditingController name = TextEditingController();
 
   void _init() async {
-    name.text = widget.position?.name;
+    name.text = widget.position.name;
   }
 
   @override
@@ -310,7 +312,7 @@ class _EditPositionDialogState extends State<EditPositionDialog> {
                     CustomTextButton(
                       onPressed: () {
                         widget.positionProvider.delete(
-                          id: '${widget.position.id}',
+                          id: widget.position.id,
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('雇用形態を削除しました')),
@@ -324,7 +326,7 @@ class _EditPositionDialogState extends State<EditPositionDialog> {
                     CustomTextButton(
                       onPressed: () async {
                         if (!await widget.positionProvider.update(
-                          id: widget.position?.id,
+                          id: widget.position.id,
                           name: name.text.trim(),
                         )) {
                           return;
@@ -354,9 +356,9 @@ class UserPositionDialog extends StatefulWidget {
   final PositionModel position;
 
   UserPositionDialog({
-    @required this.groupProvider,
-    @required this.positionProvider,
-    @required this.position,
+    required this.groupProvider,
+    required this.positionProvider,
+    required this.position,
   });
 
   @override
@@ -368,12 +370,10 @@ class _UserPositionDialogState extends State<UserPositionDialog> {
   List<UserModel> _selected = [];
 
   void _init() async {
-    for (String _id in widget.position?.userIds) {
-      UserModel _user = widget.groupProvider.users.singleWhere(
-        (e) => e.id == _id,
-        orElse: () => null,
-      );
-      if (_user != null) {
+    for (String _id in widget.position.userIds) {
+      UserModel? _user =
+          widget.groupProvider.users.singleWhere((e) => e.id == _id);
+      if (_user.id != '') {
         _selected.add(_user);
       }
     }
@@ -401,7 +401,7 @@ class _UserPositionDialogState extends State<UserPositionDialog> {
             SizedBox(height: 16.0),
             CustomLabelColumn(
               label: '雇用形態名',
-              child: Text('${widget.position?.name}'),
+              child: Text(widget.position.name),
             ),
             Divider(),
             SizedBox(height: 8.0),

@@ -667,12 +667,12 @@ Future<void> _works01({
 Future<void> _works02({
   required PositionProvider positionProvider,
   required WorkProvider workProvider,
-  WorkShiftProvider workShiftProvider,
-  GroupModel group,
-  DateTime month,
-  UserModel user,
-  bool isAll,
-  List<UserModel> users,
+  required WorkShiftProvider workShiftProvider,
+  required GroupModel group,
+  required DateTime month,
+  required UserModel user,
+  required bool isAll,
+  required List<UserModel> users,
 }) async {
   final pdf = pw.Document();
   final font = await rootBundle.load(fontPath);
@@ -689,10 +689,10 @@ Future<void> _works02({
   );
 
   // セル作成
-  pw.Widget _cell({String label, PdfColor color}) {
+  pw.Widget _cell(String label, PdfColor? color) {
     return pw.Container(
       padding: pw.EdgeInsets.all(4.0),
-      color: color ?? null,
+      color: color,
       child: pw.Text(label, style: _listStyle),
     );
   }
@@ -724,7 +724,7 @@ Future<void> _works02({
 
   // 全スタッフ一括出力フラグ
   if (isAll) {
-    if (users == null) return;
+    if (users.length == 0) return;
     for (UserModel _user in users) {
       // 各種データ取得
       String _positionName = '';
@@ -753,7 +753,7 @@ Future<void> _works02({
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
             pw.Text(
-              '${DateFormat('yyyy年MM月').format(month)}',
+              dateText('yyyy年MM月', month),
               style: _headStyle,
             ),
             pw.Text(
@@ -776,14 +776,14 @@ Future<void> _works02({
         _row.add(pw.TableRow(
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            _cell(label: '日付'),
-            _cell(label: '勤務状況'),
-            _cell(label: '出勤時間'),
-            _cell(label: '退勤時間'),
-            _cell(label: '休憩時間'),
-            _cell(label: '勤務時間'),
-            _cell(label: '時間外1'),
-            _cell(label: '時間外2'),
+            _cell('日付', null),
+            _cell('勤務状況', null),
+            _cell('出勤時間', null),
+            _cell('退勤時間', null),
+            _cell('休憩時間', null),
+            _cell('勤務時間', null),
+            _cell('時間外1', null),
+            _cell('時間外2', null),
           ],
         ));
         DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -796,14 +796,14 @@ Future<void> _works02({
               _dayWorks.add(_work);
             }
           }
-          WorkShiftModel _dayWorkShift;
+          WorkShiftModel? _dayWorkShift;
           for (WorkShiftModel _workShift in workShifts) {
             String _start = '${_format.format(_workShift.startedAt)}';
             if (days[i] == DateTime.parse(_start)) {
               _dayWorkShift = _workShift;
             }
           }
-          String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
+          String _day = dateText('dd (E)', days[i]);
           if (_dayWorks.length > 0) {
             for (int j = 0; j < _dayWorks.length; j++) {
               if (_dayWorks[j].startedAt != _dayWorks[j].endedAt) {
@@ -838,14 +838,14 @@ Future<void> _works02({
                 overTime2s = addTime(overTime2s, _overTime2);
                 _row.add(pw.TableRow(
                   children: [
-                    _cell(label: _day),
-                    _cell(label: _state),
-                    _cell(label: _startTime),
-                    _cell(label: _endTime),
-                    _cell(label: _breakTime),
-                    _cell(label: _workTime),
-                    _cell(label: _overTime1),
-                    _cell(label: _overTime2),
+                    _cell(_day, null),
+                    _cell(_state, null),
+                    _cell(_startTime, null),
+                    _cell(_endTime, null),
+                    _cell(_breakTime, null),
+                    _cell(_workTime, null),
+                    _cell(_overTime1, null),
+                    _cell(_overTime2, null),
                   ],
                 ));
               }
@@ -853,17 +853,17 @@ Future<void> _works02({
           } else {
             _row.add(pw.TableRow(
               children: [
-                _cell(label: _day),
+                _cell(_day, null),
                 _cell(
-                  label: _dayWorkShift?.state ?? '',
-                  color: _dayWorkShift?.stateColor3(),
+                  _dayWorkShift?.state ?? '',
+                  _dayWorkShift?.stateColor3(),
                 ),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
-                _cell(label: ''),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
+                _cell('', null),
               ],
             ));
           }
@@ -872,14 +872,14 @@ Future<void> _works02({
         _row.add(pw.TableRow(
           decoration: pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            _cell(label: '合計'),
-            _cell(label: ''),
-            _cell(label: ''),
-            _cell(label: ''),
-            _cell(label: ''),
-            _cell(label: workTimes),
-            _cell(label: overTime1s),
-            _cell(label: overTime2s),
+            _cell('合計', null),
+            _cell('', null),
+            _cell('', null),
+            _cell('', null),
+            _cell('', null),
+            _cell(workTimes, null),
+            _cell(overTime1s, null),
+            _cell(overTime2s, null),
           ],
         ));
         return pw.Table(
@@ -904,7 +904,7 @@ Future<void> _works02({
       ));
     }
   } else {
-    if (user == null) return;
+    if (user.id == '') return;
     // 各種データ取得
     String _positionName = '';
     for (PositionModel _position in positions) {
@@ -932,7 +932,7 @@ Future<void> _works02({
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            '${DateFormat('yyyy年MM月').format(month)}',
+            dateText('yyyy年MM月', month),
             style: _headStyle,
           ),
           pw.Text(
@@ -955,14 +955,14 @@ Future<void> _works02({
       _row.add(pw.TableRow(
         decoration: pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          _cell(label: '日付'),
-          _cell(label: '勤務状況'),
-          _cell(label: '出勤時間'),
-          _cell(label: '退勤時間'),
-          _cell(label: '休憩時間'),
-          _cell(label: '勤務時間'),
-          _cell(label: '時間外1'),
-          _cell(label: '時間外2'),
+          _cell('日付', null),
+          _cell('勤務状況', null),
+          _cell('出勤時間', null),
+          _cell('退勤時間', null),
+          _cell('休憩時間', null),
+          _cell('勤務時間', null),
+          _cell('時間外1', null),
+          _cell('時間外2', null),
         ],
       ));
       DateFormat _format = DateFormat('yyyy-MM-dd');
@@ -975,14 +975,14 @@ Future<void> _works02({
             _dayWorks.add(_work);
           }
         }
-        WorkShiftModel _dayWorkShift;
+        WorkShiftModel? _dayWorkShift;
         for (WorkShiftModel _workShift in workShifts) {
           String _start = '${_format.format(_workShift.startedAt)}';
           if (days[i] == DateTime.parse(_start)) {
             _dayWorkShift = _workShift;
           }
         }
-        String _day = '${DateFormat('dd (E)', 'ja').format(days[i])}';
+        String _day = dateText('dd (E)', days[i]);
         if (_dayWorks.length > 0) {
           for (int j = 0; j < _dayWorks.length; j++) {
             if (_dayWorks[j].startedAt != _dayWorks[j].endedAt) {
@@ -1017,14 +1017,14 @@ Future<void> _works02({
               overTime2s = addTime(overTime2s, _overTime2);
               _row.add(pw.TableRow(
                 children: [
-                  _cell(label: _day),
-                  _cell(label: _state),
-                  _cell(label: _startTime),
-                  _cell(label: _endTime),
-                  _cell(label: _breakTime),
-                  _cell(label: _workTime),
-                  _cell(label: _overTime1),
-                  _cell(label: _overTime2),
+                  _cell(_day, null),
+                  _cell(_state, null),
+                  _cell(_startTime, null),
+                  _cell(_endTime, null),
+                  _cell(_breakTime, null),
+                  _cell(_workTime, null),
+                  _cell(_overTime1, null),
+                  _cell(_overTime2, null),
                 ],
               ));
             }
@@ -1032,17 +1032,17 @@ Future<void> _works02({
         } else {
           _row.add(pw.TableRow(
             children: [
-              _cell(label: _day),
+              _cell(_day, null),
               _cell(
-                label: _dayWorkShift?.state ?? '',
-                color: _dayWorkShift?.stateColor3(),
+                _dayWorkShift?.state ?? '',
+                _dayWorkShift?.stateColor3(),
               ),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
-              _cell(label: ''),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
+              _cell('', null),
             ],
           ));
         }
@@ -1051,14 +1051,14 @@ Future<void> _works02({
       _row.add(pw.TableRow(
         decoration: pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          _cell(label: '合計'),
-          _cell(label: ''),
-          _cell(label: ''),
-          _cell(label: ''),
-          _cell(label: ''),
-          _cell(label: workTimes),
-          _cell(label: overTime1s),
-          _cell(label: overTime2s),
+          _cell('合計', null),
+          _cell('', null),
+          _cell('', null),
+          _cell('', null),
+          _cell('', null),
+          _cell(workTimes, null),
+          _cell(overTime1s, null),
+          _cell(overTime2s, null),
         ],
       ));
       return pw.Table(

@@ -37,8 +37,8 @@ class UserTable extends StatefulWidget {
   final UserProvider userProvider;
 
   UserTable({
-    @required this.groupProvider,
-    @required this.userProvider,
+    required this.groupProvider,
+    required this.userProvider,
   });
 
   @override
@@ -73,7 +73,7 @@ class _UserTableState extends State<UserTable> {
                       context: context,
                       builder: (_) => MigrationDialog(
                         userProvider: widget.userProvider,
-                        group: widget.groupProvider.group,
+                        group: widget.groupProvider.group!,
                         users: widget.groupProvider.users,
                       ),
                     ).then((value) {
@@ -92,7 +92,7 @@ class _UserTableState extends State<UserTable> {
                       context: context,
                       builder: (_) => AddUserDialog(
                         userProvider: widget.userProvider,
-                        group: widget.groupProvider.group,
+                        group: widget.groupProvider.group!,
                       ),
                     ).then((value) {
                       widget.groupProvider.reloadUsers();
@@ -133,7 +133,7 @@ class _UserTableState extends State<UserTable> {
                         context: context,
                         builder: (_) => EditUserDialog(
                           userProvider: widget.userProvider,
-                          group: widget.groupProvider.group,
+                          group: widget.groupProvider.group!,
                           user: widget.groupProvider.users[index],
                         ),
                       ).then((value) {
@@ -158,9 +158,9 @@ class MigrationDialog extends StatefulWidget {
   final List<UserModel> users;
 
   MigrationDialog({
-    @required this.userProvider,
-    @required this.group,
-    @required this.users,
+    required this.userProvider,
+    required this.group,
+    required this.users,
   });
 
   @override
@@ -170,8 +170,8 @@ class MigrationDialog extends StatefulWidget {
 class _MigrationDialogState extends State<MigrationDialog> {
   List<UserModel> _before = [];
   List<UserModel> _after = [];
-  UserModel _selectBefore;
-  UserModel _selectAfter;
+  UserModel? _selectBefore;
+  UserModel? _selectAfter;
 
   void _init() async {
     widget.users.forEach((user) {
@@ -271,8 +271,8 @@ class _MigrationDialogState extends State<MigrationDialog> {
                   onPressed: () async {
                     if (!await widget.userProvider.migration(
                       groupId: widget.group.id,
-                      before: _selectBefore,
-                      after: _selectAfter,
+                      before: _selectBefore!,
+                      after: _selectAfter!,
                     )) {
                       return;
                     }
@@ -298,8 +298,8 @@ class AddUserDialog extends StatefulWidget {
   final GroupModel group;
 
   AddUserDialog({
-    @required this.userProvider,
-    @required this.group,
+    required this.userProvider,
+    required this.group,
   });
 
   @override
@@ -402,9 +402,9 @@ class EditUserDialog extends StatefulWidget {
   final UserModel user;
 
   EditUserDialog({
-    @required this.userProvider,
-    @required this.group,
-    @required this.user,
+    required this.userProvider,
+    required this.group,
+    required this.user,
   });
 
   @override
@@ -417,9 +417,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
   TextEditingController recordPassword = TextEditingController();
 
   void _init() async {
-    number.text = widget.user?.number;
-    name.text = widget.user?.name;
-    recordPassword.text = widget.user?.recordPassword;
+    number.text = widget.user.number;
+    name.text = widget.user.name;
+    recordPassword.text = widget.user.recordPassword;
   }
 
   @override

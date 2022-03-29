@@ -27,26 +27,26 @@ class SettingSecurityScreen extends StatelessWidget {
 class SettingSecurityPanel extends StatefulWidget {
   final GroupProvider groupProvider;
 
-  SettingSecurityPanel({@required this.groupProvider});
+  SettingSecurityPanel({required this.groupProvider});
 
   @override
   _SettingSecurityPanelState createState() => _SettingSecurityPanelState();
 }
 
 class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
-  GoogleMapController mapController;
-  bool _qrSecurity;
-  bool _areaSecurity;
-  double _areaLat;
-  double _areaLon;
-  double _areaRange;
+  GoogleMapController? mapController;
+  bool _qrSecurity = false;
+  bool _areaSecurity = false;
+  double _areaLat = 0;
+  double _areaLon = 0;
+  double _areaRange = 0;
 
   void _init() async {
-    _qrSecurity = widget.groupProvider.group?.qrSecurity;
-    _areaSecurity = widget.groupProvider.group?.areaSecurity;
-    _areaLat = widget.groupProvider.group?.areaLat;
-    _areaLon = widget.groupProvider.group?.areaLon;
-    _areaRange = widget.groupProvider.group?.areaRange;
+    _qrSecurity = widget.groupProvider.group?.qrSecurity ?? false;
+    _areaSecurity = widget.groupProvider.group?.areaSecurity ?? false;
+    _areaLat = widget.groupProvider.group?.areaLat ?? 0;
+    _areaLon = widget.groupProvider.group?.areaLon ?? 0;
+    _areaRange = widget.groupProvider.group?.areaRange ?? 0;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -81,7 +81,7 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
               children: [
                 CustomTextIconButton(
                   onPressed: () async {
-                    await PdfApi.qrcode(group: widget.groupProvider.group);
+                    await PdfApi.qrcode(group: widget.groupProvider.group!);
                   },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
@@ -114,14 +114,14 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
         SizedBox(height: 8.0),
         CustomCheckboxListTile(
           onChanged: (value) {
-            setState(() => _qrSecurity = value);
+            setState(() => _qrSecurity = value ?? false);
           },
           label: 'QRコードで記録制限',
           value: _qrSecurity,
         ),
         CustomCheckboxListTile(
           onChanged: (value) {
-            setState(() => _areaSecurity = value);
+            setState(() => _areaSecurity = value ?? false);
           },
           label: '記録可能な範囲を制限',
           value: _areaSecurity,
@@ -192,12 +192,12 @@ class ConfirmDialog extends StatelessWidget {
   final double areaRange;
 
   ConfirmDialog({
-    @required this.groupProvider,
-    @required this.qrSecurity,
-    @required this.areaSecurity,
-    @required this.areaLat,
-    @required this.areaLon,
-    @required this.areaRange,
+    required this.groupProvider,
+    required this.qrSecurity,
+    required this.areaSecurity,
+    required this.areaLat,
+    required this.areaLon,
+    required this.areaRange,
   });
 
   @override
@@ -224,7 +224,7 @@ class ConfirmDialog extends StatelessWidget {
               CustomTextButton(
                 onPressed: () async {
                   if (!await groupProvider.updateSecurity(
-                    id: groupProvider.group?.id,
+                    id: groupProvider.group?.id ?? '',
                     qrSecurity: qrSecurity,
                     areaSecurity: areaSecurity,
                     areaLat: areaLat,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -32,51 +33,52 @@ class SettingWorkScreen extends StatelessWidget {
 class SettingWorkPanel extends StatefulWidget {
   final GroupProvider groupProvider;
 
-  SettingWorkPanel({@required this.groupProvider});
+  SettingWorkPanel({required this.groupProvider});
 
   @override
   _SettingWorkPanelState createState() => _SettingWorkPanelState();
 }
 
 class _SettingWorkPanelState extends State<SettingWorkPanel> {
-  String _roundStartType;
-  int _roundStartNum;
-  String _roundEndType;
-  int _roundEndNum;
-  String _roundBreakStartType;
-  int _roundBreakStartNum;
-  String _roundBreakEndType;
-  int _roundBreakEndNum;
-  String _roundWorkType;
-  int _roundWorkNum;
-  int _legal;
-  String _nightStart;
-  String _nightEnd;
-  String _workStart;
-  String _workEnd;
-  List<String> _holidays;
-  List<DateTime> _holidays2;
-  bool _autoBreak;
+  String _roundStartType = '';
+  int _roundStartNum = 0;
+  String _roundEndType = '';
+  int _roundEndNum = 0;
+  String _roundBreakStartType = '';
+  int _roundBreakStartNum = 0;
+  String _roundBreakEndType = '';
+  int _roundBreakEndNum = 0;
+  String _roundWorkType = '';
+  int _roundWorkNum = 0;
+  int _legal = 0;
+  String _nightStart = '';
+  String _nightEnd = '';
+  String _workStart = '';
+  String _workEnd = '';
+  List<String> _holidays = [];
+  List<DateTime> _holidays2 = [];
+  bool _autoBreak = false;
 
   void _init() async {
-    _roundStartType = widget.groupProvider.group?.roundStartType;
-    _roundStartNum = widget.groupProvider.group?.roundStartNum;
-    _roundEndType = widget.groupProvider.group?.roundEndType;
-    _roundEndNum = widget.groupProvider.group?.roundEndNum;
-    _roundBreakStartType = widget.groupProvider.group?.roundBreakStartType;
-    _roundBreakStartNum = widget.groupProvider.group?.roundBreakStartNum;
-    _roundBreakEndType = widget.groupProvider.group?.roundBreakEndType;
-    _roundBreakEndNum = widget.groupProvider.group?.roundBreakEndNum;
-    _roundWorkType = widget.groupProvider.group?.roundWorkType;
-    _roundWorkNum = widget.groupProvider.group?.roundWorkNum;
-    _legal = widget.groupProvider.group?.legal;
-    _nightStart = widget.groupProvider.group?.nightStart;
-    _nightEnd = widget.groupProvider.group?.nightEnd;
-    _workStart = widget.groupProvider.group?.workStart;
-    _workEnd = widget.groupProvider.group?.workEnd;
-    _holidays = widget.groupProvider.group?.holidays;
-    _holidays2 = widget.groupProvider.group?.holidays2;
-    _autoBreak = widget.groupProvider.group?.autoBreak;
+    _roundStartType = widget.groupProvider.group?.roundStartType ?? '';
+    _roundStartNum = widget.groupProvider.group?.roundStartNum ?? 0;
+    _roundEndType = widget.groupProvider.group?.roundEndType ?? '';
+    _roundEndNum = widget.groupProvider.group?.roundEndNum ?? 0;
+    _roundBreakStartType =
+        widget.groupProvider.group?.roundBreakStartType ?? '';
+    _roundBreakStartNum = widget.groupProvider.group?.roundBreakStartNum ?? 0;
+    _roundBreakEndType = widget.groupProvider.group?.roundBreakEndType ?? '';
+    _roundBreakEndNum = widget.groupProvider.group?.roundBreakEndNum ?? 0;
+    _roundWorkType = widget.groupProvider.group?.roundWorkType ?? '';
+    _roundWorkNum = widget.groupProvider.group?.roundWorkNum ?? 0;
+    _legal = widget.groupProvider.group?.legal ?? 0;
+    _nightStart = widget.groupProvider.group?.nightStart ?? '';
+    _nightEnd = widget.groupProvider.group?.nightEnd ?? '';
+    _workStart = widget.groupProvider.group?.workStart ?? '';
+    _workEnd = widget.groupProvider.group?.workEnd ?? '';
+    _holidays = widget.groupProvider.group?.holidays ?? [];
+    _holidays2 = widget.groupProvider.group?.holidays2 ?? [];
+    _autoBreak = widget.groupProvider.group?.autoBreak ?? false;
   }
 
   @override
@@ -107,7 +109,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
               children: [
                 CustomTextIconButton(
                   onPressed: () async {
-                    await PdfApi.qrcode(group: widget.groupProvider.group);
+                    await PdfApi.qrcode(group: widget.groupProvider.group!);
                   },
                   color: Colors.redAccent,
                   iconData: Icons.qr_code,
@@ -458,7 +460,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           CustomTextIconButton2(
                             onPressed: () async {
                               List<String> _hm = _nightStart.split(':');
-                              TimeOfDay _selected = await showTimePicker(
+                              TimeOfDay? _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
                                   hour: int.parse(_hm.first),
@@ -490,7 +492,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           CustomTextIconButton2(
                             onPressed: () async {
                               List<String> _hm = _nightEnd.split(':');
-                              TimeOfDay _selected = await showTimePicker(
+                              TimeOfDay? _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
                                   hour: int.parse(_hm.first),
@@ -524,7 +526,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           CustomTextIconButton2(
                             onPressed: () async {
                               List<String> _hm = _workStart.split(':');
-                              TimeOfDay _selected = await showTimePicker(
+                              TimeOfDay? _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
                                   hour: int.parse(_hm.first),
@@ -556,7 +558,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                           CustomTextIconButton2(
                             onPressed: () async {
                               List<String> _hm = _workEnd.split(':');
-                              TimeOfDay _selected = await showTimePicker(
+                              TimeOfDay? _selected = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
                                   hour: int.parse(_hm.first),
@@ -638,7 +640,7 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
                   SizedBox(height: 8.0),
                   CustomCheckboxListTile(
                     onChanged: (value) {
-                      setState(() => _autoBreak = value);
+                      setState(() => _autoBreak = value ?? false);
                     },
                     label: 'ここにチェックを入れると、退勤時に「01:00」分の休憩時間を登録します',
                     value: _autoBreak,
@@ -675,25 +677,25 @@ class ConfirmDialog extends StatelessWidget {
   final bool autoBreak;
 
   ConfirmDialog({
-    @required this.groupProvider,
-    @required this.roundStartType,
-    @required this.roundStartNum,
-    @required this.roundEndType,
-    @required this.roundEndNum,
-    @required this.roundBreakStartType,
-    @required this.roundBreakStartNum,
-    @required this.roundBreakEndType,
-    @required this.roundBreakEndNum,
-    @required this.roundWorkType,
-    @required this.roundWorkNum,
-    @required this.legal,
-    @required this.nightStart,
-    @required this.nightEnd,
-    @required this.workStart,
-    @required this.workEnd,
-    @required this.holidays,
-    @required this.holidays2,
-    @required this.autoBreak,
+    required this.groupProvider,
+    required this.roundStartType,
+    required this.roundStartNum,
+    required this.roundEndType,
+    required this.roundEndNum,
+    required this.roundBreakStartType,
+    required this.roundBreakStartNum,
+    required this.roundBreakEndType,
+    required this.roundBreakEndNum,
+    required this.roundWorkType,
+    required this.roundWorkNum,
+    required this.legal,
+    required this.nightStart,
+    required this.nightEnd,
+    required this.workStart,
+    required this.workEnd,
+    required this.holidays,
+    required this.holidays2,
+    required this.autoBreak,
   });
 
   @override
@@ -720,7 +722,7 @@ class ConfirmDialog extends StatelessWidget {
               CustomTextButton(
                 onPressed: () async {
                   if (!await groupProvider.updateWork(
-                    id: groupProvider.group?.id,
+                    id: groupProvider.group?.id ?? '',
                     roundStartType: roundStartType,
                     roundStartNum: roundStartNum,
                     roundEndType: roundEndType,
