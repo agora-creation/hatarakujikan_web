@@ -21,18 +21,19 @@ class GroupService {
     return _group;
   }
 
-  Future<List<GroupModel>> selectListAdminUser({String? adminUserId}) async {
+  Future<List<GroupModel>> selectListAdminUser(String? userId) async {
     List<GroupModel> _groups = [];
     await _firebaseFirestore
         .collection(_collection)
-        .where('adminUserId', isEqualTo: adminUserId)
+        .where('adminUserId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .get()
         .then((value) {
-      for (DocumentSnapshot<Map<String, dynamic>> _group in value.docs) {
-        _groups.add(GroupModel.fromSnapshot(_group));
+      for (DocumentSnapshot<Map<String, dynamic>> _data in value.docs) {
+        _groups.add(GroupModel.fromSnapshot(_data));
       }
     });
+    print(_groups.length);
     return _groups;
   }
 }

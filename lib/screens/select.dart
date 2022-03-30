@@ -21,8 +21,9 @@ class _SelectScreenState extends State<SelectScreen> {
   void _init() async {
     setState(() => _isLoading = true);
     await Future.delayed(Duration(seconds: 2));
-    if (widget.groupProvider.groups.length == 1) {
-      await widget.groupProvider.setGroup(widget.groupProvider.groups.first);
+    List<GroupModel> _groups = widget.groupProvider.groups;
+    if (_groups.length == 1) {
+      await widget.groupProvider.setGroup(_groups.first);
       setState(() => _isLoading = false);
       Navigator.of(context, rootNavigator: true).pop();
       changeScreen(context, WorkScreen());
@@ -73,7 +74,7 @@ class _SelectScreenState extends State<SelectScreen> {
                     Navigator.of(context, rootNavigator: true).pop();
                     changeScreen(context, WorkScreen());
                   },
-                  label: '${_group.name}',
+                  label: _group.name,
                 );
               },
             ),

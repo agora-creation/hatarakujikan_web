@@ -39,8 +39,8 @@ class LoginScreen extends StatelessWidget {
                         Text('for WEB', style: kSubTitleTextStyle),
                         SizedBox(height: 8.0),
                         Text(
-                          '会社/組織の管理者専用',
-                          style: TextStyle(color: Colors.white),
+                          '会社/組織の管理者のみ、メールアドレスとパスワードを入力してログインできます。',
+                          style: kLoginTextStyle,
                         ),
                       ],
                     ),
@@ -81,7 +81,7 @@ class LoginScreen extends StatelessWidget {
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (_) => ErrorDialog(
-                                    'ログインに失敗しました。メールアドレスもしくはパスワードが間違っている可能性があります。',
+                                    'ログインに失敗しました。メールアドレスまたはパスワードが間違っている可能性があります。',
                                   ),
                                 );
                                 return;
@@ -99,7 +99,6 @@ class LoginScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 32.0),
                   ],
                 ),
         ),

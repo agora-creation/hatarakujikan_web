@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 ThemeData theme() {
   return ThemeData(
@@ -8,14 +9,20 @@ ThemeData theme() {
       color: Color(0xFFFEFFFA),
       elevation: 0.0,
       centerTitle: false,
-      brightness: Brightness.light,
-      textTheme: TextTheme(
+      iconTheme: IconThemeData(color: Colors.black54),
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      toolbarTextStyle: TextTheme(
         headline6: TextStyle(
           color: Colors.black54,
           fontSize: 18.0,
         ),
-      ),
-      iconTheme: IconThemeData(color: Colors.black54),
+      ).bodyText2,
+      titleTextStyle: TextTheme(
+        headline6: TextStyle(
+          color: Colors.black54,
+          fontSize: 18.0,
+        ),
+      ).headline6,
     ),
     textTheme: TextTheme(
       bodyText1: TextStyle(color: Colors.black54),
@@ -76,6 +83,11 @@ const TextStyle kTitleTextStyle = TextStyle(
 const TextStyle kSubTitleTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 16.0,
+);
+
+const TextStyle kLoginTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 14.0,
 );
 
 const TextStyle kAdminTitleTextStyle = TextStyle(

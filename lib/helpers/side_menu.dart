@@ -25,14 +25,24 @@ const List<MenuItem> kSideMenu = [
         route: WorkShiftScreen.id,
         icon: Icons.chevron_right,
       ),
+      MenuItem(
+        title: '帳票の出力',
+        route: WorkShiftScreen.id,
+        icon: Icons.chevron_right,
+      ),
     ],
   ),
   MenuItem(
-    title: '申請/承認の管理',
+    title: '申請の管理',
     icon: Icons.receipt,
     children: [
       MenuItem(
-        title: '記録修正申請',
+        title: '勤怠修正の申請',
+        route: ApplyWorkScreen.id,
+        icon: Icons.chevron_right,
+      ),
+      MenuItem(
+        title: '有給休暇の申請',
         route: ApplyWorkScreen.id,
         icon: Icons.chevron_right,
       ),

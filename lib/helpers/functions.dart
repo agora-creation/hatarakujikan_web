@@ -51,17 +51,17 @@ String randomString(int length) {
   return String.fromCharCodes(codeUnits);
 }
 
-Future<String> getPrefs({required String key}) async {
+Future<String?> getPrefs(String key) async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
-  return _prefs.getString(key) ?? '';
+  return _prefs.getString(key);
 }
 
-Future<void> setPrefs({required String key, required String value}) async {
+Future<void> setPrefs(String key, String value) async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
   _prefs.setString(key, value);
 }
 
-Future<void> removePrefs({required String key}) async {
+Future<void> removePrefs(String key) async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
   _prefs.remove(key);
 }
