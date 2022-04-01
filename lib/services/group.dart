@@ -21,7 +21,7 @@ class GroupService {
     return _group;
   }
 
-  Future<List<GroupModel>> selectListAdminUser(String? userId) async {
+  Future<List<GroupModel>> selectListAdminUser({String? userId}) async {
     List<GroupModel> _groups = [];
     await _firebaseFirestore
         .collection(_collection)
@@ -33,7 +33,6 @@ class GroupService {
         _groups.add(GroupModel.fromSnapshot(_data));
       }
     });
-    print(_groups.length);
     return _groups;
   }
 }
