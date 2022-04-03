@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/pdf_api.dart';
-import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
@@ -64,13 +64,9 @@ class _SettingSecurityPanelState extends State<SettingSecurityPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'セキュリティ設定',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          'スマートフォンアプリから勤務時間を記録する際、不明な記録が残らないようにセキュリティ設定を行うことができます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: 'セキュリティ設定',
+          message: 'スマートフォンアプリから勤務時間を記録する際、不明な記録が残らないようにセキュリティ設定を行うことができます。',
         ),
         SizedBox(height: 16.0),
         Row(

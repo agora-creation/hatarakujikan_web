@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/models/group_notice.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/group_notice.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
@@ -65,13 +66,9 @@ class _NoticeTableState extends State<NoticeTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'お知らせの管理',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          'お知らせを一覧表示します。このお知らせはスマートフォンアプリのスタッフにのみ送信できます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: 'お知らせの管理',
+          message: 'お知らせを一覧表示します。このお知らせはスマートフォンアプリのスタッフにのみ送信できます。',
         ),
         SizedBox(height: 16.0),
         Row(

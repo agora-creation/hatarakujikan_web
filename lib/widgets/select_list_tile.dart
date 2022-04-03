@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 
-class CustomSelectListTile extends StatelessWidget {
+class SelectListTile extends StatelessWidget {
   final String? label;
   final Function()? onTap;
 
-  CustomSelectListTile({
+  SelectListTile({
     this.label,
     this.onTap,
   });

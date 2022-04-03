@@ -9,6 +9,7 @@ import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -91,13 +92,9 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'シフト表',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          'スタッフ毎の予定日時と勤務日時が表示されます。予定日時は追加/変更/削除できます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: 'シフト表',
+          message: 'スタッフ毎の予定日時と勤務日時が表示されます。予定日時は追加/変更/削除できます。',
         ),
         SizedBox(height: 16.0),
         Expanded(
@@ -244,7 +241,11 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
             Center(
               child: Text(
                 '${dateText('yyyy/MM/dd(E)', widget.date)}の予定追加',
-                style: kAdminTitleTextStyle,
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             SizedBox(height: 16.0),
@@ -472,7 +473,11 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
             Center(
               child: Text(
                 '${dateText('yyyy/MM/dd(E)', widget.appointment.startTime)}の予定変更',
-                style: kAdminTitleTextStyle,
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             SizedBox(height: 16.0),

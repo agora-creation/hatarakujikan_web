@@ -3,6 +3,7 @@ import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -92,13 +93,9 @@ class _SettingWorkPanelState extends State<SettingWorkPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '勤怠ルール設定',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          '各勤務時間の計算をする際に必要な項目を設定できます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: '勤怠ルール設定',
+          message: '各勤務時間の計算をする際に必要な項目を設定できます。',
         ),
         SizedBox(height: 16.0),
         Row(

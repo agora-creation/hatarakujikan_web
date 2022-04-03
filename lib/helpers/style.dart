@@ -90,17 +90,6 @@ const TextStyle kLoginTextStyle = TextStyle(
   fontSize: 14.0,
 );
 
-const TextStyle kAdminTitleTextStyle = TextStyle(
-  color: Colors.black54,
-  fontSize: 18.0,
-  fontWeight: FontWeight.bold,
-);
-
-const TextStyle kAdminSubTitleTextStyle = TextStyle(
-  color: Colors.black45,
-  fontSize: 16.0,
-);
-
 const TextStyle kListDayTextStyle = TextStyle(
   color: Colors.black54,
   fontSize: 15.0,

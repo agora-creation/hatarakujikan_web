@@ -14,6 +14,7 @@ import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
@@ -120,13 +121,9 @@ class _WorkTableState extends State<WorkTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '勤怠の記録',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          'スタッフが記録した勤務日時を年月形式で一覧表示します。勤務日時は追加/修正/削除できます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: '勤怠の記録',
+          message: 'スタッフが記録した勤務日時を年月形式で一覧表示します。勤務日時は追加/修正/削除できます。',
         ),
         SizedBox(height: 16.0),
         Row(

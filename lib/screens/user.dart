@@ -5,6 +5,7 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
@@ -51,13 +52,9 @@ class _UserTableState extends State<UserTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'スタッフの管理',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          'スタッフを一覧表示します。スマートフォンアプリから新規登録して会社/組織へ加入するか、この画面で新規登録できます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: 'スタッフの管理',
+          message: 'スタッフを一覧表示します。スマートフォンアプリから新規登録して会社/組織へ加入するか、この画面で新規登録できます。',
         ),
         SizedBox(height: 16.0),
         Row(

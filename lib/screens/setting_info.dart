@@ -5,6 +5,7 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
@@ -65,13 +66,10 @@ class _SettingInfoPanelState extends State<SettingInfoPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '基本情報の変更',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          '会社/組織の基本情報を変更できます。また、以下の「QRコード出力」で会社/組織IDが入ったQRコードをプリントして、スタッフの見える位置に貼ってください。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: '基本情報の変更',
+          message:
+              '会社/組織の基本情報を変更できます。また、以下の「QRコード出力」で会社/組織IDが入ったQRコードをプリントして、スタッフの見える位置に貼ってください。',
         ),
         SizedBox(height: 16.0),
         Row(

@@ -3,8 +3,8 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
-import 'package:hatarakujikan_web/widgets/custom_select_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
+import 'package:hatarakujikan_web/widgets/select_list_tile.dart';
 
 class SelectScreen extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -47,10 +47,7 @@ class _SelectScreenState extends State<SelectScreen> {
               backgroundColor: Colors.orange,
               elevation: 0.0,
               centerTitle: true,
-              title: Text(
-                '会社/組織の選択',
-                style: TextStyle(color: Colors.white),
-              ),
+              title: Text('会社/組織の選択', style: TextStyle(color: Colors.white)),
               actions: [
                 IconButton(
                   onPressed: () async {
@@ -66,7 +63,7 @@ class _SelectScreenState extends State<SelectScreen> {
               itemCount: widget.groupProvider.groups.length,
               itemBuilder: (_, index) {
                 GroupModel _group = widget.groupProvider.groups[index];
-                return CustomSelectListTile(
+                return SelectListTile(
                   onTap: () async {
                     setState(() => _isLoading = true);
                     await widget.groupProvider.setGroup(_group);

@@ -9,6 +9,7 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
@@ -87,13 +88,9 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '記録修正申請',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          'スタッフがスマートフォンアプリから申請した内容を一覧表示します。承認をした場合は自動的に勤怠データが修正されます。',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: '記録修正申請',
+          message: 'スタッフがスマートフォンアプリから申請した内容を一覧表示します。承認をした場合は自動的に勤怠データが修正されます。',
         ),
         SizedBox(height: 16.0),
         Row(

@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/models/position.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/position.dart';
+import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_icon_label.dart';
@@ -63,13 +64,9 @@ class _PositionTableState extends State<PositionTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '雇用形態の管理',
-          style: kAdminTitleTextStyle,
-        ),
-        Text(
-          '雇用形態を一覧表示します。雇用形態毎にスタッフを登録してください',
-          style: kAdminSubTitleTextStyle,
+        AdminHeader(
+          title: '雇用形態の管理',
+          message: '雇用形態を一覧表示します。雇用形態毎にスタッフを登録してください',
         ),
         SizedBox(height: 16.0),
         Row(
