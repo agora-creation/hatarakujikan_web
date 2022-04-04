@@ -109,3 +109,8 @@ const TextStyle kDefaultTextStyle = TextStyle(
   color: Colors.black54,
   fontSize: 14.0,
 );
+
+const TextStyle kDialogTextStyle = TextStyle(
+  color: Colors.black54,
+  fontSize: 15.0,
+);

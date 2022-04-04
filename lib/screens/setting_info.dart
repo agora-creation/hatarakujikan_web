@@ -187,13 +187,13 @@ class ConfirmDialog extends StatelessWidget {
               ),
               CustomTextButton(
                 onPressed: () async {
-                  if (!await groupProvider.updateInfo(
-                    id: groupProvider.group?.id ?? '',
-                    name: name,
-                    adminUserId: adminUserId,
-                  )) {
-                    return;
-                  }
+                  // if (!await groupProvider.updateInfo(
+                  //   id: groupProvider.group?.id ?? '',
+                  //   name: name,
+                  //   adminUserId: adminUserId,
+                  // )) {
+                  //   return;
+                  // }
                   await groupProvider.signOut();
                   Navigator.pop(context);
                   changeScreen(context, LoginScreen());

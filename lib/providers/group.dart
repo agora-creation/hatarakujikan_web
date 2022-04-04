@@ -126,15 +126,90 @@ class GroupProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> updateInfo({
-    required String id,
-    required String name,
-    required String adminUserId,
+  Future<bool> updateName({
+    String? id,
+    String? name,
   }) async {
+    if (id == null) return false;
+    if (name == null) return false;
     try {
       _groupService.update({
         'id': id,
         'name': name,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateAddress({
+    String? id,
+    String? zip,
+    String? address,
+  }) async {
+    if (id == null) return false;
+    if (zip == null) return false;
+    if (address == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'zip': zip,
+        'address': address,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateTel({
+    String? id,
+    String? tel,
+  }) async {
+    if (id == null) return false;
+    if (tel == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'tel': tel,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateEmail({
+    String? id,
+    String? email,
+  }) async {
+    if (id == null) return false;
+    if (email == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'email': email,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateAdminUser({
+    String? id,
+    String? adminUserId,
+  }) async {
+    if (id == null) return false;
+    if (adminUserId == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
         'adminUserId': adminUserId,
       });
       return true;

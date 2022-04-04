@@ -14,7 +14,6 @@ class CustomTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: onPressed,
       child: Text(
         label ?? '',
         style: TextStyle(
@@ -26,6 +25,7 @@ class CustomTextButton extends StatelessWidget {
         backgroundColor: color,
         padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
       ),
+      onPressed: onPressed,
     );
   }
 }
