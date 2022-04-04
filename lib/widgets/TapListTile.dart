@@ -19,11 +19,18 @@ class TapListTile extends StatelessWidget {
       child: ListTile(
         title: Text(
           title ?? '',
-          style: TextStyle(color: Colors.black87, fontSize: 16.0),
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         subtitle: Text(
           subtitle ?? '',
-          style: TextStyle(color: Colors.black54, fontSize: 14.0),
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 14.0,
+          ),
         ),
         trailing: Icon(Icons.edit),
         onTap: onTap,

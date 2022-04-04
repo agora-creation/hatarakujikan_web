@@ -85,6 +85,14 @@ class GroupProvider with ChangeNotifier {
     password.text = '';
   }
 
+  Future<void> reloadGroup() async {
+    String? _groupId = await getPrefs('groupId');
+    if (_groupId != null) {
+      _group = await _groupService.select(id: _groupId);
+    }
+    notifyListeners();
+  }
+
   Future<void> reloadGroupModel() async {
     String? _groupId = await getPrefs('groupId');
     if (_groupId != null) {

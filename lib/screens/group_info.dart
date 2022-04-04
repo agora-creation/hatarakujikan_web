@@ -5,7 +5,7 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
-import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
+import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:provider/provider.dart';
@@ -88,7 +88,15 @@ class GroupInfoScreen extends StatelessWidget {
                 TapListTile(
                   title: '管理者',
                   subtitle: groupProvider.adminUser?.name,
-                  onTap: () {},
+                  onTap: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) => EditAdminUserDialog(
+                        groupProvider: groupProvider,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -134,13 +142,11 @@ class _EditNameDialogState extends State<EditNameDialog> {
               style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: '名前',
-              child: CustomTextFormField2(
-                controller: _name,
-                textInputType: null,
-                maxLines: 1,
-              ),
+              controller: _name,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 16.0),
             Row(
@@ -161,7 +167,7 @@ class _EditNameDialogState extends State<EditNameDialog> {
                     )) {
                       return;
                     }
-                    widget.groupProvider.reloadGroupModel();
+                    widget.groupProvider.reloadGroup();
                     customSnackBar(context, '会社/組織の名前を保存しました');
                     Navigator.pop(context);
                   },
@@ -212,22 +218,18 @@ class _EditAddressDialogState extends State<EditAddressDialog> {
               style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: '郵便番号',
-              child: CustomTextFormField2(
-                controller: _zip,
-                textInputType: null,
-                maxLines: 1,
-              ),
+              controller: _zip,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 8.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: '住所',
-              child: CustomTextFormField2(
-                controller: _address,
-                textInputType: null,
-                maxLines: 1,
-              ),
+              controller: _address,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 16.0),
             Row(
@@ -249,7 +251,7 @@ class _EditAddressDialogState extends State<EditAddressDialog> {
                     )) {
                       return;
                     }
-                    widget.groupProvider.reloadGroupModel();
+                    widget.groupProvider.reloadGroup();
                     customSnackBar(context, '会社/組織の住所を保存しました');
                     Navigator.pop(context);
                   },
@@ -298,13 +300,11 @@ class _EditTelDialogState extends State<EditTelDialog> {
               style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: '電話番号',
-              child: CustomTextFormField2(
-                controller: _tel,
-                textInputType: null,
-                maxLines: 1,
-              ),
+              controller: _tel,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 16.0),
             Row(
@@ -325,7 +325,7 @@ class _EditTelDialogState extends State<EditTelDialog> {
                     )) {
                       return;
                     }
-                    widget.groupProvider.reloadGroupModel();
+                    widget.groupProvider.reloadGroup();
                     customSnackBar(context, '会社/組織の電話番号を保存しました');
                     Navigator.pop(context);
                   },
@@ -374,13 +374,11 @@ class _EditEmailDialogState extends State<EditEmailDialog> {
               style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'メールアドレス',
-              child: CustomTextFormField2(
-                controller: _email,
-                textInputType: null,
-                maxLines: 1,
-              ),
+              controller: _email,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 16.0),
             Row(
@@ -401,7 +399,99 @@ class _EditEmailDialogState extends State<EditEmailDialog> {
                     )) {
                       return;
                     }
-                    widget.groupProvider.reloadGroupModel();
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '会社/組織のメールアドレスを保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditAdminUserDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditAdminUserDialog({required this.groupProvider});
+
+  @override
+  State<EditAdminUserDialog> createState() => _EditAdminUserDialogState();
+}
+
+class _EditAdminUserDialogState extends State<EditAdminUserDialog> {
+  String? _adminUserId;
+
+  void _init() async {
+    _adminUserId = widget.groupProvider.group?.adminUserId;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '保存後、自動的にログアウトします。再度変更後の管理者アカウントでログインしてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomDropdownButton(
+              label: 'スタッフから選択',
+              isExpanded: true,
+              value: _adminUserId,
+              onChanged: (value) {
+                setState(() => _adminUserId = value);
+              },
+              items: widget.groupProvider.users.map((user) {
+                return DropdownMenuItem(
+                  value: user.id,
+                  child: Text(
+                    user.name,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateAdminUser(
+                      id: widget.groupProvider.group?.id,
+                      adminUserId: _adminUserId,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
                     customSnackBar(context, '会社/組織のメールアドレスを保存しました');
                     Navigator.pop(context);
                   },
