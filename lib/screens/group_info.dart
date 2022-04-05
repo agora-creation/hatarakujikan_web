@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
@@ -16,6 +18,12 @@ class GroupInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    String _name = groupProvider.group?.name ?? '';
+    String _address =
+        '${groupProvider.group?.zip} ${groupProvider.group?.address}';
+    String _tel = groupProvider.group?.tel ?? '';
+    String _email = groupProvider.group?.email ?? '';
+    String _adminUserName = groupProvider.adminUser?.name ?? '';
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -34,7 +42,7 @@ class GroupInfoScreen extends StatelessWidget {
               children: [
                 TapListTile(
                   title: '名前',
-                  subtitle: groupProvider.group?.name,
+                  subtitle: _name,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -47,8 +55,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: '住所',
-                  subtitle:
-                      '${groupProvider.group?.zip} ${groupProvider.group?.address}',
+                  subtitle: _address,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -61,7 +68,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: '電話番号',
-                  subtitle: groupProvider.group?.tel,
+                  subtitle: _tel,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -74,7 +81,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: 'メールアドレス',
-                  subtitle: groupProvider.group?.email,
+                  subtitle: _email,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -87,7 +94,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: '管理者',
-                  subtitle: groupProvider.adminUser?.name,
+                  subtitle: _adminUserName,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -117,10 +124,10 @@ class EditNameDialog extends StatefulWidget {
 }
 
 class _EditNameDialogState extends State<EditNameDialog> {
-  TextEditingController _name = TextEditingController();
+  TextEditingController name = TextEditingController();
 
   void _init() async {
-    _name.text = widget.groupProvider.group?.name ?? '';
+    name.text = widget.groupProvider.group?.name ?? '';
   }
 
   @override
@@ -144,7 +151,7 @@ class _EditNameDialogState extends State<EditNameDialog> {
             SizedBox(height: 16.0),
             CustomTextFormField2(
               label: '名前',
-              controller: _name,
+              controller: name,
               textInputType: null,
               maxLines: 1,
             ),
@@ -163,7 +170,7 @@ class _EditNameDialogState extends State<EditNameDialog> {
                   onPressed: () async {
                     if (!await widget.groupProvider.updateName(
                       id: widget.groupProvider.group?.id,
-                      name: _name.text.trim(),
+                      name: name.text.trim(),
                     )) {
                       return;
                     }
@@ -191,12 +198,12 @@ class EditAddressDialog extends StatefulWidget {
 }
 
 class _EditAddressDialogState extends State<EditAddressDialog> {
-  TextEditingController _zip = TextEditingController();
-  TextEditingController _address = TextEditingController();
+  TextEditingController zip = TextEditingController();
+  TextEditingController address = TextEditingController();
 
   void _init() async {
-    _zip.text = widget.groupProvider.group?.zip ?? '';
-    _address.text = widget.groupProvider.group?.address ?? '';
+    zip.text = widget.groupProvider.group?.zip ?? '';
+    address.text = widget.groupProvider.group?.address ?? '';
   }
 
   @override
@@ -220,14 +227,14 @@ class _EditAddressDialogState extends State<EditAddressDialog> {
             SizedBox(height: 16.0),
             CustomTextFormField2(
               label: '郵便番号',
-              controller: _zip,
+              controller: zip,
               textInputType: null,
               maxLines: 1,
             ),
             SizedBox(height: 8.0),
             CustomTextFormField2(
               label: '住所',
-              controller: _address,
+              controller: address,
               textInputType: null,
               maxLines: 1,
             ),
@@ -246,8 +253,8 @@ class _EditAddressDialogState extends State<EditAddressDialog> {
                   onPressed: () async {
                     if (!await widget.groupProvider.updateAddress(
                       id: widget.groupProvider.group?.id,
-                      zip: _zip.text.trim(),
-                      address: _address.text.trim(),
+                      zip: zip.text.trim(),
+                      address: address.text.trim(),
                     )) {
                       return;
                     }
@@ -275,10 +282,10 @@ class EditTelDialog extends StatefulWidget {
 }
 
 class _EditTelDialogState extends State<EditTelDialog> {
-  TextEditingController _tel = TextEditingController();
+  TextEditingController tel = TextEditingController();
 
   void _init() async {
-    _tel.text = widget.groupProvider.group?.tel ?? '';
+    tel.text = widget.groupProvider.group?.tel ?? '';
   }
 
   @override
@@ -302,7 +309,7 @@ class _EditTelDialogState extends State<EditTelDialog> {
             SizedBox(height: 16.0),
             CustomTextFormField2(
               label: '電話番号',
-              controller: _tel,
+              controller: tel,
               textInputType: null,
               maxLines: 1,
             ),
@@ -321,7 +328,7 @@ class _EditTelDialogState extends State<EditTelDialog> {
                   onPressed: () async {
                     if (!await widget.groupProvider.updateTel(
                       id: widget.groupProvider.group?.id,
-                      tel: _tel.text.trim(),
+                      tel: tel.text.trim(),
                     )) {
                       return;
                     }
@@ -349,10 +356,10 @@ class EditEmailDialog extends StatefulWidget {
 }
 
 class _EditEmailDialogState extends State<EditEmailDialog> {
-  TextEditingController _email = TextEditingController();
+  TextEditingController email = TextEditingController();
 
   void _init() async {
-    _email.text = widget.groupProvider.group?.email ?? '';
+    email.text = widget.groupProvider.group?.email ?? '';
   }
 
   @override
@@ -376,7 +383,7 @@ class _EditEmailDialogState extends State<EditEmailDialog> {
             SizedBox(height: 16.0),
             CustomTextFormField2(
               label: 'メールアドレス',
-              controller: _email,
+              controller: email,
               textInputType: null,
               maxLines: 1,
             ),
@@ -395,7 +402,7 @@ class _EditEmailDialogState extends State<EditEmailDialog> {
                   onPressed: () async {
                     if (!await widget.groupProvider.updateEmail(
                       id: widget.groupProvider.group?.id,
-                      email: _email.text.trim(),
+                      email: email.text.trim(),
                     )) {
                       return;
                     }
@@ -423,10 +430,18 @@ class EditAdminUserDialog extends StatefulWidget {
 }
 
 class _EditAdminUserDialogState extends State<EditAdminUserDialog> {
-  String? _adminUserId;
+  List<UserModel> users = [];
+  String? adminUserId;
 
   void _init() async {
-    _adminUserId = widget.groupProvider.group?.adminUserId;
+    List<UserModel> _users =
+        await widget.groupProvider.selectUsers(smartphone: true);
+    if (mounted) {
+      setState(() {
+        adminUserId = widget.groupProvider.group?.adminUserId;
+        users = _users;
+      });
+    }
   }
 
   @override
@@ -453,13 +468,13 @@ class _EditAdminUserDialogState extends State<EditAdminUserDialog> {
             ),
             SizedBox(height: 16.0),
             CustomDropdownButton(
-              label: 'スタッフから選択',
+              label: 'スタッフから選ぶ',
               isExpanded: true,
-              value: _adminUserId,
+              value: adminUserId,
               onChanged: (value) {
-                setState(() => _adminUserId = value);
+                setState(() => adminUserId = value);
               },
-              items: widget.groupProvider.users.map((user) {
+              items: users.map((user) {
                 return DropdownMenuItem(
                   value: user.id,
                   child: Text(
@@ -487,13 +502,12 @@ class _EditAdminUserDialogState extends State<EditAdminUserDialog> {
                   onPressed: () async {
                     if (!await widget.groupProvider.updateAdminUser(
                       id: widget.groupProvider.group?.id,
-                      adminUserId: _adminUserId,
+                      adminUserId: adminUserId,
                     )) {
                       return;
                     }
-                    widget.groupProvider.reloadGroup();
-                    customSnackBar(context, '会社/組織のメールアドレスを保存しました');
-                    Navigator.pop(context);
+                    await widget.groupProvider.signOut();
+                    changeScreen(context, LoginScreen());
                   },
                 ),
               ],

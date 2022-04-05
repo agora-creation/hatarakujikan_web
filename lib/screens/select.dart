@@ -16,19 +16,19 @@ class SelectScreen extends StatefulWidget {
 }
 
 class _SelectScreenState extends State<SelectScreen> {
-  bool _isLoading = false;
+  bool isLoading = false;
 
   void _init() async {
-    setState(() => _isLoading = true);
+    setState(() => isLoading = true);
     await Future.delayed(Duration(seconds: 2));
     List<GroupModel> _groups = widget.groupProvider.groups;
     if (_groups.length == 1) {
       await widget.groupProvider.setGroup(_groups.first);
-      setState(() => _isLoading = false);
+      setState(() => isLoading = false);
       Navigator.of(context, rootNavigator: true).pop();
       changeScreen(context, WorkScreen());
     }
-    setState(() => _isLoading = false);
+    setState(() => isLoading = false);
   }
 
   @override
@@ -39,7 +39,7 @@ class _SelectScreenState extends State<SelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
+    return isLoading
         ? Loading(color: Colors.orange)
         : Scaffold(
             appBar: AppBar(
@@ -65,9 +65,9 @@ class _SelectScreenState extends State<SelectScreen> {
                 GroupModel _group = widget.groupProvider.groups[index];
                 return SelectListTile(
                   onTap: () async {
-                    setState(() => _isLoading = true);
+                    setState(() => isLoading = true);
                     await widget.groupProvider.setGroup(_group);
-                    setState(() => _isLoading = false);
+                    setState(() => isLoading = false);
                     Navigator.of(context, rootNavigator: true).pop();
                     changeScreen(context, WorkScreen());
                   },

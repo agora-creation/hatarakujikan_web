@@ -12,6 +12,7 @@ import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
+import 'package:hatarakujikan_web/screens/group_rule.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/screens/notice.dart';
 import 'package:hatarakujikan_web/screens/position.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
           GroupInfoScreen.id: (context) => GroupInfoScreen(),
+          GroupRuleScreen.id: (context) => GroupRuleScreen(),
           NoticeScreen.id: (context) => NoticeScreen(),
           PositionScreen.id: (context) => PositionScreen(),
           SettingInfoScreen.id: (context) => SettingInfoScreen(),

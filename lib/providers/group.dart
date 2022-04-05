@@ -227,6 +227,27 @@ class GroupProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateRoundStart({
+    String? id,
+    String? roundStartType,
+    int? roundStartNum,
+  }) async {
+    if (id == null) return false;
+    if (roundStartType == null) return false;
+    if (roundStartNum == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'roundStartType': roundStartType,
+        'roundStartNum': roundStartNum,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   Future<bool> updateSecurity({
     required String id,
     required bool qrSecurity,
@@ -299,5 +320,18 @@ class GroupProvider with ChangeNotifier {
       print(e.toString());
       return false;
     }
+  }
+
+  Future<List<UserModel>> selectUsers({bool? smartphone}) async {
+    List<UserModel> _users = [];
+    await _userService
+        .selectList(
+      userIds: _group?.userIds ?? [],
+      smartphone: smartphone,
+    )
+        .then((value) {
+      _users = value;
+    });
+    return _users;
   }
 }

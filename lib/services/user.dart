@@ -33,20 +33,41 @@ class UserService {
     return _user;
   }
 
-  Future<List<UserModel>> selectList({required List<String> userIds}) async {
+  Future<List<UserModel>> selectList({
+    required List<String> userIds,
+    bool? smartphone,
+  }) async {
     List<UserModel> _users = [];
-    if (userIds.length > 0) {
-      for (String _id in userIds) {
-        await _firebaseFirestore
-            .collection(_collection)
-            .where('id', isEqualTo: _id)
-            .orderBy('recordPassword', descending: false)
-            .get()
-            .then((value) {
-          for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
-            _users.add(UserModel.fromSnapshot(_user));
-          }
-        });
+    if (smartphone == null) {
+      if (userIds.length > 0) {
+        for (String _id in userIds) {
+          await _firebaseFirestore
+              .collection(_collection)
+              .where('id', isEqualTo: _id)
+              .orderBy('recordPassword', descending: false)
+              .get()
+              .then((value) {
+            for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
+              _users.add(UserModel.fromSnapshot(_user));
+            }
+          });
+        }
+      }
+    } else {
+      if (userIds.length > 0) {
+        for (String _id in userIds) {
+          await _firebaseFirestore
+              .collection(_collection)
+              .where('id', isEqualTo: _id)
+              .where('smartphone', isEqualTo: smartphone)
+              .orderBy('recordPassword', descending: false)
+              .get()
+              .then((value) {
+            for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
+              _users.add(UserModel.fromSnapshot(_user));
+            }
+          });
+        }
       }
     }
     return _users;

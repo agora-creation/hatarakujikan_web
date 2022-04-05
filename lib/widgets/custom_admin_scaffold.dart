@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/side_menu.dart';
+import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
@@ -52,7 +53,7 @@ class CustomAdminScaffold extends StatelessWidget {
         activeBackgroundColor: Colors.white,
         activeIconColor: Colors.black54,
         activeTextStyle: TextStyle(color: Colors.black54, fontSize: 14.0),
-        items: kSideMenu,
+        items: sideMenu(groupProvider.group),
         selectedRoute: selectedRoute,
         onSelected: (item) {
           if (item.route != null) {
@@ -100,36 +101,36 @@ class SignOutDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16.0),
-          Text(
-            'ログアウトします。よろしいですか？',
-            style: TextStyle(fontSize: 16.0),
-          ),
-          SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomTextButton(
-                onPressed: () => Navigator.pop(context),
-                color: Colors.grey,
-                label: 'キャンセル',
-              ),
-              CustomTextButton(
-                onPressed: () async {
-                  await groupProvider.signOut();
-                  Navigator.pop(context);
-                  changeScreen(context, LoginScreen());
-                },
-                color: Colors.blue,
-                label: 'はい',
-              ),
-            ],
-          ),
-        ],
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              'ログアウトします。よろしいですか？',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: 'はい',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    await groupProvider.signOut();
+                    changeScreen(context, LoginScreen());
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
