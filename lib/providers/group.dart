@@ -248,6 +248,108 @@ class GroupProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateRoundEnd({
+    String? id,
+    String? roundEndType,
+    int? roundEndNum,
+  }) async {
+    if (id == null) return false;
+    if (roundEndType == null) return false;
+    if (roundEndNum == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'roundEndType': roundEndType,
+        'roundEndNum': roundEndNum,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateRoundBreakStart({
+    String? id,
+    String? roundBreakStartType,
+    int? roundBreakStartNum,
+  }) async {
+    if (id == null) return false;
+    if (roundBreakStartType == null) return false;
+    if (roundBreakStartNum == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'roundBreakStartType': roundBreakStartType,
+        'roundBreakStartNum': roundBreakStartNum,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateRoundBreakEnd({
+    String? id,
+    String? roundBreakEndType,
+    int? roundBreakEndNum,
+  }) async {
+    if (id == null) return false;
+    if (roundBreakEndType == null) return false;
+    if (roundBreakEndNum == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'roundBreakEndType': roundBreakEndType,
+        'roundBreakEndNum': roundBreakEndNum,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateRoundWork({
+    String? id,
+    String? roundWorkType,
+    int? roundWorkNum,
+  }) async {
+    if (id == null) return false;
+    if (roundWorkType == null) return false;
+    if (roundWorkNum == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'roundWorkType': roundWorkType,
+        'roundWorkNum': roundWorkNum,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateLegal({
+    String? id,
+    int? legal,
+  }) async {
+    if (id == null) return false;
+    if (legal == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'legal': legal,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   Future<bool> updateSecurity({
     required String id,
     required bool qrSecurity,
