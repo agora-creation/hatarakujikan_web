@@ -718,29 +718,29 @@ class ConfirmDialog extends StatelessWidget {
               ),
               CustomTextButton(
                 onPressed: () async {
-                  if (!await groupProvider.updateWork(
-                    id: groupProvider.group?.id ?? '',
-                    roundStartType: roundStartType,
-                    roundStartNum: roundStartNum,
-                    roundEndType: roundEndType,
-                    roundEndNum: roundEndNum,
-                    roundBreakStartType: roundBreakStartType,
-                    roundBreakStartNum: roundBreakStartNum,
-                    roundBreakEndType: roundBreakEndType,
-                    roundBreakEndNum: roundBreakEndNum,
-                    roundWorkType: roundWorkType,
-                    roundWorkNum: roundWorkNum,
-                    legal: legal,
-                    nightStart: nightStart,
-                    nightEnd: nightEnd,
-                    workStart: workStart,
-                    workEnd: workEnd,
-                    holidays: holidays,
-                    holidays2: holidays2,
-                    autoBreak: autoBreak,
-                  )) {
-                    return;
-                  }
+                  // if (!await groupProvider.updateWork(
+                  //   id: groupProvider.group?.id ?? '',
+                  //   roundStartType: roundStartType,
+                  //   roundStartNum: roundStartNum,
+                  //   roundEndType: roundEndType,
+                  //   roundEndNum: roundEndNum,
+                  //   roundBreakStartType: roundBreakStartType,
+                  //   roundBreakStartNum: roundBreakStartNum,
+                  //   roundBreakEndType: roundBreakEndType,
+                  //   roundBreakEndNum: roundBreakEndNum,
+                  //   roundWorkType: roundWorkType,
+                  //   roundWorkNum: roundWorkNum,
+                  //   legal: legal,
+                  //   nightStart: nightStart,
+                  //   nightEnd: nightEnd,
+                  //   workStart: workStart,
+                  //   workEnd: workEnd,
+                  //   holidays: holidays,
+                  //   holidays2: holidays2,
+                  //   autoBreak: autoBreak,
+                  // )) {
+                  //   return;
+                  // }
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('勤怠ルール設定を保存しました')),
                   );

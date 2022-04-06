@@ -350,6 +350,162 @@ class GroupProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateNight({
+    String? id,
+    String? nightStart,
+    String? nightEnd,
+  }) async {
+    if (id == null) return false;
+    if (nightStart == null) return false;
+    if (nightEnd == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'nightStart': nightStart,
+        'nightEnd': nightEnd,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateWork({
+    String? id,
+    String? workStart,
+    String? workEnd,
+  }) async {
+    if (id == null) return false;
+    if (workStart == null) return false;
+    if (workEnd == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'workStart': workStart,
+        'workEnd': workEnd,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateHolidays({
+    String? id,
+    List<String>? holidays,
+  }) async {
+    if (id == null) return false;
+    if (holidays == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'holidays': holidays,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateHolidays2({
+    String? id,
+    List<DateTime>? holidays2,
+  }) async {
+    if (id == null) return false;
+    if (holidays2 == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'holidays2': holidays2,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateAutoBreak({
+    String? id,
+    bool? autoBreak,
+  }) async {
+    if (id == null) return false;
+    if (autoBreak == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'autoBreak': autoBreak,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateQrSecurity({
+    String? id,
+    bool? qrSecurity,
+  }) async {
+    if (id == null) return false;
+    if (qrSecurity == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'qrSecurity': qrSecurity,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateAreaSecurity({
+    String? id,
+    bool? areaSecurity,
+  }) async {
+    if (id == null) return false;
+    if (areaSecurity == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'areaSecurity': areaSecurity,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateAreaLatLon({
+    String? id,
+    double? areaLat,
+    double? areaLon,
+    double? areaRange,
+  }) async {
+    if (id == null) return false;
+    if (areaLat == null) return false;
+    if (areaLon == null) return false;
+    if (areaRange == null) return false;
+    try {
+      _groupService.update({
+        'id': id,
+        'areaLat': areaLat,
+        'areaLon': areaLon,
+        'areaRange': areaRange,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   Future<bool> updateSecurity({
     required String id,
     required bool qrSecurity,
@@ -366,56 +522,6 @@ class GroupProvider with ChangeNotifier {
         'areaLat': areaLat,
         'areaLon': areaLon,
         'areaRange': areaRange,
-      });
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return false;
-    }
-  }
-
-  Future<bool> updateWork({
-    required String id,
-    required String roundStartType,
-    required int roundStartNum,
-    required String roundEndType,
-    required int roundEndNum,
-    required String roundBreakStartType,
-    required int roundBreakStartNum,
-    required String roundBreakEndType,
-    required int roundBreakEndNum,
-    required String roundWorkType,
-    required int roundWorkNum,
-    required int legal,
-    required String nightStart,
-    required String nightEnd,
-    required String workStart,
-    required String workEnd,
-    required List<String> holidays,
-    required List<DateTime> holidays2,
-    required bool autoBreak,
-  }) async {
-    try {
-      _groupService.update({
-        'id': id,
-        'roundStartType': roundStartType,
-        'roundStartNum': roundStartNum,
-        'roundEndType': roundEndType,
-        'roundEndNum': roundEndNum,
-        'roundBreakStartType': roundBreakStartType,
-        'roundBreakStartNum': roundBreakStartNum,
-        'roundBreakEndType': roundBreakEndType,
-        'roundBreakEndNum': roundBreakEndNum,
-        'roundWorkType': roundWorkType,
-        'roundWorkNum': roundWorkNum,
-        'legal': legal,
-        'nightStart': nightStart,
-        'nightEnd': nightEnd,
-        'workStart': workStart,
-        'workEnd': workEnd,
-        'holidays': holidays,
-        'holidays2': holidays2,
-        'autoBreak': autoBreak,
       });
       return true;
     } catch (e) {

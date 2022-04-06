@@ -276,3 +276,22 @@ void customSnackBar(BuildContext context, String? message) {
     SnackBar(content: Text(message ?? '')),
   );
 }
+
+Future<String?> customTimePicker({
+  required BuildContext context,
+  String? init,
+}) async {
+  String? _ret;
+  List<String> _hm = init!.split(':');
+  TimeOfDay? _selected = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay(
+      hour: int.parse(_hm.first),
+      minute: int.parse(_hm.last),
+    ),
+  );
+  if (_selected != null) {
+    _ret = '${_selected.format(context)}';
+  }
+  return _ret;
+}

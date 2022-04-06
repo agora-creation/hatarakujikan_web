@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/position.dart';
@@ -15,6 +16,7 @@ import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 
 class PositionScreen extends StatelessWidget {
@@ -28,9 +30,106 @@ class PositionScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: PositionTable(
-        groupProvider: groupProvider,
-        positionProvider: positionProvider,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdminHeader(
+            title: '雇用形態の管理',
+            message: '雇用形態を登録し、各スタッフへ設定できます。',
+          ),
+          SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(),
+              TextIconButton(
+                iconData: Icons.add,
+                iconColor: Colors.white,
+                label: '新規登録',
+                labelColor: Colors.white,
+                backgroundColor: Colors.blue,
+                onPressed: () {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => AddDialog(
+                      positionProvider: positionProvider,
+                      group: groupProvider.group,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 8.0),
+        ],
+      ),
+    );
+  }
+}
+
+class AddDialog extends StatefulWidget {
+  final PositionProvider positionProvider;
+  final GroupModel? group;
+
+  AddDialog({
+    required this.positionProvider,
+    this.group,
+  });
+
+  @override
+  State<AddDialog> createState() => _AddDialogState();
+}
+
+class _AddDialogState extends State<AddDialog> {
+  TextEditingController name = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomTextFormField2(
+              label: '雇用形態名',
+              controller: name,
+              textInputType: null,
+              maxLines: 1,
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.positionProvider.create(
+                      groupId: widget.group?.id,
+                      name: name.text.trim(),
+                    )) {
+                      return;
+                    }
+                    customSnackBar(context, '雇用形態を登録しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

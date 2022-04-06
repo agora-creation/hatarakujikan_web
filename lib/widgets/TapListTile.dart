@@ -31,6 +31,7 @@ class TapListTile extends StatelessWidget {
             color: Colors.black54,
             fontSize: 14.0,
           ),
+          overflow: TextOverflow.ellipsis,
         ),
         trailing: Icon(Icons.edit),
         onTap: onTap,

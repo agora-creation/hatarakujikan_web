@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
@@ -7,10 +8,14 @@ import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_google_map.dart';
+import 'package:hatarakujikan_web/widgets/custom_slider.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
+import 'package:hatarakujikan_web/widgets/date_range_picker.dart';
 import 'package:hatarakujikan_web/widgets/icon_title.dart';
 import 'package:hatarakujikan_web/widgets/time_form_field.dart';
+import 'package:hatarakujikan_web/widgets/week_checkbox.dart';
 import 'package:provider/provider.dart';
 
 class GroupRuleScreen extends StatelessWidget {
@@ -57,6 +62,9 @@ class GroupRuleScreen extends StatelessWidget {
     if (groupProvider.group?.areaSecurity == true) {
       _areaSecurity = '有効';
     }
+    String _areaLat = '${groupProvider.group?.areaLat}';
+    String _areaLon = '${groupProvider.group?.areaLon}';
+    String _areaRange = '${groupProvider.group?.areaRange}m';
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -180,7 +188,7 @@ class GroupRuleScreen extends StatelessWidget {
                         showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => EditRoundStartDialog(
+                          builder: (_) => EditWorkDialog(
                             groupProvider: groupProvider,
                           ),
                         );
@@ -193,7 +201,7 @@ class GroupRuleScreen extends StatelessWidget {
                         showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => EditRoundStartDialog(
+                          builder: (_) => EditHolidaysDialog(
                             groupProvider: groupProvider,
                           ),
                         );
@@ -206,20 +214,20 @@ class GroupRuleScreen extends StatelessWidget {
                         showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => EditRoundStartDialog(
+                          builder: (_) => EditHolidays2Dialog(
                             groupProvider: groupProvider,
                           ),
                         );
                       },
                     ),
                     TapListTile(
-                      title: '自動休憩(1時間)',
+                      title: '自動休憩時間付与(1時間)',
                       subtitle: _autoBreak,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => EditRoundStartDialog(
+                          builder: (_) => EditAutoBreakDialog(
                             groupProvider: groupProvider,
                           ),
                         );
@@ -232,31 +240,47 @@ class GroupRuleScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 8.0),
                     TapListTile(
-                      title: '打刻時、QRコードで認証する',
+                      title: 'QRコード認証',
                       subtitle: _qrSecurity,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => EditRoundStartDialog(
+                          builder: (_) => EditQrSecurityDialog(
                             groupProvider: groupProvider,
                           ),
                         );
                       },
                     ),
                     TapListTile(
-                      title: '打刻時、位置情報が範囲外なら打刻させない',
+                      title: 'GPS位置情報制限',
                       subtitle: _areaSecurity,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => EditRoundStartDialog(
+                          builder: (_) => EditAreaSecurityDialog(
                             groupProvider: groupProvider,
                           ),
                         );
                       },
                     ),
+                    groupProvider.group?.areaSecurity == true
+                        ? TapListTile(
+                            title: '制限する範囲',
+                            subtitle:
+                                '緯度：$_areaLat、経度：$_areaLon、半径：$_areaRange',
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => EditAreaLatLonDialog(
+                                  groupProvider: groupProvider,
+                                ),
+                              );
+                            },
+                          )
+                        : Container(),
                   ],
                 ),
               ],
@@ -944,32 +968,38 @@ class _EditNightDialogState extends State<EditNightDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TimeFormField(
-                  label: '深夜開始時間',
-                  time: nightStart,
-                  onPressed: () async {
-                    List<String> _hm = nightStart!.split(':');
-                    TimeOfDay? _selected = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay(
-                        hour: int.parse(_hm.first),
-                        minute: int.parse(_hm.last),
-                      ),
-                    );
-                    if (_selected == null) return;
-                    String _time = '${_selected.format(context)}';
-                    setState(() => nightStart = _time);
-                  },
+                Expanded(
+                  child: TimeFormField(
+                    label: '深夜開始時間',
+                    time: nightStart,
+                    onPressed: () async {
+                      String? _time = await customTimePicker(
+                        context: context,
+                        init: nightStart,
+                      );
+                      if (_time == null) return;
+                      setState(() => nightStart = _time);
+                    },
+                  ),
                 ),
                 SizedBox(width: 8.0),
                 Center(
                   child: Text('〜', style: TextStyle(color: Colors.black54)),
                 ),
                 SizedBox(width: 8.0),
-                TimeFormField(
-                  label: '深夜終了時間',
-                  time: nightEnd,
-                  onPressed: () {},
+                Expanded(
+                  child: TimeFormField(
+                    label: '深夜終了時間',
+                    time: nightEnd,
+                    onPressed: () async {
+                      String? _time = await customTimePicker(
+                        context: context,
+                        init: nightEnd,
+                      );
+                      if (_time == null) return;
+                      setState(() => nightEnd = _time);
+                    },
+                  ),
                 ),
               ],
             ),
@@ -985,7 +1015,708 @@ class _EditNightDialogState extends State<EditNightDialog> {
                 CustomTextButton(
                   label: '保存する',
                   color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateNight(
+                      id: widget.groupProvider.group?.id,
+                      nightStart: nightStart,
+                      nightEnd: nightEnd,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '深夜時間帯を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditWorkDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditWorkDialog({required this.groupProvider});
+
+  @override
+  State<EditWorkDialog> createState() => _EditWorkDialogState();
+}
+
+class _EditWorkDialogState extends State<EditWorkDialog> {
+  String? workStart;
+  String? workEnd;
+
+  void _init() async {
+    workStart = widget.groupProvider.group?.workStart;
+    workEnd = widget.groupProvider.group?.workEnd;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: TimeFormField(
+                    label: '労働開始時間',
+                    time: workStart,
+                    onPressed: () async {
+                      String? _time = await customTimePicker(
+                        context: context,
+                        init: workStart,
+                      );
+                      if (_time == null) return;
+                      setState(() => workStart = _time);
+                    },
+                  ),
+                ),
+                SizedBox(width: 8.0),
+                Center(
+                  child: Text('〜', style: TextStyle(color: Colors.black54)),
+                ),
+                SizedBox(width: 8.0),
+                Expanded(
+                  child: TimeFormField(
+                    label: '労働終了時間',
+                    time: workEnd,
+                    onPressed: () async {
+                      String? _time = await customTimePicker(
+                        context: context,
+                        init: workEnd,
+                      );
+                      if (_time == null) return;
+                      setState(() => workEnd = _time);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
                   onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateWork(
+                      id: widget.groupProvider.group?.id,
+                      workStart: workStart,
+                      workEnd: workEnd,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '所定労働時間帯を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditHolidaysDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditHolidaysDialog({required this.groupProvider});
+
+  @override
+  State<EditHolidaysDialog> createState() => _EditHolidaysDialogState();
+}
+
+class _EditHolidaysDialogState extends State<EditHolidaysDialog> {
+  List<String> holidays = [];
+
+  void _init() async {
+    holidays = widget.groupProvider.group?.holidays ?? [];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '休日としたい曜日にチェックを入れてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            Column(
+              children: weekList.map((e) {
+                return WeekCheckbox(
+                  label: e,
+                  value: holidays.contains(e),
+                  onChanged: (value) {
+                    setState(() {
+                      if (holidays.contains(e)) {
+                        holidays.remove(e);
+                      } else {
+                        holidays.add(e);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateHolidays(
+                      id: widget.groupProvider.group?.id,
+                      holidays: holidays,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '休日設定(曜日指定)を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditHolidays2Dialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditHolidays2Dialog({required this.groupProvider});
+
+  @override
+  State<EditHolidays2Dialog> createState() => _EditHolidays2DialogState();
+}
+
+class _EditHolidays2DialogState extends State<EditHolidays2Dialog> {
+  List<DateTime> holidays2 = [];
+
+  void _init() async {
+    holidays2 = widget.groupProvider.group?.holidays2 ?? [];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '休日としたい日付を選択してください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            DateRangePicker(
+              initialSelectedDates: holidays2,
+              onSelectionChanged: (value) {
+                holidays2.clear();
+                for (DateTime _day in value.value) {
+                  holidays2.add(_day);
+                }
+              },
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateHolidays2(
+                      id: widget.groupProvider.group?.id,
+                      holidays2: holidays2,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '休日設定(日付指定)を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditAutoBreakDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditAutoBreakDialog({required this.groupProvider});
+
+  @override
+  State<EditAutoBreakDialog> createState() => _EditAutoBreakDialogState();
+}
+
+class _EditAutoBreakDialogState extends State<EditAutoBreakDialog> {
+  bool? autoBreak;
+
+  void _init() async {
+    autoBreak = widget.groupProvider.group?.autoBreak;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '有効にすると、各スタッフが退勤時に1時間分の休憩時間を自動付与します。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomDropdownButton(
+              label: '自動休憩時間付与(1時間)',
+              isExpanded: true,
+              value: autoBreak,
+              onChanged: (value) {
+                setState(() => autoBreak = value);
+              },
+              items: [
+                DropdownMenuItem(
+                  value: false,
+                  child: Text(
+                    '無効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: true,
+                  child: Text(
+                    '有効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateAutoBreak(
+                      id: widget.groupProvider.group?.id,
+                      autoBreak: autoBreak,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '自動休憩時間付与(1時間)の設定を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditQrSecurityDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditQrSecurityDialog({required this.groupProvider});
+
+  @override
+  State<EditQrSecurityDialog> createState() => _EditQrSecurityDialogState();
+}
+
+class _EditQrSecurityDialogState extends State<EditQrSecurityDialog> {
+  bool? qrSecurity;
+
+  void _init() async {
+    qrSecurity = widget.groupProvider.group?.qrSecurity;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '有効にすると、各スタッフがスマホアプリでの打刻時に、会社/組織のQRコードが無いと打刻できなくなります。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomDropdownButton(
+              label: 'QRコード認証',
+              isExpanded: true,
+              value: qrSecurity,
+              onChanged: (value) {
+                setState(() => qrSecurity = value);
+              },
+              items: [
+                DropdownMenuItem(
+                  value: false,
+                  child: Text(
+                    '無効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: true,
+                  child: Text(
+                    '有効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateQrSecurity(
+                      id: widget.groupProvider.group?.id,
+                      qrSecurity: qrSecurity,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, 'QRコード認証の設定を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditAreaSecurityDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditAreaSecurityDialog({required this.groupProvider});
+
+  @override
+  State<EditAreaSecurityDialog> createState() => _EditAreaSecurityDialogState();
+}
+
+class _EditAreaSecurityDialogState extends State<EditAreaSecurityDialog> {
+  bool? areaSecurity;
+
+  void _init() async {
+    areaSecurity = widget.groupProvider.group?.areaSecurity;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '有効にすると、各スタッフがスマホアプリでの打刻時に、指定した範囲内にスマホが入っていないと打刻できなくなります。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomDropdownButton(
+              label: 'GPS位置情報制限',
+              isExpanded: true,
+              value: areaSecurity,
+              onChanged: (value) {
+                setState(() => areaSecurity = value);
+              },
+              items: [
+                DropdownMenuItem(
+                  value: false,
+                  child: Text(
+                    '無効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: true,
+                  child: Text(
+                    '有効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateAreaSecurity(
+                      id: widget.groupProvider.group?.id,
+                      areaSecurity: areaSecurity,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, 'GPS位置情報制限の設定を保存しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditAreaLatLonDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+
+  EditAreaLatLonDialog({required this.groupProvider});
+
+  @override
+  State<EditAreaLatLonDialog> createState() => _EditAreaLatLonDialogState();
+}
+
+class _EditAreaLatLonDialogState extends State<EditAreaLatLonDialog> {
+  double? areaLat;
+  double? areaLon;
+  double? areaRange;
+  GoogleMapController? mapController;
+
+  void _init() async {
+    areaLat = widget.groupProvider.group?.areaLat;
+    areaLon = widget.groupProvider.group?.areaLon;
+    areaRange = widget.groupProvider.group?.areaRange;
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() => mapController = controller);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 650.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '赤い範囲が打刻できる範囲になります。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomGoogleMap(
+              height: 350.0,
+              onMapCreated: _onMapCreated,
+              lat: areaLat,
+              lon: areaLon,
+              range: areaRange,
+              onTap: (latLng) {
+                setState(() {
+                  areaLat = latLng.latitude;
+                  areaLon = latLng.longitude;
+                });
+              },
+            ),
+            SizedBox(height: 8.0),
+            CustomSlider(
+              text: '半径：$areaRange m',
+              label: '$areaRange',
+              value: areaRange,
+              onChanged: (value) {
+                setState(() => areaRange = value);
+              },
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    if (!await widget.groupProvider.updateAreaLatLon(
+                      id: widget.groupProvider.group?.id,
+                      areaLat: areaLat,
+                      areaLon: areaLon,
+                      areaRange: areaRange,
+                    )) {
+                      return;
+                    }
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, '制限する範囲を保存しました');
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             ),

@@ -24,24 +24,27 @@ class TimeFormField extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        TextButton.icon(
-          icon: Icon(
-            Icons.access_time,
-            color: Colors.black54,
-            size: 16.0,
-          ),
-          label: Text(
-            time ?? '--:--',
-            style: TextStyle(
+        Container(
+          width: double.infinity,
+          child: TextButton.icon(
+            icon: Icon(
+              Icons.access_time,
               color: Colors.black54,
-              fontSize: 16.0,
+              size: 16.0,
             ),
+            label: Text(
+              time ?? '--:--',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 16.0,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.grey.shade200,
+              padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+            ),
+            onPressed: onPressed,
           ),
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.grey.shade200,
-            padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-          ),
-          onPressed: onPressed,
         ),
       ],
     );

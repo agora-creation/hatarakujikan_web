@@ -7,11 +7,11 @@ class PositionProvider with ChangeNotifier {
   PositionService _positionService = PositionService();
 
   Future<bool> create({
-    required String groupId,
-    required String name,
+    String? groupId,
+    String? name,
   }) async {
-    if (groupId == '') return false;
-    if (name == '') return false;
+    if (groupId == null) return false;
+    if (name == null) return false;
     try {
       String _id = _positionService.id();
       _positionService.create({
