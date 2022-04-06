@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 
-class WeekCheckbox extends StatelessWidget {
+class CustomCheckbox extends StatelessWidget {
   final String? label;
   final bool? value;
+  final Color? activeColor;
   final Function(bool?)? onChanged;
 
-  WeekCheckbox({
+  CustomCheckbox({
     this.label,
     this.value,
+    this.activeColor,
     this.onChanged,
   });
 
@@ -24,7 +26,7 @@ class WeekCheckbox extends StatelessWidget {
             fontSize: 16.0,
           ),
         ),
-        activeColor: Colors.redAccent,
+        activeColor: activeColor,
         controlAffinity: ListTileControlAffinity.leading,
         value: value,
         onChanged: onChanged,

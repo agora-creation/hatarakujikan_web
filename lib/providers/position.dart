@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/position.dart';
-import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/position.dart';
 
 class PositionProvider with ChangeNotifier {
@@ -29,9 +28,11 @@ class PositionProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    required String id,
-    required String name,
+    String? id,
+    String? name,
   }) async {
+    if (id == null) return false;
+    if (name == null) return false;
     try {
       _positionService.update({
         'id': id,
@@ -44,19 +45,10 @@ class PositionProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateUsers({
-    required PositionModel position,
-    required List<UserModel> users,
-  }) async {
+  Future<bool> delete({String? id}) async {
+    if (id == null) return false;
     try {
-      List<String> _userIds = [];
-      for (UserModel _user in users) {
-        _userIds.add(_user.id);
-      }
-      _positionService.update({
-        'id': position.id,
-        'userIds': _userIds,
-      });
+      _positionService.delete({'id': id});
       return true;
     } catch (e) {
       print(e.toString());
@@ -64,8 +56,22 @@ class PositionProvider with ChangeNotifier {
     }
   }
 
-  void delete({required String id}) {
-    _positionService.delete({'id': id});
+  Future<bool> updateUserIds({
+    String? id,
+    List<String>? userIds,
+  }) async {
+    if (id == null) return false;
+    if (userIds == null) return false;
+    try {
+      _positionService.update({
+        'id': id,
+        'userIds': userIds,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   Future<List<PositionModel>> selectList({required String groupId}) async {

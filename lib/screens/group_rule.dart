@@ -7,6 +7,7 @@ import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_google_map.dart';
 import 'package:hatarakujikan_web/widgets/custom_slider.dart';
@@ -15,7 +16,6 @@ import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/date_range_picker.dart';
 import 'package:hatarakujikan_web/widgets/icon_title.dart';
 import 'package:hatarakujikan_web/widgets/time_form_field.dart';
-import 'package:hatarakujikan_web/widgets/week_checkbox.dart';
 import 'package:provider/provider.dart';
 
 class GroupRuleScreen extends StatelessWidget {
@@ -1187,9 +1187,10 @@ class _EditHolidaysDialogState extends State<EditHolidaysDialog> {
             SizedBox(height: 16.0),
             Column(
               children: weekList.map((e) {
-                return WeekCheckbox(
+                return CustomCheckbox(
                   label: e,
                   value: holidays.contains(e),
+                  activeColor: Colors.redAccent,
                   onChanged: (value) {
                     setState(() {
                       if (holidays.contains(e)) {
