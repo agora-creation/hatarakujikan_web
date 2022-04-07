@@ -18,7 +18,7 @@ import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 
 class GroupPositionScreen extends StatelessWidget {
-  static const String id = 'position';
+  static const String id = 'group_position';
 
   @override
   Widget build(BuildContext context) {
@@ -129,9 +129,9 @@ class GroupPositionScreen extends StatelessWidget {
                                 barrierDismissible: false,
                                 context: context,
                                 builder: (_) => CheckUserDialog(
+                                  groupProvider: groupProvider,
                                   positionProvider: positionProvider,
                                   position: positions[index],
-                                  users: groupProvider.users,
                                 ),
                               );
                             },
@@ -313,14 +313,14 @@ class _EditDialogState extends State<EditDialog> {
 }
 
 class CheckUserDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final PositionProvider positionProvider;
   final PositionModel position;
-  final List<UserModel> users;
 
   CheckUserDialog({
+    required this.groupProvider,
     required this.positionProvider,
     required this.position,
-    required this.users,
   });
 
   @override
@@ -329,14 +329,19 @@ class CheckUserDialog extends StatefulWidget {
 
 class _CheckUserDialogState extends State<CheckUserDialog> {
   ScrollController _controller = ScrollController();
+  List<UserModel> users = [];
   List<String> userIds = [];
 
   void _init() async {
-    for (String _id in widget.position.userIds) {
-      UserModel _user = widget.users.singleWhere((e) => e.id == _id);
-      if (_user.id != '') {
-        userIds.add(_user.id);
-      }
+    List<UserModel> _users = await widget.groupProvider.selectUsers();
+    if (mounted) {
+      setState(() {
+        users = _users;
+        for (String _id in widget.position.userIds) {
+          UserModel? _user = users.singleWhere((e) => e.id == _id);
+          if (_user.id != '') userIds.add(_user.id);
+        }
+      });
     }
   }
 
@@ -373,9 +378,9 @@ class _CheckUserDialogState extends State<CheckUserDialog> {
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   controller: _controller,
-                  itemCount: widget.users.length,
+                  itemCount: users.length,
                   itemBuilder: (_, index) {
-                    UserModel _user = widget.users[index];
+                    UserModel _user = users[index];
                     var contain = userIds.where((e) => e == _user.id);
                     return CustomCheckbox(
                       label: _user.name,

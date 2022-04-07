@@ -219,16 +219,6 @@ class ConfirmDialog extends StatelessWidget {
               ),
               CustomTextButton(
                 onPressed: () async {
-                  if (!await groupProvider.updateSecurity(
-                    id: groupProvider.group?.id ?? '',
-                    qrSecurity: qrSecurity,
-                    areaSecurity: areaSecurity,
-                    areaLat: areaLat,
-                    areaLon: areaLon,
-                    areaRange: areaRange,
-                  )) {
-                    return;
-                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('セキュリティ設定を保存しました')),
                   );

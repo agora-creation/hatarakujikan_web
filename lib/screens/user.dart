@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
@@ -12,6 +13,7 @@ import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 
 class UserScreen extends StatelessWidget {
@@ -21,15 +23,115 @@ class UserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
+    GroupModel? group = groupProvider.group;
+    List<UserModel> users = [];
+    Stream<QuerySnapshot<Map<String, dynamic>>>? stream = FirebaseFirestore
+        .instance
+        .collection('user')
+        .where('id', whereIn: group?.userIds ?? [''])
+        .orderBy('recordPassword', descending: false)
+        .snapshots();
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: UserTable(
-        groupProvider: groupProvider,
-        userProvider: userProvider,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdminHeader(
+            title: 'スタッフの管理',
+            message: 'お知らせを登録し、各スタッフのスマホアプリへ通知を送ることができます。',
+          ),
+          SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(),
+              TextIconButton(
+                iconData: Icons.add,
+                iconColor: Colors.white,
+                label: '新規登録',
+                labelColor: Colors.white,
+                backgroundColor: Colors.blue,
+                onPressed: () {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => AddDialog(
+                      userProvider: userProvider,
+                      group: group,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 8.0),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: stream,
+              builder: (context, snapshot) {
+                users.clear();
+                if (snapshot.hasData) {
+                  for (DocumentSnapshot<Map<String, dynamic>> doc
+                      in snapshot.data!.docs) {
+                    users.add(UserModel.fromSnapshot(doc));
+                  }
+                }
+                if (users.length == 0) return Text('現在登録しているスタッフはいません。');
+                return DataTable2(
+                  columns: [
+                    DataColumn2(label: Text('スタッフ番号'), size: ColumnSize.M),
+                    DataColumn2(label: Text('スタッフ名'), size: ColumnSize.M),
+                    DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.M),
+                    DataColumn2(label: Text('スマホアプリ利用'), size: ColumnSize.M),
+                    DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+                  ],
+                  rows: List<DataRow>.generate(
+                    users.length,
+                    (index) => DataRow(
+                      cells: [
+                        DataCell(Text('${users[index].number}')),
+                        DataCell(Text('${users[index].name}')),
+                        DataCell(Text('${users[index].recordPassword}')),
+                        DataCell(IconButton(
+                          icon: Icon(Icons.smartphone, color: Colors.blue),
+                          onPressed: () {},
+                        )),
+                        DataCell(IconButton(
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {},
+                        )),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class AddDialog extends StatefulWidget {
+  final UserProvider userProvider;
+  final GroupModel? group;
+
+  AddDialog({
+    required this.userProvider,
+    this.group,
+  });
+
+  @override
+  State<AddDialog> createState() => _AddDialogState();
+}
+
+class _AddDialogState extends State<AddDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
 

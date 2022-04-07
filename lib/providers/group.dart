@@ -506,30 +506,6 @@ class GroupProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateSecurity({
-    required String id,
-    required bool qrSecurity,
-    required bool areaSecurity,
-    required double areaLat,
-    required double areaLon,
-    required double areaRange,
-  }) async {
-    try {
-      _groupService.update({
-        'id': id,
-        'qrSecurity': qrSecurity,
-        'areaSecurity': areaSecurity,
-        'areaLat': areaLat,
-        'areaLon': areaLon,
-        'areaRange': areaRange,
-      });
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return false;
-    }
-  }
-
   Future<List<UserModel>> selectUsers({bool? smartphone}) async {
     List<UserModel> _users = [];
     await _userService

@@ -118,9 +118,9 @@ class GroupNoticeScreen extends StatelessWidget {
                               barrierDismissible: false,
                               context: context,
                               builder: (_) => SendDialog(
+                                groupProvider: groupProvider,
                                 noticeProvider: noticeProvider,
                                 notice: notices[index],
-                                users: groupProvider.users,
                               ),
                             );
                           },
@@ -322,14 +322,14 @@ class _EditDialogState extends State<EditDialog> {
 }
 
 class SendDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
   final GroupNoticeProvider noticeProvider;
   final GroupNoticeModel notice;
-  final List<UserModel> users;
 
   SendDialog({
+    required this.groupProvider,
     required this.noticeProvider,
     required this.notice,
-    required this.users,
   });
 
   @override
@@ -337,11 +337,25 @@ class SendDialog extends StatefulWidget {
 }
 
 class _SendDialogState extends State<SendDialog> {
+  ScrollController _controller = ScrollController();
+  List<UserModel> users = [];
+  List<UserModel> selected = [];
+
+  void _init() async {
+    List<UserModel> _users = await widget.groupProvider.selectUsers();
+    if (mounted) {
+      setState(() => users = _users);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
   @override
   Widget build(BuildContext context) {
-    ScrollController _controller = ScrollController();
-    List<UserModel> users = [];
-
     return AlertDialog(
       content: Container(
         width: 450.0,
@@ -367,21 +381,21 @@ class _SendDialogState extends State<SendDialog> {
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   controller: _controller,
-                  itemCount: widget.users.length,
+                  itemCount: users.length,
                   itemBuilder: (_, index) {
-                    UserModel _user = widget.users[index];
-                    var contain = users.where((e) => e.id == _user.id);
+                    UserModel _user = users[index];
+                    var contain = selected.where((e) => e.id == _user.id);
                     return CustomCheckbox(
                       label: _user.name,
                       value: contain.isNotEmpty,
                       activeColor: Colors.blue,
                       onChanged: (value) {
-                        var _contain = users.where((e) => e.id == _user.id);
+                        var _contain = selected.where((e) => e.id == _user.id);
                         setState(() {
                           if (_contain.isEmpty) {
-                            users.add(_user);
+                            selected.add(_user);
                           } else {
-                            users.removeWhere((e) => e.id == _user.id);
+                            selected.removeWhere((e) => e.id == _user.id);
                           }
                         });
                       },
@@ -405,7 +419,7 @@ class _SendDialogState extends State<SendDialog> {
                   onPressed: () async {
                     if (!await widget.noticeProvider.send(
                       notice: widget.notice,
-                      users: users,
+                      users: selected,
                     )) {
                       return;
                     }

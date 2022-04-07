@@ -22,6 +22,14 @@ class GroupInvoiceScreen extends StatelessWidget {
             message: '本システムの利用に当たって発生する請求書の控えを表示しています。',
           ),
           SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(),
+              Container(),
+            ],
+          ),
+          SizedBox(height: 8.0),
           Expanded(child: Text('現在利用できません。'))
         ],
       ),
