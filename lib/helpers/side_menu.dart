@@ -3,10 +3,10 @@ import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
+import 'package:hatarakujikan_web/screens/group_invoice.dart';
+import 'package:hatarakujikan_web/screens/group_notice.dart';
+import 'package:hatarakujikan_web/screens/group_position.dart';
 import 'package:hatarakujikan_web/screens/group_rule.dart';
-import 'package:hatarakujikan_web/screens/notice.dart';
-import 'package:hatarakujikan_web/screens/position.dart';
-import 'package:hatarakujikan_web/screens/setting_security.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
 import 'package:hatarakujikan_web/screens/work_shift.dart';
@@ -73,17 +73,17 @@ List<MenuItem> sideMenu(GroupModel? group) {
         ),
         MenuItem(
           title: '雇用形態の管理',
-          route: PositionScreen.id,
+          route: GroupPositionScreen.id,
           icon: Icons.chevron_right,
         ),
         MenuItem(
           title: 'お知らせの管理',
-          route: NoticeScreen.id,
+          route: GroupNoticeScreen.id,
           icon: Icons.chevron_right,
         ),
         MenuItem(
           title: '請求書の管理',
-          route: SettingSecurityScreen.id,
+          route: GroupInvoiceScreen.id,
           icon: Icons.chevron_right,
         ),
       ],

@@ -8,6 +8,7 @@ import 'package:hatarakujikan_web/models/position.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/position.dart';
+import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
@@ -16,7 +17,7 @@ import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 
-class PositionScreen extends StatelessWidget {
+class GroupPositionScreen extends StatelessWidget {
   static const String id = 'position';
 
   @override
@@ -78,6 +79,7 @@ class PositionScreen extends StatelessWidget {
                     positions.add(PositionModel.fromSnapshot(doc));
                   }
                 }
+                if (positions.length == 0) return Text('現在登録している雇用形態はありません。');
                 return DataTable2(
                   columns: [
                     DataColumn2(label: Text('雇用形態名'), size: ColumnSize.S),
@@ -357,6 +359,11 @@ class _CheckUserDialogState extends State<CheckUserDialog> {
               style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
+            TapListTile(
+              title: '雇用形態名',
+              subtitle: widget.position.name,
+            ),
+            SizedBox(height: 8.0),
             Container(
               height: 350.0,
               child: Scrollbar(

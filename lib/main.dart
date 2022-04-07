@@ -12,10 +12,11 @@ import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
+import 'package:hatarakujikan_web/screens/group_invoice.dart';
+import 'package:hatarakujikan_web/screens/group_notice.dart';
+import 'package:hatarakujikan_web/screens/group_position.dart';
 import 'package:hatarakujikan_web/screens/group_rule.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
-import 'package:hatarakujikan_web/screens/notice.dart';
-import 'package:hatarakujikan_web/screens/position.dart';
 import 'package:hatarakujikan_web/screens/setting_info.dart';
 import 'package:hatarakujikan_web/screens/setting_security.dart';
 import 'package:hatarakujikan_web/screens/setting_work.dart';
@@ -68,9 +69,10 @@ class MyApp extends StatelessWidget {
         routes: {
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
           GroupInfoScreen.id: (context) => GroupInfoScreen(),
+          GroupInvoiceScreen.id: (context) => GroupInvoiceScreen(),
+          GroupNoticeScreen.id: (context) => GroupNoticeScreen(),
+          GroupPositionScreen.id: (context) => GroupPositionScreen(),
           GroupRuleScreen.id: (context) => GroupRuleScreen(),
-          NoticeScreen.id: (context) => NoticeScreen(),
-          PositionScreen.id: (context) => PositionScreen(),
           SettingInfoScreen.id: (context) => SettingInfoScreen(),
           SettingSecurityScreen.id: (context) => SettingSecurityScreen(),
           SettingWorkScreen.id: (context) => SettingWorkScreen(),

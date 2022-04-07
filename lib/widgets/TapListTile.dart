@@ -33,7 +33,7 @@ class TapListTile extends StatelessWidget {
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: Icon(Icons.edit),
+        trailing: onTap != null ? Icon(Icons.edit) : null,
         onTap: onTap,
       ),
     );
