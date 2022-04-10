@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -11,13 +12,15 @@ class UserProvider with ChangeNotifier {
   WorkService _workService = WorkService();
 
   Future<bool> create({
-    required String number,
-    required String name,
-    required String recordPassword,
-    required GroupModel group,
+    GroupModel? group,
+    String? number,
+    String? name,
+    String? recordPassword,
   }) async {
-    if (number == '') return false;
-    if (name == '') return false;
+    if (group == null) return false;
+    if (number == null) return false;
+    if (name == null) return false;
+    if (recordPassword == null) return false;
     try {
       String _id = _userService.id();
       _userService.create({
@@ -34,8 +37,7 @@ class UserProvider with ChangeNotifier {
         'smartphone': false,
         'createdAt': DateTime.now(),
       });
-      List<String> _userIds = [];
-      _userIds = group.userIds;
+      List<String> _userIds = group.userIds;
       _userIds.add(_id);
       _groupService.update({
         'id': group.id,
@@ -49,11 +51,15 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    required String id,
-    required String number,
-    required String name,
-    required String recordPassword,
+    String? id,
+    String? number,
+    String? name,
+    String? recordPassword,
   }) async {
+    if (id == null) return false;
+    if (number == null) return false;
+    if (name == null) return false;
+    if (recordPassword == null) return false;
     try {
       _userService.update({
         'id': id,
@@ -68,18 +74,84 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  void delete({
-    required UserModel user,
-    required GroupModel group,
-  }) {
-    _userService.delete({'id': user.id});
-    List<String> _userIds = [];
-    _userIds = group.userIds;
-    _userIds.remove(user.id);
-    _groupService.update({
-      'id': group.id,
-      'userIds': _userIds,
+  Future<String?> createSmartphone({
+    String? email,
+    String? password,
+  }) async {
+    String? _ret;
+    FirebaseAuth? _auth = FirebaseAuth.instance;
+    await _auth
+        .createUserWithEmailAndPassword(
+      email: email ?? '',
+      password: password ?? '',
+    )
+        .then((value) {
+      _ret = value.user?.uid;
     });
+    return _ret;
+  }
+
+  Future<bool> updateSmartphone({
+    GroupModel? group,
+    UserModel? user,
+    String? email,
+    String? password,
+    String? newId,
+  }) async {
+    if (group == null) return false;
+    if (user == null) return false;
+    if (email == null) return false;
+    if (password == null) return false;
+    if (newId == null) return false;
+    try {
+      _userService.delete({'id': user.id});
+      _userService.create({
+        'id': newId,
+        'number': user.number,
+        'name': user.name,
+        'email': email,
+        'password': password,
+        'recordPassword': user.recordPassword,
+        'workLv': user.workLv,
+        'lastWorkId': user.lastWorkId,
+        'lastBreakId': user.lastBreakId,
+        'token': user.token,
+        'smartphone': true,
+        'createdAt': DateTime.now(),
+      });
+      List<String> _userIds = group.userIds;
+      _userIds.remove(user.id);
+      _userIds.add(newId);
+      _groupService.update({
+        'id': group.id,
+        'userIds': _userIds,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> delete({
+    GroupModel? group,
+    String? id,
+  }) async {
+    if (group == null) return false;
+    if (id == null) return false;
+    try {
+      _userService.delete({'id': id});
+      List<String> _userIds = group.userIds;
+      _userIds.remove(id);
+      _groupService.update({
+        'id': group.id,
+        'userIds': _userIds,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   Future<bool> migration({

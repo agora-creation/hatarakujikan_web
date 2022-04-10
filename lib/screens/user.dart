@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -9,10 +10,8 @@ import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
-import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
-import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +39,8 @@ class UserScreen extends StatelessWidget {
         children: [
           AdminHeader(
             title: 'スタッフの管理',
-            message: 'お知らせを登録し、各スタッフのスマホアプリへ通知を送ることができます。',
+            message:
+                '会社/組織へ所属するスタッフを登録し、タブレットアプリで打刻できるようにします。スマホアプリを利用できるようにここで設定も可能です。',
           ),
           SizedBox(height: 8.0),
           Row(
@@ -84,8 +84,8 @@ class UserScreen extends StatelessWidget {
                     DataColumn2(label: Text('スタッフ番号'), size: ColumnSize.M),
                     DataColumn2(label: Text('スタッフ名'), size: ColumnSize.M),
                     DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.M),
-                    DataColumn2(label: Text('スマホアプリ利用'), size: ColumnSize.M),
                     DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+                    DataColumn2(label: Text('スマホアプリ利用'), size: ColumnSize.M),
                   ],
                   rows: List<DataRow>.generate(
                     users.length,
@@ -95,12 +95,35 @@ class UserScreen extends StatelessWidget {
                         DataCell(Text('${users[index].name}')),
                         DataCell(Text('${users[index].recordPassword}')),
                         DataCell(IconButton(
-                          icon: Icon(Icons.smartphone, color: Colors.blue),
-                          onPressed: () {},
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditDialog(
+                                userProvider: userProvider,
+                                user: users[index],
+                                group: group,
+                              ),
+                            );
+                          },
                         )),
                         DataCell(IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {},
+                          icon: users[index].smartphone == true
+                              ? Icon(Icons.smartphone, color: Colors.blue)
+                              : Icon(Icons.no_cell, color: Colors.blue),
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => SmartphoneDialog(
+                                groupProvider: groupProvider,
+                                userProvider: userProvider,
+                                user: users[index],
+                                group: group,
+                              ),
+                            );
+                          },
                         )),
                       ],
                     ),
@@ -129,283 +152,6 @@ class AddDialog extends StatefulWidget {
 }
 
 class _AddDialogState extends State<AddDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class UserTable extends StatefulWidget {
-  final GroupProvider groupProvider;
-  final UserProvider userProvider;
-
-  UserTable({
-    required this.groupProvider,
-    required this.userProvider,
-  });
-
-  @override
-  _UserTableState createState() => _UserTableState();
-}
-
-class _UserTableState extends State<UserTable> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AdminHeader(
-          title: 'スタッフの管理',
-          message: 'スタッフを一覧表示します。スマートフォンアプリから新規登録して会社/組織へ加入するか、この画面で新規登録できます。',
-        ),
-        SizedBox(height: 16.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(),
-            Row(
-              children: [
-                CustomTextIconButton(
-                  onPressed: () async {
-                    await showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => MigrationDialog(
-                        userProvider: widget.userProvider,
-                        group: widget.groupProvider.group!,
-                        users: widget.groupProvider.users,
-                      ),
-                    ).then((value) {
-                      widget.groupProvider.reloadUsers();
-                    });
-                  },
-                  color: Colors.cyan,
-                  iconData: Icons.smartphone,
-                  label: 'データ移行',
-                ),
-                SizedBox(width: 4.0),
-                CustomTextIconButton(
-                  onPressed: () async {
-                    await showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => AddUserDialog(
-                        userProvider: widget.userProvider,
-                        group: widget.groupProvider.group!,
-                      ),
-                    ).then((value) {
-                      widget.groupProvider.reloadUsers();
-                    });
-                  },
-                  color: Colors.blue,
-                  iconData: Icons.add,
-                  label: '新規登録',
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(height: 8.0),
-        Expanded(
-          child: DataTable2(
-            columns: [
-              DataColumn2(label: Text('スタッフ番号'), size: ColumnSize.L),
-              DataColumn2(label: Text('スタッフ名')),
-              DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.L),
-              DataColumn2(label: Text('メールアドレス')),
-              DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
-            ],
-            rows: List<DataRow>.generate(
-              widget.groupProvider.users.length,
-              (index) => DataRow(
-                cells: [
-                  DataCell(Text('${widget.groupProvider.users[index].number}')),
-                  DataCell(Text('${widget.groupProvider.users[index].name}')),
-                  DataCell(Text(
-                    '${widget.groupProvider.users[index].recordPassword}',
-                  )),
-                  DataCell(Text('${widget.groupProvider.users[index].email}')),
-                  DataCell(IconButton(
-                    onPressed: () async {
-                      await showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => EditUserDialog(
-                          userProvider: widget.userProvider,
-                          group: widget.groupProvider.group!,
-                          user: widget.groupProvider.users[index],
-                        ),
-                      ).then((value) {
-                        widget.groupProvider.reloadUsers();
-                      });
-                    },
-                    icon: Icon(Icons.edit, color: Colors.blue),
-                  )),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class MigrationDialog extends StatefulWidget {
-  final UserProvider userProvider;
-  final GroupModel group;
-  final List<UserModel> users;
-
-  MigrationDialog({
-    required this.userProvider,
-    required this.group,
-    required this.users,
-  });
-
-  @override
-  _MigrationDialogState createState() => _MigrationDialogState();
-}
-
-class _MigrationDialogState extends State<MigrationDialog> {
-  List<UserModel> _before = [];
-  List<UserModel> _after = [];
-  UserModel? _selectBefore;
-  UserModel? _selectAfter;
-
-  void _init() async {
-    widget.users.forEach((user) {
-      if (user.smartphone == false) {
-        _before.add(user);
-      }
-    });
-    widget.users.forEach((user) {
-      if (user.smartphone == true) {
-        _after.add(user);
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            SizedBox(height: 16.0),
-            Text(
-              'この機能は、この管理画面から登録したスタッフがスマートフォンアプリの利用を始めた際、スタッフデータが二重に登録されてしまう為、ここでスタッフデータの統一化ができます。',
-              style: kDefaultTextStyle,
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              '「移行元スタッフ」と「移行先スタッフ」をそれぞれ選択し、最後に「移行する」ボタンを押してください。移行が完了すると、「移行元」のスタッフデータは削除されます。',
-              style: kDefaultTextStyle,
-            ),
-            SizedBox(height: 16.0),
-            CustomLabelColumn(
-              label: '移行元スタッフ(未スマホユーザー)',
-              child: CustomDropdownButton(
-                isExpanded: true,
-                value: _selectBefore,
-                onChanged: (value) {
-                  setState(() => _selectBefore = value);
-                },
-                items: _before.map((value) {
-                  return DropdownMenuItem<UserModel>(
-                    value: value,
-                    child: Text(
-                      '${value.name}',
-                      style: kDefaultTextStyle,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(height: 8.0),
-            Center(
-              child: Icon(
-                Icons.arrow_downward,
-                color: Colors.black54,
-                size: 28.0,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: '移行先スタッフ(スマホユーザー)',
-              child: CustomDropdownButton(
-                isExpanded: false,
-                value: _selectAfter,
-                onChanged: (value) {
-                  setState(() => _selectAfter = value);
-                },
-                items: _after.map((value) {
-                  return DropdownMenuItem<UserModel>(
-                    value: value,
-                    child: Text(
-                      '${value.name}',
-                      style: kDefaultTextStyle,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
-                  label: 'キャンセル',
-                ),
-                CustomTextButton(
-                  onPressed: () async {
-                    if (!await widget.userProvider.migration(
-                      groupId: widget.group.id,
-                      before: _selectBefore!,
-                      after: _selectAfter!,
-                    )) {
-                      return;
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('データの移行が完了しました')),
-                    );
-                    Navigator.pop(context);
-                  },
-                  color: Colors.cyan,
-                  label: '移行する',
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AddUserDialog extends StatefulWidget {
-  final UserProvider userProvider;
-  final GroupModel group;
-
-  AddUserDialog({
-    required this.userProvider,
-    required this.group,
-  });
-
-  @override
-  _AddUserDialogState createState() => _AddUserDialogState();
-}
-
-class _AddUserDialogState extends State<AddUserDialog> {
   TextEditingController number = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
@@ -418,73 +164,58 @@ class _AddUserDialogState extends State<AddUserDialog> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            SizedBox(height: 16.0),
             Text(
-              '項目を全て入力して、最後に「登録する」ボタンを押してください。',
-              style: kDefaultTextStyle,
-            ),
-            Text(
-              '※ここで新規登録したスタッフデータではスマートフォンアプリにログインできません。スマートフォンアプリから新規登録して、会社/組織へ加入してください。',
-              style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
+              '情報を入力し、「登録する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'スタッフ番号',
-              child: CustomTextFormField2(
-                textInputType: null,
-                maxLines: 1,
-                controller: number,
-                onChanged: (value) {
-                  recordPassword.text = value;
-                },
-              ),
+              controller: number,
+              textInputType: null,
+              maxLines: 1,
+              onChanged: (value) {
+                recordPassword.text = value;
+              },
             ),
             SizedBox(height: 8.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'スタッフ名',
-              child: CustomTextFormField2(
-                textInputType: null,
-                maxLines: 1,
-                controller: name,
-                onChanged: (value) {},
-              ),
+              controller: name,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 8.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'タブレット用暗証番号',
-              child: CustomTextFormField2(
-                textInputType: null,
-                maxLines: 1,
-                controller: recordPassword,
-                onChanged: (value) {},
-              ),
+              controller: recordPassword,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
                   label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
                 ),
                 CustomTextButton(
+                  label: '登録する',
+                  color: Colors.blue,
                   onPressed: () async {
                     if (!await widget.userProvider.create(
+                      group: widget.group,
                       number: number.text.trim(),
                       name: name.text.trim(),
                       recordPassword: recordPassword.text.trim(),
-                      group: widget.group,
                     )) {
                       return;
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('スタッフを登録しました')),
-                    );
+                    customSnackBar(context, 'スタッフを登録しました');
                     Navigator.pop(context);
                   },
-                  color: Colors.blue,
-                  label: '登録する',
                 ),
               ],
             ),
@@ -495,22 +226,22 @@ class _AddUserDialogState extends State<AddUserDialog> {
   }
 }
 
-class EditUserDialog extends StatefulWidget {
+class EditDialog extends StatefulWidget {
   final UserProvider userProvider;
-  final GroupModel group;
   final UserModel user;
+  final GroupModel? group;
 
-  EditUserDialog({
+  EditDialog({
     required this.userProvider,
-    required this.group,
     required this.user,
+    required this.group,
   });
 
   @override
-  _EditUserDialogState createState() => _EditUserDialogState();
+  State<EditDialog> createState() => _EditDialogState();
 }
 
-class _EditUserDialogState extends State<EditUserDialog> {
+class _EditDialogState extends State<EditDialog> {
   TextEditingController number = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
@@ -535,78 +266,63 @@ class _EditUserDialogState extends State<EditUserDialog> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            SizedBox(height: 16.0),
             Text(
-              'スタッフの情報を修正できます。',
-              style: kDefaultTextStyle,
-            ),
-            Text(
-              '※スマートフォンアプリから登録している方は、この画面では削除はできません。スマートフォンアプリ内から削除するか、会社/組織から脱退してください。',
-              style: TextStyle(color: Colors.redAccent, fontSize: 14.0),
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'スタッフ番号',
-              child: CustomTextFormField2(
-                textInputType: null,
-                maxLines: 1,
-                controller: number,
-                onChanged: (value) {},
-              ),
+              controller: number,
+              textInputType: null,
+              maxLines: 1,
+              onChanged: (value) {
+                recordPassword.text = value;
+              },
             ),
             SizedBox(height: 8.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'スタッフ名',
-              child: CustomTextFormField2(
-                textInputType: null,
-                maxLines: 1,
-                controller: name,
-                onChanged: (value) {},
-              ),
+              controller: name,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 8.0),
-            CustomLabelColumn(
+            CustomTextFormField2(
               label: 'タブレット用暗証番号',
-              child: CustomTextFormField2(
-                textInputType: null,
-                maxLines: 1,
-                controller: recordPassword,
-                onChanged: (value) {},
-              ),
+              controller: recordPassword,
+              textInputType: null,
+              maxLines: 1,
             ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
                   label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
                 ),
                 Row(
                   children: [
-                    widget.user.smartphone
-                        ? CustomTextButton(
-                            onPressed: null,
-                            color: Colors.grey,
-                            label: '削除する',
-                          )
-                        : CustomTextButton(
-                            onPressed: () {
-                              widget.userProvider.delete(
-                                user: widget.user,
-                                group: widget.group,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('スタッフを削除しました')),
-                              );
-                              Navigator.pop(context);
-                            },
-                            color: Colors.red,
-                            label: '削除する',
-                          ),
+                    CustomTextButton(
+                      label: '削除する',
+                      color: Colors.red,
+                      onPressed: () async {
+                        if (!await widget.userProvider.delete(
+                          group: widget.group,
+                          id: widget.user.id,
+                        )) {
+                          return;
+                        }
+                        customSnackBar(context, 'スタッフを削除しました');
+                        Navigator.pop(context);
+                      },
+                    ),
                     SizedBox(width: 4.0),
                     CustomTextButton(
+                      label: '保存する',
+                      color: Colors.blue,
                       onPressed: () async {
                         if (!await widget.userProvider.update(
                           id: widget.user.id,
@@ -616,15 +332,165 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         )) {
                           return;
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('スタッフを修正しました')),
-                        );
+                        customSnackBar(context, 'スタッフを保存しました');
                         Navigator.pop(context);
                       },
-                      color: Colors.blue,
-                      label: '修正する',
                     ),
                   ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SmartphoneDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+  final UserProvider userProvider;
+  final UserModel user;
+  final GroupModel? group;
+
+  SmartphoneDialog({
+    required this.groupProvider,
+    required this.userProvider,
+    required this.user,
+    required this.group,
+  });
+
+  @override
+  State<SmartphoneDialog> createState() => _SmartphoneDialogState();
+}
+
+class _SmartphoneDialogState extends State<SmartphoneDialog> {
+  bool? smartphone;
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  void _init() async {
+    smartphone = widget.user.smartphone;
+    email.text = widget.user.email;
+    password.text = widget.user.password;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を変更し、「保存する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            Text(
+              '有効になったスタッフはアプリをインストールし、メールアドレスとパスワードでログインしてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomDropdownButton(
+              label: 'スマホアプリ利用',
+              isExpanded: true,
+              value: smartphone,
+              onChanged: (value) {
+                setState(() => smartphone = value);
+              },
+              items: [
+                DropdownMenuItem(
+                  value: false,
+                  child: Text(
+                    '無効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: true,
+                  child: Text(
+                    '有効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            smartphone == true
+                ? Column(
+                    children: [
+                      SizedBox(height: 8.0),
+                      CustomTextFormField2(
+                        label: 'メールアドレス',
+                        controller: email,
+                        textInputType: TextInputType.emailAddress,
+                        maxLines: 1,
+                      ),
+                      SizedBox(height: 8.0),
+                      CustomTextFormField2(
+                        label: 'パスワード',
+                        controller: password,
+                        textInputType: TextInputType.visiblePassword,
+                        maxLines: 1,
+                      ),
+                    ],
+                  )
+                : Container(),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: '保存する',
+                  color: Colors.blue,
+                  onPressed: () async {
+                    print("1");
+                    if (!await widget.groupProvider.signOut2()) {
+                      return;
+                    }
+                    print("2");
+                    String? _newId = await widget.userProvider.createSmartphone(
+                      email: email.text.trim(),
+                      password: password.text.trim(),
+                    );
+                    if (_newId == null) return;
+                    print("3");
+                    if (!await widget.groupProvider.signIn2()) {
+                      return;
+                    }
+                    print("4");
+                    if (!await widget.userProvider.updateSmartphone(
+                      group: widget.group,
+                      user: widget.user,
+                      email: email.text.trim(),
+                      password: password.text.trim(),
+                      newId: _newId,
+                    )) {
+                      return;
+                    }
+                    print("5");
+
+                    widget.groupProvider.reloadGroup();
+                    customSnackBar(context, 'スマホアプリ利用の設定を保存しました');
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             ),
