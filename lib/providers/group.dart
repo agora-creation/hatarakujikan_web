@@ -69,23 +69,6 @@ class GroupProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> signIn2() async {
-    try {
-      await _auth!.signOut();
-      await Future.delayed(Duration(seconds: 1));
-      UserCredential _user = await _auth!.signInWithEmailAndPassword(
-        email: adminUser?.email ?? '',
-        password: adminUser?.password ?? '',
-      );
-      print(_user.user?.uid);
-      _onStateChanged(_user.user);
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return false;
-    }
-  }
-
   Future signOut() async {
     await _auth!.signOut();
     _status = Status.Unauthenticated;

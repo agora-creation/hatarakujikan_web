@@ -466,26 +466,17 @@ class _SmartphoneDialogState extends State<SmartphoneDialog> {
                       return;
                     }
                     print("2");
-                    String? _newId = await widget.userProvider.createSmartphone(
-                      email: email.text.trim(),
-                      password: password.text.trim(),
-                    );
-                    if (_newId == null) return;
-                    print("3");
-                    if (!await widget.groupProvider.signIn2()) {
-                      return;
-                    }
-                    print("4");
                     if (!await widget.userProvider.updateSmartphone(
                       group: widget.group,
+                      adminUser: widget.groupProvider.adminUser,
                       user: widget.user,
+                      smartphone: smartphone,
                       email: email.text.trim(),
                       password: password.text.trim(),
-                      newId: _newId,
                     )) {
                       return;
                     }
-                    print("5");
+                    print("3");
 
                     widget.groupProvider.reloadGroup();
                     customSnackBar(context, 'スマホアプリ利用の設定を保存しました');

@@ -74,36 +74,38 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> createSmartphone({
-    String? email,
-    String? password,
-  }) async {
-    String? _ret;
-    FirebaseAuth? _auth = FirebaseAuth.instance;
-    await _auth
-        .createUserWithEmailAndPassword(
-      email: email ?? '',
-      password: password ?? '',
-    )
-        .then((value) {
-      _ret = value.user?.uid;
-    });
-    return _ret;
-  }
-
   Future<bool> updateSmartphone({
     GroupModel? group,
+    UserModel? adminUser,
     UserModel? user,
+    bool? smartphone,
     String? email,
     String? password,
-    String? newId,
   }) async {
     if (group == null) return false;
+    if (adminUser == null) return false;
     if (user == null) return false;
+    if (smartphone == null) return false;
     if (email == null) return false;
     if (password == null) return false;
-    if (newId == null) return false;
     try {
+      FirebaseAuth? _auth = FirebaseAuth.instance;
+      String? newId;
+      await _auth
+          .createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      )
+          .then((value) {
+        newId = value.user?.uid;
+      });
+      await _auth.signOut();
+      print("1");
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: adminUser.email,
+        password: adminUser.password,
+      );
+      print("2");
       _userService.delete({'id': user.id});
       _userService.create({
         'id': newId,
@@ -121,7 +123,7 @@ class UserProvider with ChangeNotifier {
       });
       List<String> _userIds = group.userIds;
       _userIds.remove(user.id);
-      _userIds.add(newId);
+      _userIds.add(newId ?? '');
       _groupService.update({
         'id': group.id,
         'userIds': _userIds,
