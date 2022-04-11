@@ -89,9 +89,9 @@ class UserProvider with ChangeNotifier {
     if (email == null) return false;
     if (password == null) return false;
     try {
-      FirebaseAuth? _auth = FirebaseAuth.instance;
+      FirebaseAuth? _auth1 = FirebaseAuth.instance;
       String? newId;
-      await _auth
+      await _auth1
           .createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -99,13 +99,15 @@ class UserProvider with ChangeNotifier {
           .then((value) {
         newId = value.user?.uid;
       });
-      await _auth.signOut();
-      print("1");
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await _auth1.signOut();
+      print("a");
+      await Future.delayed(Duration(seconds: 5));
+      FirebaseAuth? _auth2 = FirebaseAuth.instance;
+      await _auth2.signInWithEmailAndPassword(
         email: adminUser.email,
         password: adminUser.password,
       );
-      print("2");
+      print("b");
       _userService.delete({'id': user.id});
       _userService.create({
         'id': newId,
