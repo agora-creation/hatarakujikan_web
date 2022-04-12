@@ -69,6 +69,26 @@ class GroupProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> signIn2() async {
+    if (adminUser?.email == '') return false;
+    if (adminUser?.password == '') return false;
+    try {
+      await _auth!
+          .signInWithEmailAndPassword(
+        email: adminUser?.email ?? '',
+        password: adminUser?.password ?? '',
+      )
+          .then((value) {
+        _fUser = value.user;
+      });
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   Future signOut() async {
     await _auth!.signOut();
     _status = Status.Unauthenticated;
@@ -80,15 +100,10 @@ class GroupProvider with ChangeNotifier {
     return Future.delayed(Duration.zero);
   }
 
-  Future<bool> signOut2() async {
-    try {
-      await _auth!.signOut();
-      await Future.delayed(Duration.zero);
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return false;
-    }
+  Future signOut2() async {
+    await _auth!.signOut();
+    notifyListeners();
+    return Future.delayed(Duration.zero);
   }
 
   void clearController() {

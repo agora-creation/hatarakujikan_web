@@ -461,22 +461,26 @@ class _SmartphoneDialogState extends State<SmartphoneDialog> {
                   label: '保存する',
                   color: Colors.blue,
                   onPressed: () async {
-                    print("1");
-                    if (!await widget.groupProvider.signOut2()) {
+                    await widget.groupProvider.signOut2();
+                    String? newId = await widget.userProvider.createAuth(
+                      email: email.text.trim(),
+                      password: password.text.trim(),
+                    );
+                    if (newId == '') {
                       return;
                     }
-                    print("2");
-                    if (!await widget.userProvider.updateSmartphone(
+                    if (!await widget.groupProvider.signIn2()) {
+                      return;
+                    }
+                    if (!await widget.userProvider.reCreate(
                       group: widget.group,
-                      adminUser: widget.groupProvider.adminUser,
                       user: widget.user,
-                      smartphone: smartphone,
+                      newId: newId,
                       email: email.text.trim(),
                       password: password.text.trim(),
                     )) {
                       return;
                     }
-                    print("3");
 
                     widget.groupProvider.reloadGroup();
                     customSnackBar(context, 'スマホアプリ利用の設定を保存しました');

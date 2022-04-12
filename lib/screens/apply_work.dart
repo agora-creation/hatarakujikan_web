@@ -16,6 +16,7 @@ import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -24,15 +25,73 @@ class ApplyWorkScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final applyWorkProvider = Provider.of<ApplyWorkProvider>(context);
     final groupProvider = Provider.of<GroupProvider>(context);
+    final applyWorkProvider = Provider.of<ApplyWorkProvider>(context);
+    GroupModel? group = groupProvider.group;
+    List<ApplyWorkModel> applyWorks = [];
+    Stream<QuerySnapshot<Map<String, dynamic>>>? stream = FirebaseFirestore
+        .instance
+        .collection('applyWork')
+        .where('groupId', isEqualTo: group?.id)
+        .where('approval', isEqualTo: false)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: ApplyWorkTable(
-        applyWorkProvider: applyWorkProvider,
-        groupProvider: groupProvider,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdminHeader(
+            title: '勤怠修正の申請',
+            message: 'スタッフがスマホアプリから申請した内容を表示しています。承認した場合、自動的に勤怠データが修正されます。',
+          ),
+          SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  TextIconButton(
+                    iconData: Icons.person,
+                    iconColor: Colors.white,
+                    label: 'スタッフ未選択',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.lightBlue,
+                    onPressed: () {},
+                  ),
+                  SizedBox(width: 4.0),
+                  TextIconButton(
+                    iconData: Icons.approval,
+                    iconColor: Colors.white,
+                    label: '承認待ち',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.lightBlue,
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              Container(),
+            ],
+          ),
+          SizedBox(height: 8.0),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: stream,
+              builder: (context, snapshot) {
+                applyWorks.clear();
+                if (snapshot.hasData) {
+                  for (DocumentSnapshot<Map<String, dynamic>> doc
+                      in snapshot.data!.docs) {
+                    applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
+                  }
+                }
+                return Text('現在申請はありません。');
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
