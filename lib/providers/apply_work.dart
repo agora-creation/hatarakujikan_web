@@ -40,13 +40,13 @@ class ApplyWorkProvider with ChangeNotifier {
   UserModel? user;
   bool approval = false;
 
-  void changeUser(UserModel selected) {
-    user = selected;
+  void changeUser(UserModel value) {
+    user = value;
     notifyListeners();
   }
 
-  void changeApproval(bool selected) {
-    approval = selected;
+  void changeApproval(bool value) {
+    approval = value;
     notifyListeners();
   }
 

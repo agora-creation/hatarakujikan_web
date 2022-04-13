@@ -14,9 +14,7 @@ import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
-import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
-import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +71,15 @@ class ApplyWorkScreen extends StatelessWidget {
                     label: '承認待ち',
                     labelColor: Colors.white,
                     backgroundColor: Colors.lightBlue,
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => SearchApprovalDialog(
+                          applyWorkProvider: applyWorkProvider,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -92,162 +98,46 @@ class ApplyWorkScreen extends StatelessWidget {
                     applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
                   }
                 }
-                return Text('現在申請はありません。');
+                if (applyWorks.length == 0) return Text('現在申請はありません。');
+                return DataTable2(
+                  columns: [
+                    DataColumn2(label: Text('申請日時'), size: ColumnSize.M),
+                    DataColumn2(label: Text('申請者名'), size: ColumnSize.M),
+                    DataColumn2(label: Text('事由'), size: ColumnSize.L),
+                    DataColumn2(label: Text('承認状況'), size: ColumnSize.M),
+                    DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
+                  ],
+                  rows: List<DataRow>.generate(
+                    applyWorks.length,
+                    (index) => DataRow(
+                      cells: [
+                        DataCell(Text(
+                          dateText(
+                            'yyyy/MM/dd HH:mm',
+                            applyWorks[index].createdAt,
+                          ),
+                        )),
+                        DataCell(Text(applyWorks[index].userName)),
+                        DataCell(Text(
+                          applyWorks[index].reason,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                        DataCell(Text(
+                          applyWorks[index].approval == true ? '承認済み' : '承認待ち',
+                        )),
+                        DataCell(IconButton(
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {},
+                        )),
+                      ],
+                    ),
+                  ),
+                );
               },
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class ApplyWorkTable extends StatefulWidget {
-  final ApplyWorkProvider applyWorkProvider;
-  final GroupProvider groupProvider;
-
-  ApplyWorkTable({
-    required this.applyWorkProvider,
-    required this.groupProvider,
-  });
-
-  @override
-  _ApplyWorkTableState createState() => _ApplyWorkTableState();
-}
-
-class _ApplyWorkTableState extends State<ApplyWorkTable> {
-  UserModel? _user;
-  bool _approval = false;
-
-  void userChange(UserModel userModel) {
-    setState(() => _user = userModel);
-  }
-
-  void approvalChange(bool app) {
-    setState(() => _approval = app);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Stream<QuerySnapshot<Map<String, dynamic>>> _stream;
-    GroupModel? _group = widget.groupProvider.group;
-    if (_user != null) {
-      _stream = FirebaseFirestore.instance
-          .collection('applyWork')
-          .where('groupId', isEqualTo: _group?.id ?? 'error')
-          .where('userId', isEqualTo: _user?.id ?? 'error')
-          .where('approval', isEqualTo: _approval)
-          .orderBy('createdAt', descending: true)
-          .snapshots();
-    } else {
-      _stream = FirebaseFirestore.instance
-          .collection('applyWork')
-          .where('groupId', isEqualTo: _group?.id ?? 'error')
-          .where('approval', isEqualTo: _approval)
-          .orderBy('createdAt', descending: true)
-          .snapshots();
-    }
-    List<ApplyWorkModel> _applyWorks = [];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AdminHeader(
-          title: '記録修正申請',
-          message: 'スタッフがスマートフォンアプリから申請した内容を一覧表示します。承認をした場合は自動的に勤怠データが修正されます。',
-        ),
-        SizedBox(height: 16.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                CustomTextIconButton(
-                  onPressed: () {},
-                  color: Colors.lightBlueAccent,
-                  iconData: Icons.person,
-                  label: _user?.name ?? '選択してください',
-                ),
-                SizedBox(width: 4.0),
-                CustomTextIconButton(
-                  onPressed: () {
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => SearchApprovalDialog(
-                        approval: _approval,
-                        approvalChange: approvalChange,
-                      ),
-                    );
-                  },
-                  color: Colors.lightBlueAccent,
-                  iconData: Icons.approval,
-                  label: _approval ? '承認済み' : '承認待ち',
-                ),
-              ],
-            ),
-            Container(),
-          ],
-        ),
-        SizedBox(height: 8.0),
-        Expanded(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _stream,
-            builder: (context, snapshot) {
-              _applyWorks.clear();
-              if (snapshot.hasData) {
-                for (DocumentSnapshot<Map<String, dynamic>> doc
-                    in snapshot.data!.docs) {
-                  _applyWorks.add(ApplyWorkModel.fromSnapshot(doc));
-                }
-              }
-              return DataTable2(
-                columns: [
-                  DataColumn2(label: Text('申請日時')),
-                  DataColumn2(label: Text('申請者名')),
-                  DataColumn2(label: Text('事由'), size: ColumnSize.L),
-                  DataColumn2(label: Text('承認状況')),
-                  DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
-                ],
-                rows: List<DataRow>.generate(
-                  _applyWorks.length,
-                  (index) => DataRow(
-                    cells: [
-                      DataCell(Text(
-                        dateText(
-                          'yyyy/MM/dd HH:mm',
-                          _applyWorks[index].createdAt,
-                        ),
-                      )),
-                      DataCell(Text('${_applyWorks[index].userName}')),
-                      DataCell(Text(
-                        '${_applyWorks[index].reason}',
-                        overflow: TextOverflow.ellipsis,
-                      )),
-                      _applyWorks[index].approval
-                          ? DataCell(Text('承認済み'))
-                          : DataCell(Text('承認待ち')),
-                      DataCell(IconButton(
-                        onPressed: () {
-                          showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => EditApplyWorkDialog(
-                              applyWorkProvider: widget.applyWorkProvider,
-                              applyWork: _applyWorks[index],
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.edit, color: Colors.blue),
-                      )),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }
@@ -336,12 +226,10 @@ class _SearchUserDialogState extends State<SearchUserDialog> {
 }
 
 class SearchApprovalDialog extends StatelessWidget {
-  final bool approval;
-  final Function approvalChange;
+  final ApplyWorkProvider applyWorkProvider;
 
   SearchApprovalDialog({
-    required this.approval,
-    required this.approvalChange,
+    required this.applyWorkProvider,
   });
 
   @override
@@ -352,27 +240,26 @@ class SearchApprovalDialog extends StatelessWidget {
         child: ListView(
           shrinkWrap: true,
           children: [
-            SizedBox(height: 16.0),
-            Divider(),
-            CustomRadioListTile(
-              onChanged: (value) {
-                approvalChange(value);
-                Navigator.pop(context);
-              },
+            CustomRadio(
               label: '承認待ち',
               value: false,
-              groupValue: approval,
-            ),
-            CustomRadioListTile(
+              groupValue: applyWorkProvider.approval,
+              activeColor: Colors.lightBlue,
               onChanged: (value) {
-                approvalChange(value);
+                applyWorkProvider.changeApproval(value);
                 Navigator.pop(context);
               },
+            ),
+            CustomRadio(
               label: '承認済み',
               value: true,
-              groupValue: approval,
+              groupValue: applyWorkProvider.approval,
+              activeColor: Colors.lightBlue,
+              onChanged: (value) {
+                applyWorkProvider.changeApproval(value);
+                Navigator.pop(context);
+              },
             ),
-            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -382,11 +269,7 @@ class SearchApprovalDialog extends StatelessWidget {
                   color: Colors.grey,
                   label: 'キャンセル',
                 ),
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.blue,
-                  label: 'OK',
-                ),
+                Container(),
               ],
             ),
           ],
