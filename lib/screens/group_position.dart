@@ -26,12 +26,6 @@ class GroupPositionScreen extends StatelessWidget {
     final positionProvider = Provider.of<PositionProvider>(context);
     GroupModel? group = groupProvider.group;
     List<PositionModel> positions = [];
-    Stream<QuerySnapshot<Map<String, dynamic>>>? stream = FirebaseFirestore
-        .instance
-        .collection('position')
-        .where('groupId', isEqualTo: group?.id)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -70,7 +64,7 @@ class GroupPositionScreen extends StatelessWidget {
           SizedBox(height: 8.0),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: stream,
+              stream: positionProvider.streamList(groupId: group?.id),
               builder: (context, snapshot) {
                 positions.clear();
                 if (snapshot.hasData) {
@@ -128,7 +122,7 @@ class GroupPositionScreen extends StatelessWidget {
                               showDialog(
                                 barrierDismissible: false,
                                 context: context,
-                                builder: (_) => CheckUserDialog(
+                                builder: (_) => InUserDialog(
                                   groupProvider: groupProvider,
                                   positionProvider: positionProvider,
                                   position: positions[index],
@@ -312,22 +306,22 @@ class _EditDialogState extends State<EditDialog> {
   }
 }
 
-class CheckUserDialog extends StatefulWidget {
+class InUserDialog extends StatefulWidget {
   final GroupProvider groupProvider;
   final PositionProvider positionProvider;
   final PositionModel position;
 
-  CheckUserDialog({
+  InUserDialog({
     required this.groupProvider,
     required this.positionProvider,
     required this.position,
   });
 
   @override
-  State<CheckUserDialog> createState() => _CheckUserDialogState();
+  State<InUserDialog> createState() => _InUserDialogState();
 }
 
-class _CheckUserDialogState extends State<CheckUserDialog> {
+class _InUserDialogState extends State<InUserDialog> {
   ScrollController _controller = ScrollController();
   List<UserModel> users = [];
   List<String> userIds = [];

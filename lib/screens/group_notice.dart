@@ -26,14 +26,6 @@ class GroupNoticeScreen extends StatelessWidget {
     final noticeProvider = Provider.of<GroupNoticeProvider>(context);
     GroupModel? group = groupProvider.group;
     List<GroupNoticeModel> notices = [];
-    Stream<QuerySnapshot<Map<String, dynamic>>>? stream = FirebaseFirestore
-        .instance
-        .collection('group')
-        .doc(group?.id)
-        .collection('notice')
-        .where('groupId', isEqualTo: group?.id)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -72,7 +64,7 @@ class GroupNoticeScreen extends StatelessWidget {
           SizedBox(height: 8.0),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: stream,
+              stream: noticeProvider.streamList(groupId: group?.id),
               builder: (context, snapshot) {
                 notices.clear();
                 if (snapshot.hasData) {

@@ -13,6 +13,7 @@ import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
+import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
@@ -29,13 +30,6 @@ class ApplyWorkScreen extends StatelessWidget {
     final applyWorkProvider = Provider.of<ApplyWorkProvider>(context);
     GroupModel? group = groupProvider.group;
     List<ApplyWorkModel> applyWorks = [];
-    Stream<QuerySnapshot<Map<String, dynamic>>>? stream = FirebaseFirestore
-        .instance
-        .collection('applyWork')
-        .where('groupId', isEqualTo: group?.id)
-        .where('approval', isEqualTo: false)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -45,7 +39,7 @@ class ApplyWorkScreen extends StatelessWidget {
         children: [
           AdminHeader(
             title: '勤怠修正の申請',
-            message: 'スタッフがスマホアプリから申請した内容を表示しています。承認した場合、自動的に勤怠データが修正されます。',
+            message: 'スタッフがスマホアプリから申請した内容を表示しています。承認した場合、自動的に勤怠データが更新されます。',
           ),
           SizedBox(height: 8.0),
           Row(
@@ -56,10 +50,21 @@ class ApplyWorkScreen extends StatelessWidget {
                   TextIconButton(
                     iconData: Icons.person,
                     iconColor: Colors.white,
-                    label: 'スタッフ未選択',
+                    label: applyWorkProvider.user == null
+                        ? '未選択'
+                        : applyWorkProvider.user?.name ?? '',
                     labelColor: Colors.white,
                     backgroundColor: Colors.lightBlue,
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => SearchUserDialog(
+                          groupProvider: groupProvider,
+                          applyWorkProvider: applyWorkProvider,
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(width: 4.0),
                   TextIconButton(
@@ -78,7 +83,7 @@ class ApplyWorkScreen extends StatelessWidget {
           SizedBox(height: 8.0),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: stream,
+              stream: applyWorkProvider.streamList(groupId: group?.id),
               builder: (context, snapshot) {
                 applyWorks.clear();
                 if (snapshot.hasData) {
@@ -158,17 +163,7 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
             Row(
               children: [
                 CustomTextIconButton(
-                  onPressed: () {
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => SearchUserDialog(
-                        users: widget.groupProvider.users,
-                        user: _user!,
-                        userChange: userChange,
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   color: Colors.lightBlueAccent,
                   iconData: Icons.person,
                   label: _user?.name ?? '選択してください',
@@ -257,69 +252,80 @@ class _ApplyWorkTableState extends State<ApplyWorkTable> {
   }
 }
 
-class SearchUserDialog extends StatelessWidget {
-  final List<UserModel> users;
-  final UserModel user;
-  final Function userChange;
+class SearchUserDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+  final ApplyWorkProvider applyWorkProvider;
 
   SearchUserDialog({
-    required this.users,
-    required this.user,
-    required this.userChange,
+    required this.groupProvider,
+    required this.applyWorkProvider,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final ScrollController _scrollController = ScrollController();
+  State<SearchUserDialog> createState() => _SearchUserDialogState();
+}
 
+class _SearchUserDialogState extends State<SearchUserDialog> {
+  ScrollController _controller = ScrollController();
+  List<UserModel> users = [];
+
+  void _init() async {
+    List<UserModel> _users = await widget.groupProvider.selectUsers();
+    if (mounted) {
+      setState(() => users = _users);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
       content: Container(
         width: 450.0,
         child: ListView(
           shrinkWrap: true,
           children: [
-            SizedBox(height: 16.0),
-            Divider(),
             Container(
               height: 350.0,
               child: Scrollbar(
                 isAlwaysShown: true,
-                controller: _scrollController,
+                controller: _controller,
                 child: ListView.builder(
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
-                  controller: _scrollController,
+                  controller: _controller,
                   itemCount: users.length,
                   itemBuilder: (_, index) {
                     UserModel _user = users[index];
-                    return CustomRadioListTile(
+                    return CustomRadio(
+                      label: _user.name,
+                      value: _user,
+                      groupValue: widget.applyWorkProvider.user,
+                      activeColor: Colors.lightBlue,
                       onChanged: (value) {
-                        userChange(value);
+                        widget.applyWorkProvider.changeUser(value);
                         Navigator.pop(context);
                       },
-                      label: '${_user.name}',
-                      value: _user,
-                      groupValue: user,
                     );
                   },
                 ),
               ),
             ),
-            Divider(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
                   label: 'キャンセル',
-                ),
-                CustomTextButton(
+                  color: Colors.grey,
                   onPressed: () => Navigator.pop(context),
-                  color: Colors.blue,
-                  label: 'OK',
                 ),
+                Container(),
               ],
             ),
           ],

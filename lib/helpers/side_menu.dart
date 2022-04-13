@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/models/group.dart';
+import 'package:hatarakujikan_web/screens/apply_pto.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_invoice.dart';
@@ -47,7 +48,7 @@ List<MenuItem> sideMenu(GroupModel? group) {
         ),
         MenuItem(
           title: '有給休暇の申請',
-          route: ApplyWorkScreen.id,
+          route: ApplyPTOScreen.id,
           icon: Icons.chevron_right,
         ),
       ],

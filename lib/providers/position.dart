@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/position.dart';
 import 'package:hatarakujikan_web/services/position.dart';
@@ -80,5 +81,15 @@ class PositionProvider with ChangeNotifier {
       _positions = value;
     });
     return _positions;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({String? groupId}) {
+    Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
+    _ret = FirebaseFirestore.instance
+        .collection('position')
+        .where('groupId', isEqualTo: groupId)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+    return _ret;
   }
 }

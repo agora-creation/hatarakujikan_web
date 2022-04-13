@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -189,5 +190,17 @@ class UserProvider with ChangeNotifier {
       _users = value;
     });
     return _users;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({
+    List<String>? userIds,
+  }) {
+    Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
+    _ret = FirebaseFirestore.instance
+        .collection('user')
+        .where('id', whereIn: userIds)
+        .orderBy('recordPassword', descending: false)
+        .snapshots();
+    return _ret;
   }
 }

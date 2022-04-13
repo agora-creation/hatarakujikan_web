@@ -24,12 +24,6 @@ class UserScreen extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context);
     GroupModel? group = groupProvider.group;
     List<UserModel> users = [];
-    Stream<QuerySnapshot<Map<String, dynamic>>>? stream = FirebaseFirestore
-        .instance
-        .collection('user')
-        .where('id', whereIn: group?.userIds ?? [''])
-        .orderBy('recordPassword', descending: false)
-        .snapshots();
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -69,7 +63,7 @@ class UserScreen extends StatelessWidget {
           SizedBox(height: 8.0),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: stream,
+              stream: userProvider.streamList(userIds: group?.userIds),
               builder: (context, snapshot) {
                 users.clear();
                 if (snapshot.hasData) {

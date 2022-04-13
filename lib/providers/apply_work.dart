@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/apply_work.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
+import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/apply_work.dart';
 import 'package:hatarakujikan_web/services/work.dart';
 
@@ -33,5 +35,39 @@ class ApplyWorkProvider with ChangeNotifier {
 
   void delete({required ApplyWorkModel applyWork}) {
     _applyWorkService.delete({'id': applyWork.id});
+  }
+
+  UserModel? user;
+  bool approval = false;
+
+  void changeUser(UserModel selected) {
+    user = selected;
+    notifyListeners();
+  }
+
+  void changeApproval(bool selected) {
+    approval = selected;
+    notifyListeners();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({String? groupId}) {
+    Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
+    if (user == null) {
+      _ret = FirebaseFirestore.instance
+          .collection('applyWork')
+          .where('groupId', isEqualTo: groupId)
+          .where('approval', isEqualTo: approval)
+          .orderBy('createdAt', descending: true)
+          .snapshots();
+    } else {
+      _ret = FirebaseFirestore.instance
+          .collection('applyWork')
+          .where('groupId', isEqualTo: groupId)
+          .where('userId', isEqualTo: user?.id)
+          .where('approval', isEqualTo: approval)
+          .orderBy('createdAt', descending: true)
+          .snapshots();
+    }
+    return _ret;
   }
 }

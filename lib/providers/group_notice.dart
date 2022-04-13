@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/group_notice.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -103,5 +104,17 @@ class GroupNoticeProvider with ChangeNotifier {
       print(e.toString());
       return false;
     }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({String? groupId}) {
+    Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
+    _ret = FirebaseFirestore.instance
+        .collection('group')
+        .doc(groupId)
+        .collection('notice')
+        .where('groupId', isEqualTo: groupId)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+    return _ret;
   }
 }

@@ -10,6 +10,7 @@ import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
+import 'package:hatarakujikan_web/screens/apply_pto.dart';
 import 'package:hatarakujikan_web/screens/apply_work.dart';
 import 'package:hatarakujikan_web/screens/group_info.dart';
 import 'package:hatarakujikan_web/screens/group_invoice.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
         theme: theme(),
         home: SplashController(),
         routes: {
+          ApplyPTOScreen.id: (context) => ApplyPTOScreen(),
           ApplyWorkScreen.id: (context) => ApplyWorkScreen(),
           GroupInfoScreen.id: (context) => GroupInfoScreen(),
           GroupInvoiceScreen.id: (context) => GroupInvoiceScreen(),
