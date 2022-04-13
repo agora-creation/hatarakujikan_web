@@ -9,14 +9,12 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
-import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
-import 'package:hatarakujikan_web/widgets/custom_label_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ApplyWorkScreen extends StatelessWidget {
@@ -52,7 +50,7 @@ class ApplyWorkScreen extends StatelessWidget {
                         ? '未選択'
                         : applyWorkProvider.user?.name ?? '',
                     labelColor: Colors.white,
-                    backgroundColor: Colors.lightBlue,
+                    backgroundColor: Colors.lightBlueAccent,
                     onPressed: () {
                       showDialog(
                         barrierDismissible: false,
@@ -68,9 +66,9 @@ class ApplyWorkScreen extends StatelessWidget {
                   TextIconButton(
                     iconData: Icons.approval,
                     iconColor: Colors.white,
-                    label: '承認待ち',
+                    label: applyWorkProvider.approval == true ? '承認済み' : '承認待ち',
                     labelColor: Colors.white,
-                    backgroundColor: Colors.lightBlue,
+                    backgroundColor: Colors.lightBlueAccent,
                     onPressed: () {
                       showDialog(
                         barrierDismissible: false,
@@ -127,7 +125,16 @@ class ApplyWorkScreen extends StatelessWidget {
                         )),
                         DataCell(IconButton(
                           icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditDialog(
+                                applyWorkProvider: applyWorkProvider,
+                                applyWork: applyWorks[index],
+                              ),
+                            );
+                          },
                         )),
                       ],
                     ),
@@ -279,11 +286,11 @@ class SearchApprovalDialog extends StatelessWidget {
   }
 }
 
-class EditApplyWorkDialog extends StatelessWidget {
+class EditDialog extends StatelessWidget {
   final ApplyWorkProvider applyWorkProvider;
   final ApplyWorkModel applyWork;
 
-  EditApplyWorkDialog({
+  EditDialog({
     required this.applyWorkProvider,
     required this.applyWork,
   });
@@ -296,137 +303,114 @@ class EditApplyWorkDialog extends StatelessWidget {
         child: ListView(
           shrinkWrap: true,
           children: [
-            SizedBox(height: 16.0),
             Text(
-              '申請内容を確認し、「却下する」もしくは「承認する」ボタンを押してください。',
-              style: kDefaultTextStyle,
+              '申請内容を確認し、「承認する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
-            CustomLabelColumn(
-              label: '申請日時',
-              child: Text(
-                dateText('yyyy/MM/dd HH:mm', applyWork.createdAt),
-              ),
+            TapListTile(
+              title: '申請日時',
+              subtitle: dateText('yyyy/MM/dd HH:mm', applyWork.createdAt),
             ),
-            Divider(),
-            CustomLabelColumn(
-              label: '申請者名',
-              child: Text('${applyWork.userName}'),
+            TapListTile(
+              title: '申請者名',
+              subtitle: applyWork.userName,
             ),
-            Divider(),
-            CustomLabelColumn(
-              label: '申請内容',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomLabelListTile(
-                    label: '出勤時間',
-                    value: dateText('yyyy/MM/dd HH:mm', applyWork.startedAt),
-                  ),
-                  applyWork.breaks.length > 0
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: ScrollPhysics(),
-                          itemCount: applyWork.breaks.length,
-                          itemBuilder: (_, index) {
-                            BreaksModel _breaks = applyWork.breaks[index];
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CustomLabelListTile(
-                                  label: '休憩開始時間',
-                                  value: dateText(
-                                    'yyyy/MM/dd HH:mm',
-                                    _breaks.startedAt,
-                                  ),
-                                ),
-                                CustomLabelListTile(
-                                  label: '休憩終了時間',
-                                  value: dateText(
-                                    'yyyy/MM/dd HH:mm',
-                                    _breaks.endedAt,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        )
-                      : Container(),
-                  CustomLabelListTile(
-                    label: '退勤時間',
-                    value:
-                        '${DateFormat('yyyy/MM/dd HH:mm').format(applyWork.endedAt)}',
-                  ),
-                ],
-              ),
+            TapListTile(
+              title: '出勤時間',
+              subtitle: dateText('yyyy/MM/dd HH:mm', applyWork.startedAt),
             ),
-            Divider(),
-            CustomLabelColumn(
-              label: '事由',
-              child: Text('${applyWork.reason}'),
+            applyWork.breaks.length > 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemCount: applyWork.breaks.length,
+                    itemBuilder: (_, index) {
+                      BreaksModel _breaks = applyWork.breaks[index];
+                      return Column(
+                        children: [
+                          TapListTile(
+                            title: '休憩開始時間',
+                            subtitle: dateText(
+                              'yyyy/MM/dd HH:mm',
+                              _breaks.startedAt,
+                            ),
+                          ),
+                          TapListTile(
+                            title: '休憩終了時間',
+                            subtitle: dateText(
+                              'yyyy/MM/dd HH:mm',
+                              _breaks.endedAt,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                : Container(),
+            TapListTile(
+              title: '退勤時間',
+              subtitle: dateText('yyyy/MM/dd HH:mm', applyWork.endedAt),
             ),
-            Divider(),
-            CustomLabelColumn(
-              label: '承認状況',
-              child: applyWork.approval ? Text('承認済み') : Text('承認待ち'),
+            TapListTile(
+              title: '事由',
+              subtitle: applyWork.reason,
             ),
-            Divider(),
+            TapListTile(
+              title: '承認状況',
+              subtitle: applyWork.approval == true ? '承認済み' : '承認待ち',
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
                   label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
                 ),
                 Row(
                   children: [
-                    applyWork.approval
-                        ? CustomTextButton(
-                            onPressed: () {
-                              applyWorkProvider.delete(applyWork: applyWork);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('申請を削除しました')),
-                              );
-                              Navigator.pop(context);
-                            },
-                            color: Colors.red,
-                            label: '削除する',
-                          )
-                        : CustomTextButton(
-                            onPressed: () {
-                              applyWorkProvider.delete(applyWork: applyWork);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('申請を却下しました')),
-                              );
-                              Navigator.pop(context);
-                            },
-                            color: Colors.red,
-                            label: '却下する',
-                          ),
+                    CustomTextButton(
+                      label: applyWork.approval == true ? '削除する' : '却下する',
+                      color: Colors.red,
+                      onPressed: () async {
+                        if (applyWork.approval == true) {
+                          if (!await applyWorkProvider.delete(
+                            id: applyWork.id,
+                          )) {
+                            return;
+                          }
+                          customSnackBar(context, '申請を削除しました');
+                          Navigator.pop(context);
+                        } else {
+                          if (!await applyWorkProvider.delete(
+                            id: applyWork.id,
+                          )) {
+                            return;
+                          }
+                          customSnackBar(context, '申請を却下しました');
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
                     SizedBox(width: 4.0),
-                    applyWork.approval
-                        ? CustomTextButton(
-                            onPressed: null,
-                            color: Colors.grey,
-                            label: '承認する',
-                          )
-                        : CustomTextButton(
-                            onPressed: () async {
-                              if (!await applyWorkProvider.update(
-                                applyWork: applyWork,
-                              )) {
-                                return;
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('申請を承認しました')),
-                              );
-                              Navigator.pop(context);
-                            },
-                            color: Colors.blue,
-                            label: '承認する',
-                          ),
+                    CustomTextButton(
+                      label: '承認する',
+                      color: applyWork.approval == true
+                          ? Colors.grey
+                          : Colors.blue,
+                      onPressed: () async {
+                        if (applyWork.approval == true) return;
+                        if (!await applyWorkProvider.update(
+                          applyWork: applyWork,
+                        )) {
+                          return;
+                        }
+                        customSnackBar(context, '申請を承認しました');
+                        Navigator.pop(context);
+                      },
+                    ),
                   ],
                 ),
               ],

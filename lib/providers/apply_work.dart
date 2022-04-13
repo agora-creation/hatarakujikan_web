@@ -10,7 +10,8 @@ class ApplyWorkProvider with ChangeNotifier {
   ApplyWorkService _applyWorkService = ApplyWorkService();
   WorkService _workService = WorkService();
 
-  Future<bool> update({required ApplyWorkModel applyWork}) async {
+  Future<bool> update({ApplyWorkModel? applyWork}) async {
+    if (applyWork == null) return false;
     try {
       _applyWorkService.update({
         'id': applyWork.id,
@@ -33,8 +34,15 @@ class ApplyWorkProvider with ChangeNotifier {
     }
   }
 
-  void delete({required ApplyWorkModel applyWork}) {
-    _applyWorkService.delete({'id': applyWork.id});
+  Future<bool> delete({String? id}) async {
+    if (id == null) return false;
+    try {
+      _applyWorkService.delete({'id': id});
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   UserModel? user;

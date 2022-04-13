@@ -28,6 +28,7 @@ import 'package:hatarakujikan_web/widgets/custom_work_footer_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_header_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
+import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
@@ -47,12 +48,53 @@ class WorkScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: WorkTable(
-        groupProvider: groupProvider,
-        positionProvider: positionProvider,
-        userProvider: userProvider,
-        workProvider: workProvider,
-        workShiftProvider: workShiftProvider,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdminHeader(
+            title: '勤怠の記録',
+            message: 'スタッフが打刻した勤怠の履歴を年月毎に表示しています。',
+          ),
+          SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  TextIconButton(
+                    iconData: Icons.today,
+                    iconColor: Colors.white,
+                    label: '2020年04月',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.lightBlueAccent,
+                    onPressed: () {},
+                  ),
+                  SizedBox(width: 4.0),
+                  TextIconButton(
+                    iconData: Icons.person,
+                    iconColor: Colors.white,
+                    label: '未選択',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.lightBlueAccent,
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              TextIconButton(
+                iconData: Icons.add,
+                iconColor: Colors.white,
+                label: '新規登録',
+                labelColor: Colors.white,
+                backgroundColor: Colors.blue,
+                onPressed: () {},
+              ),
+            ],
+          ),
+          SizedBox(height: 8.0),
+          Expanded(
+            child: Text('aaaa'),
+          ),
+        ],
       ),
     );
   }
