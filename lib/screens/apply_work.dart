@@ -203,7 +203,7 @@ class _SearchUserDialogState extends State<SearchUserDialog> {
                       label: _user.name,
                       value: _user,
                       groupValue: widget.applyWorkProvider.user,
-                      activeColor: Colors.lightBlue,
+                      activeColor: Colors.lightBlueAccent,
                       onChanged: (value) {
                         widget.applyWorkProvider.changeUser(value);
                         Navigator.pop(context);
@@ -251,7 +251,7 @@ class SearchApprovalDialog extends StatelessWidget {
               label: '承認待ち',
               value: false,
               groupValue: applyWorkProvider.approval,
-              activeColor: Colors.lightBlue,
+              activeColor: Colors.lightBlueAccent,
               onChanged: (value) {
                 applyWorkProvider.changeApproval(value);
                 Navigator.pop(context);
@@ -261,7 +261,7 @@ class SearchApprovalDialog extends StatelessWidget {
               label: '承認済み',
               value: true,
               groupValue: applyWorkProvider.approval,
-              activeColor: Colors.lightBlue,
+              activeColor: Colors.lightBlueAccent,
               onChanged: (value) {
                 applyWorkProvider.changeApproval(value);
                 Navigator.pop(context);
