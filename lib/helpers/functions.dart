@@ -4,8 +4,10 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
+import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void nextScreen(BuildContext context, Widget widget) {
@@ -277,6 +279,36 @@ void customSnackBar(BuildContext context, String? message) {
   );
 }
 
+Future<DateTime?> customMonthPicker({
+  required BuildContext context,
+  required DateTime init,
+}) async {
+  DateTime? _ret;
+  DateTime? _selected = await showMonthPicker(
+    context: context,
+    initialDate: init,
+    firstDate: kMonthFirstDate,
+    lastDate: kMonthLastDate,
+  );
+  if (_selected != null) _ret = _selected;
+  return _ret;
+}
+
+Future<DateTime?> customDatePicker({
+  required BuildContext context,
+  required DateTime init,
+}) async {
+  DateTime? _ret;
+  DateTime? _selected = await showDatePicker(
+    context: context,
+    initialDate: init,
+    firstDate: kDayFirstDate,
+    lastDate: kDayLastDate,
+  );
+  if (_selected != null) _ret = _selected;
+  return _ret;
+}
+
 Future<String?> customTimePicker({
   required BuildContext context,
   String? init,
@@ -293,5 +325,21 @@ Future<String?> customTimePicker({
   if (_selected != null) {
     _ret = '${_selected.format(context)}';
   }
+  return _ret;
+}
+
+Future<TimeOfDay?> customTimePicker2({
+  required BuildContext context,
+  DateTime? init,
+}) async {
+  TimeOfDay? _ret;
+  TimeOfDay? _selected = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay(
+      hour: timeToInt(init)[0],
+      minute: timeToInt(init)[1],
+    ),
+  );
+  if (_selected != null) _ret = _selected;
   return _ret;
 }

@@ -17,6 +17,7 @@ import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/screens/work_list.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -27,6 +28,7 @@ import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_time_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_footer_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
+import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/work_footer.dart';
@@ -73,11 +75,9 @@ class WorkScreen extends StatelessWidget {
                     labelColor: Colors.white,
                     backgroundColor: Colors.lightBlueAccent,
                     onPressed: () async {
-                      var selected = await showMonthPicker(
+                      DateTime? selected = await customMonthPicker(
                         context: context,
-                        initialDate: workProvider.month,
-                        firstDate: kMonthFirstDate,
-                        lastDate: kMonthLastDate,
+                        init: workProvider.month,
                       );
                       if (selected == null) return;
                       workProvider.changeMonth(selected);
@@ -111,7 +111,17 @@ class WorkScreen extends StatelessWidget {
                 label: '新規登録',
                 labelColor: Colors.white,
                 backgroundColor: Colors.blue,
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => AddDialog(
+                      groupProvider: groupProvider,
+                      workProvider: workProvider,
+                      group: group,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -267,6 +277,339 @@ class _SearchUserDialogState extends State<SearchUserDialog> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 Container(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AddDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+  final WorkProvider workProvider;
+  final GroupModel? group;
+
+  AddDialog({
+    required this.groupProvider,
+    required this.workProvider,
+    this.group,
+  });
+
+  @override
+  _AddDialogState createState() => _AddDialogState();
+}
+
+class _AddDialogState extends State<AddDialog> {
+  List<UserModel> users = [];
+  String? userId;
+  DateTime startedAt = DateTime.now();
+  DateTime endedAt = DateTime.now();
+  bool isBreaks = false;
+  DateTime breakStartedAt = DateTime.now();
+  DateTime breakEndedAt = DateTime.now();
+  String state = workStates.first;
+
+  void _init() async {
+    List<UserModel> _users =
+        await widget.groupProvider.selectUsers(smartphone: true);
+    if (mounted) {
+      setState(() {
+        users = _users;
+        userId = widget.workProvider.user?.id;
+        endedAt = startedAt.add(Duration(hours: 8));
+        breakEndedAt = breakStartedAt.add(Duration(hours: 1));
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '情報を入力し、「登録する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            CustomDropdownButton(
+              label: '対象スタッフ',
+              isExpanded: true,
+              value: userId,
+              onChanged: (value) {
+                setState(() => userId = value);
+              },
+              items: users.map((user) {
+                return DropdownMenuItem(
+                  value: user.id,
+                  child: Text(
+                    user.name,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 8.0),
+            CustomDropdownButton(
+              label: '勤務状況',
+              isExpanded: true,
+              value: state,
+              onChanged: (value) {
+                setState(() => state = value);
+              },
+              items: workStates.map((e) {
+                return DropdownMenuItem(
+                  value: e,
+                  child: Text(
+                    e,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 8.0),
+            DateTimeFormField(
+              label: '出勤日時',
+              date: dateText('yyyy/MM/dd', startedAt),
+              dateOnPressed: () async {
+                DateTime? _date = await customDatePicker(
+                  context: context,
+                  init: startedAt,
+                );
+                if (_date == null) return;
+                DateTime _dateTime = rebuildDate(_date, startedAt);
+                setState(() => startedAt = _dateTime);
+              },
+              time: dateText('HH:mm', startedAt),
+              timeOnPressed: () async {
+                TimeOfDay? _time = await customTimePicker2(
+                  context: context,
+                  init: startedAt,
+                );
+                if (_time == null) return;
+                DateTime _dateTime = rebuildTime(context, startedAt, _time);
+                setState(() => startedAt = _dateTime);
+              },
+            ),
+            SizedBox(height: 8.0),
+            CustomCheckbox(
+              label: '休憩時間を入力する',
+              value: isBreaks,
+              activeColor: Colors.blue,
+              onChanged: (value) {
+                setState(() => isBreaks = value!);
+              },
+            ),
+            SizedBox(height: 8.0),
+            SizedBox(height: 8.0),
+            SizedBox(height: 8.0),
+            SizedBox(height: 8.0),
+            _isBreaks == true
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomLabelColumn(
+                        label: '休憩開始日時',
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: CustomDateButton(
+                                onPressed: () async {
+                                  DateTime? _selected = await showDatePicker(
+                                    context: context,
+                                    initialDate: _breakStartedAt,
+                                    firstDate: kDayFirstDate,
+                                    lastDate: kDayLastDate,
+                                  );
+                                  if (_selected != null) {
+                                    _selected =
+                                        rebuildDate(_selected, _breakStartedAt);
+                                    setState(
+                                        () => _breakStartedAt = _selected!);
+                                  }
+                                },
+                                label: dateText('yyyy/MM/dd', _breakStartedAt),
+                              ),
+                            ),
+                            SizedBox(width: 4.0),
+                            Expanded(
+                              flex: 2,
+                              child: CustomTimeButton(
+                                onPressed: () async {
+                                  TimeOfDay? _selected = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay(
+                                      hour: timeToInt(_breakStartedAt)[0],
+                                      minute: timeToInt(_breakStartedAt)[1],
+                                    ),
+                                  );
+                                  if (_selected != null) {
+                                    DateTime _dateTime = rebuildTime(
+                                      context,
+                                      _breakStartedAt,
+                                      _selected,
+                                    );
+                                    setState(() => _breakStartedAt = _dateTime);
+                                  }
+                                },
+                                label: dateText('HH:mm', _breakStartedAt),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      CustomLabelColumn(
+                        label: '休憩終了日時',
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: CustomDateButton(
+                                onPressed: () async {
+                                  DateTime? _selected = await showDatePicker(
+                                    context: context,
+                                    initialDate: _breakEndedAt,
+                                    firstDate: kDayFirstDate,
+                                    lastDate: kDayLastDate,
+                                  );
+                                  if (_selected != null) {
+                                    _selected =
+                                        rebuildDate(_selected, _breakEndedAt);
+                                    setState(() => _breakEndedAt = _selected!);
+                                  }
+                                },
+                                label: dateText('yyyy/MM/dd', _breakEndedAt),
+                              ),
+                            ),
+                            SizedBox(width: 4.0),
+                            Expanded(
+                              flex: 2,
+                              child: CustomTimeButton(
+                                onPressed: () async {
+                                  TimeOfDay? _selected = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay(
+                                      hour: timeToInt(_breakEndedAt)[0],
+                                      minute: timeToInt(_breakEndedAt)[1],
+                                    ),
+                                  );
+                                  if (_selected != null) {
+                                    DateTime _dateTime = rebuildTime(
+                                      context,
+                                      _breakEndedAt,
+                                      _selected,
+                                    );
+                                    setState(() => _breakEndedAt = _dateTime);
+                                  }
+                                },
+                                label: dateText('HH:mm', _breakEndedAt),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
+            SizedBox(height: 8.0),
+            CustomLabelColumn(
+              label: '退勤日時',
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: CustomDateButton(
+                      onPressed: () async {
+                        DateTime? _selected = await showDatePicker(
+                          context: context,
+                          initialDate: _endedAt,
+                          firstDate: kDayFirstDate,
+                          lastDate: kDayLastDate,
+                        );
+                        if (_selected != null) {
+                          _selected = rebuildDate(_selected, _endedAt);
+                          setState(() => _endedAt = _selected!);
+                        }
+                      },
+                      label: dateText('yyyy/MM/dd', _endedAt),
+                    ),
+                  ),
+                  SizedBox(width: 4.0),
+                  Expanded(
+                    flex: 2,
+                    child: CustomTimeButton(
+                      onPressed: () async {
+                        TimeOfDay? _selected = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(
+                            hour: timeToInt(_endedAt)[0],
+                            minute: timeToInt(_endedAt)[1],
+                          ),
+                        );
+                        if (_selected != null) {
+                          DateTime _dateTime = rebuildTime(
+                            context,
+                            _endedAt,
+                            _selected,
+                          );
+                          setState(() => _endedAt = _dateTime);
+                        }
+                      },
+                      label: dateText('HH:mm', _endedAt),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.grey,
+                  label: 'キャンセル',
+                ),
+                CustomTextButton(
+                  onPressed: () async {
+                    if (!await widget.workProvider.create(
+                      group: widget.group,
+                      user: _user!,
+                      startedAt: _startedAt,
+                      endedAt: _endedAt,
+                      isBreaks: _isBreaks,
+                      breakStartedAt: _breakStartedAt,
+                      breakEndedAt: _breakEndedAt,
+                    )) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('勤務データを登録しました')),
+                    );
+                    Navigator.pop(context);
+                  },
+                  color: Colors.blue,
+                  label: '登録する',
+                ),
               ],
             ),
           ],
@@ -840,355 +1183,6 @@ class _PdfDialogState extends State<PdfDialog> {
                   ),
                 ],
               ),
-      ),
-    );
-  }
-}
-
-class AddWorkDialog extends StatefulWidget {
-  final WorkProvider workProvider;
-  final GroupModel group;
-  final List<UserModel> users;
-  final UserModel user;
-
-  AddWorkDialog({
-    required this.workProvider,
-    required this.group,
-    required this.users,
-    required this.user,
-  });
-
-  @override
-  _AddWorkDialogState createState() => _AddWorkDialogState();
-}
-
-class _AddWorkDialogState extends State<AddWorkDialog> {
-  UserModel? _user;
-  String _state = '';
-  DateTime _startedAt = DateTime.now();
-  DateTime _endedAt = DateTime.now();
-  bool _isBreaks = false;
-  DateTime _breakStartedAt = DateTime.now();
-  DateTime _breakEndedAt = DateTime.now();
-
-  void _init() async {
-    _user = widget.user;
-    _state = workStates.first;
-    _endedAt = _startedAt.add(Duration(hours: 8));
-    _breakEndedAt = _breakStartedAt.add(Duration(hours: 1));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            SizedBox(height: 16.0),
-            Text(
-              '勤務状況と記録したい日時を選択し、最後に「登録する」ボタンを押してください。',
-              style: kDefaultTextStyle,
-            ),
-            SizedBox(height: 16.0),
-            CustomLabelColumn(
-              label: 'スタッフ',
-              child: CustomDropdownButton(
-                isExpanded: true,
-                value: _user,
-                onChanged: (value) {
-                  setState(() => _user = value);
-                },
-                items: widget.users.map((value) {
-                  return DropdownMenuItem(
-                    value: value,
-                    child: Text(
-                      '${value.name}',
-                      style: kDefaultTextStyle,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: '勤務状況',
-              child: CustomDropdownButton(
-                isExpanded: true,
-                value: _state,
-                onChanged: (value) {
-                  setState(() => _state = value);
-                },
-                items: workStates.map((value) {
-                  return DropdownMenuItem(
-                    value: value,
-                    child: Text(
-                      '$value',
-                      style: kDefaultTextStyle,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: '出勤日時',
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: CustomDateButton(
-                      onPressed: () async {
-                        DateTime? _selected = await showDatePicker(
-                          context: context,
-                          initialDate: _startedAt,
-                          firstDate: kDayFirstDate,
-                          lastDate: kDayLastDate,
-                        );
-                        if (_selected != null) {
-                          _selected = rebuildDate(_selected, _startedAt);
-                          setState(() => _startedAt = _selected!);
-                        }
-                      },
-                      label: dateText('yyyy/MM/dd', _startedAt),
-                    ),
-                  ),
-                  SizedBox(width: 4.0),
-                  Expanded(
-                    flex: 2,
-                    child: CustomTimeButton(
-                      onPressed: () async {
-                        TimeOfDay? _selected = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay(
-                            hour: timeToInt(_startedAt)[0],
-                            minute: timeToInt(_startedAt)[1],
-                          ),
-                        );
-                        if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _startedAt,
-                            _selected,
-                          );
-                          setState(() => _startedAt = _dateTime);
-                        }
-                      },
-                      label: dateText('HH:mm', _startedAt),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 8.0),
-            CustomCheckboxListTile(
-              onChanged: (value) {
-                setState(() => _isBreaks = value ?? false);
-              },
-              label: '休憩を追加する',
-              value: _isBreaks,
-            ),
-            SizedBox(height: 8.0),
-            _isBreaks == true
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomLabelColumn(
-                        label: '休憩開始日時',
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: CustomDateButton(
-                                onPressed: () async {
-                                  DateTime? _selected = await showDatePicker(
-                                    context: context,
-                                    initialDate: _breakStartedAt,
-                                    firstDate: kDayFirstDate,
-                                    lastDate: kDayLastDate,
-                                  );
-                                  if (_selected != null) {
-                                    _selected =
-                                        rebuildDate(_selected, _breakStartedAt);
-                                    setState(
-                                        () => _breakStartedAt = _selected!);
-                                  }
-                                },
-                                label: dateText('yyyy/MM/dd', _breakStartedAt),
-                              ),
-                            ),
-                            SizedBox(width: 4.0),
-                            Expanded(
-                              flex: 2,
-                              child: CustomTimeButton(
-                                onPressed: () async {
-                                  TimeOfDay? _selected = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay(
-                                      hour: timeToInt(_breakStartedAt)[0],
-                                      minute: timeToInt(_breakStartedAt)[1],
-                                    ),
-                                  );
-                                  if (_selected != null) {
-                                    DateTime _dateTime = rebuildTime(
-                                      context,
-                                      _breakStartedAt,
-                                      _selected,
-                                    );
-                                    setState(() => _breakStartedAt = _dateTime);
-                                  }
-                                },
-                                label: dateText('HH:mm', _breakStartedAt),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 8.0),
-                      CustomLabelColumn(
-                        label: '休憩終了日時',
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: CustomDateButton(
-                                onPressed: () async {
-                                  DateTime? _selected = await showDatePicker(
-                                    context: context,
-                                    initialDate: _breakEndedAt,
-                                    firstDate: kDayFirstDate,
-                                    lastDate: kDayLastDate,
-                                  );
-                                  if (_selected != null) {
-                                    _selected =
-                                        rebuildDate(_selected, _breakEndedAt);
-                                    setState(() => _breakEndedAt = _selected!);
-                                  }
-                                },
-                                label: dateText('yyyy/MM/dd', _breakEndedAt),
-                              ),
-                            ),
-                            SizedBox(width: 4.0),
-                            Expanded(
-                              flex: 2,
-                              child: CustomTimeButton(
-                                onPressed: () async {
-                                  TimeOfDay? _selected = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay(
-                                      hour: timeToInt(_breakEndedAt)[0],
-                                      minute: timeToInt(_breakEndedAt)[1],
-                                    ),
-                                  );
-                                  if (_selected != null) {
-                                    DateTime _dateTime = rebuildTime(
-                                      context,
-                                      _breakEndedAt,
-                                      _selected,
-                                    );
-                                    setState(() => _breakEndedAt = _dateTime);
-                                  }
-                                },
-                                label: dateText('HH:mm', _breakEndedAt),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Container(),
-            SizedBox(height: 8.0),
-            CustomLabelColumn(
-              label: '退勤日時',
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: CustomDateButton(
-                      onPressed: () async {
-                        DateTime? _selected = await showDatePicker(
-                          context: context,
-                          initialDate: _endedAt,
-                          firstDate: kDayFirstDate,
-                          lastDate: kDayLastDate,
-                        );
-                        if (_selected != null) {
-                          _selected = rebuildDate(_selected, _endedAt);
-                          setState(() => _endedAt = _selected!);
-                        }
-                      },
-                      label: dateText('yyyy/MM/dd', _endedAt),
-                    ),
-                  ),
-                  SizedBox(width: 4.0),
-                  Expanded(
-                    flex: 2,
-                    child: CustomTimeButton(
-                      onPressed: () async {
-                        TimeOfDay? _selected = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay(
-                            hour: timeToInt(_endedAt)[0],
-                            minute: timeToInt(_endedAt)[1],
-                          ),
-                        );
-                        if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _endedAt,
-                            _selected,
-                          );
-                          setState(() => _endedAt = _dateTime);
-                        }
-                      },
-                      label: dateText('HH:mm', _endedAt),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.grey,
-                  label: 'キャンセル',
-                ),
-                CustomTextButton(
-                  onPressed: () async {
-                    if (!await widget.workProvider.create(
-                      group: widget.group,
-                      user: _user!,
-                      startedAt: _startedAt,
-                      endedAt: _endedAt,
-                      isBreaks: _isBreaks,
-                      breakStartedAt: _breakStartedAt,
-                      breakEndedAt: _breakEndedAt,
-                    )) {
-                      return;
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('勤務データを登録しました')),
-                    );
-                    Navigator.pop(context);
-                  },
-                  color: Colors.blue,
-                  label: '登録する',
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
