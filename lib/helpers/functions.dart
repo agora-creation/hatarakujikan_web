@@ -78,11 +78,11 @@ DateTime rebuildDate(DateTime? date, DateTime? time) {
   return _ret;
 }
 
-DateTime rebuildTime(BuildContext context, DateTime? date, TimeOfDay? time) {
+DateTime rebuildTime(BuildContext context, DateTime? date, String? time) {
   DateTime _ret = DateTime.now();
   if (date != null && time != null) {
     String _date = dateText('yyyy-MM-dd', date);
-    String _time = '${time.format(context).padLeft(5, '0')}:00.000';
+    String _time = '$time:00.000';
     _ret = DateTime.parse('$_date $_time');
   }
   return _ret;
@@ -325,21 +325,5 @@ Future<String?> customTimePicker({
   if (_selected != null) {
     _ret = '${_selected.format(context)}';
   }
-  return _ret;
-}
-
-Future<TimeOfDay?> customTimePicker2({
-  required BuildContext context,
-  DateTime? init,
-}) async {
-  TimeOfDay? _ret;
-  TimeOfDay? _selected = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay(
-      hour: timeToInt(init)[0],
-      minute: timeToInt(init)[1],
-    ),
-  );
-  if (_selected != null) _ret = _selected;
   return _ret;
 }

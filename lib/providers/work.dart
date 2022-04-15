@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -12,43 +11,39 @@ class WorkProvider with ChangeNotifier {
   WorkService _workService = WorkService();
 
   Future<bool> create({
-    required GroupModel group,
-    required UserModel user,
-    required DateTime startedAt,
-    required DateTime endedAt,
-    required bool isBreaks,
-    required DateTime breakStartedAt,
-    required DateTime breakEndedAt,
+    WorkModel? work,
+    BreaksModel? breaks,
   }) async {
-    if (group.id == '') return false;
-    if (user.id == '') return false;
+    if (work == null) return false;
+    if (breaks == null) return false;
+    if (work.startedAt == work.endedAt) return false;
     try {
-      String _id = _workService.id();
       List<Map> _breaks = [];
-      if (isBreaks) {
-        String _breaksId = randomString(20);
+      String _breaksId = randomString(20);
+      if (breaks.startedAt != breaks.endedAt) {
         _breaks.add({
           'id': _breaksId,
-          'startedAt': breakStartedAt,
-          'startedLat': 0.0,
-          'startedLon': 0.0,
-          'endedAt': breakEndedAt,
-          'endedLat': 0.0,
-          'endedLon': 0.0,
+          'startedAt': breaks.startedAt,
+          'startedLat': breaks.startedLat,
+          'startedLon': breaks.startedLon,
+          'endedAt': breaks.endedAt,
+          'endedLat': breaks.endedLat,
+          'endedLon': breaks.endedLon,
         });
       }
+      String _id = _workService.id();
       _workService.create({
         'id': _id,
-        'groupId': group.id,
-        'userId': user.id,
-        'startedAt': startedAt,
-        'startedLat': 0.0,
-        'startedLon': 0.0,
-        'endedAt': endedAt,
-        'endedLat': 0.0,
-        'endedLon': 0.0,
+        'groupId': work.groupId,
+        'userId': work.userId,
+        'startedAt': work.startedAt,
+        'startedLat': work.startedLat,
+        'startedLon': work.startedLon,
+        'endedAt': work.endedAt,
+        'endedLat': work.endedLat,
+        'endedLon': work.endedLon,
         'breaks': _breaks,
-        'state': workStates.first,
+        'state': work.state,
         'createdAt': DateTime.now(),
       });
       return true;
@@ -141,7 +136,7 @@ class WorkProvider with ChangeNotifier {
         .collection('work')
         .where('groupId', isEqualTo: groupId)
         .where('userId', isEqualTo: user?.id)
-        .orderBy('startedAt', descending: true)
+        .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     return _ret;
   }
@@ -155,7 +150,7 @@ class WorkProvider with ChangeNotifier {
         .collection('workShift')
         .where('groupId', isEqualTo: groupId)
         .where('userId', isEqualTo: user?.id)
-        .orderBy('startedAt', descending: true)
+        .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     return _ret;
   }

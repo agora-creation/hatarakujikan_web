@@ -242,12 +242,12 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                           ),
                         );
                         if (_selected != null) {
-                          DateTime? _dateTime = rebuildTime(
-                            context,
-                            _work?.startedAt,
-                            _selected,
-                          );
-                          setState(() => _work?.startedAt = _dateTime);
+                          // DateTime? _dateTime = rebuildTime(
+                          //   context,
+                          //   _work?.startedAt,
+                          //   _selected,
+                          // );
+                          // setState(() => _work?.startedAt = _dateTime);
                         }
                       },
                       label: dateText('HH:mm', _work?.startedAt),
@@ -308,13 +308,13 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         ),
                                       );
                                       if (_selected != null) {
-                                        DateTime _dateTime = rebuildTime(
-                                          context,
-                                          _breaks.startedAt,
-                                          _selected,
-                                        );
-                                        setState(() =>
-                                            _breaks.startedAt = _dateTime);
+                                        // DateTime _dateTime = rebuildTime(
+                                        //   context,
+                                        //   _breaks.startedAt,
+                                        //   _selected,
+                                        // );
+                                        // setState(() =>
+                                        //     _breaks.startedAt = _dateTime);
                                       }
                                     },
                                     label: dateText('HH:mm', _breaks.startedAt),
@@ -364,13 +364,13 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                         ),
                                       );
                                       if (_selected != null) {
-                                        DateTime? _dateTime = rebuildTime(
-                                          context,
-                                          _breaks.endedAt,
-                                          _selected,
-                                        );
-                                        setState(
-                                            () => _breaks.endedAt = _dateTime);
+                                        // DateTime? _dateTime = rebuildTime(
+                                        //   context,
+                                        //   _breaks.endedAt,
+                                        //   _selected,
+                                        // );
+                                        // setState(
+                                        //     () => _breaks.endedAt = _dateTime);
                                       }
                                     },
                                     label: dateText('HH:mm', _breaks.endedAt),
@@ -440,13 +440,13 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                               ),
                                             );
                                             if (_selected != null) {
-                                              DateTime _dateTime = rebuildTime(
-                                                context,
-                                                _breakStartedAt,
-                                                _selected,
-                                              );
-                                              setState(() =>
-                                                  _breakStartedAt = _dateTime);
+                                              // DateTime _dateTime = rebuildTime(
+                                              //   context,
+                                              //   _breakStartedAt,
+                                              //   _selected,
+                                              // );
+                                              // setState(() =>
+                                              //     _breakStartedAt = _dateTime);
                                             }
                                           },
                                           label: dateText(
@@ -499,13 +499,13 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                                               ),
                                             );
                                             if (_selected != null) {
-                                              DateTime _dateTime = rebuildTime(
-                                                context,
-                                                _breakEndedAt,
-                                                _selected,
-                                              );
-                                              setState(() =>
-                                                  _breakEndedAt = _dateTime);
+                                              // DateTime _dateTime = rebuildTime(
+                                              //   context,
+                                              //   _breakEndedAt,
+                                              //   _selected,
+                                              // );
+                                              // setState(() =>
+                                              //     _breakEndedAt = _dateTime);
                                             }
                                           },
                                           label:
@@ -556,12 +556,12 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                           ),
                         );
                         if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _work?.endedAt,
-                            _selected,
-                          );
-                          setState(() => _work?.endedAt = _dateTime);
+                          // DateTime _dateTime = rebuildTime(
+                          //   context,
+                          //   _work?.endedAt,
+                          //   _selected,
+                          // );
+                          // setState(() => _work?.endedAt = _dateTime);
                         }
                       },
                       label: dateText('HH:mm', _work?.endedAt),

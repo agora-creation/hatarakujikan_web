@@ -324,12 +324,12 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                           ),
                         );
                         if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _startedAt,
-                            _selected,
-                          );
-                          setState(() => _startedAt = _dateTime);
+                          // DateTime _dateTime = rebuildTime(
+                          //   context,
+                          //   _startedAt,
+                          //   _selected,
+                          // );
+                          // setState(() => _startedAt = _dateTime);
                         }
                       },
                       label: dateText('HH:mm', _startedAt),
@@ -374,12 +374,12 @@ class _AddWorkShiftDialogState extends State<AddWorkShiftDialog> {
                           ),
                         );
                         if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _endedAt,
-                            _selected,
-                          );
-                          setState(() => _endedAt = _dateTime);
+                          // DateTime _dateTime = rebuildTime(
+                          //   context,
+                          //   _endedAt,
+                          //   _selected,
+                          // );
+                          // setState(() => _endedAt = _dateTime);
                         }
                       },
                       label: dateText('HH:mm', _endedAt),
@@ -556,12 +556,12 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                           ),
                         );
                         if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _startedAt,
-                            _selected,
-                          );
-                          setState(() => _startedAt = _dateTime);
+                          // DateTime _dateTime = rebuildTime(
+                          //   context,
+                          //   _startedAt,
+                          //   _selected,
+                          // );
+                          // setState(() => _startedAt = _dateTime);
                         }
                       },
                       label: dateText('HH:mm', _startedAt),
@@ -606,12 +606,12 @@ class _EditWorkShiftDialogState extends State<EditWorkShiftDialog> {
                           ),
                         );
                         if (_selected != null) {
-                          DateTime _dateTime = rebuildTime(
-                            context,
-                            _endedAt,
-                            _selected,
-                          );
-                          setState(() => _endedAt = _dateTime);
+                          // DateTime _dateTime = rebuildTime(
+                          //   context,
+                          //   _endedAt,
+                          //   _selected,
+                          // );
+                          // setState(() => _endedAt = _dateTime);
                         }
                       },
                       label: dateText('HH:mm', _endedAt),
