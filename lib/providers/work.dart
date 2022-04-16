@@ -12,23 +12,23 @@ class WorkProvider with ChangeNotifier {
 
   Future<bool> create({
     WorkModel? work,
-    BreaksModel? breaks,
+    List<BreaksModel>? breaks,
   }) async {
     if (work == null) return false;
     if (breaks == null) return false;
     if (work.startedAt == work.endedAt) return false;
     try {
       List<Map> _breaks = [];
-      String _breaksId = randomString(20);
-      if (breaks.startedAt != breaks.endedAt) {
+      for (BreaksModel _breaksModel in breaks) {
+        String _breaksId = randomString(20);
         _breaks.add({
           'id': _breaksId,
-          'startedAt': breaks.startedAt,
-          'startedLat': breaks.startedLat,
-          'startedLon': breaks.startedLon,
-          'endedAt': breaks.endedAt,
-          'endedLat': breaks.endedLat,
-          'endedLon': breaks.endedLon,
+          'startedAt': _breaksModel.startedAt,
+          'startedLat': _breaksModel.startedLat,
+          'startedLon': _breaksModel.startedLon,
+          'endedAt': _breaksModel.endedAt,
+          'endedLat': _breaksModel.endedLat,
+          'endedLon': _breaksModel.endedLon,
         });
       }
       String _id = _workService.id();
@@ -54,33 +54,33 @@ class WorkProvider with ChangeNotifier {
   }
 
   Future<bool> update({
-    required WorkModel work,
-    required bool isBreaks,
-    required DateTime breakStartedAt,
-    required DateTime breakEndedAt,
+    WorkModel? work,
+    List<BreaksModel>? breaks,
   }) async {
+    if (work == null) return false;
+    if (breaks == null) return false;
+    if (work.startedAt == work.endedAt) return false;
     try {
       List<Map> _breaks = [];
-      for (BreaksModel breaks in work.breaks) {
-        _breaks.add(breaks.toMap());
-      }
-      if (isBreaks) {
+      for (BreaksModel _breaksModel in breaks) {
         String _breaksId = randomString(20);
         _breaks.add({
           'id': _breaksId,
-          'startedAt': breakStartedAt,
-          'startedLat': 0.0,
-          'startedLon': 0.0,
-          'endedAt': breakEndedAt,
-          'endedLat': 0.0,
-          'endedLon': 0.0,
+          'startedAt': _breaksModel.startedAt,
+          'startedLat': _breaksModel.startedLat,
+          'startedLon': _breaksModel.startedLon,
+          'endedAt': _breaksModel.endedAt,
+          'endedLat': _breaksModel.endedLat,
+          'endedLon': _breaksModel.endedLon,
         });
       }
       _workService.update({
         'id': work.id,
+        'userId': work.userId,
         'startedAt': work.startedAt,
         'endedAt': work.endedAt,
         'breaks': _breaks,
+        'state': work.state,
       });
       return true;
     } catch (e) {
@@ -89,8 +89,15 @@ class WorkProvider with ChangeNotifier {
     }
   }
 
-  void delete({required String id}) {
-    _workService.delete({'id': id});
+  Future<bool> delete({String? id}) async {
+    if (id == null) return false;
+    try {
+      _workService.delete({'id': id});
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   Future<List<WorkModel>> selectList({
@@ -134,8 +141,8 @@ class WorkProvider with ChangeNotifier {
     Timestamp _endAt = convertTimestamp(days.last, true);
     _ret = FirebaseFirestore.instance
         .collection('work')
-        .where('groupId', isEqualTo: groupId)
-        .where('userId', isEqualTo: user?.id)
+        .where('groupId', isEqualTo: groupId ?? 'error')
+        .where('userId', isEqualTo: user?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     return _ret;
@@ -148,8 +155,8 @@ class WorkProvider with ChangeNotifier {
     Timestamp _endAt = convertTimestamp(days.last, true);
     _ret = FirebaseFirestore.instance
         .collection('workShift')
-        .where('groupId', isEqualTo: groupId)
-        .where('userId', isEqualTo: user?.id)
+        .where('groupId', isEqualTo: groupId ?? 'error')
+        .where('userId', isEqualTo: user?.id ?? 'error')
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     return _ret;

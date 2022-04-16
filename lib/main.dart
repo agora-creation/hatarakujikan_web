@@ -25,6 +25,7 @@ import 'package:hatarakujikan_web/screens/setting_work.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
+import 'package:hatarakujikan_web/screens/work_output.dart';
 import 'package:hatarakujikan_web/screens/work_shift.dart';
 import 'package:provider/provider.dart';
 
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
           SettingWorkScreen.id: (context) => SettingWorkScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),
+          WorkOutputScreen.id: (context) => WorkOutputScreen(),
           WorkShiftScreen.id: (context) => WorkShiftScreen(),
         },
       ),

@@ -1677,6 +1677,7 @@ class _EditAreaLatLonDialogState extends State<EditAreaLatLonDialog> {
               lat: areaLat,
               lon: areaLon,
               range: areaRange,
+              area: true,
               onTap: (latLng) {
                 setState(() {
                   areaLat = latLng.latitude;

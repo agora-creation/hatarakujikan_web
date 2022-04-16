@@ -63,15 +63,15 @@ class ApplyWorkProvider with ChangeNotifier {
     if (user == null) {
       _ret = FirebaseFirestore.instance
           .collection('applyWork')
-          .where('groupId', isEqualTo: groupId)
+          .where('groupId', isEqualTo: groupId ?? 'error')
           .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();
     } else {
       _ret = FirebaseFirestore.instance
           .collection('applyWork')
-          .where('groupId', isEqualTo: groupId)
-          .where('userId', isEqualTo: user?.id)
+          .where('groupId', isEqualTo: groupId ?? 'error')
+          .where('userId', isEqualTo: user?.id ?? 'error')
           .where('approval', isEqualTo: approval)
           .orderBy('createdAt', descending: true)
           .snapshots();

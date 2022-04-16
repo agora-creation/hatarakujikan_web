@@ -12,6 +12,16 @@ class BreaksModel {
 
   String get id => _id;
 
+  BreaksModel.set(Map data) {
+    _id = data['id'] ?? '';
+    startedAt = data['startedAt'] ?? DateTime.now();
+    startedLat = data['startedLat'] ?? 0;
+    startedLon = data['startedLon'] ?? 0;
+    endedAt = data['endedAt'] ?? DateTime.now();
+    endedLat = data['endedLat'] ?? 0;
+    endedLon = data['endedLon'] ?? 0;
+  }
+
   BreaksModel.fromMap(Map data) {
     _id = data['id'] ?? '';
     startedAt = data['startedAt'].toDate() ?? DateTime.now();

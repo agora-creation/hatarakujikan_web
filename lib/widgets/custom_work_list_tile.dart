@@ -600,14 +600,14 @@ class _EditWorkDialogState extends State<EditWorkDialog> {
                     SizedBox(width: 4.0),
                     CustomTextButton(
                       onPressed: () async {
-                        if (!await widget.workProvider.update(
-                          work: _work!,
-                          isBreaks: _isBreaks,
-                          breakStartedAt: _breakStartedAt,
-                          breakEndedAt: _breakEndedAt,
-                        )) {
-                          return;
-                        }
+                        // if (!await widget.workProvider.update(
+                        //   work: _work!,
+                        //   isBreaks: _isBreaks,
+                        //   breakStartedAt: _breakStartedAt,
+                        //   breakEndedAt: _breakEndedAt,
+                        // )) {
+                        //   return;
+                        // }
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('勤務データを修正しました')),
                         );

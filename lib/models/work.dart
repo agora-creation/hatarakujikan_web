@@ -21,19 +21,19 @@ class WorkModel {
   String get groupId => _groupId;
   DateTime get createdAt => _createdAt;
 
-  WorkModel.fromMap(Map data) {
+  WorkModel.set(Map data) {
     _id = data['id'] ?? '';
     _groupId = data['groupId'] ?? '';
     userId = data['userId'] ?? '';
-    startedAt = data['startedAt'].toDate() ?? DateTime.now();
-    startedLat = data['startedLat'].toDouble() ?? 0;
-    startedLon = data['startedLon'].toDouble() ?? 0;
-    endedAt = data['endedAt'].toDate() ?? DateTime.now();
-    endedLat = data['endedLat'].toDouble() ?? 0;
-    endedLon = data['endedLon'].toDouble() ?? 0;
+    startedAt = data['startedAt'] ?? DateTime.now();
+    startedLat = data['startedLat'] ?? 0;
+    startedLon = data['startedLon'] ?? 0;
+    endedAt = data['endedAt'] ?? DateTime.now();
+    endedLat = data['endedLat'] ?? 0;
+    endedLon = data['endedLon'] ?? 0;
     breaks = data['breaks'] ?? [];
     state = data['state'] ?? '';
-    _createdAt = data['createdAt'].toDate() ?? DateTime.now();
+    _createdAt = data['createdAt'] ?? DateTime.now();
   }
 
   WorkModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {

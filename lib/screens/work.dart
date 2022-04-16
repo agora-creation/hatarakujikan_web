@@ -24,15 +24,12 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
-import 'package:hatarakujikan_web/widgets/custom_text_icon_button.dart';
-import 'package:hatarakujikan_web/widgets/custom_work_footer_list_tile.dart';
-import 'package:hatarakujikan_web/widgets/custom_work_list_tile.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_button_mini.dart';
 import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/work_footer.dart';
 import 'package:hatarakujikan_web/widgets/work_header.dart';
-import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
@@ -117,7 +114,6 @@ class WorkScreen extends StatelessWidget {
                     builder: (_) => AddDialog(
                       groupProvider: groupProvider,
                       workProvider: workProvider,
-                      group: group,
                     ),
                   );
                 },
@@ -168,6 +164,7 @@ class WorkScreen extends StatelessWidget {
                         }
                       }
                       return WorkList(
+                        groupProvider: groupProvider,
                         workProvider: workProvider,
                         day: workProvider.days[index],
                         dayInWorks: _dayInWorks,
@@ -288,12 +285,10 @@ class _SearchUserDialogState extends State<SearchUserDialog> {
 class AddDialog extends StatefulWidget {
   final GroupProvider groupProvider;
   final WorkProvider workProvider;
-  final GroupModel? group;
 
   AddDialog({
     required this.groupProvider,
     required this.workProvider,
-    this.group,
   });
 
   @override
@@ -303,35 +298,31 @@ class AddDialog extends StatefulWidget {
 class _AddDialogState extends State<AddDialog> {
   List<UserModel> users = [];
   WorkModel? work;
-  BreaksModel? breaks;
+  List<BreaksModel> breaks = [];
+
+  void _addBreaks() {
+    BreaksModel _breaks = BreaksModel.set({
+      'startedAt': DateTime.now(),
+      'endedAt': DateTime.now().add(Duration(hours: 1)),
+    });
+    setState(() => breaks.add(_breaks));
+  }
+
+  void _removeBreaks() {
+    setState(() => breaks.removeLast());
+  }
 
   void _init() async {
     List<UserModel> _users = await widget.groupProvider.selectUsers();
     if (mounted) {
       setState(() {
         users = _users;
-        work = WorkModel.fromMap({
-          'id': '',
-          'groupId': widget.group?.id,
+        work = WorkModel.set({
+          'groupId': widget.groupProvider.group?.id,
           'userId': widget.workProvider.user?.id,
           'startedAt': DateTime.now(),
-          'startedLat': 0,
-          'startedLon': 0,
           'endedAt': DateTime.now().add(Duration(hours: 8)),
-          'endedLat': 0,
-          'endedLon': 0,
-          'breaks': [],
           'state': workStates.first,
-          'createdAt': DateTime.now(),
-        });
-        breaks = BreaksModel.fromMap({
-          'id': '',
-          'startedAt': DateTime.now(),
-          'startedLat': 0,
-          'startedLon': 0,
-          'endedAt': DateTime.now().add(Duration(hours: 1)),
-          'endedLat': 0,
-          'endedLon': 0,
         });
       });
     }
@@ -341,6 +332,7 @@ class _AddDialogState extends State<AddDialog> {
   void initState() {
     super.initState();
     _init();
+    _addBreaks();
   }
 
   @override
@@ -359,7 +351,7 @@ class _AddDialogState extends State<AddDialog> {
             CustomDropdownButton(
               label: '対象スタッフ',
               isExpanded: true,
-              value: work?.userId,
+              value: work?.userId != '' ? work?.userId : null,
               onChanged: (value) {
                 setState(() => work?.userId = value);
               },
@@ -380,7 +372,7 @@ class _AddDialogState extends State<AddDialog> {
             CustomDropdownButton(
               label: '勤務状況',
               isExpanded: true,
-              value: work?.state,
+              value: work?.state != '' ? work?.state : null,
               onChanged: (value) {
                 setState(() => work?.state = value);
               },
@@ -450,62 +442,91 @@ class _AddDialogState extends State<AddDialog> {
               },
             ),
             SizedBox(height: 8.0),
-            Column(
+            breaks.length > 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemCount: breaks.length,
+                    itemBuilder: (_, index) {
+                      BreaksModel _breaks = breaks[index];
+                      return Column(
+                        children: [
+                          DateTimeFormField(
+                            label: '休憩開始日時',
+                            date: dateText('yyyy/MM/dd', _breaks.startedAt),
+                            dateOnPressed: () async {
+                              DateTime? _date = await customDatePicker(
+                                context: context,
+                                init: _breaks.startedAt,
+                              );
+                              if (_date == null) return;
+                              DateTime _dateTime =
+                                  rebuildDate(_date, _breaks.startedAt);
+                              setState(() => _breaks.startedAt = _dateTime);
+                            },
+                            time: dateText('HH:mm', _breaks.startedAt),
+                            timeOnPressed: () async {
+                              String? _time = await customTimePicker(
+                                context: context,
+                                init: dateText('HH:mm', _breaks.startedAt),
+                              );
+                              if (_time == null) return;
+                              DateTime _dateTime = rebuildTime(
+                                context,
+                                _breaks.startedAt,
+                                _time,
+                              );
+                              setState(() => _breaks.startedAt = _dateTime);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          DateTimeFormField(
+                            label: '休憩終了日時',
+                            date: dateText('yyyy/MM/dd', _breaks.endedAt),
+                            dateOnPressed: () async {
+                              DateTime? _date = await customDatePicker(
+                                context: context,
+                                init: _breaks.endedAt,
+                              );
+                              if (_date == null) return;
+                              DateTime _dateTime =
+                                  rebuildDate(_date, _breaks.endedAt);
+                              setState(() => _breaks.endedAt = _dateTime);
+                            },
+                            time: dateText('HH:mm', _breaks.endedAt),
+                            timeOnPressed: () async {
+                              String? _time = await customTimePicker(
+                                context: context,
+                                init: dateText('HH:mm', _breaks.endedAt),
+                              );
+                              if (_time == null) return;
+                              DateTime _dateTime = rebuildTime(
+                                context,
+                                _breaks.endedAt,
+                                _time,
+                              );
+                              setState(() => _breaks.endedAt = _dateTime);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                        ],
+                      );
+                    },
+                  )
+                : Container(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                DateTimeFormField(
-                  label: '休憩開始日時',
-                  date: dateText('yyyy/MM/dd', breaks?.startedAt),
-                  dateOnPressed: () async {
-                    DateTime? _date = await customDatePicker(
-                      context: context,
-                      init: breaks?.startedAt ?? DateTime.now(),
-                    );
-                    if (_date == null) return;
-                    DateTime _dateTime = rebuildDate(_date, breaks?.startedAt);
-                    setState(() => breaks?.startedAt = _dateTime);
-                  },
-                  time: dateText('HH:mm', breaks?.startedAt),
-                  timeOnPressed: () async {
-                    String? _time = await customTimePicker(
-                      context: context,
-                      init: dateText('HH:mm', breaks?.startedAt),
-                    );
-                    if (_time == null) return;
-                    DateTime _dateTime = rebuildTime(
-                      context,
-                      breaks?.startedAt,
-                      _time,
-                    );
-                    setState(() => breaks?.startedAt = _dateTime);
-                  },
+                CustomTextButtonMini(
+                  label: '休憩削除',
+                  color: Colors.deepOrange,
+                  onPressed: () => _removeBreaks(),
                 ),
-                SizedBox(height: 8.0),
-                DateTimeFormField(
-                  label: '休憩終了日時',
-                  date: dateText('yyyy/MM/dd', breaks?.endedAt),
-                  dateOnPressed: () async {
-                    DateTime? _date = await customDatePicker(
-                      context: context,
-                      init: breaks?.endedAt ?? DateTime.now(),
-                    );
-                    if (_date == null) return;
-                    DateTime _dateTime = rebuildDate(_date, breaks?.endedAt);
-                    setState(() => breaks?.endedAt = _dateTime);
-                  },
-                  time: dateText('HH:mm', breaks?.endedAt),
-                  timeOnPressed: () async {
-                    String? _time = await customTimePicker(
-                      context: context,
-                      init: dateText('HH:mm', breaks?.endedAt),
-                    );
-                    if (_time == null) return;
-                    DateTime _dateTime = rebuildTime(
-                      context,
-                      breaks?.endedAt,
-                      _time,
-                    );
-                    setState(() => breaks?.endedAt = _dateTime);
-                  },
+                SizedBox(width: 4.0),
+                CustomTextButtonMini(
+                  label: '休憩追加',
+                  color: Colors.cyan,
+                  onPressed: () => _addBreaks(),
                 ),
               ],
             ),
@@ -537,263 +558,6 @@ class _AddDialogState extends State<AddDialog> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class WorkTable extends StatefulWidget {
-  final GroupProvider groupProvider;
-  final PositionProvider positionProvider;
-  final UserProvider userProvider;
-  final WorkProvider workProvider;
-  final WorkShiftProvider workShiftProvider;
-
-  WorkTable({
-    required this.groupProvider,
-    required this.positionProvider,
-    required this.userProvider,
-    required this.workProvider,
-    required this.workShiftProvider,
-  });
-
-  @override
-  _WorkTableState createState() => _WorkTableState();
-}
-
-class _WorkTableState extends State<WorkTable> {
-  DateTime _month = DateTime.now();
-  UserModel? _user;
-  List<DateTime> _days = [];
-
-  void _init() async {
-    setState(() => _days = generateDays(_month));
-  }
-
-  void userChange(UserModel userModel) {
-    setState(() => _user = userModel);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    GroupModel? _group = widget.groupProvider.group;
-    Timestamp _startAt = convertTimestamp(_days.first, false);
-    Timestamp _endAt = convertTimestamp(_days.last, true);
-    Stream<QuerySnapshot<Map<String, dynamic>>> _streamWork = FirebaseFirestore
-        .instance
-        .collection('work')
-        .where('groupId', isEqualTo: _group?.id ?? 'error')
-        .where('userId', isEqualTo: _user?.id ?? 'error')
-        .orderBy('startedAt', descending: false)
-        .startAt([_startAt]).endAt([_endAt]).snapshots();
-    Stream<QuerySnapshot<Map<String, dynamic>>> _streamWorkShift =
-        FirebaseFirestore.instance
-            .collection('workShift')
-            .where('groupId', isEqualTo: _group?.id ?? 'error')
-            .where('userId', isEqualTo: _user?.id ?? 'error')
-            .orderBy('startedAt', descending: false)
-            .startAt([_startAt]).endAt([_endAt]).snapshots();
-    List<WorkModel> _works = [];
-    List<WorkShiftModel> _workShifts = [];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AdminHeader(
-          title: '勤怠の記録',
-          message: 'スタッフが記録した勤務日時を年月形式で一覧表示します。勤務日時は追加/修正/削除できます。',
-        ),
-        SizedBox(height: 16.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                CustomTextIconButton(
-                  onPressed: () async {
-                    var selected = await showMonthPicker(
-                      context: context,
-                      initialDate: _month,
-                      firstDate: kMonthFirstDate,
-                      lastDate: kMonthLastDate,
-                    );
-                    if (selected == null) return;
-                    setState(() {
-                      _month = selected;
-                      _days = generateDays(_month);
-                    });
-                  },
-                  color: Colors.lightBlueAccent,
-                  iconData: Icons.today,
-                  label: dateText('yyyy年MM月', _month),
-                ),
-                SizedBox(width: 4.0),
-                CustomTextIconButton(
-                  onPressed: () {},
-                  color: Colors.lightBlueAccent,
-                  iconData: Icons.person,
-                  label: _user?.name ?? '選択してください',
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                CustomTextIconButton(
-                  onPressed: () {
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => CsvDialog(
-                        positionProvider: widget.positionProvider,
-                        userProvider: widget.userProvider,
-                        workProvider: widget.workProvider,
-                        workShiftProvider: widget.workShiftProvider,
-                        group: widget.groupProvider.group!,
-                        month: _month,
-                      ),
-                    );
-                  },
-                  color: Colors.green,
-                  iconData: Icons.file_download,
-                  label: 'CSV出力',
-                ),
-                SizedBox(width: 4.0),
-                CustomTextIconButton(
-                  onPressed: () {
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => PdfDialog(
-                        positionProvider: widget.positionProvider,
-                        workProvider: widget.workProvider,
-                        workShiftProvider: widget.workShiftProvider,
-                        group: widget.groupProvider.group!,
-                        month: _month,
-                        users: widget.groupProvider.users,
-                        user: _user!,
-                      ),
-                    );
-                  },
-                  color: Colors.redAccent,
-                  iconData: Icons.file_download,
-                  label: 'PDF出力',
-                ),
-                SizedBox(width: 4.0),
-                CustomTextIconButton(
-                  onPressed: () {},
-                  color: Colors.blue,
-                  iconData: Icons.add,
-                  label: '新規登録',
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(height: 8.0),
-        WorkHeader(),
-        Expanded(
-          child: StreamBuilder2<QuerySnapshot<Map<String, dynamic>>,
-              QuerySnapshot<Map<String, dynamic>>>(
-            streams: Tuple2(_streamWork, _streamWorkShift),
-            builder: (context, snapshot) {
-              _works.clear();
-              if (snapshot.item1.hasData) {
-                for (DocumentSnapshot<Map<String, dynamic>> doc
-                    in snapshot.item1.data!.docs) {
-                  _works.add(WorkModel.fromSnapshot(doc));
-                }
-              }
-              _workShifts.clear();
-              if (snapshot.item2.hasData) {
-                for (DocumentSnapshot<Map<String, dynamic>> doc
-                    in snapshot.item2.data!.docs) {
-                  _workShifts.add(WorkShiftModel.fromSnapshot(doc));
-                }
-              }
-              return Scrollbar(
-                child: ListView.builder(
-                  itemCount: _days.length,
-                  itemBuilder: (_, index) {
-                    DateFormat _format = DateFormat('yyyy-MM-dd');
-                    List<WorkModel> _dayWorks = [];
-                    for (WorkModel _work in _works) {
-                      String _start = '${_format.format(_work.startedAt)}';
-                      if (_days[index] == DateTime.parse(_start)) {
-                        _dayWorks.add(_work);
-                      }
-                    }
-                    WorkShiftModel? _dayWorkShift;
-                    for (WorkShiftModel _workShift in _workShifts) {
-                      String _start = '${_format.format(_workShift.startedAt)}';
-                      if (_days[index] == DateTime.parse(_start)) {
-                        _dayWorkShift = _workShift;
-                      }
-                    }
-                    return CustomWorkListTile(
-                      workProvider: widget.workProvider,
-                      day: _days[index],
-                      dayWorks: _dayWorks,
-                      dayWorkShift: _dayWorkShift,
-                      group: widget.groupProvider.group,
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-        StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: _streamWork,
-          builder: (context, snapshot) {
-            Map _count = {};
-            int _workCount = 0;
-            String _workTime = '00:00';
-            String _legalTime = '00:00';
-            String _nonLegalTime = '00:00';
-            String _nightTime = '00:00';
-            List<WorkModel> _worksTmp = [];
-            if (snapshot.hasData) {
-              for (DocumentSnapshot<Map<String, dynamic>> _workTmp
-                  in snapshot.data!.docs) {
-                _worksTmp.add(WorkModel.fromSnapshot(_workTmp));
-              }
-            }
-            DateFormat _format = DateFormat('yyyy-MM-dd');
-            for (WorkModel _work in _worksTmp) {
-              if (_work.startedAt != _work.endedAt) {
-                String _key = '${_format.format(_work.startedAt)}';
-                _count[_key] = '';
-                _workTime = addTime(
-                  _workTime,
-                  _work.workTime(widget.groupProvider.group),
-                );
-                List<String> _legalTimes = _work.legalTimes(
-                  widget.groupProvider.group,
-                );
-                _legalTime = addTime(_legalTime, _legalTimes.first);
-                _nonLegalTime = addTime(_nonLegalTime, _legalTimes.last);
-                List<String> _nightTimes = _work.nightTimes(
-                  widget.groupProvider.group,
-                );
-                _nightTime = addTime(_nightTime, _nightTimes.last);
-              }
-            }
-            _workCount = _count.length;
-            return CustomWorkFooterListTile(
-              workCount: _workCount,
-              workTime: _workTime,
-              legalTime: _legalTime,
-              nonLegalTime: _nonLegalTime,
-              nightTime: _nightTime,
-            );
-          },
-        ),
-      ],
     );
   }
 }

@@ -87,7 +87,7 @@ class PositionProvider with ChangeNotifier {
     Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
     _ret = FirebaseFirestore.instance
         .collection('position')
-        .where('groupId', isEqualTo: groupId)
+        .where('groupId', isEqualTo: groupId ?? '')
         .orderBy('createdAt', descending: true)
         .snapshots();
     return _ret;

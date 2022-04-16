@@ -10,6 +10,7 @@ import 'package:hatarakujikan_web/screens/group_position.dart';
 import 'package:hatarakujikan_web/screens/group_rule.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
+import 'package:hatarakujikan_web/screens/work_output.dart';
 import 'package:hatarakujikan_web/screens/work_shift.dart';
 
 List<MenuItem> sideMenu(GroupModel? group) {
@@ -32,7 +33,7 @@ List<MenuItem> sideMenu(GroupModel? group) {
             : MenuItem(title: 'シフト表(利用不可)'),
         MenuItem(
           title: '帳票の出力',
-          route: WorkShiftScreen.id,
+          route: WorkOutputScreen.id,
           icon: Icons.chevron_right,
         ),
       ],

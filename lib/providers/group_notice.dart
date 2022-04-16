@@ -112,7 +112,7 @@ class GroupNoticeProvider with ChangeNotifier {
         .collection('group')
         .doc(groupId)
         .collection('notice')
-        .where('groupId', isEqualTo: groupId)
+        .where('groupId', isEqualTo: groupId ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     return _ret;
