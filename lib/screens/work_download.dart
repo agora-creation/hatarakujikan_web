@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hatarakujikan_web/helpers/csv_download.dart';
+import 'package:hatarakujikan_web/helpers/csv_file.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -18,8 +18,8 @@ import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/month_form_field.dart';
 import 'package:provider/provider.dart';
 
-class WorkOutputScreen extends StatelessWidget {
-  static const String id = 'work_output';
+class WorkDownloadScreen extends StatelessWidget {
+  static const String id = 'work_download';
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,7 @@ class WorkOutputScreen extends StatelessWidget {
                 TapListTile(
                   title: 'PDFファイル形式で出力',
                   subtitle: '勤怠の記録を印刷して確認できるよう、PDFファイルをダウンロードできます。',
-                  iconData: Icons.print,
+                  iconData: Icons.file_download,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -157,7 +157,7 @@ class _CSVDialogState extends State<CSVDialog> {
                         color: Colors.blue,
                         onPressed: () async {
                           setState(() => isLoading = true);
-                          await CSVDownload.download(
+                          await CSVFile.download(
                             positionProvider: widget.positionProvider,
                             userProvider: widget.userProvider,
                             workProvider: widget.workProvider,

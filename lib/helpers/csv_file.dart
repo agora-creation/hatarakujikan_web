@@ -12,9 +12,9 @@ import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:universal_html/html.dart';
 
-class CSVDownload {
+class CSVFile {
   //共通部
-  static Future<void> download({
+  static Future download({
     required PositionProvider positionProvider,
     required UserProvider userProvider,
     required WorkProvider workProvider,
@@ -46,12 +46,19 @@ class CSVDownload {
         );
         return;
       default:
+        await _model01(
+          positionProvider: positionProvider,
+          userProvider: userProvider,
+          workProvider: workProvider,
+          group: group,
+          month: month,
+        );
         return;
     }
   }
 }
 
-Future<void> _model01({
+Future _model01({
   required PositionProvider positionProvider,
   required UserProvider userProvider,
   required WorkProvider workProvider,
@@ -114,9 +121,10 @@ Future<void> _model01({
     }
   }
   _dl(rows: rows, fileName: 'works.csv');
+  return;
 }
 
-Future<void> _model02({
+Future _model02({
   required PositionProvider positionProvider,
   required UserProvider userProvider,
   required WorkProvider workProvider,
@@ -295,6 +303,7 @@ Future<void> _model02({
     }
   }
   _dl(rows: rows, fileName: 'works.csv');
+  return;
 }
 
 void _dl({
