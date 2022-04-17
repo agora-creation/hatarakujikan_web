@@ -75,7 +75,7 @@ class PositionProvider with ChangeNotifier {
     }
   }
 
-  Future<List<PositionModel>> selectList({required String groupId}) async {
+  Future<List<PositionModel>> selectList({String? groupId}) async {
     List<PositionModel> _positions = [];
     await _positionService.selectList(groupId: groupId).then((value) {
       _positions = value;

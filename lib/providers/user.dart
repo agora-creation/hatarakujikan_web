@@ -184,9 +184,9 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<List<UserModel>> selectList({required List<String> userIds}) async {
+  Future<List<UserModel>> selectList({List<String>? userIds}) async {
     List<UserModel> _users = [];
-    await _userService.selectList(userIds: userIds).then((value) {
+    await _userService.selectList(userIds: userIds ?? []).then((value) {
       _users = value;
     });
     return _users;
