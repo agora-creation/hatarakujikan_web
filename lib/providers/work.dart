@@ -17,6 +17,8 @@ class WorkProvider with ChangeNotifier {
     if (work == null) return false;
     if (breaks == null) return false;
     if (work.startedAt == work.endedAt) return false;
+    if (work.startedAt.millisecondsSinceEpoch >
+        work.endedAt.millisecondsSinceEpoch) return false;
     try {
       List<Map> _breaks = [];
       for (BreaksModel _breaksModel in breaks) {
@@ -60,6 +62,8 @@ class WorkProvider with ChangeNotifier {
     if (work == null) return false;
     if (breaks == null) return false;
     if (work.startedAt == work.endedAt) return false;
+    if (work.startedAt.millisecondsSinceEpoch >
+        work.endedAt.millisecondsSinceEpoch) return false;
     try {
       List<Map> _breaks = [];
       for (BreaksModel _breaksModel in breaks) {
@@ -98,26 +102,6 @@ class WorkProvider with ChangeNotifier {
       print(e.toString());
       return false;
     }
-  }
-
-  Future<List<WorkModel>> selectList({
-    required GroupModel group,
-    required UserModel user,
-    required DateTime startAt,
-    required DateTime endAt,
-  }) async {
-    List<WorkModel> _works = [];
-    await _workService
-        .selectList(
-      groupId: group.id,
-      userId: user.id,
-      startAt: startAt,
-      endAt: endAt,
-    )
-        .then((value) {
-      _works = value;
-    });
-    return _works;
   }
 
   DateTime month = DateTime.now();
@@ -160,5 +144,25 @@ class WorkProvider with ChangeNotifier {
         .orderBy('startedAt', descending: false)
         .startAt([_startAt]).endAt([_endAt]).snapshots();
     return _ret;
+  }
+
+  Future<List<WorkModel>> selectList({
+    GroupModel? group,
+    UserModel? user,
+    DateTime? startAt,
+    DateTime? endAt,
+  }) async {
+    List<WorkModel> _works = [];
+    await _workService
+        .selectList(
+      groupId: group?.id,
+      userId: user?.id,
+      startAt: startAt,
+      endAt: endAt,
+    )
+        .then((value) {
+      _works = value;
+    });
+    return _works;
   }
 }
