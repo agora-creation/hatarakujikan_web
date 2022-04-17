@@ -4,11 +4,13 @@ import 'package:hatarakujikan_web/helpers/style.dart';
 class TapListTile extends StatelessWidget {
   final String? title;
   final String? subtitle;
+  final IconData? iconData;
   final Function()? onTap;
 
   TapListTile({
     this.title,
     this.subtitle,
+    this.iconData,
     this.onTap,
   });
 
@@ -33,7 +35,7 @@ class TapListTile extends StatelessWidget {
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: onTap != null ? Icon(Icons.edit) : null,
+        trailing: onTap != null ? Icon(iconData) : null,
         onTap: onTap,
       ),
     );

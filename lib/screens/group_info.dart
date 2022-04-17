@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
@@ -18,12 +19,7 @@ class GroupInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    String _name = groupProvider.group?.name ?? '';
-    String _address =
-        '${groupProvider.group?.zip} ${groupProvider.group?.address}';
-    String _tel = groupProvider.group?.tel ?? '';
-    String _email = groupProvider.group?.email ?? '';
-    String _adminUserName = groupProvider.adminUser?.name ?? '';
+    GroupModel? group = groupProvider.group;
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -42,7 +38,7 @@ class GroupInfoScreen extends StatelessWidget {
               children: [
                 TapListTile(
                   title: '名前',
-                  subtitle: _name,
+                  subtitle: group?.name ?? '',
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -55,7 +51,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: '住所',
-                  subtitle: _address,
+                  subtitle: '${group?.zip ?? ''} ${group?.address ?? ''}',
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -68,7 +64,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: '電話番号',
-                  subtitle: _tel,
+                  subtitle: group?.tel ?? '',
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -81,7 +77,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: 'メールアドレス',
-                  subtitle: _email,
+                  subtitle: group?.email ?? '',
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -94,7 +90,7 @@ class GroupInfoScreen extends StatelessWidget {
                 ),
                 TapListTile(
                   title: '管理者',
-                  subtitle: _adminUserName,
+                  subtitle: groupProvider.adminUser?.name ?? '',
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -470,7 +466,7 @@ class _EditAdminUserDialogState extends State<EditAdminUserDialog> {
             CustomDropdownButton(
               label: 'スタッフから選ぶ',
               isExpanded: true,
-              value: adminUserId,
+              value: adminUserId ?? null,
               onChanged: (value) {
                 setState(() => adminUserId = value);
               },

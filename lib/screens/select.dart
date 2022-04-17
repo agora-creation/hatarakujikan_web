@@ -3,8 +3,8 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
+import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
-import 'package:hatarakujikan_web/widgets/select_list_tile.dart';
 
 class SelectScreen extends StatefulWidget {
   final GroupProvider groupProvider;
@@ -18,17 +18,20 @@ class SelectScreen extends StatefulWidget {
 class _SelectScreenState extends State<SelectScreen> {
   bool isLoading = false;
 
-  void _init() async {
+  Future _next(GroupModel? group) async {
     setState(() => isLoading = true);
+    await widget.groupProvider.setGroup(group);
+    setState(() => isLoading = false);
+    Navigator.of(context, rootNavigator: true).pop();
+    changeScreen(context, WorkScreen());
+  }
+
+  void _init() async {
     await Future.delayed(Duration(seconds: 2));
     List<GroupModel> _groups = widget.groupProvider.groups;
     if (_groups.length == 1) {
-      await widget.groupProvider.setGroup(_groups.first);
-      setState(() => isLoading = false);
-      Navigator.of(context, rootNavigator: true).pop();
-      changeScreen(context, WorkScreen());
+      await _next(_groups.first);
     }
-    setState(() => isLoading = false);
   }
 
   @override
@@ -63,15 +66,11 @@ class _SelectScreenState extends State<SelectScreen> {
               itemCount: widget.groupProvider.groups.length,
               itemBuilder: (_, index) {
                 GroupModel _group = widget.groupProvider.groups[index];
-                return SelectListTile(
-                  onTap: () async {
-                    setState(() => isLoading = true);
-                    await widget.groupProvider.setGroup(_group);
-                    setState(() => isLoading = false);
-                    Navigator.of(context, rootNavigator: true).pop();
-                    changeScreen(context, WorkScreen());
-                  },
-                  label: _group.name,
+                return TapListTile(
+                  title: '会社/組織名',
+                  subtitle: _group.name,
+                  iconData: Icons.chevron_right,
+                  onTap: () async => await _next(_group),
                 );
               },
             ),

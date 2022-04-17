@@ -19,9 +19,6 @@ import 'package:hatarakujikan_web/screens/group_notice.dart';
 import 'package:hatarakujikan_web/screens/group_position.dart';
 import 'package:hatarakujikan_web/screens/group_rule.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
-import 'package:hatarakujikan_web/screens/setting_info.dart';
-import 'package:hatarakujikan_web/screens/setting_security.dart';
-import 'package:hatarakujikan_web/screens/setting_work.dart';
 import 'package:hatarakujikan_web/screens/splash.dart';
 import 'package:hatarakujikan_web/screens/user.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
@@ -78,9 +75,6 @@ class MyApp extends StatelessWidget {
           GroupNoticeScreen.id: (context) => GroupNoticeScreen(),
           GroupPositionScreen.id: (context) => GroupPositionScreen(),
           GroupRuleScreen.id: (context) => GroupRuleScreen(),
-          SettingInfoScreen.id: (context) => SettingInfoScreen(),
-          SettingSecurityScreen.id: (context) => SettingSecurityScreen(),
-          SettingWorkScreen.id: (context) => SettingWorkScreen(),
           UserScreen.id: (context) => UserScreen(),
           WorkScreen.id: (context) => WorkScreen(),
           WorkOutputScreen.id: (context) => WorkOutputScreen(),

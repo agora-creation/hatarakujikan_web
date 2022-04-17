@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
@@ -24,47 +25,41 @@ class GroupRuleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    String _roundStartType = groupProvider.group?.roundStartType ?? '';
-    String _roundStartNum = '${groupProvider.group?.roundStartNum}分';
-    String _roundEndType = groupProvider.group?.roundEndType ?? '';
-    String _roundEndNum = '${groupProvider.group?.roundEndNum}分';
-    String _roundBreakStartType =
-        groupProvider.group?.roundBreakStartType ?? '';
-    String _roundBreakStartNum = '${groupProvider.group?.roundBreakStartNum}分';
-    String _roundBreakEndType = groupProvider.group?.roundBreakEndType ?? '';
-    String _roundBreakEndNum = '${groupProvider.group?.roundBreakEndNum}分';
-    String _roundWorkType = groupProvider.group?.roundWorkType ?? '';
-    String _roundWorkNum = '${groupProvider.group?.roundWorkNum}分';
-    String _legal = '${groupProvider.group?.legal}時間';
-    String _nightStart = groupProvider.group?.nightStart ?? '';
-    String _nightEnd = groupProvider.group?.nightEnd ?? '';
-    String _workStart = groupProvider.group?.workStart ?? '';
-    String _workEnd = groupProvider.group?.workEnd ?? '';
+    GroupModel? group = groupProvider.group;
+    String _roundStartType = group?.roundStartType ?? '';
+    String _roundStartNum = '${group?.roundStartNum ?? 0}分';
+    String _roundEndType = group?.roundEndType ?? '';
+    String _roundEndNum = '${group?.roundEndNum ?? 0}分';
+    String _roundBreakStartType = group?.roundBreakStartType ?? '';
+    String _roundBreakStartNum = '${group?.roundBreakStartNum ?? 0}分';
+    String _roundBreakEndType = group?.roundBreakEndType ?? '';
+    String _roundBreakEndNum = '${group?.roundBreakEndNum ?? 0}分';
+    String _roundWorkType = group?.roundWorkType ?? '';
+    String _roundWorkNum = '${group?.roundWorkNum ?? 0}分';
+    String _legal = '${group?.legal}時間';
+    String _nightStart = group?.nightStart ?? '--:--';
+    String _nightEnd = group?.nightEnd ?? '--:--';
+    String _workStart = group?.workStart ?? '--:--';
+    String _workEnd = group?.workEnd ?? '--:--';
     String _holidays = '';
-    for (String _week in groupProvider.group?.holidays ?? []) {
-      if (_holidays != '') _holidays += ',';
+    for (String _week in group?.holidays ?? []) {
+      if (_holidays != '') _holidays += ' / ';
       _holidays += _week;
     }
     String _holidays2 = '';
-    for (DateTime _day in groupProvider.group?.holidays2 ?? []) {
-      if (_holidays2 != '') _holidays2 += ',';
+    for (DateTime _day in group?.holidays2 ?? []) {
+      if (_holidays2 != '') _holidays2 += ' / ';
       _holidays2 += dateText('yyyy-MM-dd', _day);
     }
     String _autoBreak = '無効';
-    if (groupProvider.group?.autoBreak == true) {
-      _autoBreak = '有効';
-    }
+    if (group?.autoBreak == true) _autoBreak = '有効';
     String _qrSecurity = '無効';
-    if (groupProvider.group?.qrSecurity == true) {
-      _qrSecurity = '有効';
-    }
+    if (group?.qrSecurity == true) _qrSecurity = '有効';
     String _areaSecurity = '無効';
-    if (groupProvider.group?.areaSecurity == true) {
-      _areaSecurity = '有効';
-    }
-    String _areaLat = '${groupProvider.group?.areaLat}';
-    String _areaLon = '${groupProvider.group?.areaLon}';
-    String _areaRange = '${groupProvider.group?.areaRange}m';
+    if (group?.areaSecurity == true) _areaSecurity = '有効';
+    String _areaLat = '${group?.areaLat ?? 0}';
+    String _areaLon = '${group?.areaLon ?? 0}';
+    String _areaRange = '${group?.areaRange ?? 0}m';
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -332,7 +327,7 @@ class _EditRoundStartDialogState extends State<EditRoundStartDialog> {
             CustomDropdownButton(
               label: '出勤時間のまるめ方',
               isExpanded: true,
-              value: roundStartType,
+              value: roundStartType ?? null,
               onChanged: (value) {
                 setState(() => roundStartType = value);
               },
@@ -353,7 +348,7 @@ class _EditRoundStartDialogState extends State<EditRoundStartDialog> {
             CustomDropdownButton(
               label: '出勤時間のまるめ分数',
               isExpanded: true,
-              value: roundStartNum,
+              value: roundStartNum ?? null,
               onChanged: (value) {
                 setState(() => roundStartNum = value);
               },
@@ -444,7 +439,7 @@ class _EditRoundEndDialogState extends State<EditRoundEndDialog> {
             CustomDropdownButton(
               label: '退勤時間のまるめ方',
               isExpanded: true,
-              value: roundEndType,
+              value: roundEndType ?? null,
               onChanged: (value) {
                 setState(() => roundEndType = value);
               },
@@ -465,7 +460,7 @@ class _EditRoundEndDialogState extends State<EditRoundEndDialog> {
             CustomDropdownButton(
               label: '退勤時間のまるめ分数',
               isExpanded: true,
-              value: roundEndNum,
+              value: roundEndNum ?? null,
               onChanged: (value) {
                 setState(() => roundEndNum = value);
               },
@@ -557,7 +552,7 @@ class _EditRoundBreakStartDialogState extends State<EditRoundBreakStartDialog> {
             CustomDropdownButton(
               label: '休憩開始時間のまるめ方',
               isExpanded: true,
-              value: roundBreakStartType,
+              value: roundBreakStartType ?? null,
               onChanged: (value) {
                 setState(() => roundBreakStartType = value);
               },
@@ -578,7 +573,7 @@ class _EditRoundBreakStartDialogState extends State<EditRoundBreakStartDialog> {
             CustomDropdownButton(
               label: '休憩開始時間のまるめ分数',
               isExpanded: true,
-              value: roundBreakStartNum,
+              value: roundBreakStartNum ?? null,
               onChanged: (value) {
                 setState(() => roundBreakStartNum = value);
               },
@@ -670,7 +665,7 @@ class _EditRoundBreakEndDialogState extends State<EditRoundBreakEndDialog> {
             CustomDropdownButton(
               label: '休憩終了時間のまるめ方',
               isExpanded: true,
-              value: roundBreakEndType,
+              value: roundBreakEndType ?? null,
               onChanged: (value) {
                 setState(() => roundBreakEndType = value);
               },
@@ -691,7 +686,7 @@ class _EditRoundBreakEndDialogState extends State<EditRoundBreakEndDialog> {
             CustomDropdownButton(
               label: '休憩終了時間のまるめ分数',
               isExpanded: true,
-              value: roundBreakEndNum,
+              value: roundBreakEndNum ?? null,
               onChanged: (value) {
                 setState(() => roundBreakEndNum = value);
               },
@@ -782,7 +777,7 @@ class _EditRoundWorkDialogState extends State<EditRoundWorkDialog> {
             CustomDropdownButton(
               label: '勤務時間のまるめ方',
               isExpanded: true,
-              value: roundWorkType,
+              value: roundWorkType ?? null,
               onChanged: (value) {
                 setState(() => roundWorkType = value);
               },
@@ -803,7 +798,7 @@ class _EditRoundWorkDialogState extends State<EditRoundWorkDialog> {
             CustomDropdownButton(
               label: '勤務時間のまるめ分数',
               isExpanded: true,
-              value: roundWorkNum,
+              value: roundWorkNum ?? null,
               onChanged: (value) {
                 setState(() => roundWorkNum = value);
               },

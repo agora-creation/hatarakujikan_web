@@ -41,7 +41,7 @@ class CustomAdminScaffold extends StatelessWidget {
                 );
               },
               color: Colors.grey,
-              label: '${groupProvider.adminUser?.name}がログイン中',
+              label: '${groupProvider.adminUser?.name ?? ''}がログイン中',
             ),
           ),
         ],
