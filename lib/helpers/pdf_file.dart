@@ -1,5 +1,12 @@
 import 'package:flutter/services.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
+import 'package:hatarakujikan_web/models/user.dart';
+import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/models/work_shift.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
+import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
@@ -114,12 +121,58 @@ class PDFFile {
   }
 }
 
-Future _model01() async {
+Future _model01({
+  required UserProvider userProvider,
+  required WorkProvider workProvider,
+  required WorkShiftProvider workShiftProvider,
+  GroupModel? group,
+  DateTime? month,
+  bool? isAll,
+}) async {
+  if (month == null) return;
   final pdf = pw.Document();
   final font = await rootBundle.load(fontPath);
   final ttf = pw.Font.ttf(font);
   final headStyle = pw.TextStyle(font: ttf, fontSize: 9.0);
   final listStyle = pw.TextStyle(font: ttf, fontSize: 7.0);
+  //日付配列作成
+  List<DateTime> days = generateDays(month);
+  //日付配列(1週間分前後多いver)
+  List<DateTime> days2 = [];
+  DateTime _start2 = days.first.add(Duration(days: 7) * -1);
+  DateTime _end2 = days.last.add(Duration(days: 7));
+  for (int i = 0; i <= _end2.difference(_start2).inDays; i++) {
+    days2.add(_start2.add(Duration(days: i)));
+  }
+  if (isAll == true) {
+    List<UserModel> users = await userProvider.selectList(
+      userIds: group?.userIds,
+    );
+    for (UserModel _user in users) {
+      List<WorkModel> works = await workProvider.selectList(
+        group: group,
+        user: _user,
+        startAt: days.first,
+        endAt: days.last,
+      );
+      List<WorkModel> works2 = await workProvider.selectList(
+        group: group,
+        user: _user,
+        startAt: days2.first,
+        endAt: days2.last,
+      );
+      List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
+        group: group,
+        user: _user,
+        startAt: days.first,
+        endAt: days.last,
+      );
+    }
+  }
+  //合計値初期化
+  Map cnt = {};
+  String workTimes = '00:00';
+
   await _dl(pdf: pdf, fileName: 'works.pdf');
   return;
 }
