@@ -143,6 +143,15 @@ class PDFFile {
         );
         return;
       default:
+        await _model01(
+          userProvider: userProvider,
+          workProvider: workProvider,
+          workShiftProvider: workShiftProvider,
+          group: group,
+          month: month,
+          user: user,
+          isAll: isAll,
+        );
         return;
     }
   }
@@ -334,7 +343,11 @@ Future _model01({
         build: (context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            _buildHeader(month: month, user: _user, style: headStyle),
+            _buildHeader(
+              month: dateText('yyyy年MM月', month),
+              user: '${user?.name} (${user?.number})',
+              style: headStyle,
+            ),
             pw.SizedBox(height: 4.0),
             pw.Table(
               border: pw.TableBorder.all(color: PdfColors.grey),
@@ -509,7 +522,11 @@ Future _model01({
       build: (context) => pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _buildHeader(month: month, user: user, style: headStyle),
+          _buildHeader(
+            month: dateText('yyyy年MM月', month),
+            user: '${user.name} (${user.number})',
+            style: headStyle,
+          ),
           pw.SizedBox(height: 4.0),
           pw.Table(
             border: pw.TableBorder.all(color: PdfColors.grey),
@@ -617,19 +634,35 @@ Future _model02({
               String endTime = _work.endTime(group);
               String breakTime = _work.breakTimes(group).first;
               String workTime = '00:00';
-
-              String workTime = _work.workTime(group);
-              String dayTime = _work.calTimes01(group)[0];
-              String nightTime = _work.calTimes01(group)[1];
-              String dayTimeOver = _work.calTimes01(group)[2];
-              String nightTimeOver = _work.calTimes01(group)[3];
+              String overTime1 = '00:00';
+              String overTime2 = '00:00';
+              switch (positionName) {
+                case 'Aグループ':
+                  workTime = _work.calTimes02(group, 'A')[0];
+                  overTime1 = _work.calTimes02(group, 'A')[1];
+                  overTime2 = _work.calTimes02(group, 'A')[2];
+                  break;
+                case 'Bグループ':
+                  workTime = _work.calTimes02(group, 'B')[0];
+                  overTime1 = _work.calTimes02(group, 'B')[1];
+                  overTime2 = _work.calTimes02(group, 'B')[2];
+                  break;
+                case 'Cグループ':
+                  workTime = _work.calTimes02(group, 'C')[0];
+                  overTime1 = _work.calTimes02(group, 'C')[1];
+                  overTime2 = _work.calTimes02(group, 'C')[2];
+                  break;
+                default:
+                  workTime = _work.calTimes02(group, 'A')[0];
+                  overTime1 = _work.calTimes02(group, 'A')[1];
+                  overTime2 = _work.calTimes02(group, 'A')[2];
+                  break;
+              }
               String _key = dateText('yyyy-MM-dd', _work.startedAt);
               cnt[_key] = '';
               workTimes = addTime(workTimes, workTime);
-              dayTimes = addTime(dayTimes, dayTime);
-              nightTimes = addTime(nightTimes, nightTime);
-              dayTimeOvers = addTime(dayTimeOvers, dayTimeOver);
-              nightTimeOvers = addTime(nightTimeOvers, nightTimeOver);
+              overTimes1 = addTime(overTimes1, overTime1);
+              overTimes2 = addTime(overTimes2, overTime2);
               _row.add(pw.TableRow(
                 children: [
                   _cell(day, listStyle),
@@ -638,11 +671,8 @@ Future _model02({
                   _cell(endTime, listStyle),
                   _cell(breakTime, listStyle),
                   _cell(workTime, listStyle),
-                  _cell(dayTime, listStyle),
-                  _cell(nightTime, listStyle),
-                  _cell(dayTimeOver, listStyle),
-                  _cell(nightTimeOver, listStyle),
-                  _cell(cnt2[dateText('yyyy-MM-dd', _day)], listStyle),
+                  _cell(overTime1, listStyle),
+                  _cell(overTime2, listStyle),
                 ],
               ));
             }
@@ -662,25 +692,23 @@ Future _model02({
               _cell('', listStyle),
               _cell('', listStyle),
               _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell(cnt2[dateText('yyyy-MM-dd', _day)] ?? '', listStyle),
             ],
           ));
         }
       }
       //各時間の合計
       List<pw.TableRow> _totalRow = [];
-      int workDays = cnt.length;
       _totalRow.add(pw.TableRow(
         decoration: pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          _cell('総勤務日数 [$workDays日]', listStyle),
-          _cell('総勤務時間 [$workTimes]', listStyle),
-          _cell('総通常時間 [$dayTimes]', listStyle),
-          _cell('総深夜時間(-) [$nightTimes]', listStyle),
-          _cell('総通常時間外 [$dayTimeOvers]', listStyle),
-          _cell('総深夜時間外 [$nightTimeOvers]', listStyle),
+          _cell('合計', listStyle),
+          _cell('', listStyle),
+          _cell('', listStyle),
+          _cell('', listStyle),
+          _cell('', listStyle),
+          _cell(workTimes, listStyle),
+          _cell(overTimes1, listStyle),
+          _cell(overTimes2, listStyle),
         ],
       ));
       //ページ作成
@@ -689,7 +717,11 @@ Future _model02({
         build: (context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            _buildHeader(month: month, user: _user, style: headStyle),
+            _buildHeader(
+              month: dateText('yyyy年MM月', month),
+              user: '${user?.name} (${user?.number})【$positionName】',
+              style: headStyle,
+            ),
             pw.SizedBox(height: 4.0),
             pw.Table(
               border: pw.TableBorder.all(color: PdfColors.grey),
@@ -700,24 +732,26 @@ Future _model02({
               children: _totalRow,
             ),
             pw.SizedBox(height: 4.0),
-            _buildRemarks(style: listStyle),
+            _buildRemarks2(style: listStyle),
           ],
         ),
       ));
     }
   } else {
     if (user == null) return;
+    String positionName = '';
+    for (PositionModel _position in positions) {
+      List<String> _userIds = _position.userIds;
+      if (_userIds.contains(user.id)) {
+        positionName = _position.name;
+        break;
+      }
+    }
     List<WorkModel> works = await workProvider.selectList(
       group: group,
       user: user,
       startAt: days.first,
       endAt: days.last,
-    );
-    List<WorkModel> works2 = await workProvider.selectList(
-      group: group,
-      user: user,
-      startAt: days2.first,
-      endAt: days2.last,
     );
     List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
       group: group,
@@ -727,12 +761,9 @@ Future _model02({
     );
     //合計値初期化
     Map cnt = {};
-    Map cnt2 = {};
     String workTimes = '00:00';
-    String dayTimes = '00:00';
-    String nightTimes = '00:00';
-    String dayTimeOvers = '00:00';
-    String nightTimeOvers = '00:00';
+    String overTimes1 = '00:00';
+    String overTimes2 = '00:00';
     //一行目
     List<pw.TableRow> _row = [];
     _row.add(pw.TableRow(
@@ -744,35 +775,10 @@ Future _model02({
         _cell('退勤時間', listStyle),
         _cell('休憩時間', listStyle),
         _cell('勤務時間', listStyle),
-        _cell('通常時間※1', listStyle),
-        _cell('深夜時間(-)※2', listStyle),
-        _cell('通常時間外※3', listStyle),
-        _cell('深夜時間外※4', listStyle),
-        _cell('週間合計※5', listStyle),
+        _cell('時間外1', listStyle),
+        _cell('時間外2', listStyle),
       ],
     ));
-    //週間合計の計算
-    String _tmp = '00:00';
-    for (DateTime _day2 in days2) {
-      List<WorkModel> _dayInWorks2 = [];
-      for (WorkModel _work2 in works2) {
-        String _key = dateText('yyyy-MM-dd', _work2.startedAt);
-        if (_day2 == DateTime.parse(_key)) _dayInWorks2.add(_work2);
-      }
-      String _week = dateText('E', _day2);
-      if (_week == '日') _tmp = '00:00';
-      if (_dayInWorks2.length > 0) {
-        for (WorkModel _work in _dayInWorks2) {
-          if (_work.startedAt != _work.endedAt) {
-            _tmp = addTime(_tmp, _work.workTime(group));
-          }
-        }
-      }
-      if (_week == '土') {
-        String _key = dateText('yyyy-MM-dd', _day2);
-        cnt2[_key] = _tmp;
-      }
-    }
     //二行目以降
     for (DateTime _day in days) {
       List<WorkModel> _dayInWorks = [];
@@ -793,18 +799,36 @@ Future _model02({
             String startTime = _work.startTime(group);
             String endTime = _work.endTime(group);
             String breakTime = _work.breakTimes(group).first;
-            String workTime = _work.workTime(group);
-            String dayTime = _work.calTimes01(group)[0];
-            String nightTime = _work.calTimes01(group)[1];
-            String dayTimeOver = _work.calTimes01(group)[2];
-            String nightTimeOver = _work.calTimes01(group)[3];
+            String workTime = '00:00';
+            String overTime1 = '00:00';
+            String overTime2 = '00:00';
+            switch (positionName) {
+              case 'Aグループ':
+                workTime = _work.calTimes02(group, 'A')[0];
+                overTime1 = _work.calTimes02(group, 'A')[1];
+                overTime2 = _work.calTimes02(group, 'A')[2];
+                break;
+              case 'Bグループ':
+                workTime = _work.calTimes02(group, 'B')[0];
+                overTime1 = _work.calTimes02(group, 'B')[1];
+                overTime2 = _work.calTimes02(group, 'B')[2];
+                break;
+              case 'Cグループ':
+                workTime = _work.calTimes02(group, 'C')[0];
+                overTime1 = _work.calTimes02(group, 'C')[1];
+                overTime2 = _work.calTimes02(group, 'C')[2];
+                break;
+              default:
+                workTime = _work.calTimes02(group, 'A')[0];
+                overTime1 = _work.calTimes02(group, 'A')[1];
+                overTime2 = _work.calTimes02(group, 'A')[2];
+                break;
+            }
             String _key = dateText('yyyy-MM-dd', _work.startedAt);
             cnt[_key] = '';
             workTimes = addTime(workTimes, workTime);
-            dayTimes = addTime(dayTimes, dayTime);
-            nightTimes = addTime(nightTimes, nightTime);
-            dayTimeOvers = addTime(dayTimeOvers, dayTimeOver);
-            nightTimeOvers = addTime(nightTimeOvers, nightTimeOver);
+            overTimes1 = addTime(overTimes1, overTime1);
+            overTimes2 = addTime(overTimes2, overTime2);
             _row.add(pw.TableRow(
               children: [
                 _cell(day, listStyle),
@@ -813,11 +837,8 @@ Future _model02({
                 _cell(endTime, listStyle),
                 _cell(breakTime, listStyle),
                 _cell(workTime, listStyle),
-                _cell(dayTime, listStyle),
-                _cell(nightTime, listStyle),
-                _cell(dayTimeOver, listStyle),
-                _cell(nightTimeOver, listStyle),
-                _cell(cnt2[dateText('yyyy-MM-dd', _day)], listStyle),
+                _cell(overTime1, listStyle),
+                _cell(overTime2, listStyle),
               ],
             ));
           }
@@ -837,25 +858,23 @@ Future _model02({
             _cell('', listStyle),
             _cell('', listStyle),
             _cell('', listStyle),
-            _cell('', listStyle),
-            _cell('', listStyle),
-            _cell(cnt2[dateText('yyyy-MM-dd', _day)] ?? '', listStyle),
           ],
         ));
       }
     }
     //各時間の合計
     List<pw.TableRow> _totalRow = [];
-    int workDays = cnt.length;
     _totalRow.add(pw.TableRow(
       decoration: pw.BoxDecoration(color: PdfColors.grey300),
       children: [
-        _cell('総勤務日数 [$workDays日]', listStyle),
-        _cell('総勤務時間 [$workTimes]', listStyle),
-        _cell('総通常時間 [$dayTimes]', listStyle),
-        _cell('総深夜時間(-) [$nightTimes]', listStyle),
-        _cell('総通常時間外 [$dayTimeOvers]', listStyle),
-        _cell('総深夜時間外 [$nightTimeOvers]', listStyle),
+        _cell('合計', listStyle),
+        _cell('', listStyle),
+        _cell('', listStyle),
+        _cell('', listStyle),
+        _cell('', listStyle),
+        _cell(workTimes, listStyle),
+        _cell(overTimes1, listStyle),
+        _cell(overTimes2, listStyle),
       ],
     ));
     //ページ作成
@@ -864,7 +883,11 @@ Future _model02({
       build: (context) => pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _buildHeader(month: month, user: user, style: headStyle),
+          _buildHeader(
+            month: dateText('yyyy年MM月', month),
+            user: '${user.name} (${user.number})【$positionName】',
+            style: headStyle,
+          ),
           pw.SizedBox(height: 4.0),
           pw.Table(
             border: pw.TableBorder.all(color: PdfColors.grey),
@@ -875,7 +898,7 @@ Future _model02({
             children: _totalRow,
           ),
           pw.SizedBox(height: 4.0),
-          _buildRemarks(style: listStyle),
+          _buildRemarks2(style: listStyle),
         ],
       ),
     ));
@@ -901,33 +924,27 @@ Future _dl({
 }
 
 pw.Widget _cell(
-  String label,
-  pw.TextStyle style, {
+  String? label,
+  pw.TextStyle? style, {
   PdfColor? color,
 }) {
   return pw.Container(
     padding: pw.EdgeInsets.all(4.0),
     color: color,
-    child: pw.Text(label, style: style),
+    child: pw.Text(label ?? '', style: style),
   );
 }
 
 pw.Widget _buildHeader({
-  DateTime? month,
-  UserModel? user,
+  String? month,
+  String? user,
   pw.TextStyle? style,
 }) {
   return pw.Row(
     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
     children: [
-      pw.Text(
-        dateText('yyyy年MM月', month),
-        style: style,
-      ),
-      pw.Text(
-        '${user?.name} (${user?.number})',
-        style: style,
-      ),
+      pw.Text(month ?? '', style: style),
+      pw.Text(user ?? '', style: style),
     ],
   );
 }

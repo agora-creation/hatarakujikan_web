@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hatarakujikan_web/helpers/csv_api.dart';
 import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
-import 'package:hatarakujikan_web/helpers/pdf_api.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
@@ -11,26 +9,18 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/providers/position.dart';
-import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
-import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
-import 'package:hatarakujikan_web/widgets/custom_checkbox_list_tile.dart';
-import 'package:hatarakujikan_web/widgets/custom_date_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
-import 'package:hatarakujikan_web/widgets/custom_label_column.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button_mini.dart';
 import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
-import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/work_footer.dart';
 import 'package:hatarakujikan_web/widgets/work_header.dart';
 import 'package:hatarakujikan_web/widgets/work_list.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 
@@ -40,10 +30,7 @@ class WorkScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
-    final positionProvider = Provider.of<PositionProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
     final workProvider = Provider.of<WorkProvider>(context);
-    final workShiftProvider = Provider.of<WorkShiftProvider>(context);
     GroupModel? group = groupProvider.group;
     List<WorkModel> works = [];
     List<WorkShiftModel> workShifts = [];
@@ -557,307 +544,6 @@ class _AddDialogState extends State<AddDialog> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CsvDialog extends StatefulWidget {
-  final PositionProvider positionProvider;
-  final UserProvider userProvider;
-  final WorkProvider workProvider;
-  final WorkShiftProvider workShiftProvider;
-  final GroupModel group;
-  final DateTime month;
-
-  CsvDialog({
-    required this.positionProvider,
-    required this.userProvider,
-    required this.workProvider,
-    required this.workShiftProvider,
-    required this.group,
-    required this.month,
-  });
-
-  @override
-  _CsvDialogState createState() => _CsvDialogState();
-}
-
-class _CsvDialogState extends State<CsvDialog> {
-  DateTime _month = DateTime.now();
-  bool _isLoading = false;
-  String _template = '';
-
-  void _init() async {
-    CsvApi.groupCheck(group: widget.group);
-    _month = widget.month;
-    _template = csvTemplates.first;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        width: 450.0,
-        child: _isLoading
-            ? ListView(
-                shrinkWrap: true,
-                children: [
-                  SizedBox(height: 16.0),
-                  Loading(color: Colors.orange),
-                  SizedBox(height: 16.0),
-                ],
-              )
-            : ListView(
-                shrinkWrap: true,
-                children: [
-                  SizedBox(height: 16.0),
-                  Text(
-                    '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
-                    style: kDefaultTextStyle,
-                  ),
-                  SizedBox(height: 16.0),
-                  CustomLabelColumn(
-                    label: 'テンプレート',
-                    child: CustomDropdownButton(
-                      isExpanded: true,
-                      value: _template,
-                      onChanged: (value) {
-                        setState(() => _template = value);
-                      },
-                      items: csvTemplates.map((value) {
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: kDefaultTextStyle,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  CustomLabelColumn(
-                    label: '年月',
-                    child: CustomDateButton(
-                      onPressed: () async {
-                        var selected = await showMonthPicker(
-                          context: context,
-                          initialDate: _month,
-                          firstDate: kMonthFirstDate,
-                          lastDate: kMonthLastDate,
-                        );
-                        if (selected == null) return;
-                        setState(() => _month = selected);
-                      },
-                      label: dateText('yyyy年MM月', _month),
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CustomTextButton(
-                        onPressed: () => Navigator.pop(context),
-                        color: Colors.grey,
-                        label: 'キャンセル',
-                      ),
-                      CustomTextButton(
-                        onPressed: () async {
-                          setState(() => _isLoading = true);
-                          await CsvApi.download(
-                            positionProvider: widget.positionProvider,
-                            userProvider: widget.userProvider,
-                            workProvider: widget.workProvider,
-                            workShiftProvider: widget.workShiftProvider,
-                            group: widget.group,
-                            template: _template,
-                            month: _month,
-                          );
-                          setState(() => _isLoading = false);
-                          Navigator.pop(context);
-                        },
-                        color: Colors.green,
-                        label: '出力する',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
-}
-
-class PdfDialog extends StatefulWidget {
-  final PositionProvider positionProvider;
-  final WorkProvider workProvider;
-  final WorkShiftProvider workShiftProvider;
-  final GroupModel group;
-  final DateTime month;
-  final List<UserModel> users;
-  final UserModel user;
-
-  PdfDialog({
-    required this.positionProvider,
-    required this.workProvider,
-    required this.workShiftProvider,
-    required this.group,
-    required this.month,
-    required this.users,
-    required this.user,
-  });
-
-  @override
-  _PdfDialogState createState() => _PdfDialogState();
-}
-
-class _PdfDialogState extends State<PdfDialog> {
-  DateTime _month = DateTime.now();
-  UserModel? _user;
-  bool _isAll = false;
-  bool _isLoading = false;
-  String _template = '';
-
-  void _init() async {
-    PdfApi.groupCheck(group: widget.group);
-    _month = widget.month;
-    _user = widget.user;
-    _template = pdfTemplates.first;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        width: 450.0,
-        child: _isLoading
-            ? ListView(
-                shrinkWrap: true,
-                children: [
-                  SizedBox(height: 16.0),
-                  Loading(color: Colors.orange),
-                  SizedBox(height: 16.0),
-                ],
-              )
-            : ListView(
-                shrinkWrap: true,
-                children: [
-                  SizedBox(height: 16.0),
-                  Text(
-                    '以下の出力条件を選択し、最後に「出力する」ボタンを押してください。',
-                    style: kDefaultTextStyle,
-                  ),
-                  SizedBox(height: 16.0),
-                  CustomLabelColumn(
-                    label: 'テンプレート',
-                    child: CustomDropdownButton(
-                      isExpanded: true,
-                      value: _template,
-                      onChanged: (value) {
-                        setState(() => _template = value);
-                      },
-                      items: pdfTemplates.map((value) {
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: kDefaultTextStyle,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  CustomLabelColumn(
-                    label: '年月',
-                    child: CustomDateButton(
-                      onPressed: () async {
-                        var selected = await showMonthPicker(
-                          context: context,
-                          initialDate: _month,
-                          firstDate: kMonthFirstDate,
-                          lastDate: kMonthLastDate,
-                        );
-                        if (selected == null) return;
-                        setState(() => _month = selected);
-                      },
-                      label: dateText('yyyy年MM月', _month),
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  CustomLabelColumn(
-                    label: 'スタッフ',
-                    child: CustomDropdownButton(
-                      isExpanded: true,
-                      value: _user,
-                      onChanged: (value) {
-                        setState(() => _user = value);
-                      },
-                      items: widget.users.map((value) {
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(
-                            '${value.name}',
-                            style: kDefaultTextStyle,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  CustomCheckboxListTile(
-                    onChanged: (value) {
-                      setState(() => _isAll = value ?? false);
-                    },
-                    label: '全スタッフ一括出力',
-                    value: _isAll,
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CustomTextButton(
-                        onPressed: () => Navigator.pop(context),
-                        color: Colors.grey,
-                        label: 'キャンセル',
-                      ),
-                      CustomTextButton(
-                        onPressed: () async {
-                          setState(() => _isLoading = true);
-                          await PdfApi.download(
-                            positionProvider: widget.positionProvider,
-                            workProvider: widget.workProvider,
-                            workShiftProvider: widget.workShiftProvider,
-                            group: widget.group,
-                            month: _month,
-                            user: _user!,
-                            isAll: _isAll,
-                            users: widget.users,
-                            template: _template,
-                          );
-                          setState(() => _isLoading = false);
-                          Navigator.pop(context);
-                        },
-                        color: Colors.redAccent,
-                        label: '出力する',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
       ),
     );
   }

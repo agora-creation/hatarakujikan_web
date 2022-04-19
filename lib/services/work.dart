@@ -18,9 +18,9 @@ class WorkService {
     _firebaseFirestore.collection(_collection).doc(values['id']).update(values);
   }
 
-  Future<void> updateMigration({
-    required String beforeUserId,
-    required String afterUserId,
+  Future updateMigration({
+    String? beforeUserId,
+    String? afterUserId,
   }) async {
     await _firebaseFirestore
         .collection(_collection)

@@ -159,24 +159,24 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<bool> migration({
-    required String groupId,
-    required UserModel before,
-    required UserModel after,
+    GroupModel? group,
+    UserModel? beforeUser,
+    UserModel? afterUser,
   }) async {
-    if (groupId == '') return false;
-    if (before.id == '') return false;
-    if (after.id == '') return false;
+    if (group == null) return false;
+    if (beforeUser == null) return false;
+    if (afterUser == null) return false;
     try {
       _userService.update({
-        'id': after.id,
-        'number': before.number,
-        'recordPassword': before.recordPassword,
+        'id': afterUser.id,
+        'number': beforeUser.number,
+        'recordPassword': beforeUser.recordPassword,
       });
       await _workService.updateMigration(
-        beforeUserId: before.id,
-        afterUserId: after.id,
+        beforeUserId: beforeUser.id,
+        afterUserId: afterUser.id,
       );
-      _userService.delete({'id': before.id});
+      _userService.delete({'id': beforeUser.id});
       return true;
     } catch (e) {
       print(e.toString());
@@ -198,7 +198,7 @@ class UserProvider with ChangeNotifier {
     Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
     _ret = FirebaseFirestore.instance
         .collection('user')
-        .where('id', whereIn: userIds)
+        .where('id', whereIn: userIds ?? ['error'])
         .orderBy('recordPassword', descending: false)
         .snapshots();
     return _ret;

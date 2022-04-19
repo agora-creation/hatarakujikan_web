@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -63,11 +64,32 @@ class WorkShiftProvider with ChangeNotifier {
     _workShiftService.delete({'id': id});
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({String? groupId}) {
+    Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
+    _ret = FirebaseFirestore.instance
+        .collection('work')
+        .where('groupId', isEqualTo: groupId ?? 'error')
+        .orderBy('startedAt', descending: false)
+        .snapshots();
+    return _ret;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamListShift(
+      {String? groupId}) {
+    Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
+    _ret = FirebaseFirestore.instance
+        .collection('workShift')
+        .where('groupId', isEqualTo: groupId ?? 'error')
+        .orderBy('startedAt', descending: false)
+        .snapshots();
+    return _ret;
+  }
+
   Future<List<WorkShiftModel>> selectList({
-     GroupModel? group,
-     UserModel? user,
-     DateTime? startAt,
-     DateTime? endAt,
+    GroupModel? group,
+    UserModel? user,
+    DateTime? startAt,
+    DateTime? endAt,
   }) async {
     List<WorkShiftModel> _workShifts = [];
     await _workShiftService

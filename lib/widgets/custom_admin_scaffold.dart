@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/helpers/pdf_file.dart';
 import 'package:hatarakujikan_web/helpers/side_menu.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -30,19 +31,21 @@ class CustomAdminScaffold extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CustomTextButton(
-              onPressed: () {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (_) => SignOutDialog(groupProvider: groupProvider),
-                );
-              },
-              color: Colors.grey,
-              label: '${groupProvider.adminUser?.name ?? ''}がログイン中',
-            ),
+          IconButton(
+            icon: Icon(Icons.qr_code),
+            onPressed: () async {
+              await PDFFile.qrcode(group: groupProvider.group);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (_) => SignOutDialog(groupProvider: groupProvider),
+              );
+            },
           ),
         ],
       ),

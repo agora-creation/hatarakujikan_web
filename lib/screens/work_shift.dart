@@ -21,6 +21,16 @@ import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+class _ShiftDataSource extends CalendarDataSource {
+  _ShiftDataSource(
+    List<Appointment> source,
+    List<CalendarResource> resourceColl,
+  ) {
+    appointments = source;
+    resources = resourceColl;
+  }
+}
+
 class WorkShiftScreen extends StatelessWidget {
   static const String id = 'workShift';
 
@@ -32,10 +42,119 @@ class WorkShiftScreen extends StatelessWidget {
     return CustomAdminScaffold(
       groupProvider: groupProvider,
       selectedRoute: id,
-      body: WorkShiftTable(
-        groupProvider: groupProvider,
-        workShiftProvider: workShiftProvider,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdminHeader(
+            title: 'シフト表',
+            message: 'スタッフ毎の勤怠データをシフト表形式で表示しています。実務データの他、予定もここで登録できます。',
+          ),
+          SizedBox(height: 8.0),
+          Expanded(
+            child: ShiftTable(
+              groupProvider: groupProvider,
+              workShiftProvider: workShiftProvider,
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class ShiftTable extends StatefulWidget {
+  final GroupProvider groupProvider;
+  final WorkShiftProvider workShiftProvider;
+
+  ShiftTable({
+    required this.groupProvider,
+    required this.workShiftProvider,
+  });
+
+  @override
+  State<ShiftTable> createState() => _ShiftTableState();
+}
+
+class _ShiftTableState extends State<ShiftTable> {
+  List<CalendarResource> resources = [];
+  List<Appointment> appointments = [];
+
+  void _init() async {
+    List<UserModel> _users = await widget.groupProvider.selectUsers();
+
+    for (UserModel _user in _users) {
+      resources.add(CalendarResource(
+        id: _user.id,
+        displayName: _user.name,
+        color: Colors.grey.shade100,
+      ));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    GroupModel? group = widget.groupProvider.group;
+
+    return StreamBuilder2<QuerySnapshot<Map<String, dynamic>>,
+        QuerySnapshot<Map<String, dynamic>>>(
+      streams: Tuple2(
+        widget.workShiftProvider.streamList(groupId: group?.id),
+        widget.workShiftProvider.streamListShift(groupId: group?.id),
+      ),
+      builder: (context, snapshot) {
+        appointments.clear();
+        if (snapshot.item1.hasData) {
+          for (DocumentSnapshot<Map<String, dynamic>> doc
+              in snapshot.item1.data!.docs) {
+            WorkModel work = WorkModel.fromSnapshot(doc);
+            if (work.startedAt != work.endedAt) {
+              appointments.add(Appointment(
+                startTime: work.startedAt,
+                endTime: work.endedAt,
+                subject: work.state,
+                color: Colors.grey,
+                resourceIds: [work.userId],
+                id: work.id,
+                notes: 'work',
+              ));
+            }
+          }
+        }
+        if (snapshot.item2.hasData) {
+          for (DocumentSnapshot<Map<String, dynamic>> doc
+              in snapshot.item2.data!.docs) {
+            WorkShiftModel workShift = WorkShiftModel.fromSnapshot(doc);
+            appointments.add(Appointment(
+              startTime: workShift.startedAt,
+              endTime: workShift.endedAt,
+              subject: workShift.state,
+              color: workShift.stateColor(),
+              resourceIds: [workShift.userId],
+              id: workShift.id,
+              notes: 'workShift',
+            ));
+          }
+        }
+        return CustomSfCalendar(
+          dataSource: _ShiftDataSource(appointments, resources),
+          onTap: (CalendarTapDetails details) {
+            if (details.appointments != null) {
+              dynamic _appointment = details.appointments![0];
+              Appointment? _selected;
+              if (_appointment is Appointment) _selected = _appointment;
+              if (_selected?.notes == 'workShift') {}
+            } else {
+              if (details.resource != null) {}
+            }
+          },
+        );
+      },
     );
   }
 }
@@ -178,16 +297,6 @@ class _WorkShiftTableState extends State<WorkShiftTable> {
         ),
       ],
     );
-  }
-}
-
-class _ShiftDataSource extends CalendarDataSource {
-  _ShiftDataSource(
-    List<Appointment> source,
-    List<CalendarResource> resourceColl,
-  ) {
-    appointments = source;
-    resources = resourceColl;
   }
 }
 

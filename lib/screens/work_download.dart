@@ -204,6 +204,7 @@ class PDFDialog extends StatefulWidget {
 }
 
 class _PDFDialogState extends State<PDFDialog> {
+  bool isLoading = false;
   List<UserModel> users = [];
   DateTime month = DateTime.now();
   UserModel? user;
@@ -227,84 +228,96 @@ class _PDFDialogState extends State<PDFDialog> {
     return AlertDialog(
       content: Container(
         width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Text(
-              '出力条件を変更し、「出力する」ボタンをクリックしてください。',
-              style: kDialogTextStyle,
-            ),
-            SizedBox(height: 16.0),
-            MonthFormField(
-              label: '出力年月',
-              month: dateText('yyyy年MM月', DateTime.now()),
-              onPressed: () async {
-                DateTime? selected = await customMonthPicker(
-                  context: context,
-                  init: month,
-                );
-                if (selected == null) return;
-                setState(() => month = selected);
-              },
-            ),
-            SizedBox(height: 8.0),
-            CustomDropdownButton(
-              label: '出力スタッフ',
-              isExpanded: true,
-              value: user ?? null,
-              onChanged: (value) {
-                setState(() => user = value);
-              },
-              items: users.map((user) {
-                return DropdownMenuItem(
-                  value: user,
-                  child: Text(
-                    user.name,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
-                    ),
+        child: isLoading == true
+            ? ListView(
+                shrinkWrap: true,
+                children: [
+                  SizedBox(height: 24.0),
+                  Loading(color: Colors.orange),
+                  SizedBox(height: 24.0),
+                ],
+              )
+            : ListView(
+                shrinkWrap: true,
+                children: [
+                  Text(
+                    '出力条件を変更し、「出力する」ボタンをクリックしてください。',
+                    style: kDialogTextStyle,
                   ),
-                );
-              }).toList(),
-            ),
-            CustomCheckbox(
-              label: '全てのスタッフを出力',
-              value: isAll,
-              activeColor: Colors.blue,
-              onChanged: (value) {
-                setState(() => isAll = !isAll);
-              },
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  label: 'キャンセル',
-                  color: Colors.grey,
-                  onPressed: () => Navigator.pop(context),
-                ),
-                CustomTextButton(
-                  label: '出力する',
-                  color: Colors.blue,
-                  onPressed: () async {
-                    await PDFFile.download(
-                      positionProvider: widget.positionProvider,
-                      userProvider: widget.userProvider,
-                      workProvider: widget.workProvider,
-                      workShiftProvider: widget.workShiftProvider,
-                      group: widget.groupProvider.group,
-                      user: user,
-                      isAll: isAll,
-                    );
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+                  SizedBox(height: 16.0),
+                  MonthFormField(
+                    label: '出力年月',
+                    month: dateText('yyyy年MM月', DateTime.now()),
+                    onPressed: () async {
+                      DateTime? selected = await customMonthPicker(
+                        context: context,
+                        init: month,
+                      );
+                      if (selected == null) return;
+                      setState(() => month = selected);
+                    },
+                  ),
+                  SizedBox(height: 8.0),
+                  CustomDropdownButton(
+                    label: '出力スタッフ',
+                    isExpanded: true,
+                    value: user ?? null,
+                    onChanged: (value) {
+                      setState(() => user = value);
+                    },
+                    items: users.map((user) {
+                      return DropdownMenuItem(
+                        value: user,
+                        child: Text(
+                          user.name,
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  CustomCheckbox(
+                    label: '全てのスタッフを出力',
+                    value: isAll,
+                    activeColor: Colors.blue,
+                    onChanged: (value) {
+                      setState(() => isAll = !isAll);
+                    },
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomTextButton(
+                        label: 'キャンセル',
+                        color: Colors.grey,
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      CustomTextButton(
+                        label: '出力する',
+                        color: Colors.blue,
+                        onPressed: () async {
+                          setState(() => isLoading = true);
+                          await PDFFile.download(
+                            positionProvider: widget.positionProvider,
+                            userProvider: widget.userProvider,
+                            workProvider: widget.workProvider,
+                            workShiftProvider: widget.workShiftProvider,
+                            group: widget.groupProvider.group,
+                            month: month,
+                            user: user,
+                            isAll: isAll,
+                          );
+                          setState(() => isLoading = false);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
       ),
     );
   }
