@@ -74,6 +74,7 @@ class WorkDownloadScreen extends StatelessWidget {
                       barrierDismissible: false,
                       context: context,
                       builder: (_) => PDFDialog(
+                        positionProvider: positionProvider,
                         groupProvider: groupProvider,
                         userProvider: userProvider,
                         workProvider: workProvider,
@@ -185,12 +186,14 @@ class _CSVDialogState extends State<CSVDialog> {
 
 class PDFDialog extends StatefulWidget {
   final GroupProvider groupProvider;
+  final PositionProvider positionProvider;
   final UserProvider userProvider;
   final WorkProvider workProvider;
   final WorkShiftProvider workShiftProvider;
 
   PDFDialog({
     required this.groupProvider,
+    required this.positionProvider,
     required this.userProvider,
     required this.workProvider,
     required this.workShiftProvider,
@@ -287,6 +290,7 @@ class _PDFDialogState extends State<PDFDialog> {
                   color: Colors.blue,
                   onPressed: () async {
                     await PDFFile.download(
+                      positionProvider: widget.positionProvider,
                       userProvider: widget.userProvider,
                       workProvider: widget.workProvider,
                       workShiftProvider: widget.workShiftProvider,
