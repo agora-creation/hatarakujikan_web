@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hatarakujikan_web/helpers/csv_file.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/helpers/pdf_file.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
@@ -12,6 +13,7 @@ import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
+import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
@@ -73,6 +75,9 @@ class WorkDownloadScreen extends StatelessWidget {
                       context: context,
                       builder: (_) => PDFDialog(
                         groupProvider: groupProvider,
+                        userProvider: userProvider,
+                        workProvider: workProvider,
+                        workShiftProvider: workShiftProvider,
                       ),
                     );
                   },
@@ -180,9 +185,15 @@ class _CSVDialogState extends State<CSVDialog> {
 
 class PDFDialog extends StatefulWidget {
   final GroupProvider groupProvider;
+  final UserProvider userProvider;
+  final WorkProvider workProvider;
+  final WorkShiftProvider workShiftProvider;
 
   PDFDialog({
     required this.groupProvider,
+    required this.userProvider,
+    required this.workProvider,
+    required this.workShiftProvider,
   });
 
   @override
@@ -193,6 +204,7 @@ class _PDFDialogState extends State<PDFDialog> {
   List<UserModel> users = [];
   DateTime month = DateTime.now();
   UserModel? user;
+  bool isAll = false;
 
   void _init() async {
     List<UserModel> _users = await widget.groupProvider.selectUsers();
@@ -237,7 +249,9 @@ class _PDFDialogState extends State<PDFDialog> {
               label: '出力スタッフ',
               isExpanded: true,
               value: user ?? null,
-              onChanged: (value) {},
+              onChanged: (value) {
+                setState(() => user = value);
+              },
               items: users.map((user) {
                 return DropdownMenuItem(
                   value: user,
@@ -251,6 +265,14 @@ class _PDFDialogState extends State<PDFDialog> {
                 );
               }).toList(),
             ),
+            CustomCheckbox(
+              label: '全てのスタッフを出力',
+              value: isAll,
+              activeColor: Colors.blue,
+              onChanged: (value) {
+                setState(() => isAll = !isAll);
+              },
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -263,7 +285,17 @@ class _PDFDialogState extends State<PDFDialog> {
                 CustomTextButton(
                   label: '出力する',
                   color: Colors.blue,
-                  onPressed: () async {},
+                  onPressed: () async {
+                    await PDFFile.download(
+                      userProvider: widget.userProvider,
+                      workProvider: widget.workProvider,
+                      workShiftProvider: widget.workShiftProvider,
+                      group: widget.groupProvider.group,
+                      user: user,
+                      isAll: isAll,
+                    );
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             ),

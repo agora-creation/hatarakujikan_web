@@ -104,13 +104,27 @@ class PDFFile {
 
   //共通部
   static Future download({
+    required UserProvider userProvider,
+    required WorkProvider workProvider,
+    required WorkShiftProvider workShiftProvider,
     GroupModel? group,
+    DateTime? month,
+    UserModel? user,
+    bool? isAll,
   }) async {
     String? groupId = group?.id;
     switch (groupId) {
       //ひろめ市場
       case 'UryZHGotsjyR0Zb6g06J':
-        await _model01();
+        await _model01(
+          userProvider: userProvider,
+          workProvider: workProvider,
+          workShiftProvider: workShiftProvider,
+          group: group,
+          month: month,
+          user: user,
+          isAll: isAll,
+        );
         return;
       //土佐税理士
       case 'h74zqng5i59qHdMG16Cb':
@@ -169,6 +183,160 @@ Future _model01({
         startAt: days.first,
         endAt: days.last,
       );
+      //合計値初期化
+      Map cnt = {};
+      Map cnt2 = {};
+      String workTimes = '00:00';
+      String dayTimes = '00:00';
+      String nightTimes = '00:00';
+      String dayTimeOvers = '00:00';
+      String nightTimeOvers = '00:00';
+      //一行目
+      List<pw.TableRow> _row = [];
+      _row.add(pw.TableRow(
+        decoration: pw.BoxDecoration(color: PdfColors.grey300),
+        children: [
+          _cell('日付', listStyle),
+          _cell('勤務状況', listStyle),
+          _cell('出勤時間', listStyle),
+          _cell('退勤時間', listStyle),
+          _cell('休憩時間', listStyle),
+          _cell('勤務時間', listStyle),
+          _cell('通常時間※1', listStyle),
+          _cell('深夜時間(-)※2', listStyle),
+          _cell('通常時間外※3', listStyle),
+          _cell('深夜時間外※4', listStyle),
+          _cell('週間合計※5', listStyle),
+        ],
+      ));
+      //週間合計の計算
+      String _tmp = '00:00';
+      for (DateTime _day2 in days2) {
+        List<WorkModel> _dayInWorks2 = [];
+        for (WorkModel _work2 in works2) {
+          String _key = dateText('yyyy-MM-dd', _work2.startedAt);
+          if (_day2 == DateTime.parse(_key)) _dayInWorks2.add(_work2);
+        }
+        String _week = dateText('E', _day2);
+        if (_week == '日') _tmp = '00:00';
+        if (_dayInWorks2.length > 0) {
+          for (WorkModel _work in _dayInWorks2) {
+            if (_work.startedAt != _work.endedAt) {
+              _tmp = addTime(_tmp, _work.workTime(group));
+            }
+          }
+        }
+        if (_week == '土') {
+          String _key = dateText('yyyy-MM-dd', _day2);
+          cnt2[_key] = _tmp;
+        }
+      }
+      //二行目以降
+      for (DateTime _day in days) {
+        List<WorkModel> _dayInWorks = [];
+        for (WorkModel _work in works) {
+          String _key = dateText('yyyy-MM-dd', _work.startedAt);
+          if (_day == DateTime.parse(_key)) _dayInWorks.add(_work);
+        }
+        WorkShiftModel? _dayInWorkShifts;
+        for (WorkShiftModel _workShift in workShifts) {
+          String _key = dateText('yyyy-MM-dd', _workShift.startedAt);
+          if (_day == DateTime.parse(_key)) _dayInWorkShifts = _workShift;
+        }
+        String day = dateText('dd (E)', _day);
+        if (_dayInWorks.length > 0) {
+          for (WorkModel _work in _dayInWorks) {
+            if (_work.startedAt != _work.endedAt) {
+              String state = _work.state;
+              String startTime = _work.startTime(group);
+              String endTime = _work.endTime(group);
+              String breakTime = _work.breakTimes(group).first;
+              String workTime = _work.workTime(group);
+              String dayTime = _work.calTimes01(group)[0];
+              String nightTime = _work.calTimes01(group)[1];
+              String dayTimeOver = _work.calTimes01(group)[2];
+              String nightTimeOver = _work.calTimes01(group)[3];
+              String _key = dateText('yyyy-MM-dd', _work.startedAt);
+              cnt[_key] = '';
+              workTimes = addTime(workTimes, workTime);
+              dayTimes = addTime(dayTimes, dayTime);
+              nightTimes = addTime(nightTimes, nightTime);
+              dayTimeOvers = addTime(dayTimeOvers, dayTimeOver);
+              nightTimeOvers = addTime(nightTimeOvers, nightTimeOver);
+              _row.add(pw.TableRow(
+                children: [
+                  _cell(day, listStyle),
+                  _cell(state, listStyle),
+                  _cell(startTime, listStyle),
+                  _cell(endTime, listStyle),
+                  _cell(breakTime, listStyle),
+                  _cell(workTime, listStyle),
+                  _cell(dayTime, listStyle),
+                  _cell(nightTime, listStyle),
+                  _cell(dayTimeOver, listStyle),
+                  _cell(nightTimeOver, listStyle),
+                  _cell(cnt2[dateText('yyyy-MM-dd', _day)], listStyle),
+                ],
+              ));
+            }
+          }
+        } else {
+          _row.add(pw.TableRow(
+            children: [
+              _cell(day, listStyle),
+              _cell(
+                _dayInWorkShifts?.state ?? '',
+                listStyle,
+                color: _dayInWorkShifts?.stateColor3(),
+              ),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell('', listStyle),
+              _cell(cnt2[dateText('yyyy-MM-dd', _day)] ?? '', listStyle),
+            ],
+          ));
+        }
+      }
+      //各時間の合計
+      List<pw.TableRow> _totalRow = [];
+      int workDays = cnt.length;
+      _totalRow.add(pw.TableRow(
+        decoration: pw.BoxDecoration(color: PdfColors.grey300),
+        children: [
+          _cell('総勤務日数 [$workDays日]', listStyle),
+          _cell('総勤務時間 [$workTimes]', listStyle),
+          _cell('総通常時間 [$dayTimes]', listStyle),
+          _cell('総深夜時間(-) [$nightTimes]', listStyle),
+          _cell('総通常時間外 [$dayTimeOvers]', listStyle),
+          _cell('総深夜時間外 [$nightTimeOvers]', listStyle),
+        ],
+      ));
+      //ページ作成
+      pdf.addPage(pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            _buildHeader(month: month, user: _user, style: headStyle),
+            pw.SizedBox(height: 4.0),
+            pw.Table(
+              border: pw.TableBorder.all(color: PdfColors.grey),
+              children: _row,
+            ),
+            pw.Table(
+              border: pw.TableBorder.all(color: PdfColors.grey),
+              children: _totalRow,
+            ),
+            pw.SizedBox(height: 4.0),
+            _buildRemarks(style: listStyle),
+          ],
+        ),
+      ));
     }
   } else {
     if (user == null) return;
@@ -190,8 +358,16 @@ Future _model01({
       startAt: days.first,
       endAt: days.last,
     );
-    List<pw.TableRow> _row = [];
+    //合計値初期化
+    Map cnt = {};
+    Map cnt2 = {};
+    String workTimes = '00:00';
+    String dayTimes = '00:00';
+    String nightTimes = '00:00';
+    String dayTimeOvers = '00:00';
+    String nightTimeOvers = '00:00';
     //一行目
+    List<pw.TableRow> _row = [];
     _row.add(pw.TableRow(
       decoration: pw.BoxDecoration(color: PdfColors.grey300),
       children: [
@@ -208,15 +384,7 @@ Future _model01({
         _cell('週間合計※5', listStyle),
       ],
     ));
-    //合計値初期化
-    Map cnt = {};
-    Map cnt2 = {};
-    String workTimes = '00:00';
-    String dayTimes = '00:00';
-    String nightTimes = '00:00';
-    String dayTimeOvers = '00:00';
-    String nightTimeOvers = '00:00';
-    //週間合計
+    //週間合計の計算
     String _tmp = '00:00';
     for (DateTime _day2 in days2) {
       List<WorkModel> _dayInWorks2 = [];
@@ -238,7 +406,7 @@ Future _model01({
         cnt2[_key] = _tmp;
       }
     }
-    //各時間
+    //二行目以降
     for (DateTime _day in days) {
       List<WorkModel> _dayInWorks = [];
       for (WorkModel _work in works) {
@@ -270,7 +438,6 @@ Future _model01({
             nightTimes = addTime(nightTimes, nightTime);
             dayTimeOvers = addTime(dayTimeOvers, dayTimeOver);
             nightTimeOvers = addTime(nightTimeOvers, nightTimeOver);
-            //二行目以降
             _row.add(pw.TableRow(
               children: [
                 _cell(day, listStyle),
@@ -289,7 +456,6 @@ Future _model01({
           }
         }
       } else {
-        //二行目以降
         _row.add(pw.TableRow(
           children: [
             _cell(day, listStyle),
@@ -385,7 +551,7 @@ pw.Widget _cell(
   return pw.Container(
     padding: pw.EdgeInsets.all(4.0),
     color: color,
-    child: pw.Text(label ?? '', style: style),
+    child: pw.Text(label, style: style),
   );
 }
 
