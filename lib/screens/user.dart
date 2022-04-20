@@ -23,6 +23,7 @@ class UserScreen extends StatelessWidget {
     final groupProvider = Provider.of<GroupProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
     GroupModel? group = groupProvider.group;
+    List<String> userIds = group?.userIds ?? [];
     List<UserModel> users = [];
 
     return CustomAdminScaffold(
@@ -85,13 +86,16 @@ class UserScreen extends StatelessWidget {
           SizedBox(height: 8.0),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: userProvider.streamList(userIds: group?.userIds),
+              stream: userProvider.streamList(),
               builder: (context, snapshot) {
                 users.clear();
                 if (snapshot.hasData) {
                   for (DocumentSnapshot<Map<String, dynamic>> doc
                       in snapshot.data!.docs) {
-                    users.add(UserModel.fromSnapshot(doc));
+                    UserModel _user = UserModel.fromSnapshot(doc);
+                    if (userIds.contains(_user.id)) {
+                      users.add(_user);
+                    }
                   }
                 }
                 if (users.length == 0) return Text('現在登録しているスタッフはいません。');

@@ -183,7 +183,7 @@ Future _model01({
   }
   if (isAll == true) {
     List<UserModel> users = await userProvider.selectList(
-      userIds: group?.userIds,
+      userIds: group?.userIds ?? [],
     );
     for (UserModel _user in users) {
       List<WorkModel> works = await workProvider.selectList(
@@ -570,7 +570,7 @@ Future _model02({
   );
   if (isAll == true) {
     List<UserModel> users = await userProvider.selectList(
-      userIds: group?.userIds,
+      userIds: group?.userIds ?? [],
     );
     for (UserModel _user in users) {
       String positionName = '';

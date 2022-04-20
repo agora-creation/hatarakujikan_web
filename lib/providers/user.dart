@@ -184,21 +184,21 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<List<UserModel>> selectList({List<String>? userIds}) async {
+  Future<List<UserModel>> selectList({
+    required List<String> userIds,
+    bool? smartphone,
+  }) async {
     List<UserModel> _users = [];
-    await _userService.selectList(userIds: userIds ?? []).then((value) {
+    await _userService.selectList(userIds: userIds).then((value) {
       _users = value;
     });
     return _users;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({
-    List<String>? userIds,
-  }) {
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamList() {
     Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
     _ret = FirebaseFirestore.instance
         .collection('user')
-        .where('id', whereIn: userIds ?? ['error'])
         .orderBy('recordPassword', descending: false)
         .snapshots();
     return _ret;
