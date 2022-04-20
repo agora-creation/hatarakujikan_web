@@ -39,6 +39,7 @@ class GroupInfoScreen extends StatelessWidget {
                 TapListTile(
                   title: '名前',
                   subtitle: group?.name ?? '',
+                  iconData: Icons.edit,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -52,6 +53,7 @@ class GroupInfoScreen extends StatelessWidget {
                 TapListTile(
                   title: '住所',
                   subtitle: '${group?.zip ?? ''} ${group?.address ?? ''}',
+                  iconData: Icons.edit,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -65,6 +67,7 @@ class GroupInfoScreen extends StatelessWidget {
                 TapListTile(
                   title: '電話番号',
                   subtitle: group?.tel ?? '',
+                  iconData: Icons.edit,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -78,6 +81,7 @@ class GroupInfoScreen extends StatelessWidget {
                 TapListTile(
                   title: 'メールアドレス',
                   subtitle: group?.email ?? '',
+                  iconData: Icons.edit,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,
@@ -91,6 +95,7 @@ class GroupInfoScreen extends StatelessWidget {
                 TapListTile(
                   title: '管理者',
                   subtitle: groupProvider.adminUser?.name ?? '',
+                  iconData: Icons.edit,
                   onTap: () {
                     showDialog(
                       barrierDismissible: false,

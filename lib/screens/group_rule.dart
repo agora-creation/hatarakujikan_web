@@ -86,6 +86,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '出勤時間のまるめ',
                       subtitle: 'まるめ方：$_roundStartType、まるめ分数：$_roundStartNum',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -99,6 +100,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '退勤時間のまるめ',
                       subtitle: 'まるめ方：$_roundEndType、まるめ分数：$_roundEndNum',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -113,6 +115,7 @@ class GroupRuleScreen extends StatelessWidget {
                       title: '休憩開始時間のまるめ',
                       subtitle:
                           'まるめ方：$_roundBreakStartType、まるめ分数：$_roundBreakStartNum',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -127,6 +130,7 @@ class GroupRuleScreen extends StatelessWidget {
                       title: '休憩終了時間のまるめ',
                       subtitle:
                           'まるめ方：$_roundBreakEndType、まるめ分数：$_roundBreakEndNum',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -140,6 +144,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '勤務時間のまるめ',
                       subtitle: 'まるめ方：$_roundWorkType、まるめ分数：$_roundWorkNum',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -153,6 +158,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '法定労働時間',
                       subtitle: _legal,
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -166,6 +172,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '深夜時間帯',
                       subtitle: '$_nightStart〜$_nightEnd',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -179,6 +186,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '所定労働時間帯',
                       subtitle: '$_workStart〜$_workEnd',
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -192,6 +200,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '休日設定(曜日指定)',
                       subtitle: _holidays,
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -205,6 +214,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '休日設定(日付指定)',
                       subtitle: _holidays2,
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -218,6 +228,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: '自動休憩時間付与(1時間)',
                       subtitle: _autoBreak,
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -237,6 +248,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: 'QRコード認証',
                       subtitle: _qrSecurity,
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -250,6 +262,7 @@ class GroupRuleScreen extends StatelessWidget {
                     TapListTile(
                       title: 'GPS位置情報制限',
                       subtitle: _areaSecurity,
+                      iconData: Icons.edit,
                       onTap: () {
                         showDialog(
                           barrierDismissible: false,
@@ -265,6 +278,7 @@ class GroupRuleScreen extends StatelessWidget {
                             title: '制限する範囲',
                             subtitle:
                                 '緯度：$_areaLat、経度：$_areaLon、半径：$_areaRange',
+                            iconData: Icons.edit,
                             onTap: () {
                               showDialog(
                                 barrierDismissible: false,
