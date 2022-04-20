@@ -90,26 +90,6 @@ const TextStyle kLoginTextStyle = TextStyle(
   fontSize: 14.0,
 );
 
-const TextStyle kListDayTextStyle = TextStyle(
-  color: Colors.black54,
-  fontSize: 15.0,
-);
-
-const TextStyle kListTimeTextStyle = TextStyle(
-  color: Colors.black87,
-  fontSize: 15.0,
-);
-
-const TextStyle kListTime2TextStyle = TextStyle(
-  color: Colors.transparent,
-  fontSize: 15.0,
-);
-
-const TextStyle kDefaultTextStyle = TextStyle(
-  color: Colors.black54,
-  fontSize: 14.0,
-);
-
 const TextStyle kDialogTextStyle = TextStyle(
   color: Colors.black54,
   fontSize: 15.0,

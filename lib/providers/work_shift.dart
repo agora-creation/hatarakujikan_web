@@ -8,25 +8,20 @@ import 'package:hatarakujikan_web/services/work_shift.dart';
 class WorkShiftProvider with ChangeNotifier {
   WorkShiftService _workShiftService = WorkShiftService();
 
-  Future<bool> create({
-    required GroupModel group,
-    required UserModel user,
-    required DateTime startedAt,
-    required DateTime endedAt,
-    required String state,
-  }) async {
-    if (group.id == '') return false;
-    if (user.id == '') return false;
-    if (state == '') return false;
+  Future<bool> create({WorkShiftModel? workShift}) async {
+    if (workShift == null) return false;
+    if (workShift.startedAt == workShift.endedAt) return false;
+    if (workShift.startedAt.millisecondsSinceEpoch >
+        workShift.endedAt.millisecondsSinceEpoch) return false;
     try {
       String _id = _workShiftService.id();
       _workShiftService.create({
         'id': _id,
-        'groupId': group.id,
-        'userId': user.id,
-        'startedAt': startedAt,
-        'endedAt': endedAt,
-        'state': state,
+        'groupId': workShift.groupId,
+        'userId': workShift.userId,
+        'startedAt': workShift.startedAt,
+        'endedAt': workShift.endedAt,
+        'state': workShift.state,
         'createdAt': DateTime.now(),
       });
       return true;
@@ -36,22 +31,18 @@ class WorkShiftProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> update({
-    required String id,
-    required UserModel user,
-    required DateTime startedAt,
-    required DateTime endedAt,
-    required String state,
-  }) async {
-    if (user.id == '') return false;
-    if (state == '') return false;
+  Future<bool> update({WorkShiftModel? workShift}) async {
+    if (workShift == null) return false;
+    if (workShift.startedAt == workShift.endedAt) return false;
+    if (workShift.startedAt.millisecondsSinceEpoch >
+        workShift.endedAt.millisecondsSinceEpoch) return false;
     try {
       _workShiftService.update({
-        'id': id,
-        'userId': user.id,
-        'startedAt': startedAt,
-        'endedAt': endedAt,
-        'state': state,
+        'id': workShift.id,
+        'userId': workShift.userId,
+        'startedAt': workShift.startedAt,
+        'endedAt': workShift.endedAt,
+        'state': workShift.state,
       });
       return true;
     } catch (e) {
@@ -60,8 +51,15 @@ class WorkShiftProvider with ChangeNotifier {
     }
   }
 
-  void delete({required String id}) {
-    _workShiftService.delete({'id': id});
+  Future<bool> delete({String? id}) async {
+    if (id == null) return false;
+    try {
+      _workShiftService.delete({'id': id});
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({String? groupId}) {

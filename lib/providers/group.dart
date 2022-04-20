@@ -17,14 +17,12 @@ class GroupProvider with ChangeNotifier {
   List<GroupModel> _groups = [];
   GroupModel? _group;
   UserModel? _adminUser;
-  List<UserModel> _users = [];
 
   Status get status => _status;
   User? get fUser => _fUser;
   List<GroupModel> get groups => _groups;
   GroupModel? get group => _group;
   UserModel? get adminUser => _adminUser;
-  List<UserModel> get users => _users;
 
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
@@ -37,8 +35,6 @@ class GroupProvider with ChangeNotifier {
     if (group == null) return;
     _group = group;
     await setPrefs('groupId', group.id);
-    _users = await _userService.selectList(userIds: _group?.userIds ?? []);
-    _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     _groups.clear();
     notifyListeners();
   }
@@ -56,9 +52,9 @@ class GroupProvider with ChangeNotifier {
       )
           .then((value) async {
         _groups.clear();
-        _groups =
-            await _groupService.selectListAdminUser(userId: value.user?.uid);
-        _users.clear();
+        _groups = await _groupService.selectListAdminUser(
+          userId: value.user?.uid,
+        );
       });
       return true;
     } catch (e) {
@@ -94,7 +90,6 @@ class GroupProvider with ChangeNotifier {
     _status = Status.Unauthenticated;
     _groups.clear();
     _group = null;
-    _users.clear();
     await removePrefs('groupId');
     notifyListeners();
     return Future.delayed(Duration.zero);
@@ -123,8 +118,6 @@ class GroupProvider with ChangeNotifier {
     String? _groupId = await getPrefs('groupId');
     if (_groupId != null) {
       _group = await _groupService.select(id: _groupId);
-      _users = await _userService.selectList(userIds: _group?.userIds ?? []);
-      _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     }
     _adminUser = await _userService.select(id: _fUser?.uid);
     notifyListeners();
@@ -140,23 +133,13 @@ class GroupProvider with ChangeNotifier {
         _status = Status.Unauthenticated;
         _groups.clear();
         _group = null;
-        _users.clear();
       } else {
         _status = Status.Authenticated;
         _groups.clear();
         _group = await _groupService.select(id: _groupId);
-        _users = await _userService.selectList(userIds: _group?.userIds ?? []);
-        _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
       }
       _adminUser = await _userService.select(id: _fUser?.uid);
     }
-    notifyListeners();
-  }
-
-  Future reloadUsers() async {
-    _users.clear();
-    _users = await _userService.selectList(userIds: _group?.userIds ?? []);
-    _users.sort((a, b) => a.recordPassword.compareTo(b.recordPassword));
     notifyListeners();
   }
 

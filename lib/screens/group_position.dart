@@ -77,32 +77,15 @@ class GroupPositionScreen extends StatelessWidget {
                 return DataTable2(
                   columns: [
                     DataColumn2(label: Text('雇用形態名'), size: ColumnSize.S),
-                    DataColumn2(label: Text('割当中のスタッフ'), size: ColumnSize.L),
                     DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
                     DataColumn2(label: Text('スタッフ割当'), size: ColumnSize.S),
                   ],
                   rows: List<DataRow>.generate(
                     positions.length,
                     (index) {
-                      List<UserModel> _users = groupProvider.users;
-                      String positionUsers = '';
-                      if (positions[index].userIds.length != 0) {
-                        for (String _id in positions[index].userIds) {
-                          if (positionUsers != '') positionUsers += ',';
-                          UserModel? _user =
-                              _users.singleWhere((e) => e.id == _id);
-                          if (_user.name != '') {
-                            positionUsers += _user.name;
-                          }
-                        }
-                      }
                       return DataRow(
                         cells: [
                           DataCell(Text('${positions[index].name}')),
-                          DataCell(Text(
-                            '$positionUsers',
-                            overflow: TextOverflow.ellipsis,
-                          )),
                           DataCell(IconButton(
                             icon: Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
