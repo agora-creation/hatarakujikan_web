@@ -105,6 +105,7 @@ class UserScreen extends StatelessWidget {
                     DataColumn2(label: Text('スタッフ名'), size: ColumnSize.M),
                     DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.M),
                     DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
+                    DataColumn2(label: Text('スマホアプリ利用'), size: ColumnSize.M),
                   ],
                   rows: List<DataRow>.generate(
                     users.length,
@@ -127,6 +128,12 @@ class UserScreen extends StatelessWidget {
                               ),
                             );
                           },
+                        )),
+                        DataCell(IconButton(
+                          icon: users[index].smartphone == true
+                              ? Icon(Icons.smartphone, color: Colors.blue)
+                              : Icon(Icons.no_cell, color: Colors.grey),
+                          onPressed: () {},
                         )),
                       ],
                     ),

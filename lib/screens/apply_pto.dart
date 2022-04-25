@@ -1,4 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:hatarakujikan_web/helpers/functions.dart';
+import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/apply_pto.dart';
+import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_pto.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
@@ -6,6 +12,7 @@ import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/tap_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +23,8 @@ class ApplyPTOScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
     final applyPTOProvider = Provider.of<ApplyPTOProvider>(context);
+    GroupModel? group = groupProvider.group;
+    List<ApplyPTOModel> applyPTOs = [];
 
     return CustomAdminScaffold(
       groupProvider: groupProvider,
@@ -76,7 +85,62 @@ class ApplyPTOScreen extends StatelessWidget {
           ),
           SizedBox(height: 8.0),
           Expanded(
-            child: Text('現在申請はありません。'),
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: applyPTOProvider.streamList(groupId: group?.id),
+              builder: (context, snapshot) {
+                applyPTOs.clear();
+                if (snapshot.hasData) {
+                  for (DocumentSnapshot<Map<String, dynamic>> doc
+                      in snapshot.data!.docs) {
+                    applyPTOs.add(ApplyPTOModel.fromSnapshot(doc));
+                  }
+                }
+                if (applyPTOs.length == 0) return Text('現在申請はありません。');
+                return DataTable2(
+                  columns: [
+                    DataColumn2(label: Text('申請日時'), size: ColumnSize.M),
+                    DataColumn2(label: Text('申請者名'), size: ColumnSize.M),
+                    DataColumn2(label: Text('事由'), size: ColumnSize.L),
+                    DataColumn2(label: Text('承認状況'), size: ColumnSize.M),
+                    DataColumn2(label: Text('承認/却下'), size: ColumnSize.S),
+                  ],
+                  rows: List<DataRow>.generate(
+                    applyPTOs.length,
+                    (index) => DataRow(
+                      cells: [
+                        DataCell(Text(
+                          dateText(
+                            'yyyy/MM/dd HH:mm',
+                            applyPTOs[index].createdAt,
+                          ),
+                        )),
+                        DataCell(Text(applyPTOs[index].userName)),
+                        DataCell(Text(
+                          applyPTOs[index].reason,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                        DataCell(Text(
+                          applyPTOs[index].approval == true ? '承認済み' : '承認待ち',
+                        )),
+                        DataCell(IconButton(
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => EditDialog(
+                                applyPTOProvider: applyPTOProvider,
+                                applyPTO: applyPTOs[index],
+                              ),
+                            );
+                          },
+                        )),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -212,6 +276,113 @@ class SearchApprovalDialog extends StatelessWidget {
                   label: 'キャンセル',
                 ),
                 Container(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditDialog extends StatelessWidget {
+  final ApplyPTOProvider applyPTOProvider;
+  final ApplyPTOModel applyPTO;
+
+  EditDialog({
+    required this.applyPTOProvider,
+    required this.applyPTO,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '申請内容を確認し、「承認する」ボタンをクリックしてください。',
+              style: kDialogTextStyle,
+            ),
+            SizedBox(height: 16.0),
+            TapListTile(
+              title: '申請日時',
+              subtitle: dateText('yyyy/MM/dd HH:mm', applyPTO.createdAt),
+            ),
+            TapListTile(
+              title: '申請者名',
+              subtitle: applyPTO.userName,
+            ),
+            TapListTile(
+              title: '開始日',
+              subtitle: dateText('yyyy/MM/dd', applyPTO.startedAt),
+            ),
+            TapListTile(
+              title: '終了日',
+              subtitle: dateText('yyyy/MM/dd', applyPTO.endedAt),
+            ),
+            TapListTile(
+              title: '事由',
+              subtitle: applyPTO.reason,
+            ),
+            TapListTile(
+              title: '承認状況',
+              subtitle: applyPTO.approval == true ? '承認済み' : '承認待ち',
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Row(
+                  children: [
+                    CustomTextButton(
+                      label: applyPTO.approval == true ? '削除する' : '却下する',
+                      color: Colors.red,
+                      onPressed: () async {
+                        if (applyPTO.approval == true) {
+                          if (!await applyPTOProvider.delete(
+                            id: applyPTO.id,
+                          )) {
+                            return;
+                          }
+                          customSnackBar(context, '申請を削除しました');
+                          Navigator.pop(context);
+                        } else {
+                          if (!await applyPTOProvider.delete(
+                            id: applyPTO.id,
+                          )) {
+                            return;
+                          }
+                          customSnackBar(context, '申請を却下しました');
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                    SizedBox(width: 4.0),
+                    CustomTextButton(
+                      label: '承認する',
+                      color:
+                          applyPTO.approval == true ? Colors.grey : Colors.blue,
+                      onPressed: () async {
+                        if (applyPTO.approval == true) return;
+                        if (!await applyPTOProvider.update(
+                          applyPTO: applyPTO,
+                        )) {
+                          return;
+                        }
+                        customSnackBar(context, '申請を承認しました');
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ],
