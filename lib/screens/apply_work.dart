@@ -9,11 +9,11 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/providers/apply_work.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/tap_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:provider/provider.dart';
 

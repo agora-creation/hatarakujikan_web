@@ -3,8 +3,8 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/screens/work.dart';
-import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
+import 'package:hatarakujikan_web/widgets/tap_list_tile.dart';
 
 class SelectScreen extends StatefulWidget {
   final GroupProvider groupProvider;

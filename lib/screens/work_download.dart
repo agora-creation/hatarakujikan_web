@@ -10,7 +10,6 @@ import 'package:hatarakujikan_web/providers/position.dart';
 import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
-import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
@@ -18,6 +17,7 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/month_form_field.dart';
+import 'package:hatarakujikan_web/widgets/tap_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class WorkDownloadScreen extends StatelessWidget {

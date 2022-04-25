@@ -5,7 +5,6 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
-import 'package:hatarakujikan_web/widgets/TapListTile.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
@@ -16,6 +15,7 @@ import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/date_range_picker.dart';
 import 'package:hatarakujikan_web/widgets/icon_title.dart';
+import 'package:hatarakujikan_web/widgets/tap_list_tile.dart';
 import 'package:hatarakujikan_web/widgets/time_form_field.dart';
 import 'package:provider/provider.dart';
 
