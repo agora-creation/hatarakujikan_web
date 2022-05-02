@@ -345,7 +345,7 @@ Future _model01({
           children: [
             _buildHeader(
               month: dateText('yyyy年MM月', month),
-              user: '${user?.name} (${user?.number})',
+              user: '${_user.name} (${_user.number})',
               style: headStyle,
             ),
             pw.SizedBox(height: 4.0),
@@ -719,7 +719,7 @@ Future _model02({
           children: [
             _buildHeader(
               month: dateText('yyyy年MM月', month),
-              user: '${user?.name} (${user?.number})【$positionName】',
+              user: '${_user.name} (${_user.number})【$positionName】',
               style: headStyle,
             ),
             pw.SizedBox(height: 4.0),
