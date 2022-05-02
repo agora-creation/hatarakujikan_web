@@ -247,7 +247,7 @@ class _PDFDialogState extends State<PDFDialog> {
                   SizedBox(height: 16.0),
                   MonthFormField(
                     label: '出力年月',
-                    month: dateText('yyyy年MM月', DateTime.now()),
+                    month: dateText('yyyy年MM月', month),
                     onPressed: () async {
                       DateTime? selected = await customMonthPicker(
                         context: context,
