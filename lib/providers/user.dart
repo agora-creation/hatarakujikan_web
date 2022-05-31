@@ -6,11 +6,13 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/group.dart';
 import 'package:hatarakujikan_web/services/user.dart';
 import 'package:hatarakujikan_web/services/work.dart';
+import 'package:hatarakujikan_web/services/work_shift.dart';
 
 class UserProvider with ChangeNotifier {
   GroupService _groupService = GroupService();
   UserService _userService = UserService();
   WorkService _workService = WorkService();
+  WorkShiftService _workShiftService = WorkShiftService();
 
   Future<bool> create({
     GroupModel? group,
@@ -170,9 +172,14 @@ class UserProvider with ChangeNotifier {
       _userService.update({
         'id': afterUser.id,
         'number': beforeUser.number,
+        'name': beforeUser.name,
         'recordPassword': beforeUser.recordPassword,
       });
       await _workService.updateMigration(
+        beforeUserId: beforeUser.id,
+        afterUserId: afterUser.id,
+      );
+      await _workShiftService.updateMigration(
         beforeUserId: beforeUser.id,
         afterUserId: afterUser.id,
       );

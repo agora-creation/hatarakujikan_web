@@ -538,9 +538,9 @@ class _MigrationDialogState extends State<MigrationDialog> {
 
   void _init() async {
     List<UserModel> _beforeUsers =
-        await widget.groupProvider.selectUsers(smartphone: false);
+        await widget.groupProvider.selectUsers();
     List<UserModel> _afterUsers =
-        await widget.groupProvider.selectUsers(smartphone: true);
+        await widget.groupProvider.selectUsers();
     if (mounted) {
       setState(() {
         beforeUsers = _beforeUsers;

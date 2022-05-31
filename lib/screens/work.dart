@@ -165,7 +165,7 @@ class WorkScreen extends StatelessWidget {
             ),
           ),
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: workProvider.streamList(),
+            stream: workProvider.streamList(groupId: group?.id),
             builder: (context, snapshot) {
               List<WorkModel> _works = [];
               if (snapshot.hasData) {
