@@ -315,8 +315,8 @@ class _InUserDialogState extends State<InUserDialog> {
       setState(() {
         users = _users;
         for (String _id in widget.position.userIds) {
-          UserModel? _user = users.singleWhere((e) => e.id == _id);
-          if (_user.id != '') userIds.add(_user.id);
+          UserModel? _user = users.singleWhereOrNull((e) => e.id == _id);
+          if (_user?.id != '') userIds.add(_user?.id ?? '');
         }
       });
     }

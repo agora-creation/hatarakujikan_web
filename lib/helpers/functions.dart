@@ -327,3 +327,8 @@ Future<String?> customTimePicker({
   }
   return _ret;
 }
+
+extension IterableModifier<E> on Iterable<E> {
+  E? singleWhereOrNull(bool Function(E) test) =>
+      cast<E?>().singleWhere((v) => v != null && test(v), orElse: () => null);
+}
