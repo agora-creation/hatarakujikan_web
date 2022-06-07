@@ -102,7 +102,7 @@ Future _model01({
           cnt[_key] = '';
           time = addTime(time, _work.workTime(group));
           time1 = addTime(time1, _work.calTimes01(group)[0]);
-          time2 = addTime(time2, _work.calTimes01(group)[3]);
+          time2 = addTime(time2, _work.calTimes01(group)[1]);
         }
       }
       int workDays = cnt.length;
