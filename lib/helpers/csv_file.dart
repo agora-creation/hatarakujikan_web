@@ -234,7 +234,7 @@ Future _model02({
       List<String> overTime1s = overTime1.split(':');
       if (30 <= int.parse(overTime1s.last)) {
         overTime1 = '${twoDigits(int.parse(overTime1s.first))}:00';
-        overTime2 = addTime(overTime1, '01:00');
+        overTime1 = addTime(overTime1, '01:00');
       } else {
         overTime1 = '${twoDigits(int.parse(overTime1s.first))}:00';
       }
