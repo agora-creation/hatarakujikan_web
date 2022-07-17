@@ -652,6 +652,11 @@ Future _model02({
                   overTime1 = _work.calTimes02(group, 'C')[1];
                   overTime2 = _work.calTimes02(group, 'C')[2];
                   break;
+                case 'Dグループ':
+                  workTime = _work.calTimes02(group, 'D')[0];
+                  overTime1 = _work.calTimes02(group, 'D')[1];
+                  overTime2 = _work.calTimes02(group, 'D')[2];
+                  break;
                 default:
                   workTime = _work.calTimes02(group, 'A')[0];
                   overTime1 = _work.calTimes02(group, 'A')[1];
@@ -817,6 +822,11 @@ Future _model02({
                 workTime = _work.calTimes02(group, 'C')[0];
                 overTime1 = _work.calTimes02(group, 'C')[1];
                 overTime2 = _work.calTimes02(group, 'C')[2];
+                break;
+              case 'Dグループ':
+                workTime = _work.calTimes02(group, 'D')[0];
+                overTime1 = _work.calTimes02(group, 'D')[1];
+                overTime2 = _work.calTimes02(group, 'D')[2];
                 break;
               default:
                 workTime = _work.calTimes02(group, 'A')[0];
@@ -990,7 +1000,7 @@ pw.Widget _buildRemarks2({pw.TextStyle? style}) {
         style: style,
       ),
       pw.Text(
-        '※Cグループ・・・勤務時間が8時間を超えた分の時間を「時間外2」に該当させる。休日出勤の場合は全ての時間を「時間外2」に該当させる。',
+        '※C/Dグループ・・・勤務時間が8時間を超えた分の時間を「時間外2」に該当させる。休日出勤の場合は全ての時間を「時間外2」に該当させる。',
         style: style,
       ),
       pw.Text(

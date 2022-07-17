@@ -9,7 +9,11 @@ import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/providers/position.dart';
+import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
+import 'package:hatarakujikan_web/providers/work_shift.dart';
+import 'package:hatarakujikan_web/screens/work_download.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -30,7 +34,10 @@ class WorkScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupProvider = Provider.of<GroupProvider>(context);
+    final positionProvider = Provider.of<PositionProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final workProvider = Provider.of<WorkProvider>(context);
+    final workShiftProvider = Provider.of<WorkShiftProvider>(context);
     GroupModel? group = groupProvider.group;
     List<WorkModel> works = [];
     List<WorkShiftModel> workShifts = [];
@@ -88,22 +95,68 @@ class WorkScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              TextIconButton(
-                iconData: Icons.add,
-                iconColor: Colors.white,
-                label: '新規登録',
-                labelColor: Colors.white,
-                backgroundColor: Colors.blue,
-                onPressed: () {
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (_) => AddDialog(
-                      groupProvider: groupProvider,
-                      workProvider: workProvider,
-                    ),
-                  );
-                },
+              Row(
+                children: [
+                  TextIconButton(
+                    iconData: Icons.download,
+                    iconColor: Colors.white,
+                    label: 'CSV出力',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.green,
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => CSVDialog(
+                          positionProvider: positionProvider,
+                          userProvider: userProvider,
+                          workProvider: workProvider,
+                          workShiftProvider: workShiftProvider,
+                          group: group,
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 4.0),
+                  TextIconButton(
+                    iconData: Icons.print,
+                    iconColor: Colors.white,
+                    label: 'PDF印刷',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.redAccent,
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => PDFDialog(
+                          positionProvider: positionProvider,
+                          groupProvider: groupProvider,
+                          userProvider: userProvider,
+                          workProvider: workProvider,
+                          workShiftProvider: workShiftProvider,
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 4.0),
+                  TextIconButton(
+                    iconData: Icons.add,
+                    iconColor: Colors.white,
+                    label: '新規登録',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => AddDialog(
+                          groupProvider: groupProvider,
+                          workProvider: workProvider,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

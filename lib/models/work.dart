@@ -423,6 +423,18 @@ class WorkModel {
       }
     }
     // ----------------------------------------
+    // Dグループ
+    if (type == 'D') {
+      List<String> _time0s = _time0.split(':');
+      int _legal = group?.legal ?? 0;
+      if (_legal <= int.parse(_time0s.first)) {
+        String _tmp = subTime(_time0, '0$_legal:00');
+        _time2 = addTime(_time2, _tmp);
+      } else {
+        _time2 = '00:00';
+      }
+    }
+    // ----------------------------------------
     String week = dateText('E', _startedAt);
     if (group!.holidays.contains(week)) {
       _time2 = _time0;

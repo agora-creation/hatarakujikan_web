@@ -222,6 +222,19 @@ Future _model02({
               overTime1 = addTime(overTime1, _work.calTimes02(group, 'C')[1]);
               overTime2 = addTime(overTime2, _work.calTimes02(group, 'C')[2]);
               break;
+            case 'Dグループ':
+              workTime = addTime(workTime, _work.calTimes02(group, 'D')[0]);
+              overTime1 = addTime(overTime1, _work.calTimes02(group, 'D')[1]);
+              overTime2 = addTime(overTime2, _work.calTimes02(group, 'D')[2]);
+              //勤務時間を30分四捨五入
+              List<String> workTimes = workTime.split(':');
+              if (30 <= int.parse(workTimes.last)) {
+                workTime = '${twoDigits(int.parse(workTimes.first))}:00';
+                workTime = addTime(workTime, '01:00');
+              } else {
+                workTime = '${twoDigits(int.parse(workTimes.first))}:00';
+              }
+              break;
             default:
               workTime = addTime(workTime, _work.calTimes02(group, 'A')[0]);
               overTime1 = addTime(overTime1, _work.calTimes02(group, 'A')[1]);
