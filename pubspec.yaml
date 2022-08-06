@@ -35,8 +35,8 @@ dependencies:
   google_maps_flutter: ^2.1.3
   google_maps_flutter_web: ^0.3.2+1
   http: ^0.13.4
-  syncfusion_flutter_calendar: ^19.4.56
-  syncfusion_flutter_datepicker: ^19.4.56
+  syncfusion_flutter_calendar: ^20.2.40
+  syncfusion_flutter_datepicker: ^20.2.40
   intl: ^0.17.0
 
 dev_dependencies:

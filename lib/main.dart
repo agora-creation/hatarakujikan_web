@@ -29,7 +29,14 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyCCEn5twtEVssNBtIH3pxq_W-VNQryOCd8",
+      appId: "1:433017475057:web:87260307fae0432cebfe50",
+      messagingSenderId: "433017475057",
+      projectId: "hatarakujikan",
+    ),
+  );
   await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   if (FirebaseAuth.instance.currentUser == null) {
     await Future.any([
