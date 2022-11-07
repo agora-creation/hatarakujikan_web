@@ -13,6 +13,7 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/time_form_field.dart';
 import 'package:provider/provider.dart';
 
 class UserScreen extends StatelessWidget {
@@ -257,11 +258,15 @@ class _EditDialogState extends State<EditDialog> {
   TextEditingController number = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController recordPassword = TextEditingController();
+  bool? autoWorkEnd;
+  String? autoWorkEndTime;
 
   void _init() async {
     number.text = widget.user.number;
     name.text = widget.user.name;
     recordPassword.text = widget.user.recordPassword;
+    autoWorkEnd = widget.user.autoWorkEnd;
+    autoWorkEndTime = widget.user.autoWorkEndTime;
   }
 
   @override
@@ -312,6 +317,52 @@ class _EditDialogState extends State<EditDialog> {
               textInputType: null,
               maxLines: 1,
             ),
+            SizedBox(height: 8.0),
+            CustomDropdownButton(
+              label: '自動退勤',
+              isExpanded: true,
+              value: autoWorkEnd,
+              onChanged: (value) {
+                setState(() => autoWorkEnd = value);
+              },
+              items: [
+                DropdownMenuItem(
+                  value: false,
+                  child: Text(
+                    '無効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: true,
+                  child: Text(
+                    '有効',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            autoWorkEnd == true ? SizedBox(height: 8.0) : Container(),
+            autoWorkEnd == true
+                ? TimeFormField(
+                    label: '自動退勤時間',
+                    time: autoWorkEndTime,
+                    onPressed: () async {
+                      String? _time = await customTimePicker(
+                        context: context,
+                        init: autoWorkEndTime,
+                      );
+                      if (_time == null) return;
+                      setState(() => autoWorkEndTime = _time);
+                    },
+                  )
+                : Container(),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -350,6 +401,8 @@ class _EditDialogState extends State<EditDialog> {
                           number: number.text.trim(),
                           name: name.text.trim(),
                           recordPassword: recordPassword.text.trim(),
+                          autoWorkEnd: autoWorkEnd,
+                          autoWorkEndTime: autoWorkEndTime,
                         )) {
                           return;
                         }
@@ -537,10 +590,8 @@ class _MigrationDialogState extends State<MigrationDialog> {
   UserModel? afterUser;
 
   void _init() async {
-    List<UserModel> _beforeUsers =
-        await widget.groupProvider.selectUsers();
-    List<UserModel> _afterUsers =
-        await widget.groupProvider.selectUsers();
+    List<UserModel> _beforeUsers = await widget.groupProvider.selectUsers();
+    List<UserModel> _afterUsers = await widget.groupProvider.selectUsers();
     if (mounted) {
       setState(() {
         beforeUsers = _beforeUsers;

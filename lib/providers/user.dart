@@ -36,6 +36,8 @@ class UserProvider with ChangeNotifier {
         'workLv': 0,
         'lastWorkId': '',
         'lastBreakId': '',
+        'autoWorkEnd': false,
+        'autoWorkEndTime': '00:00',
         'token': '',
         'smartphone': false,
         'createdAt': DateTime.now(),
@@ -58,17 +60,23 @@ class UserProvider with ChangeNotifier {
     String? number,
     String? name,
     String? recordPassword,
+    bool? autoWorkEnd,
+    String? autoWorkEndTime,
   }) async {
     if (id == null) return false;
     if (number == null) return false;
     if (name == null) return false;
     if (recordPassword == null) return false;
+    if (autoWorkEnd == null) return false;
+    if (autoWorkEndTime == null) return false;
     try {
       _userService.update({
         'id': id,
         'number': number,
         'name': name,
         'recordPassword': recordPassword,
+        'autoWorkEnd': autoWorkEnd,
+        'autoWorkEndTime': autoWorkEndTime,
       });
       return true;
     } catch (e) {
@@ -121,6 +129,8 @@ class UserProvider with ChangeNotifier {
         'workLv': user.workLv,
         'lastWorkId': user.lastWorkId,
         'lastBreakId': user.lastBreakId,
+        'autoWorkEnd': user.autoWorkEnd,
+        'autoWorkEndTime': user.autoWorkEndTime,
         'token': user.token,
         'smartphone': true,
         'createdAt': DateTime.now(),
@@ -174,6 +184,8 @@ class UserProvider with ChangeNotifier {
         'number': beforeUser.number,
         'name': beforeUser.name,
         'recordPassword': beforeUser.recordPassword,
+        'autoWorkEnd': beforeUser.autoWorkEnd,
+        'autoWorkEndTime': beforeUser.autoWorkEndTime,
       });
       await _workService.updateMigration(
         beforeUserId: beforeUser.id,

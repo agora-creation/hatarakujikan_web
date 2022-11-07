@@ -11,7 +11,7 @@ class UserModel {
   String _lastWorkId = '';
   String _lastBreakId = '';
   bool _autoWorkEnd = false;
-  String _autoWorkEndTime = '';
+  String _autoWorkEndTime = '00:00';
   String _token = '';
   bool _smartphone = false;
   DateTime _createdAt = DateTime.now();
@@ -42,7 +42,7 @@ class UserModel {
     _lastWorkId = snapshot.data()!['lastWorkId'] ?? '';
     _lastBreakId = snapshot.data()!['lastBreakId'] ?? '';
     _autoWorkEnd = snapshot.data()!['autoWorkEnd'] ?? false;
-    _autoWorkEndTime = snapshot.data()!['autoWorkEndTime'] ?? '';
+    _autoWorkEndTime = snapshot.data()!['autoWorkEndTime'] ?? '00:00';
     _token = snapshot.data()!['token'] ?? '';
     _smartphone = snapshot.data()!['smartphone'] ?? false;
     _createdAt = snapshot.data()!['createdAt'].toDate() ?? DateTime.now();
