@@ -52,7 +52,7 @@ class ApplyWorkProvider with ChangeNotifier {
         'userName': _user.name,
         'workId': applyWork.workId,
         'title': '勤怠データを修正しました',
-        'details': details,
+        'details': details.trim(),
         'createdAt': DateTime.now(),
       });
       return true;
