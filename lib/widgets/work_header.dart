@@ -26,6 +26,7 @@ class WorkHeader extends StatelessWidget {
               Text('法定外時間', style: headStyle),
               Text('深夜時間', style: headStyle),
               Text('修正/削除', style: headStyle),
+              Text('操作ログ', style: headStyle),
               Text('位置情報', style: headStyle),
             ],
           ),

@@ -39,6 +39,9 @@ dependencies:
   syncfusion_flutter_datepicker: ^20.2.40
   intl: ^0.17.0
 
+dependency_overrides:
+  modal_bottom_sheet: ^3.0.0-pre
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

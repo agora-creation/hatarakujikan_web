@@ -108,6 +108,16 @@ class WorkList extends StatelessWidget {
                           },
                         ),
                         IconButton(
+                          icon: Icon(Icons.list_alt, color: Colors.blue),
+                          onPressed: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) => LogDialog(),
+                            );
+                          },
+                        ),
+                        IconButton(
                           icon: Icon(Icons.location_on, color: Colors.blue),
                           onPressed: () {
                             showDialog(
@@ -142,7 +152,8 @@ class WorkList extends StatelessWidget {
                         Text('00:00', style: timeStyle2),
                         Text('00:00', style: timeStyle2),
                         Icon(Icons.edit, color: Colors.transparent),
-                        Icon(Icons.map, color: Colors.transparent),
+                        Icon(Icons.list_alt, color: Colors.transparent),
+                        Icon(Icons.location_on, color: Colors.transparent),
                       ],
                     ),
                   )
@@ -439,6 +450,45 @@ class _EditDialogState extends State<EditDialog> {
                     ),
                   ],
                 ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LogDialog extends StatefulWidget {
+  const LogDialog({Key? key}) : super(key: key);
+
+  @override
+  State<LogDialog> createState() => _LogDialogState();
+}
+
+class _LogDialogState extends State<LogDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Container(
+              height: 350.0,
+              child: Text('操作ログ'),
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Container(),
               ],
             ),
           ],
