@@ -6,10 +6,12 @@ import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/services/log.dart';
+import 'package:hatarakujikan_web/services/user.dart';
 import 'package:hatarakujikan_web/services/work.dart';
 
 class WorkProvider with ChangeNotifier {
   LogService _logService = LogService();
+  UserService _userService = UserService();
   WorkService _workService = WorkService();
 
   Future<bool> create({
@@ -18,6 +20,8 @@ class WorkProvider with ChangeNotifier {
   }) async {
     if (work == null) return false;
     if (breaks == null) return false;
+    UserModel? _user = await _userService.select(id: work.userId);
+    if (_user == null) return false;
     if (work.startedAt == work.endedAt) return false;
     if (work.startedAt.millisecondsSinceEpoch >
         work.endedAt.millisecondsSinceEpoch) return false;
@@ -51,14 +55,24 @@ class WorkProvider with ChangeNotifier {
         'createdAt': DateTime.now(),
       });
       String _logId = _logService.id();
+      String details = '''
+      [出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}
+      [退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}
+      ''';
+      for (BreaksModel _breaksModel in breaks) {
+        details += '''
+        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}
+        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}
+        ''';
+      }
       _logService.create({
         'id': _logId,
         'groupId': work.groupId,
         'userId': work.userId,
-        'userName': '',
+        'userName': _user.name,
         'workId': _id,
         'title': '勤怠データを記録しました',
-        'details': '',
+        'details': details,
         'createdAt': DateTime.now(),
       });
       return true;
@@ -74,6 +88,8 @@ class WorkProvider with ChangeNotifier {
   }) async {
     if (work == null) return false;
     if (breaks == null) return false;
+    UserModel? _user = await _userService.select(id: work.userId);
+    if (_user == null) return false;
     if (work.startedAt == work.endedAt) return false;
     if (work.startedAt.millisecondsSinceEpoch >
         work.endedAt.millisecondsSinceEpoch) return false;
@@ -100,14 +116,24 @@ class WorkProvider with ChangeNotifier {
         'state': work.state,
       });
       String _logId = _logService.id();
+      String details = '''
+      [出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}
+      [退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}
+      ''';
+      for (BreaksModel _breaksModel in breaks) {
+        details += '''
+        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}
+        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}
+        ''';
+      }
       _logService.create({
         'id': _logId,
         'groupId': work.groupId,
         'userId': work.userId,
-        'userName': '',
+        'userName': _user.name,
         'workId': work.id,
         'title': '勤怠データを修正しました',
-        'details': '',
+        'details': details,
         'createdAt': DateTime.now(),
       });
       return true;
@@ -117,10 +143,33 @@ class WorkProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> delete({String? id}) async {
-    if (id == null) return false;
+  Future<bool> delete({WorkModel? work}) async {
+    if (work == null) return false;
+    UserModel? _user = await _userService.select(id: work.userId);
+    if (_user == null) return false;
     try {
-      _workService.delete({'id': id});
+      _workService.delete({'id': work.id});
+      String _logId = _logService.id();
+      String details = '''
+      [出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}
+      [退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}
+      ''';
+      for (BreaksModel _breaksModel in work.breaks) {
+        details += '''
+        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}
+        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}
+        ''';
+      }
+      _logService.create({
+        'id': _logId,
+        'groupId': work.groupId,
+        'userId': work.userId,
+        'userName': _user.name,
+        'workId': work.id,
+        'title': '勤怠データを削除しました',
+        'details': details,
+        'createdAt': DateTime.now(),
+      });
       return true;
     } catch (e) {
       print(e.toString());

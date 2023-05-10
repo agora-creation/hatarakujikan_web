@@ -434,7 +434,7 @@ class _EditDialogState extends State<EditDialog> {
                       label: '削除する',
                       color: Colors.red,
                       onPressed: () async {
-                        if (!await widget.workProvider.delete(id: work?.id)) {
+                        if (!await widget.workProvider.delete(work: work)) {
                           return;
                         }
                         customSnackBar(context, '勤務データを削除しました');
