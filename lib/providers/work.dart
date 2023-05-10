@@ -55,15 +55,12 @@ class WorkProvider with ChangeNotifier {
         'createdAt': DateTime.now(),
       });
       String _logId = _logService.id();
-      String details = '''
-      [出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}
-      [退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}
-      ''';
+      String d = '';
+      d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
+      d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in breaks) {
-        details += '''
-        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}
-        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}
-        ''';
+        d += '[休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}\n';
+        d += '[休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}\n';
       }
       _logService.create({
         'id': _logId,
@@ -72,7 +69,7 @@ class WorkProvider with ChangeNotifier {
         'userName': _user.name,
         'workId': _id,
         'title': '勤怠データを記録しました',
-        'details': details.trim(),
+        'details': d.trim(),
         'createdAt': DateTime.now(),
       });
       return true;
@@ -116,15 +113,12 @@ class WorkProvider with ChangeNotifier {
         'state': work.state,
       });
       String _logId = _logService.id();
-      String details = '''
-      [出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}
-      [退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}
-      ''';
+      String d = '';
+      d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
+      d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in breaks) {
-        details += '''
-        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}
-        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}
-        ''';
+        d += '[休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}\n';
+        d += '[休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}\n';
       }
       _logService.create({
         'id': _logId,
@@ -133,7 +127,7 @@ class WorkProvider with ChangeNotifier {
         'userName': _user.name,
         'workId': work.id,
         'title': '勤怠データを修正しました',
-        'details': details.trim(),
+        'details': d.trim(),
         'createdAt': DateTime.now(),
       });
       return true;
@@ -150,15 +144,12 @@ class WorkProvider with ChangeNotifier {
     try {
       _workService.delete({'id': work.id});
       String _logId = _logService.id();
-      String details = '''
-      [出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}
-      [退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}
-      ''';
+      String d = '';
+      d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
+      d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in work.breaks) {
-        details += '''
-        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}
-        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}
-        ''';
+        d += '[休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}\n';
+        d += '[休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}\n';
       }
       _logService.create({
         'id': _logId,
@@ -167,7 +158,7 @@ class WorkProvider with ChangeNotifier {
         'userName': _user.name,
         'workId': work.id,
         'title': '勤怠データを削除しました',
-        'details': details.trim(),
+        'details': d.trim(),
         'createdAt': DateTime.now(),
       });
       return true;

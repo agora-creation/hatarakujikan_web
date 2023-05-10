@@ -35,15 +35,12 @@ class ApplyWorkProvider with ChangeNotifier {
         'breaks': _breaks,
       });
       String _logId = _logService.id();
-      String details = '''
-      [出勤] ${dateText('yyyy/MM/dd HH:mm', applyWork.startedAt)}
-      [退勤] ${dateText('yyyy/MM/dd HH:mm', applyWork.endedAt)}
-      ''';
-      for (BreaksModel breaks in applyWork.breaks) {
-        details += '''
-        [休憩開始] ${dateText('yyyy/MM/dd HH:mm', breaks.startedAt)}
-        [休憩終了] ${dateText('yyyy/MM/dd HH:mm', breaks.endedAt)}
-        ''';
+      String d = '';
+      d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', applyWork.startedAt)}\n';
+      d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', applyWork.endedAt)}\n';
+      for (BreaksModel _breaksModel in applyWork.breaks) {
+        d += '[休憩開始] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.startedAt)}\n';
+        d += '[休憩終了] ${dateText('yyyy/MM/dd HH:mm', _breaksModel.endedAt)}\n';
       }
       _logService.create({
         'id': _logId,
@@ -52,7 +49,7 @@ class ApplyWorkProvider with ChangeNotifier {
         'userName': _user.name,
         'workId': applyWork.workId,
         'title': '勤怠データを修正しました',
-        'details': details.trim(),
+        'details': d.trim(),
         'createdAt': DateTime.now(),
       });
       return true;

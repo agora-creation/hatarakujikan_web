@@ -22,7 +22,7 @@ class LogProvider with ChangeNotifier {
         .collection('log')
         .where('groupId', isEqualTo: groupId ?? 'error')
         .where('userId', isEqualTo: userId ?? 'error')
-        .where('workId', isEqualTo: userId ?? 'error')
+        .where('workId', isEqualTo: workId ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     return _ret;
