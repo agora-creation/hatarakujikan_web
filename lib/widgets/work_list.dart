@@ -121,6 +121,7 @@ class WorkList extends StatelessWidget {
                               builder: (_) => LogDialog(
                                 groupId: group?.id,
                                 userId: _work.userId,
+                                workId: _work.id,
                               ),
                             );
                           },
@@ -470,10 +471,12 @@ class _EditDialogState extends State<EditDialog> {
 class LogDialog extends StatefulWidget {
   final String? groupId;
   final String? userId;
+  final String? workId;
 
   const LogDialog({
     this.groupId,
     this.userId,
+    this.workId,
     Key? key,
   }) : super(key: key);
 
@@ -500,6 +503,7 @@ class _LogDialogState extends State<LogDialog> {
                 stream: logProvider.streamList2(
                   groupId: widget.groupId,
                   userId: widget.userId,
+                  workId: widget.workId,
                 ),
                 builder: (context, snapshot) {
                   List<LogModel> logs = [];

@@ -15,12 +15,14 @@ class LogProvider with ChangeNotifier {
   Stream<QuerySnapshot<Map<String, dynamic>>>? streamList2({
     String? groupId,
     String? userId,
+    String? workId,
   }) {
     Stream<QuerySnapshot<Map<String, dynamic>>>? _ret;
     _ret = FirebaseFirestore.instance
         .collection('log')
         .where('groupId', isEqualTo: groupId ?? 'error')
         .where('userId', isEqualTo: userId ?? 'error')
+        .where('workId', isEqualTo: userId ?? 'error')
         .orderBy('createdAt', descending: true)
         .snapshots();
     return _ret;
