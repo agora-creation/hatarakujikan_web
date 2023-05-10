@@ -14,6 +14,7 @@ class LogProvider with ChangeNotifier {
         'userId': '',
         'userName': '',
         'workId': '',
+        'title': '',
         'details': '',
         'createdAt': DateTime.now(),
       });

@@ -6,6 +6,7 @@ class LogModel {
   String _userId = '';
   String _userName = '';
   String _workId = '';
+  String _title = '';
   String _details = '';
   DateTime _createdAt = DateTime.now();
 
@@ -14,6 +15,7 @@ class LogModel {
   String get userId => _userId;
   String get userName => _userName;
   String get workId => _workId;
+  String get title => _title;
   String get details => _details;
   DateTime get createdAt => _createdAt;
 
@@ -23,6 +25,7 @@ class LogModel {
     _userId = snapshot.data()!['userId'] ?? '';
     _userName = snapshot.data()!['userName'] ?? '';
     _workId = snapshot.data()!['workId'] ?? '';
+    _title = snapshot.data()!['title'] ?? '';
     _details = snapshot.data()!['details'] ?? '';
     _createdAt = snapshot.data()!['createdAt'].toDate() ?? DateTime.now();
   }

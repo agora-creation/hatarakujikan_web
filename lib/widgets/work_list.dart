@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hatarakujikan_web/helpers/define.dart';
@@ -5,16 +6,20 @@ import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
+import 'package:hatarakujikan_web/models/log.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
 import 'package:hatarakujikan_web/models/work_shift.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/providers/log.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_google_map.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button_mini.dart';
 import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
+import 'package:hatarakujikan_web/widgets/log_list_tile.dart';
+import 'package:provider/provider.dart';
 
 const TextStyle timeStyle = TextStyle(
   color: Colors.black87,
@@ -113,7 +118,10 @@ class WorkList extends StatelessWidget {
                             showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => LogDialog(),
+                              builder: (_) => LogDialog(
+                                groupId: group?.id,
+                                userId: _work.userId,
+                              ),
                             );
                           },
                         ),
@@ -460,25 +468,67 @@ class _EditDialogState extends State<EditDialog> {
 }
 
 class LogDialog extends StatefulWidget {
-  const LogDialog({Key? key}) : super(key: key);
+  final String? groupId;
+  final String? userId;
+
+  const LogDialog({
+    this.groupId,
+    this.userId,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<LogDialog> createState() => _LogDialogState();
 }
 
 class _LogDialogState extends State<LogDialog> {
+  ScrollController _controller = ScrollController();
+
   @override
   Widget build(BuildContext context) {
+    final logProvider = Provider.of<LogProvider>(context);
+
     return AlertDialog(
+      title: Text('勤怠操作ログ'),
       content: Container(
         width: 450.0,
         child: ListView(
           shrinkWrap: true,
           children: [
-            Container(
-              height: 350.0,
-              child: Text('操作ログ'),
-            ),
+            Divider(height: 0),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: logProvider.streamList2(
+                  groupId: widget.groupId,
+                  userId: widget.userId,
+                ),
+                builder: (context, snapshot) {
+                  List<LogModel> logs = [];
+                  if (snapshot.hasData) {
+                    for (DocumentSnapshot<Map<String, dynamic>> doc
+                        in snapshot.data!.docs) {
+                      LogModel _log = LogModel.fromSnapshot(doc);
+                      logs.add(_log);
+                    }
+                  }
+                  return Container(
+                    height: 350.0,
+                    child: Scrollbar(
+                      isAlwaysShown: true,
+                      controller: _controller,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        controller: _controller,
+                        itemCount: logs.length,
+                        itemBuilder: (_, index) {
+                          LogModel _log = logs[index];
+                          return LogListTile(log: _log);
+                        },
+                      ),
+                    ),
+                  );
+                }),
+            Divider(height: 0),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -1,12 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:hatarakujikan_web/helpers/functions.dart';
 import 'package:hatarakujikan_web/helpers/pdf_file.dart';
 import 'package:hatarakujikan_web/helpers/side_menu.dart';
 import 'package:hatarakujikan_web/helpers/style.dart';
+import 'package:hatarakujikan_web/models/log.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
+import 'package:hatarakujikan_web/providers/log.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/log_list_tile.dart';
+import 'package:provider/provider.dart';
 
 class CustomAdminScaffold extends StatelessWidget {
   final GroupProvider groupProvider;
@@ -31,6 +36,16 @@ class CustomAdminScaffold extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.list_alt),
+            onPressed: () {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (_) => LogDialog(groupId: groupProvider.group?.id),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.qr_code),
             onPressed: () async {
@@ -88,6 +103,82 @@ class CustomAdminScaffold extends StatelessWidget {
               padding: EdgeInsets.all(16.0),
               constraints: BoxConstraints(maxHeight: 850.0),
               child: body,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LogDialog extends StatefulWidget {
+  final String? groupId;
+
+  const LogDialog({
+    this.groupId,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<LogDialog> createState() => _LogDialogState();
+}
+
+class _LogDialogState extends State<LogDialog> {
+  ScrollController _controller = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    final logProvider = Provider.of<LogProvider>(context);
+
+    return AlertDialog(
+      title: Text('勤怠操作ログ'),
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Divider(height: 0),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: logProvider.streamList(groupId: widget.groupId),
+                builder: (context, snapshot) {
+                  List<LogModel> logs = [];
+                  if (snapshot.hasData) {
+                    for (DocumentSnapshot<Map<String, dynamic>> doc
+                        in snapshot.data!.docs) {
+                      LogModel _log = LogModel.fromSnapshot(doc);
+                      logs.add(_log);
+                    }
+                  }
+                  return Container(
+                    height: 350.0,
+                    child: Scrollbar(
+                      isAlwaysShown: true,
+                      controller: _controller,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        controller: _controller,
+                        itemCount: logs.length,
+                        itemBuilder: (_, index) {
+                          LogModel _log = logs[index];
+                          return LogListTile(log: _log);
+                        },
+                      ),
+                    ),
+                  );
+                }),
+            Divider(height: 0),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Container(),
+              ],
             ),
           ],
         ),
