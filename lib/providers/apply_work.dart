@@ -4,10 +4,12 @@ import 'package:hatarakujikan_web/models/apply_work.dart';
 import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/services/apply_work.dart';
+import 'package:hatarakujikan_web/services/log.dart';
 import 'package:hatarakujikan_web/services/work.dart';
 
 class ApplyWorkProvider with ChangeNotifier {
   ApplyWorkService _applyWorkService = ApplyWorkService();
+  LogService _logService = LogService();
   WorkService _workService = WorkService();
 
   Future<bool> update({ApplyWorkModel? applyWork}) async {

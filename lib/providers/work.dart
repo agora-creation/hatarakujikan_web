@@ -5,9 +5,11 @@ import 'package:hatarakujikan_web/models/breaks.dart';
 import 'package:hatarakujikan_web/models/group.dart';
 import 'package:hatarakujikan_web/models/user.dart';
 import 'package:hatarakujikan_web/models/work.dart';
+import 'package:hatarakujikan_web/services/log.dart';
 import 'package:hatarakujikan_web/services/work.dart';
 
 class WorkProvider with ChangeNotifier {
+  LogService _logService = LogService();
   WorkService _workService = WorkService();
 
   Future<bool> create({
@@ -48,6 +50,17 @@ class WorkProvider with ChangeNotifier {
         'state': work.state,
         'createdAt': DateTime.now(),
       });
+      String _logId = _logService.id();
+      _logService.create({
+        'id': _logId,
+        'groupId': work.groupId,
+        'userId': work.userId,
+        'userName': '',
+        'workId': _id,
+        'title': '勤怠データを記録しました',
+        'details': '',
+        'createdAt': DateTime.now(),
+      });
       return true;
     } catch (e) {
       print(e.toString());
@@ -85,6 +98,17 @@ class WorkProvider with ChangeNotifier {
         'endedAt': work.endedAt,
         'breaks': _breaks,
         'state': work.state,
+      });
+      String _logId = _logService.id();
+      _logService.create({
+        'id': _logId,
+        'groupId': work.groupId,
+        'userId': work.userId,
+        'userName': '',
+        'workId': work.id,
+        'title': '勤怠データを修正しました',
+        'details': '',
+        'createdAt': DateTime.now(),
       });
       return true;
     } catch (e) {
