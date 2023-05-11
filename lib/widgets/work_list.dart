@@ -17,6 +17,7 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_google_map.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button_mini.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
 import 'package:hatarakujikan_web/widgets/log_list_tile.dart';
 import 'package:provider/provider.dart';
@@ -188,6 +189,7 @@ class EditDialog extends StatefulWidget {
 }
 
 class _EditDialogState extends State<EditDialog> {
+  TextEditingController memo = TextEditingController();
   List<UserModel> users = [];
   WorkModel? work;
   List<BreaksModel> breaks = [];
@@ -420,6 +422,13 @@ class _EditDialogState extends State<EditDialog> {
                 ),
               ],
             ),
+            SizedBox(height: 8.0),
+            CustomTextFormField2(
+              label: '修正・削除メモ',
+              controller: memo,
+              textInputType: null,
+              maxLines: 1,
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -435,7 +444,10 @@ class _EditDialogState extends State<EditDialog> {
                       label: '削除する',
                       color: Colors.red,
                       onPressed: () async {
-                        if (!await widget.workProvider.delete(work: work)) {
+                        if (!await widget.workProvider.delete(
+                          work: work,
+                          memo: memo.text.trim(),
+                        )) {
                           return;
                         }
                         customSnackBar(context, '勤務データを削除しました');
@@ -450,6 +462,7 @@ class _EditDialogState extends State<EditDialog> {
                         if (!await widget.workProvider.update(
                           work: work,
                           breaks: breaks,
+                          memo: memo.text.trim(),
                         )) {
                           return;
                         }

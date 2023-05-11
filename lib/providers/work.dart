@@ -82,6 +82,7 @@ class WorkProvider with ChangeNotifier {
   Future<bool> update({
     WorkModel? work,
     List<BreaksModel>? breaks,
+    required String memo,
   }) async {
     if (work == null) return false;
     if (breaks == null) return false;
@@ -114,6 +115,7 @@ class WorkProvider with ChangeNotifier {
       });
       String _logId = _logService.id();
       String d = '';
+      d += '$memo\n';
       d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
       d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in breaks) {
@@ -137,7 +139,10 @@ class WorkProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> delete({WorkModel? work}) async {
+  Future<bool> delete({
+    WorkModel? work,
+    required String memo,
+  }) async {
     if (work == null) return false;
     UserModel? _user = await _userService.select(id: work.userId);
     if (_user == null) return false;
@@ -145,6 +150,7 @@ class WorkProvider with ChangeNotifier {
       _workService.delete({'id': work.id});
       String _logId = _logService.id();
       String d = '';
+      d += '$memo\n';
       d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
       d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in work.breaks) {
