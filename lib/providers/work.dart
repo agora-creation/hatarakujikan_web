@@ -17,6 +17,7 @@ class WorkProvider with ChangeNotifier {
   Future<bool> create({
     WorkModel? work,
     List<BreaksModel>? breaks,
+    required String memo,
   }) async {
     if (work == null) return false;
     if (breaks == null) return false;
@@ -55,6 +56,10 @@ class WorkProvider with ChangeNotifier {
         'createdAt': DateTime.now(),
       });
       String _logId = _logService.id();
+      String t = '勤怠データを記録しました';
+      if (memo != '') {
+        t += '($memo)';
+      }
       String d = '';
       d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
       d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
@@ -68,7 +73,7 @@ class WorkProvider with ChangeNotifier {
         'userId': work.userId,
         'userName': _user.name,
         'workId': _id,
-        'title': '勤怠データを記録しました',
+        'title': t.trim(),
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });
@@ -114,8 +119,11 @@ class WorkProvider with ChangeNotifier {
         'state': work.state,
       });
       String _logId = _logService.id();
+      String t = '勤怠データを修正しました';
+      if (memo != '') {
+        t += '($memo)';
+      }
       String d = '';
-      d += '$memo\n';
       d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
       d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in breaks) {
@@ -128,7 +136,7 @@ class WorkProvider with ChangeNotifier {
         'userId': work.userId,
         'userName': _user.name,
         'workId': work.id,
-        'title': '勤怠データを修正しました',
+        'title': t.trim(),
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });
@@ -149,8 +157,11 @@ class WorkProvider with ChangeNotifier {
     try {
       _workService.delete({'id': work.id});
       String _logId = _logService.id();
+      String t = '勤怠データを削除しました';
+      if (memo != '') {
+        t += '($memo)';
+      }
       String d = '';
-      d += '$memo\n';
       d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', work.startedAt)}\n';
       d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', work.endedAt)}\n';
       for (BreaksModel _breaksModel in work.breaks) {
@@ -163,7 +174,7 @@ class WorkProvider with ChangeNotifier {
         'userId': work.userId,
         'userName': _user.name,
         'workId': work.id,
-        'title': '勤怠データを削除しました',
+        'title': t.trim(),
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });

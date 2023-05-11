@@ -32,6 +32,7 @@ class LogListTile extends StatelessWidget {
               Text(
                 log.title,
                 style: TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

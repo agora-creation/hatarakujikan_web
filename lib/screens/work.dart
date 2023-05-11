@@ -20,6 +20,7 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_radio.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button_mini.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/work_footer.dart';
@@ -336,6 +337,7 @@ class AddDialog extends StatefulWidget {
 }
 
 class _AddDialogState extends State<AddDialog> {
+  TextEditingController memo = TextEditingController();
   List<UserModel> users = [];
   WorkModel? work;
   List<BreaksModel> breaks = [];
@@ -570,6 +572,13 @@ class _AddDialogState extends State<AddDialog> {
                 ),
               ],
             ),
+            SizedBox(height: 8.0),
+            CustomTextFormField2(
+              label: '登録メモ',
+              controller: memo,
+              textInputType: null,
+              maxLines: 1,
+            ),
             SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -586,6 +595,7 @@ class _AddDialogState extends State<AddDialog> {
                     if (!await widget.workProvider.create(
                       work: work,
                       breaks: breaks,
+                      memo: memo.text.trim(),
                     )) {
                       return;
                     }

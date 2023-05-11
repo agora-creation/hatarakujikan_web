@@ -35,8 +35,8 @@ class ApplyWorkProvider with ChangeNotifier {
         'breaks': _breaks,
       });
       String _logId = _logService.id();
+      String t = '勤怠データを修正しました(勤務修正の申請)';
       String d = '';
-      d += '勤怠修正の申請の承認により、修正\n';
       d += '[出勤] ${dateText('yyyy/MM/dd HH:mm', applyWork.startedAt)}\n';
       d += '[退勤] ${dateText('yyyy/MM/dd HH:mm', applyWork.endedAt)}\n';
       for (BreaksModel _breaksModel in applyWork.breaks) {
@@ -49,7 +49,7 @@ class ApplyWorkProvider with ChangeNotifier {
         'userId': applyWork.userId,
         'userName': _user.name,
         'workId': applyWork.workId,
-        'title': '勤怠データを修正しました',
+        'title': t.trim(),
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });
