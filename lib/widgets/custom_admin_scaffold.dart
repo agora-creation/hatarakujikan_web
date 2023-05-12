@@ -133,7 +133,7 @@ class _LogDialogState extends State<LogDialog> {
     return AlertDialog(
       title: Text('勤怠操作ログ'),
       content: Container(
-        width: 450.0,
+        width: 600.0,
         child: ListView(
           shrinkWrap: true,
           children: [
