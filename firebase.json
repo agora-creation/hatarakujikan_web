@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "hatarakujikan",
     "public": "build/web",
     "ignore": [
       "firebase.json",
