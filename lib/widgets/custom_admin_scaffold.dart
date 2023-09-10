@@ -152,7 +152,7 @@ class _LogDialogState extends State<LogDialog> {
                   return Container(
                     height: 350.0,
                     child: Scrollbar(
-                      isAlwaysShown: true,
+                      thumbVisibility: true,
                       controller: _controller,
                       child: ListView.builder(
                         shrinkWrap: true,

@@ -389,16 +389,16 @@ class WorkModel {
       if (_endedAt.millisecondsSinceEpoch < _time1end.millisecondsSinceEpoch) {
         if (_time1start.millisecondsSinceEpoch <
             _endedAt.millisecondsSinceEpoch) {
-          Duration _diff = _endedAt.difference(_time1start);
-          String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-          _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
+          // Duration _diff = _endedAt.difference(_time1start);
+          // String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+          // _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
         }
       } else {
         if (_time1start.millisecondsSinceEpoch <
             _time1end.millisecondsSinceEpoch) {
-          Duration _diff = _time1end.difference(_time1start);
-          String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-          _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
+          // Duration _diff = _time1end.difference(_time1start);
+          // String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+          // _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
         }
         DateTime _time2start = _time1end;
         DateTime _time2end = _endedAt;

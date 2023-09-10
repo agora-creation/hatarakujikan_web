@@ -367,7 +367,7 @@ class _SendDialogState extends State<SendDialog> {
             Container(
               height: 350.0,
               child: Scrollbar(
-                isAlwaysShown: true,
+                thumbVisibility: true,
                 controller: _controller,
                 child: ListView.builder(
                   shrinkWrap: true,
