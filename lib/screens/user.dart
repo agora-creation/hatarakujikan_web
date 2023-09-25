@@ -111,12 +111,13 @@ class UserScreen extends StatelessWidget {
                             );
                           },
                         )),
-                        DataCell(IconButton(
-                          icon: users[index].smartphone == true
-                              ? Icon(Icons.smartphone, color: Colors.blue)
-                              : Icon(Icons.no_cell, color: Colors.grey),
-                          onPressed: users[index].smartphone == true
-                              ? () {
+                        users[index].smartphone == true
+                            ? DataCell(IconButton(
+                                icon: Icon(
+                                  Icons.smartphone,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
                                   showDialog(
                                     barrierDismissible: false,
                                     context: context,
@@ -126,9 +127,9 @@ class UserScreen extends StatelessWidget {
                                       afterUser: users[index],
                                     ),
                                   );
-                                }
-                              : null,
-                        )),
+                                },
+                              ))
+                            : DataCell(Container()),
                       ],
                     ),
                   ),
