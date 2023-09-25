@@ -35,56 +35,37 @@ class UserScreen extends StatelessWidget {
         children: [
           AdminHeader(
             title: 'スタッフの管理',
-            message:
-                '会社/組織へ所属するスタッフを登録し、タブレットアプリで打刻できるようにします。スマホアプリを利用できるようにここで設定も可能です。',
+            message: '会社/組織へ所属するスタッフを登録し、タブレットアプリで打刻できるようにします。',
           ),
           SizedBox(height: 8.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(),
-              Row(
-                children: [
-                  TextIconButton(
-                    iconData: Icons.smartphone,
-                    iconColor: Colors.white,
-                    label: 'データ移行',
-                    labelColor: Colors.white,
-                    backgroundColor: Colors.cyan,
-                    onPressed: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => MigrationDialog(
-                          groupProvider: groupProvider,
-                          userProvider: userProvider,
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(width: 4.0),
-                  TextIconButton(
-                    iconData: Icons.add,
-                    iconColor: Colors.white,
-                    label: '新規登録',
-                    labelColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    onPressed: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) => AddDialog(
-                          userProvider: userProvider,
-                          group: group,
-                        ),
-                      );
-                    },
-                  ),
-                ],
+              TextIconButton(
+                iconData: Icons.add,
+                iconColor: Colors.white,
+                label: '新規登録',
+                labelColor: Colors.white,
+                backgroundColor: Colors.blue,
+                onPressed: () {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => AddDialog(
+                      userProvider: userProvider,
+                      group: group,
+                    ),
+                  );
+                },
               ),
             ],
           ),
           SizedBox(height: 8.0),
+          Text(
+            'スマホアプリを利用していなかったスタッフが、スマホアプリの利用を始めた場合、一覧に重複した名前で登録されるはずです。\n「スマホアプリ」のアイコンをタップして、古いスタッフデータと同期してください。',
+            style: TextStyle(color: Colors.red),
+          ),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: userProvider.streamList(),
@@ -106,7 +87,7 @@ class UserScreen extends StatelessWidget {
                     DataColumn2(label: Text('スタッフ名'), size: ColumnSize.M),
                     DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.M),
                     DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
-                    DataColumn2(label: Text('スマホアプリ利用'), size: ColumnSize.M),
+                    DataColumn2(label: Text('スマホアプリ'), size: ColumnSize.M),
                   ],
                   rows: List<DataRow>.generate(
                     users.length,
@@ -134,7 +115,19 @@ class UserScreen extends StatelessWidget {
                           icon: users[index].smartphone == true
                               ? Icon(Icons.smartphone, color: Colors.blue)
                               : Icon(Icons.no_cell, color: Colors.grey),
-                          onPressed: () {},
+                          onPressed: users[index].smartphone == true
+                              ? () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) => MigrationDialog(
+                                      groupProvider: groupProvider,
+                                      userProvider: userProvider,
+                                      afterUser: users[index],
+                                    ),
+                                  );
+                                }
+                              : null,
                         )),
                       ],
                     ),
@@ -555,7 +548,6 @@ class _SmartphoneDialogState extends State<SmartphoneDialog> {
                     )) {
                       return;
                     }
-
                     widget.groupProvider.reloadGroup();
                     customSnackBar(context, 'スマホアプリ利用の設定を保存しました');
                     Navigator.pop(context);
@@ -573,10 +565,12 @@ class _SmartphoneDialogState extends State<SmartphoneDialog> {
 class MigrationDialog extends StatefulWidget {
   final GroupProvider groupProvider;
   final UserProvider userProvider;
+  final UserModel afterUser;
 
   MigrationDialog({
     required this.groupProvider,
     required this.userProvider,
+    required this.afterUser,
   });
 
   @override
@@ -585,17 +579,15 @@ class MigrationDialog extends StatefulWidget {
 
 class _MigrationDialogState extends State<MigrationDialog> {
   List<UserModel> beforeUsers = [];
-  List<UserModel> afterUsers = [];
   UserModel? beforeUser;
-  UserModel? afterUser;
 
   void _init() async {
-    List<UserModel> _beforeUsers = await widget.groupProvider.selectUsers();
-    List<UserModel> _afterUsers = await widget.groupProvider.selectUsers();
+    List<UserModel> _beforeUsers = await widget.groupProvider.selectUsers(
+      smartphone: false,
+    );
     if (mounted) {
       setState(() {
         beforeUsers = _beforeUsers;
-        afterUsers = _afterUsers;
       });
     }
   }
@@ -609,22 +601,19 @@ class _MigrationDialogState extends State<MigrationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      title: Text('旧スタッフデータとの同期'),
       content: Container(
         width: 450.0,
         child: ListView(
           shrinkWrap: true,
           children: [
             Text(
-              'この管理画面から登録したスタッフがスマホアプリを使い始めた際、名前が二重に登録されてしまう為、このデータ移行をして統一化します。',
-              style: kDialogTextStyle,
-            ),
-            Text(
-              '「移行元スタッフ」と「移行先スタッフ」を選択し、「移行する」ボタンをクリックしてください。',
+              '${widget.afterUser.name}はスマホアプリを使い始めました！\n過去のデータは全て旧スタッフデータと紐づいているため、ここで同期するスタッフデータを選択し、『同期する』ボタンをクリックしてください。',
               style: kDialogTextStyle,
             ),
             SizedBox(height: 16.0),
             CustomDropdownButton(
-              label: '移行元スタッフ',
+              label: '同期する旧スタッフデータ',
               isExpanded: true,
               value: beforeUser ?? null,
               onChanged: (value) {
@@ -643,26 +632,10 @@ class _MigrationDialogState extends State<MigrationDialog> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 8.0),
-            CustomDropdownButton(
-              label: '移行先スタッフ',
-              isExpanded: true,
-              value: afterUser ?? null,
-              onChanged: (value) {
-                setState(() => afterUser = value);
-              },
-              items: afterUsers.map((user) {
-                return DropdownMenuItem(
-                  value: user,
-                  child: Text(
-                    user.name,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
-                    ),
-                  ),
-                );
-              }).toList(),
+            SizedBox(height: 4.0),
+            Text(
+              '※同期後は、上記で選択した旧スタッフデータは削除されます。',
+              style: TextStyle(color: Colors.red),
             ),
             SizedBox(height: 16.0),
             Row(
@@ -674,17 +647,17 @@ class _MigrationDialogState extends State<MigrationDialog> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 CustomTextButton(
-                  label: '移行する',
+                  label: '同期する',
                   color: Colors.blue,
                   onPressed: () async {
                     if (!await widget.userProvider.migration(
                       group: widget.groupProvider.group,
                       beforeUser: beforeUser,
-                      afterUser: afterUser,
+                      afterUser: widget.afterUser,
                     )) {
                       return;
                     }
-                    customSnackBar(context, 'スタッフデータの移行が完了しました');
+                    customSnackBar(context, 'スタッフデータの同期が完了しました');
                     Navigator.pop(context);
                   },
                 ),
