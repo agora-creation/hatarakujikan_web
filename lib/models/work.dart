@@ -316,6 +316,7 @@ class WorkModel {
         Duration _diff = _dayOverE.difference(_dayOverS);
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time3 = '${twoDigits(_diff.inHours)}:$_minutes';
+        _time3 = subTime(_time3, breakTimes(group)[1]);
       }
       // ----------------------------------------
       // 深夜時間外
@@ -324,6 +325,7 @@ class WorkModel {
         Duration _diff = _nightOverE.difference(_nightOverS);
         String _minutes = twoDigits(_diff.inMinutes.remainder(60));
         _time4 = '${twoDigits(_diff.inHours)}:$_minutes';
+        _time4 = subTime(_time4, breakTimes(group)[2]);
       }
       // 深夜時間(-深夜時間外)
       _time2 = subTime(_time2, _time4);
