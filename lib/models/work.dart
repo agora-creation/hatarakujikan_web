@@ -265,72 +265,49 @@ class WorkModel {
     DateTime? _nightS = _dayNightList[2];
     DateTime? _nightE = _dayNightList[3];
     // ----------------------------------------
-    // 通常時間
+    // 通常勤務時間を算出
+    String _dayWorkTime = '00:00';
     if (_dayS.millisecondsSinceEpoch < _dayE.millisecondsSinceEpoch) {
       Duration _diff = _dayE.difference(_dayS);
       String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-      _time1 = '${twoDigits(_diff.inHours)}:$_minutes';
-      _time1 = subTime(_time1, breakTimes(group)[1]);
-      List<String> _time1List = _time1.split(':');
-      if (_legal <= int.parse(_time1List.first)) {
-        _time1 = '0$_legal:00';
-      }
+      _dayWorkTime = '${twoDigits(_diff.inHours)}:$_minutes';
     }
-    // ----------------------------------------
-    // 深夜時間(-深夜時間外)
+    // 深夜勤務時間を算出
+    String _nightWorkTime = '00:00';
     if (_nightS.millisecondsSinceEpoch < _nightE.millisecondsSinceEpoch) {
       Duration _diff = _nightE.difference(_nightS);
       String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-      _time2 = '${twoDigits(_diff.inHours)}:$_minutes';
-      _time2 = subTime(_time2, breakTimes(group)[2]);
-      List<String> _time2List = _time2.split(':');
-      if (_legal <= int.parse(_time2List.first)) {
-        _time2 = '0$_legal:00';
-      }
+      _nightWorkTime = '${twoDigits(_diff.inHours)}:$_minutes';
+    }
+    // 休憩時間を引く
+    _dayWorkTime = subTime(_dayWorkTime, breakTimes(group)[1]);
+    _nightWorkTime = subTime(_nightWorkTime, breakTimes(group)[2]);
+    // ----------------------------------------
+    // 通常時間を算出
+    List<String> _dayWorkTimeList = _dayWorkTime.split(':');
+    String _dayOverTime = '00:00';
+    if (_legal <= int.parse(_dayWorkTimeList.first)) {
+      _dayOverTime = subTime(_dayWorkTime, '0$_legal:00');
+      _time1 = '0$_legal:00';
+    } else {
+      _time1 = _dayWorkTime;
     }
     // ----------------------------------------
-    List<String> _workTimes = workTime(group).split(':');
-    if (_legal <= int.parse(_workTimes.first)) {
-      // 法定時間を超えた時点の時間
-      DateTime _overS = _startedAt;
-      _overS = _overS.add(Duration(hours: _legal));
-      // 休憩時間を足す
-      List<String> _breakTimes = breakTimes(group)[0].split(':');
-      _overS = _overS.add(Duration(hours: int.parse(_breakTimes.first)));
-      _overS = _overS.add(Duration(minutes: int.parse(_breakTimes.last)));
-      // ----------------------------------------
-      // 通常時間と深夜時間に分ける
-      List<DateTime> _dayNightOverList = separateDayNight(
-        startedAt: _overS,
-        endedAt: _endedAt,
-        nightStart: group?.nightStart ?? '22:00',
-        nightEnd: group?.nightEnd ?? '05:00',
-      );
-      DateTime? _dayOverS = _dayNightOverList[0];
-      DateTime? _dayOverE = _dayNightOverList[1];
-      DateTime? _nightOverS = _dayNightOverList[2];
-      DateTime? _nightOverE = _dayNightOverList[3];
-      // ----------------------------------------
-      // 通常時間外
-      if (_dayOverS.millisecondsSinceEpoch < _dayOverE.millisecondsSinceEpoch) {
-        Duration _diff = _dayOverE.difference(_dayOverS);
-        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-        _time3 = '${twoDigits(_diff.inHours)}:$_minutes';
-        _time3 = subTime(_time3, breakTimes(group)[1]);
-      }
-      // ----------------------------------------
-      // 深夜時間外
-      if (_nightOverS.millisecondsSinceEpoch <
-          _nightOverE.millisecondsSinceEpoch) {
-        Duration _diff = _nightOverE.difference(_nightOverS);
-        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-        _time4 = '${twoDigits(_diff.inHours)}:$_minutes';
-        _time4 = subTime(_time4, breakTimes(group)[2]);
-      }
-      // 深夜時間(-深夜時間外)
-      _time2 = subTime(_time2, _time4);
-      // ----------------------------------------
+    // 深夜時間を算出
+    List<String> _nightWorkTimeList = _nightWorkTime.split(':');
+    String _nightOverTime = '00:00';
+    if (_legal <= int.parse(_nightWorkTimeList.first)) {
+      _nightOverTime = subTime(_nightOverTime, '0$_legal:00');
+      _time2 = '0$_legal:00';
+    } else {
+      _time2 = _nightWorkTime;
     }
+    // ----------------------------------------
+    // 通常時間外を算出
+    _time3 = _dayOverTime;
+    // ----------------------------------------
+    // 深夜時間外を算出
+    _time4 = _nightOverTime;
     // ----------------------------------------
     return [_time1, _time2, _time3, _time4];
   }
