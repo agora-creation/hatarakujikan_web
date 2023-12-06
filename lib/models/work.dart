@@ -287,6 +287,7 @@ class WorkModel {
     List<String> _dayWorkTimeList = _dayWorkTime.split(':');
     String _dayOverTime = '00:00';
     if (_legal <= int.parse(_dayWorkTimeList.first)) {
+      // オーバーした時間も保持
       _dayOverTime = subTime(_dayWorkTime, '0$_legal:00');
       _time1 = '0$_legal:00';
     } else {
@@ -297,17 +298,21 @@ class WorkModel {
     List<String> _nightWorkTimeList = _nightWorkTime.split(':');
     String _nightOverTime = '00:00';
     if (_legal <= int.parse(_nightWorkTimeList.first)) {
+      // オーバーした時間も保持
       _nightOverTime = subTime(_nightOverTime, '0$_legal:00');
       _time2 = '0$_legal:00';
     } else {
       _time2 = _nightWorkTime;
     }
     // ----------------------------------------
+    // 時間外を算出
+    String _overTime = addTime(_dayOverTime, _nightOverTime);
+    // ----------------------------------------
     // 通常時間外を算出
-    _time3 = _dayOverTime;
+    _time3 = subTime(_time1, _overTime);
     // ----------------------------------------
     // 深夜時間外を算出
-    _time4 = _nightOverTime;
+    _time4 = subTime(_time2, _overTime);
     // ----------------------------------------
     return [_time1, _time2, _time3, _time4];
   }
