@@ -964,7 +964,7 @@ pw.Widget _buildRemarks({pw.TextStyle? style}) {
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
       pw.Text(
-        '※1・・・深夜時間帯外の勤務時間です。',
+        '※1・・・深夜時間帯外の勤務時間です。法定時間を超えていた場合は、超えた分を切り捨てる。',
         style: style,
       ),
       pw.Text(
