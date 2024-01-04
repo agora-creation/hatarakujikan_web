@@ -15,6 +15,9 @@ import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_sf_calendar.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/datetime_form_field.dart';
+import 'package:hatarakujikan_web/widgets/month_form_field.dart';
+import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
+import 'package:hatarakujikan_web/widgets/total_list.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -48,6 +51,29 @@ class WorkShiftScreen extends StatelessWidget {
             message: 'スタッフ毎の実務/予定データをシフト表形式で表示しています。予定データを登録できます。',
           ),
           SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextIconButton(
+                iconData: Icons.table_rows,
+                iconColor: Colors.white,
+                label: '各種集計',
+                labelColor: Colors.white,
+                backgroundColor: Colors.cyan,
+                onPressed: () {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => TotalDialog(
+                      groupProvider: groupProvider,
+                      workShiftProvider: workShiftProvider,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 8.0),
           Expanded(
             child: ShiftTable(
               groupProvider: groupProvider,
@@ -55,6 +81,160 @@ class WorkShiftScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class TotalDialog extends StatefulWidget {
+  final GroupProvider groupProvider;
+  final WorkShiftProvider workShiftProvider;
+
+  const TotalDialog({
+    required this.groupProvider,
+    required this.workShiftProvider,
+  });
+
+  @override
+  State<TotalDialog> createState() => _TotalDialogState();
+}
+
+class _TotalDialogState extends State<TotalDialog> {
+  DateTime month = DateTime.now();
+  ScrollController _controller = ScrollController();
+  List<UserModel> users = [];
+
+  void _init() async {
+    List<UserModel> _users = await widget.groupProvider.selectUsers();
+    if (mounted) {
+      setState(() => users = _users);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    GroupModel? group = widget.groupProvider.group;
+
+    return AlertDialog(
+      content: Container(
+        width: 600.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            MonthFormField(
+              label: '出力年月',
+              month: dateText('yyyy年MM月', month),
+              onPressed: () async {
+                DateTime? selected = await customMonthPicker(
+                  context: context,
+                  init: month,
+                );
+                if (selected == null) return;
+                setState(() => month = selected);
+              },
+            ),
+            SizedBox(height: 16.0),
+            StreamBuilder2<QuerySnapshot<Map<String, dynamic>>,
+                QuerySnapshot<Map<String, dynamic>>>(
+              streams: Tuple2(
+                widget.workShiftProvider.streamListTotal(
+                  groupId: group?.id,
+                  month: month,
+                ),
+                widget.workShiftProvider.streamListShiftTotal(
+                  groupId: group?.id,
+                  month: month,
+                ),
+              ),
+              builder: (context, snapshot) {
+                Map _workDays = {};
+                Map _absenceDays = {};
+                Map _specialDays = {};
+                Map _leaveDays = {};
+                Map _compensatoryDays = {};
+                for (UserModel user in users) {
+                  _workDays[user.id] = 0;
+                  _absenceDays[user.id] = 0;
+                  _specialDays[user.id] = 0;
+                  _leaveDays[user.id] = 0;
+                  _compensatoryDays[user.id] = 0;
+                }
+                if (snapshot.item1.hasData) {
+                  for (DocumentSnapshot<Map<String, dynamic>> doc
+                      in snapshot.item1.data!.docs) {
+                    WorkModel work = WorkModel.fromSnapshot(doc);
+                    if (work.startedAt != work.endedAt) {
+                      _workDays[work.userId] += 1;
+                    }
+                  }
+                }
+                if (snapshot.item2.hasData) {
+                  for (DocumentSnapshot<Map<String, dynamic>> doc
+                      in snapshot.item2.data!.docs) {
+                    WorkShiftModel workShift = WorkShiftModel.fromSnapshot(doc);
+                    switch (workShift.state) {
+                      case '欠勤':
+                        _absenceDays[workShift.userId] += 1;
+                        break;
+                      case '特別休暇':
+                        _specialDays[workShift.userId] += 1;
+                        break;
+                      case '有給休暇':
+                        _leaveDays[workShift.userId] += 1;
+                        break;
+                      case '代休':
+                        _compensatoryDays[workShift.userId] += 1;
+                        break;
+                      default:
+                        break;
+                    }
+                  }
+                }
+                return Container(
+                  height: 450.0,
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    controller: _controller,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      controller: _controller,
+                      itemCount: users.length,
+                      itemBuilder: (_, index) {
+                        UserModel _user = users[index];
+                        return TotalList(
+                          userName: _user.name,
+                          workDays: _workDays[_user.id],
+                          absenceDays: _absenceDays[_user.id],
+                          specialDays: _specialDays[_user.id],
+                          leaveDays: _leaveDays[_user.id],
+                          compensatoryDays: _compensatoryDays[_user.id],
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomTextButton(
+                  label: '閉じる',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
