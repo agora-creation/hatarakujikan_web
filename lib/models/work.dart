@@ -299,28 +299,44 @@ class WorkModel {
       _time2 = _nightWorkTime;
     }
     // ----------------------------------------
-    // 勤務時間を算出する
-    String _workTime = '00:00';
-    if (_startedAt.millisecondsSinceEpoch < _endedAt.millisecondsSinceEpoch) {
-      Duration _diff = _endedAt.difference(_startedAt);
-      String _minutes = twoDigits(_diff.inMinutes.remainder(60));
-      _workTime = '${twoDigits(_diff.inHours)}:$_minutes';
+    // 出勤時間から数えて8時間時点を算出する
+    DateTime _startedAt8h = _startedAt.add(Duration(hours: 8));
+    // 8時間時点でまだ働いているかチェックする
+    if (_startedAt8h.millisecondsSinceEpoch < _endedAt.millisecondsSinceEpoch) {
+      //時間外開始時間と時間外終了時間を設定
+      DateTime _overTimeStart = _startedAt8h;
+      DateTime _overTimeEnd = _endedAt;
+      // 時間外開始時間～時間外終了時間を、通常時間枠と深夜時間枠に分ける
+      List<DateTime> _overDayNightList = separateDayNight(
+        startedAt: _overTimeStart,
+        endedAt: _overTimeEnd,
+        nightStart: group?.nightStart ?? '22:00',
+        nightEnd: group?.nightEnd ?? '05:00',
+      );
+      DateTime? _overDayS = _overDayNightList[0];
+      DateTime? _overDayE = _overDayNightList[1];
+      DateTime? _overNightS = _overDayNightList[2];
+      DateTime? _overNightE = _overDayNightList[3];
+      // 時間外通常勤務時間を算出する
+      String _dayOverTime = '00:00';
+      if (_overDayS.millisecondsSinceEpoch < _overDayE.millisecondsSinceEpoch) {
+        Duration _diff = _dayE.difference(_overDayS);
+        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+        _dayOverTime = '${twoDigits(_diff.inHours)}:$_minutes';
+      }
+      // 時間外深夜勤務時間を算出する
+      String _nightOverTime = '00:00';
+      if (_overNightS.millisecondsSinceEpoch <
+          _overNightE.millisecondsSinceEpoch) {
+        Duration _diff = _nightE.difference(_overNightS);
+        String _minutes = twoDigits(_diff.inMinutes.remainder(60));
+        _nightOverTime = '${twoDigits(_diff.inHours)}:$_minutes';
+      }
+      _time3 = _dayOverTime;
+      _time4 = _nightOverTime;
     }
-    // 休憩時間を引く
-    _workTime = subTime(_workTime, breakTimes(group)[0]);
-    // 勤務時間外を算出する
-    String _overTime = '00:00';
-    List<String> _workTimeList = _workTime.split(':');
-    if (_legal <= int.parse(_workTimeList.first)) {
-      _overTime = subTime(_workTime, '0$_legal:00');
-    }
-    // 深夜時間帯に働いていれば、勤務時間外を深夜時間外に入れる
-    // それ以外は、勤務時間外を通常時間外に入れる
-    if (_time2 != '00:00') {
-      _time4 = _overTime;
-    } else {
-      _time3 = _overTime;
-    }
+    // 深夜時間から深夜時間外分を引く
+    _time2 = subTime(_time2, _time4);
     // ----------------------------------------
     return [_time1, _time2, _time3, _time4];
   }
