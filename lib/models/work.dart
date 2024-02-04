@@ -301,6 +301,12 @@ class WorkModel {
     // ----------------------------------------
     // 出勤時間から数えて8時間時点を算出する
     DateTime _startedAt8h = _startedAt.add(Duration(hours: 8));
+    // 上記から休憩時間分を引く
+    List<String> _breakTimesList = breakTimes(group)[0].split(':');
+    int _breakTimesHours = int.parse(_breakTimesList.first);
+    int _breakTimesMinutes = int.parse(_breakTimesList.last);
+    _startedAt8h = _startedAt8h.add(Duration(hours: _breakTimesHours));
+    _startedAt8h = _startedAt8h.add(Duration(minutes: _breakTimesMinutes));
     // 8時間時点でまだ働いているかチェックする
     if (_startedAt8h.millisecondsSinceEpoch < _endedAt.millisecondsSinceEpoch) {
       //時間外開始時間と時間外終了時間を設定
