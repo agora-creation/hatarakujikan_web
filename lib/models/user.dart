@@ -14,6 +14,7 @@ class UserModel {
   String _autoWorkEndTime = '00:00';
   String _token = '';
   bool _smartphone = false;
+  bool _retired = false;
   DateTime _createdAt = DateTime.now();
 
   String get id => _id;
@@ -29,6 +30,7 @@ class UserModel {
   String get autoWorkEndTime => _autoWorkEndTime;
   String get token => _token;
   bool get smartphone => _smartphone;
+  bool get retired => _retired;
   DateTime get createdAt => _createdAt;
 
   UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
@@ -45,6 +47,7 @@ class UserModel {
     _autoWorkEndTime = snapshot.data()!['autoWorkEndTime'] ?? '00:00';
     _token = snapshot.data()!['token'] ?? '';
     _smartphone = snapshot.data()!['smartphone'] ?? false;
+    _retired = snapshot.data()!['retired'] ?? false;
     _createdAt = snapshot.data()!['createdAt'].toDate() ?? DateTime.now();
   }
 }

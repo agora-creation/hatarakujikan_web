@@ -209,6 +209,7 @@ class _PDFDialogState extends State<PDFDialog> {
   DateTime month = DateTime.now();
   UserModel? user;
   bool isAll = false;
+  bool isRetired = false;
 
   void _init() async {
     List<UserModel> _users = await widget.groupProvider.selectUsers();
@@ -279,11 +280,19 @@ class _PDFDialogState extends State<PDFDialog> {
                     }).toList(),
                   ),
                   CustomCheckbox(
-                    label: '全てのスタッフを出力',
+                    label: '全てのスタッフ分を出力',
                     value: isAll,
                     activeColor: Colors.blue,
                     onChanged: (value) {
                       setState(() => isAll = !isAll);
+                    },
+                  ),
+                  CustomCheckbox(
+                    label: '退職済みのスタッフ分を出力',
+                    value: isRetired,
+                    activeColor: Colors.blue,
+                    onChanged: (value) {
+                      setState(() => isRetired = !isRetired);
                     },
                   ),
                   SizedBox(height: 16.0),
@@ -309,6 +318,7 @@ class _PDFDialogState extends State<PDFDialog> {
                             month: month,
                             user: user,
                             isAll: isAll,
+                            isRetired: isRetired,
                           );
                           setState(() => isLoading = false);
                           Navigator.pop(context);

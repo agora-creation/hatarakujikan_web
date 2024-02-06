@@ -114,6 +114,7 @@ class PDFFile {
     DateTime? month,
     UserModel? user,
     bool? isAll,
+    bool? isRetired,
   }) async {
     String? groupId = group?.id;
     switch (groupId) {
@@ -140,6 +141,7 @@ class PDFFile {
           month: month,
           user: user,
           isAll: isAll,
+          isRetired: isRetired,
         );
         return;
       default:
@@ -151,6 +153,7 @@ class PDFFile {
           month: month,
           user: user,
           isAll: isAll,
+          isRetired: isRetired,
         );
         return;
     }
@@ -165,6 +168,7 @@ Future _model01({
   DateTime? month,
   UserModel? user,
   bool? isAll,
+  bool? isRetired,
 }) async {
   if (month == null) return;
   final pdf = pw.Document();
@@ -182,9 +186,16 @@ Future _model01({
     days2.add(_start2.add(Duration(days: i)));
   }
   if (isAll == true) {
-    List<UserModel> users = await userProvider.selectList(
-      userIds: group?.userIds ?? [],
-    );
+    List<UserModel> users = [];
+    if (isRetired == true) {
+      users = await userProvider.selectListRetired(
+        userIds: group?.userIds ?? [],
+      );
+    } else {
+      users = await userProvider.selectList(
+        userIds: group?.userIds ?? [],
+      );
+    }
     for (UserModel _user in users) {
       List<WorkModel> works = await workProvider.selectList(
         group: group,
@@ -555,6 +566,7 @@ Future _model02({
   DateTime? month,
   UserModel? user,
   bool? isAll,
+  bool? isRetired,
 }) async {
   if (month == null) return;
   final pdf = pw.Document();
@@ -569,9 +581,16 @@ Future _model02({
     groupId: group?.id,
   );
   if (isAll == true) {
-    List<UserModel> users = await userProvider.selectList(
-      userIds: group?.userIds ?? [],
-    );
+    List<UserModel> users = [];
+    if (isRetired == true) {
+      users = await userProvider.selectListRetired(
+        userIds: group?.userIds ?? [],
+      );
+    } else {
+      users = await userProvider.selectList(
+        userIds: group?.userIds ?? [],
+      );
+    }
     for (UserModel _user in users) {
       String positionName = '';
       for (PositionModel _position in positions) {

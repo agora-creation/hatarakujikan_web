@@ -11,6 +11,7 @@ import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
+import 'package:hatarakujikan_web/widgets/custom_text_button_mini.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_form_field2.dart';
 import 'package:hatarakujikan_web/widgets/text_icon_button.dart';
 import 'package:hatarakujikan_web/widgets/time_form_field.dart';
@@ -87,36 +88,41 @@ class UserScreen extends StatelessWidget {
                     DataColumn2(label: Text('スタッフ名'), size: ColumnSize.M),
                     DataColumn2(label: Text('タブレット用暗証番号'), size: ColumnSize.M),
                     DataColumn2(label: Text('修正/削除'), size: ColumnSize.S),
-                    DataColumn2(label: Text('スマホアプリ'), size: ColumnSize.M),
+                    DataColumn2(label: Text('アプリ利用'), size: ColumnSize.S),
+                    DataColumn2(label: Text('退職'), size: ColumnSize.S),
                   ],
                   rows: List<DataRow>.generate(
                     users.length,
                     (index) => DataRow(
+                      color: users[index].retired == true
+                          ? MaterialStateProperty.all<Color>(Colors.grey)
+                          : null,
                       cells: [
                         DataCell(Text('${users[index].number}')),
                         DataCell(Text('${users[index].name}')),
                         DataCell(Text('${users[index].recordPassword}')),
-                        DataCell(IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => EditDialog(
-                                userProvider: userProvider,
-                                user: users[index],
-                                group: group,
-                                adminUser: groupProvider.adminUser,
-                              ),
-                            );
-                          },
-                        )),
-                        users[index].smartphone == true
+                        users[index].retired == false
                             ? DataCell(IconButton(
-                                icon: Icon(
-                                  Icons.smartphone,
-                                  color: Colors.blue,
-                                ),
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) => EditDialog(
+                                      userProvider: userProvider,
+                                      user: users[index],
+                                      group: group,
+                                      adminUser: groupProvider.adminUser,
+                                    ),
+                                  );
+                                },
+                              ))
+                            : DataCell(Container()),
+                        users[index].retired == false &&
+                                users[index].smartphone == true
+                            ? DataCell(CustomTextButtonMini(
+                                label: '旧データと同期',
+                                color: Colors.cyan,
                                 onPressed: () {
                                   showDialog(
                                     barrierDismissible: false,
@@ -130,6 +136,26 @@ class UserScreen extends StatelessWidget {
                                 },
                               ))
                             : DataCell(Container()),
+                        users[index].retired == true
+                            ? DataCell(CustomTextButtonMini(
+                                label: '退職済み',
+                                color: Colors.grey,
+                              ))
+                            : DataCell(CustomTextButtonMini(
+                                label: '退職させる',
+                                color: Colors.deepOrange,
+                                onPressed: () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) => RetiredDialog(
+                                      userProvider: userProvider,
+                                      user: users[index],
+                                      adminUser: groupProvider.adminUser,
+                                    ),
+                                  );
+                                },
+                              )),
                       ],
                     ),
                   ),
@@ -415,154 +441,6 @@ class _EditDialogState extends State<EditDialog> {
   }
 }
 
-class SmartphoneDialog extends StatefulWidget {
-  final GroupProvider groupProvider;
-  final UserProvider userProvider;
-  final UserModel user;
-  final GroupModel? group;
-
-  SmartphoneDialog({
-    required this.groupProvider,
-    required this.userProvider,
-    required this.user,
-    required this.group,
-  });
-
-  @override
-  State<SmartphoneDialog> createState() => _SmartphoneDialogState();
-}
-
-class _SmartphoneDialogState extends State<SmartphoneDialog> {
-  bool? smartphone;
-  TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-
-  void _init() async {
-    smartphone = widget.user.smartphone;
-    email.text = widget.user.email;
-    password.text = widget.user.password;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        width: 450.0,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Text(
-              '情報を変更し、「保存する」ボタンをクリックしてください。',
-              style: kDialogTextStyle,
-            ),
-            Text(
-              '有効になったスタッフはアプリをインストールし、メールアドレスとパスワードでログインしてください。',
-              style: kDialogTextStyle,
-            ),
-            SizedBox(height: 16.0),
-            CustomDropdownButton(
-              label: 'スマホアプリ利用',
-              isExpanded: true,
-              value: smartphone,
-              onChanged: (value) {
-                setState(() => smartphone = value);
-              },
-              items: [
-                DropdownMenuItem(
-                  value: false,
-                  child: Text(
-                    '無効',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: true,
-                  child: Text(
-                    '有効',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            smartphone == true
-                ? Column(
-                    children: [
-                      SizedBox(height: 8.0),
-                      CustomTextFormField2(
-                        label: 'メールアドレス',
-                        controller: email,
-                        textInputType: TextInputType.emailAddress,
-                        maxLines: 1,
-                      ),
-                      SizedBox(height: 8.0),
-                      CustomTextFormField2(
-                        label: 'パスワード',
-                        controller: password,
-                        textInputType: TextInputType.visiblePassword,
-                        maxLines: 1,
-                      ),
-                    ],
-                  )
-                : Container(),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextButton(
-                  label: 'キャンセル',
-                  color: Colors.grey,
-                  onPressed: () => Navigator.pop(context),
-                ),
-                CustomTextButton(
-                  label: '保存する',
-                  color: Colors.blue,
-                  onPressed: () async {
-                    await widget.groupProvider.signOut2();
-                    String? newId = await widget.userProvider.createAuth(
-                      email: email.text.trim(),
-                      password: password.text.trim(),
-                    );
-                    if (newId == '') {
-                      return;
-                    }
-                    if (!await widget.groupProvider.signIn2()) {
-                      return;
-                    }
-                    if (!await widget.userProvider.reCreate(
-                      group: widget.group,
-                      user: widget.user,
-                      newId: newId,
-                      email: email.text.trim(),
-                      password: password.text.trim(),
-                    )) {
-                      return;
-                    }
-                    widget.groupProvider.reloadGroup();
-                    customSnackBar(context, 'スマホアプリ利用の設定を保存しました');
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class MigrationDialog extends StatefulWidget {
   final GroupProvider groupProvider;
   final UserProvider userProvider;
@@ -659,6 +537,74 @@ class _MigrationDialogState extends State<MigrationDialog> {
                       return;
                     }
                     customSnackBar(context, 'スタッフデータの同期が完了しました');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RetiredDialog extends StatefulWidget {
+  final UserProvider userProvider;
+  final UserModel user;
+  final UserModel? adminUser;
+
+  RetiredDialog({
+    required this.userProvider,
+    required this.user,
+    this.adminUser,
+  });
+
+  @override
+  State<RetiredDialog> createState() => _RetiredDialogState();
+}
+
+class _RetiredDialogState extends State<RetiredDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Container(
+        width: 450.0,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              '${widget.user.name}を本当に退職させますか？',
+              style: kDialogTextStyle,
+            ),
+            widget.user.id == widget.adminUser?.id
+                ? Text(
+                    'このスタッフは会社/組織の管理者として設定されているため、現在退職できません。',
+                    style: kDialogTextStyle,
+                  )
+                : Container(),
+            SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomTextButton(
+                  label: 'キャンセル',
+                  color: Colors.grey,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CustomTextButton(
+                  label: 'はい',
+                  color: widget.user.id == widget.adminUser?.id
+                      ? Colors.grey
+                      : Colors.deepOrange,
+                  onPressed: () async {
+                    if (widget.user.id == widget.adminUser?.id) return;
+                    if (!await widget.userProvider.retired(
+                      id: widget.user.id,
+                    )) {
+                      return;
+                    }
+                    customSnackBar(context, 'スタッフを退職させました');
                     Navigator.pop(context);
                   },
                 ),

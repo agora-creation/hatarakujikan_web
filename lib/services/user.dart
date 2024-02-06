@@ -28,7 +28,10 @@ class UserService {
         .doc(id)
         .get()
         .then((value) {
-      _user = UserModel.fromSnapshot(value);
+      UserModel user = UserModel.fromSnapshot(value);
+      if (user.retired == false) {
+        _user = UserModel.fromSnapshot(value);
+      }
     });
     return _user;
   }
@@ -46,7 +49,9 @@ class UserService {
           .then((value) {
         for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
           UserModel user = UserModel.fromSnapshot(_user);
-          if (userIds.contains(user.id)) _users.add(user);
+          if (user.retired == false && userIds.contains(user.id)) {
+            _users.add(user);
+          }
         }
       });
     } else {
@@ -58,10 +63,31 @@ class UserService {
           .then((value) {
         for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
           UserModel user = UserModel.fromSnapshot(_user);
-          if (userIds.contains(user.id)) _users.add(user);
+          if (user.retired == false && userIds.contains(user.id)) {
+            _users.add(user);
+          }
         }
       });
     }
+    return _users;
+  }
+
+  Future<List<UserModel>> selectListRetired({
+    required List<String> userIds,
+  }) async {
+    List<UserModel> _users = [];
+    await _firebaseFirestore
+        .collection(_collection)
+        .orderBy('recordPassword', descending: false)
+        .get()
+        .then((value) {
+      for (DocumentSnapshot<Map<String, dynamic>> _user in value.docs) {
+        UserModel user = UserModel.fromSnapshot(_user);
+        if (user.retired == true && userIds.contains(user.id)) {
+          _users.add(user);
+        }
+      }
+    });
     return _users;
   }
 }

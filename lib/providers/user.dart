@@ -203,12 +203,38 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> retired({
+    String? id,
+  }) async {
+    if (id == null) return false;
+    try {
+      _userService.update({
+        'id': id,
+        'retired': true,
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   Future<List<UserModel>> selectList({
     required List<String> userIds,
     bool? smartphone,
   }) async {
     List<UserModel> _users = [];
     await _userService.selectList(userIds: userIds).then((value) {
+      _users = value;
+    });
+    return _users;
+  }
+
+  Future<List<UserModel>> selectListRetired({
+    required List<String> userIds,
+  }) async {
+    List<UserModel> _users = [];
+    await _userService.selectListRetired(userIds: userIds).then((value) {
       _users = value;
     });
     return _users;
