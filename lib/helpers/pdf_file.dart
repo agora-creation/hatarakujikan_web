@@ -128,6 +128,7 @@ class PDFFile {
           month: month,
           user: user,
           isAll: isAll,
+          isRetired: isRetired,
         );
         return;
       //土佐税理士
