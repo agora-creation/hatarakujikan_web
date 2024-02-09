@@ -13,7 +13,6 @@ import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_checkbox.dart';
-import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/loading.dart';
 import 'package:hatarakujikan_web/widgets/month_form_field.dart';
@@ -205,9 +204,10 @@ class PDFDialog extends StatefulWidget {
 
 class _PDFDialogState extends State<PDFDialog> {
   bool isLoading = false;
+  ScrollController _controller = ScrollController();
   List<UserModel> users = [];
   DateTime month = DateTime.now();
-  UserModel? user;
+  List<UserModel> checkedUsers = [];
   bool isAll = false;
   bool isRetired = false;
 
@@ -216,6 +216,16 @@ class _PDFDialogState extends State<PDFDialog> {
     if (mounted) {
       setState(() => users = _users);
     }
+  }
+
+  void _allCheck(bool value) {
+    isAll = value;
+    if (isAll == true) {
+      checkedUsers = users;
+    } else {
+      checkedUsers = [];
+    }
+    setState(() {});
   }
 
   @override
@@ -230,16 +240,14 @@ class _PDFDialogState extends State<PDFDialog> {
       content: Container(
         width: 450.0,
         child: isLoading == true
-            ? ListView(
-                shrinkWrap: true,
+            ? Column(
                 children: [
                   SizedBox(height: 24.0),
                   Loading(color: Colors.orange),
                   SizedBox(height: 24.0),
                 ],
               )
-            : ListView(
-                shrinkWrap: true,
+            : Column(
                 children: [
                   Text(
                     '出力条件を変更し、「出力する」ボタンをクリックしてください。',
@@ -259,33 +267,47 @@ class _PDFDialogState extends State<PDFDialog> {
                     },
                   ),
                   SizedBox(height: 8.0),
-                  CustomDropdownButton(
-                    label: '出力スタッフ',
-                    isExpanded: true,
-                    value: user ?? null,
-                    onChanged: (value) {
-                      setState(() => user = value);
-                    },
-                    items: users.map((user) {
-                      return DropdownMenuItem(
-                        value: user,
-                        child: Text(
-                          user.name,
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  Divider(color: Colors.black54, height: 1),
+                  Expanded(
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      controller: _controller,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        controller: _controller,
+                        itemCount: users.length,
+                        itemBuilder: (_, index) {
+                          UserModel _user = users[index];
+                          var contain =
+                              checkedUsers.where((e) => e.id == _user.id);
+                          return CustomCheckbox(
+                            label: _user.name,
+                            value: contain.isNotEmpty,
+                            activeColor: Colors.blue,
+                            onChanged: (value) {
+                              var _contain =
+                                  checkedUsers.where((e) => e.id == _user.id);
+                              setState(() {
+                                if (_contain.isEmpty) {
+                                  checkedUsers.add(_user);
+                                } else {
+                                  checkedUsers
+                                      .removeWhere((e) => e.id == _user.id);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
                   ),
+                  Divider(color: Colors.black54, height: 1),
                   CustomCheckbox(
-                    label: '全てのスタッフ分を出力',
+                    label: '全選択',
                     value: isAll,
                     activeColor: Colors.blue,
-                    onChanged: (value) {
-                      setState(() => isAll = !isAll);
-                    },
+                    onChanged: (value) => _allCheck(value!),
                   ),
                   CustomCheckbox(
                     label: '退職済みのスタッフ分を出力',
@@ -316,8 +338,7 @@ class _PDFDialogState extends State<PDFDialog> {
                             workShiftProvider: widget.workShiftProvider,
                             group: widget.groupProvider.group,
                             month: month,
-                            user: user,
-                            isAll: isAll,
+                            users: checkedUsers,
                             isRetired: isRetired,
                           );
                           setState(() => isLoading = false);

@@ -112,8 +112,7 @@ class PDFFile {
     required WorkShiftProvider workShiftProvider,
     GroupModel? group,
     DateTime? month,
-    UserModel? user,
-    bool? isAll,
+    required List<UserModel> users,
     bool? isRetired,
   }) async {
     String? groupId = group?.id;
@@ -126,8 +125,7 @@ class PDFFile {
           workShiftProvider: workShiftProvider,
           group: group,
           month: month,
-          user: user,
-          isAll: isAll,
+          users: users,
           isRetired: isRetired,
         );
         return;
@@ -140,8 +138,7 @@ class PDFFile {
           workShiftProvider: workShiftProvider,
           group: group,
           month: month,
-          user: user,
-          isAll: isAll,
+          users: users,
           isRetired: isRetired,
         );
         return;
@@ -152,8 +149,7 @@ class PDFFile {
           workShiftProvider: workShiftProvider,
           group: group,
           month: month,
-          user: user,
-          isAll: isAll,
+          users: users,
           isRetired: isRetired,
         );
         return;
@@ -167,8 +163,7 @@ Future _model01({
   required WorkShiftProvider workShiftProvider,
   GroupModel? group,
   DateTime? month,
-  UserModel? user,
-  bool? isAll,
+  required List<UserModel> users,
   bool? isRetired,
 }) async {
   if (month == null) return;
@@ -186,212 +181,27 @@ Future _model01({
   for (int i = 0; i <= _end2.difference(_start2).inDays; i++) {
     days2.add(_start2.add(Duration(days: i)));
   }
-  if (isAll == true) {
-    List<UserModel> users = [];
-    if (isRetired == true) {
-      users = await userProvider.selectListRetired(
-        userIds: group?.userIds ?? [],
-      );
-    } else {
-      users = await userProvider.selectList(
-        userIds: group?.userIds ?? [],
-      );
-    }
-    for (UserModel _user in users) {
-      List<WorkModel> works = await workProvider.selectList(
-        group: group,
-        user: _user,
-        startAt: days.first,
-        endAt: days.last,
-      );
-      List<WorkModel> works2 = await workProvider.selectList(
-        group: group,
-        user: _user,
-        startAt: days2.first,
-        endAt: days2.last,
-      );
-      List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
-        group: group,
-        user: _user,
-        startAt: days.first,
-        endAt: days.last,
-      );
-      //合計値初期化
-      Map cnt = {};
-      Map cnt2 = {};
-      String workTimes = '00:00';
-      String dayTimes = '00:00';
-      String nightTimes = '00:00';
-      String dayTimeOvers = '00:00';
-      String nightTimeOvers = '00:00';
-      //一行目
-      List<pw.TableRow> _row = [];
-      _row.add(pw.TableRow(
-        decoration: pw.BoxDecoration(color: PdfColors.grey300),
-        children: [
-          _cell('日付', listStyle),
-          _cell('勤務状況', listStyle),
-          _cell('出勤時間', listStyle),
-          _cell('退勤時間', listStyle),
-          _cell('休憩時間', listStyle),
-          _cell('勤務時間', listStyle),
-          _cell('通常時間※1', listStyle),
-          _cell('深夜時間※2', listStyle),
-          _cell('通常時間外※3', listStyle),
-          _cell('深夜時間外※4', listStyle),
-          _cell('週間合計※5', listStyle),
-        ],
-      ));
-      //週間合計の計算
-      String _tmp = '00:00';
-      for (DateTime _day2 in days2) {
-        List<WorkModel> _dayInWorks2 = [];
-        for (WorkModel _work2 in works2) {
-          String _key = dateText('yyyy-MM-dd', _work2.startedAt);
-          if (_day2 == DateTime.parse(_key)) _dayInWorks2.add(_work2);
-        }
-        String _week = dateText('E', _day2);
-        if (_week == '日') _tmp = '00:00';
-        if (_dayInWorks2.length > 0) {
-          for (WorkModel _work in _dayInWorks2) {
-            if (_work.startedAt != _work.endedAt) {
-              _tmp = addTime(_tmp, _work.workTime(group));
-            }
-          }
-        }
-        if (_week == '土') {
-          String _key = dateText('yyyy-MM-dd', _day2);
-          cnt2[_key] = _tmp;
-        }
-      }
-      //二行目以降
-      for (DateTime _day in days) {
-        List<WorkModel> _dayInWorks = [];
-        for (WorkModel _work in works) {
-          String _key = dateText('yyyy-MM-dd', _work.startedAt);
-          if (_day == DateTime.parse(_key)) _dayInWorks.add(_work);
-        }
-        WorkShiftModel? _dayInWorkShifts;
-        for (WorkShiftModel _workShift in workShifts) {
-          String _key = dateText('yyyy-MM-dd', _workShift.startedAt);
-          if (_day == DateTime.parse(_key)) _dayInWorkShifts = _workShift;
-        }
-        String day = dateText('dd (E)', _day);
-        if (_dayInWorks.length > 0) {
-          for (WorkModel _work in _dayInWorks) {
-            if (_work.startedAt != _work.endedAt) {
-              String state = _work.state;
-              String startTime = _work.startTime(group);
-              String endTime = _work.endTime(group);
-              String breakTime = _work.breakTimes(group).first;
-              String workTime = _work.workTime(group);
-              String dayTime = _work.calTimes01(group)[0];
-              String nightTime = _work.calTimes01(group)[1];
-              String dayTimeOver = _work.calTimes01(group)[2];
-              String nightTimeOver = _work.calTimes01(group)[3];
-              String _key = dateText('yyyy-MM-dd', _work.startedAt);
-              cnt[_key] = '';
-              workTimes = addTime(workTimes, workTime);
-              dayTimes = addTime(dayTimes, dayTime);
-              nightTimes = addTime(nightTimes, nightTime);
-              dayTimeOvers = addTime(dayTimeOvers, dayTimeOver);
-              nightTimeOvers = addTime(nightTimeOvers, nightTimeOver);
-              _row.add(pw.TableRow(
-                children: [
-                  _cell(day, listStyle),
-                  _cell(state, listStyle),
-                  _cell(startTime, listStyle),
-                  _cell(endTime, listStyle),
-                  _cell(breakTime, listStyle),
-                  _cell(workTime, listStyle),
-                  _cell(dayTime, listStyle),
-                  _cell(nightTime, listStyle),
-                  _cell(dayTimeOver, listStyle),
-                  _cell(nightTimeOver, listStyle),
-                  _cell(cnt2[dateText('yyyy-MM-dd', _day)], listStyle),
-                ],
-              ));
-            }
-          }
-        } else {
-          _row.add(pw.TableRow(
-            children: [
-              _cell(day, listStyle),
-              _cell(
-                _dayInWorkShifts?.state ?? '',
-                listStyle,
-                color: _dayInWorkShifts?.stateColor3(),
-              ),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell(cnt2[dateText('yyyy-MM-dd', _day)] ?? '', listStyle),
-            ],
-          ));
-        }
-      }
-      //各時間の合計
-      List<pw.TableRow> _totalRow = [];
-      int workDays = cnt.length;
-      _totalRow.add(pw.TableRow(
-        decoration: pw.BoxDecoration(color: PdfColors.grey300),
-        children: [
-          _cell('総勤務日数 [$workDays日]', listStyle),
-          _cell('総勤務時間 [$workTimes]', listStyle),
-          _cell('総通常時間 [$dayTimes]', listStyle),
-          _cell('総深夜時間 [$nightTimes]', listStyle),
-          _cell('総通常時間外 [$dayTimeOvers]', listStyle),
-          _cell('総深夜時間外 [$nightTimeOvers]', listStyle),
-        ],
-      ));
-      //ページ作成
-      pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            _buildHeader(
-              month: dateText('yyyy年MM月', month),
-              user: '${_user.name} (${_user.number})',
-              style: headStyle,
-            ),
-            pw.SizedBox(height: 4.0),
-            pw.Table(
-              border: pw.TableBorder.all(color: PdfColors.grey),
-              children: _row,
-            ),
-            pw.Table(
-              border: pw.TableBorder.all(color: PdfColors.grey),
-              children: _totalRow,
-            ),
-            pw.SizedBox(height: 4.0),
-            _buildRemarks(style: listStyle),
-          ],
-        ),
-      ));
-    }
-  } else {
-    if (user == null) return;
+  if (isRetired == true) {
+    users = await userProvider.selectListRetired(
+      userIds: group?.userIds ?? [],
+    );
+  }
+  for (UserModel _user in users) {
     List<WorkModel> works = await workProvider.selectList(
       group: group,
-      user: user,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
     List<WorkModel> works2 = await workProvider.selectList(
       group: group,
-      user: user,
+      user: _user,
       startAt: days2.first,
       endAt: days2.last,
     );
     List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
       group: group,
-      user: user,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
@@ -536,7 +346,7 @@ Future _model01({
         children: [
           _buildHeader(
             month: dateText('yyyy年MM月', month),
-            user: '${user.name} (${user.number})',
+            user: '${_user.name} (${_user.number})',
             style: headStyle,
           ),
           pw.SizedBox(height: 4.0),
@@ -565,8 +375,7 @@ Future _model02({
   required WorkShiftProvider workShiftProvider,
   GroupModel? group,
   DateTime? month,
-  UserModel? user,
-  bool? isAll,
+  required List<UserModel> users,
   bool? isRetired,
 }) async {
   if (month == null) return;
@@ -581,206 +390,29 @@ Future _model02({
   List<PositionModel> positions = await positionProvider.selectList(
     groupId: group?.id,
   );
-  if (isAll == true) {
-    List<UserModel> users = [];
-    if (isRetired == true) {
-      users = await userProvider.selectListRetired(
-        userIds: group?.userIds ?? [],
-      );
-    } else {
-      users = await userProvider.selectList(
-        userIds: group?.userIds ?? [],
-      );
-    }
-    for (UserModel _user in users) {
-      String positionName = '';
-      for (PositionModel _position in positions) {
-        List<String> _userIds = _position.userIds;
-        if (_userIds.contains(_user.id)) {
-          positionName = _position.name;
-          break;
-        }
-      }
-      List<WorkModel> works = await workProvider.selectList(
-        group: group,
-        user: _user,
-        startAt: days.first,
-        endAt: days.last,
-      );
-      List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
-        group: group,
-        user: _user,
-        startAt: days.first,
-        endAt: days.last,
-      );
-      //合計値初期化
-      Map cnt = {};
-      String workTimes = '00:00';
-      String overTimes1 = '00:00';
-      String overTimes2 = '00:00';
-      //一行目
-      List<pw.TableRow> _row = [];
-      _row.add(pw.TableRow(
-        decoration: pw.BoxDecoration(color: PdfColors.grey300),
-        children: [
-          _cell('日付', listStyle),
-          _cell('勤務状況', listStyle),
-          _cell('出勤時間', listStyle),
-          _cell('退勤時間', listStyle),
-          _cell('休憩時間', listStyle),
-          _cell('勤務時間', listStyle),
-          _cell('時間外1', listStyle),
-          _cell('時間外2', listStyle),
-        ],
-      ));
-      //二行目以降
-      for (DateTime _day in days) {
-        List<WorkModel> _dayInWorks = [];
-        for (WorkModel _work in works) {
-          String _key = dateText('yyyy-MM-dd', _work.startedAt);
-          if (_day == DateTime.parse(_key)) _dayInWorks.add(_work);
-        }
-        WorkShiftModel? _dayInWorkShifts;
-        for (WorkShiftModel _workShift in workShifts) {
-          String _key = dateText('yyyy-MM-dd', _workShift.startedAt);
-          if (_day == DateTime.parse(_key)) _dayInWorkShifts = _workShift;
-        }
-        String day = dateText('dd (E)', _day);
-        if (_dayInWorks.length > 0) {
-          for (WorkModel _work in _dayInWorks) {
-            if (_work.startedAt != _work.endedAt) {
-              String state = _work.state;
-              String startTime = _work.startTime(group);
-              String endTime = _work.endTime(group);
-              String breakTime = _work.breakTimes(group).first;
-              String workTime = '00:00';
-              String overTime1 = '00:00';
-              String overTime2 = '00:00';
-              switch (positionName) {
-                case 'Aグループ':
-                  workTime = _work.calTimes02(group, 'A')[0];
-                  overTime1 = _work.calTimes02(group, 'A')[1];
-                  overTime2 = _work.calTimes02(group, 'A')[2];
-                  break;
-                case 'Bグループ':
-                  workTime = _work.calTimes02(group, 'B')[0];
-                  overTime1 = _work.calTimes02(group, 'B')[1];
-                  overTime2 = _work.calTimes02(group, 'B')[2];
-                  break;
-                case 'Cグループ':
-                  workTime = _work.calTimes02(group, 'C')[0];
-                  overTime1 = _work.calTimes02(group, 'C')[1];
-                  overTime2 = _work.calTimes02(group, 'C')[2];
-                  break;
-                case 'Dグループ':
-                  workTime = _work.calTimes02(group, 'D')[0];
-                  overTime1 = _work.calTimes02(group, 'D')[1];
-                  overTime2 = _work.calTimes02(group, 'D')[2];
-                  break;
-                default:
-                  workTime = _work.calTimes02(group, 'A')[0];
-                  overTime1 = _work.calTimes02(group, 'A')[1];
-                  overTime2 = _work.calTimes02(group, 'A')[2];
-                  break;
-              }
-              String _key = dateText('yyyy-MM-dd', _work.startedAt);
-              cnt[_key] = '';
-              workTimes = addTime(workTimes, workTime);
-              overTimes1 = addTime(overTimes1, overTime1);
-              overTimes2 = addTime(overTimes2, overTime2);
-              _row.add(pw.TableRow(
-                children: [
-                  _cell(day, listStyle),
-                  _cell(state, listStyle),
-                  _cell(startTime, listStyle),
-                  _cell(endTime, listStyle),
-                  _cell(breakTime, listStyle),
-                  _cell(workTime, listStyle),
-                  _cell(overTime1, listStyle),
-                  _cell(overTime2, listStyle),
-                ],
-              ));
-            }
-          }
-        } else {
-          _row.add(pw.TableRow(
-            children: [
-              _cell(day, listStyle),
-              _cell(
-                _dayInWorkShifts?.state ?? '',
-                listStyle,
-                color: _dayInWorkShifts?.stateColor3(),
-              ),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-              _cell('', listStyle),
-            ],
-          ));
-        }
-      }
-      //各時間の合計
-      List<pw.TableRow> _totalRow = [];
-      _totalRow.add(pw.TableRow(
-        decoration: pw.BoxDecoration(color: PdfColors.grey300),
-        children: [
-          _cell('合計', listStyle),
-          _cell('', listStyle),
-          _cell('', listStyle),
-          _cell('', listStyle),
-          _cell('', listStyle),
-          _cell(workTimes, listStyle),
-          _cell(overTimes1, listStyle),
-          _cell(overTimes2, listStyle),
-        ],
-      ));
-      //ページ作成
-      pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            _buildHeader(
-              month: dateText('yyyy年MM月', month),
-              user: '${_user.name} (${_user.number})【$positionName】',
-              style: headStyle,
-            ),
-            pw.SizedBox(height: 4.0),
-            pw.Table(
-              border: pw.TableBorder.all(color: PdfColors.grey),
-              children: _row,
-            ),
-            pw.Table(
-              border: pw.TableBorder.all(color: PdfColors.grey),
-              children: _totalRow,
-            ),
-            pw.SizedBox(height: 4.0),
-            _buildRemarks2(style: listStyle),
-          ],
-        ),
-      ));
-    }
-  } else {
-    if (user == null) return;
+  if (isRetired == true) {
+    users = await userProvider.selectListRetired(
+      userIds: group?.userIds ?? [],
+    );
+  }
+  for (UserModel _user in users) {
     String positionName = '';
     for (PositionModel _position in positions) {
       List<String> _userIds = _position.userIds;
-      if (_userIds.contains(user.id)) {
+      if (_userIds.contains(_user.id)) {
         positionName = _position.name;
         break;
       }
     }
     List<WorkModel> works = await workProvider.selectList(
       group: group,
-      user: user,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
     List<WorkShiftModel> workShifts = await workShiftProvider.selectList(
       group: group,
-      user: user,
+      user: _user,
       startAt: days.first,
       endAt: days.last,
     );
@@ -915,7 +547,7 @@ Future _model02({
         children: [
           _buildHeader(
             month: dateText('yyyy年MM月', month),
-            user: '${user.name} (${user.number})【$positionName】',
+            user: '${_user.name} (${_user.number})【$positionName】',
             style: headStyle,
           ),
           pw.SizedBox(height: 4.0),
