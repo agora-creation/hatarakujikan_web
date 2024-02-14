@@ -32,8 +32,8 @@ dependencies:
   pdf: ^3.0.0
   universal_html: ^2.0.8
   multiple_stream_builder: ^2.0.0
-  google_maps_flutter: ^2.1.3
-  google_maps_flutter_web: ^0.3.2+1
+  google_maps_flutter: ^2.5.3
+  google_maps_flutter_web: ^0.5.4+3
   http: ^0.13.4
   syncfusion_flutter_calendar: ^20.2.40
   syncfusion_flutter_datepicker: ^20.2.40
