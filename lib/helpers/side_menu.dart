@@ -83,11 +83,11 @@ List<AdminMenuItem> sideMenu(GroupModel? group) {
           route: GroupNoticeScreen.id,
           icon: Icons.chevron_right,
         ),
-        AdminMenuItem(
-          title: '請求書の管理',
-          route: GroupInvoiceScreen.id,
-          icon: Icons.chevron_right,
-        ),
+        // AdminMenuItem(
+        //   title: '請求書の管理',
+        //   route: GroupInvoiceScreen.id,
+        //   icon: Icons.chevron_right,
+        // ),
       ],
     ),
   ];
