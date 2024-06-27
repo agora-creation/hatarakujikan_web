@@ -75,4 +75,25 @@ class WorkService {
         });
     return _works;
   }
+
+  Future updateUserIdTransition() async {
+    final result = await _firebaseFirestore
+        .collection(_collection)
+        .where('userId', isEqualTo: 'i3D8RCN2WGYEZcv7VWCCP9VumTC2')
+        .get();
+    List<WorkModel> _works = [];
+    if (result.docs.isNotEmpty) {
+      for (DocumentSnapshot<Map<String, dynamic>> _work in result.docs) {
+        _works.add(WorkModel.fromSnapshot(_work));
+      }
+    }
+    if (_works.isNotEmpty) {
+      for (WorkModel _work in _works) {
+        update({
+          'id': _work.id,
+          'userId': 'gOqBcT1Lf7xAfpIx2Vy8',
+        });
+      }
+    }
+  }
 }

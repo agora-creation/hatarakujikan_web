@@ -14,6 +14,7 @@ import 'package:hatarakujikan_web/providers/user.dart';
 import 'package:hatarakujikan_web/providers/work.dart';
 import 'package:hatarakujikan_web/providers/work_shift.dart';
 import 'package:hatarakujikan_web/screens/work_download.dart';
+import 'package:hatarakujikan_web/services/work.dart';
 import 'package:hatarakujikan_web/widgets/admin_header.dart';
 import 'package:hatarakujikan_web/widgets/custom_admin_scaffold.dart';
 import 'package:hatarakujikan_web/widgets/custom_dropdown_button.dart';
@@ -98,6 +99,18 @@ class WorkScreen extends StatelessWidget {
               ),
               Row(
                 children: [
+                  TextIconButton(
+                    iconData: Icons.terminal,
+                    iconColor: Colors.white,
+                    label: 'テスト',
+                    labelColor: Colors.white,
+                    backgroundColor: Colors.black,
+                    onPressed: () async {
+                      await WorkService().updateUserIdTransition();
+                      print('success');
+                    },
+                  ),
+                  SizedBox(width: 4.0),
                   TextIconButton(
                     iconData: Icons.download,
                     iconColor: Colors.white,

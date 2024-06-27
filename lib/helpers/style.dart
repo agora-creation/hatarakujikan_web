@@ -12,21 +12,22 @@ ThemeData theme() {
       iconTheme: IconThemeData(color: Colors.black54),
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       toolbarTextStyle: TextTheme(
-        headline6: TextStyle(
+        headlineMedium: TextStyle(
           color: Colors.black54,
           fontSize: 18.0,
         ),
-      ).bodyText2,
+      ).bodyMedium,
       titleTextStyle: TextTheme(
-        headline6: TextStyle(
+        headlineMedium: TextStyle(
           color: Colors.black54,
           fontSize: 18.0,
         ),
-      ).headline6,
+      ).bodyMedium,
     ),
     textTheme: TextTheme(
-      bodyText1: TextStyle(color: Colors.black54),
-      bodyText2: TextStyle(color: Colors.black54),
+      bodySmall: TextStyle(color: Colors.black54),
+      bodyMedium: TextStyle(color: Colors.black54),
+      bodyLarge: TextStyle(color: Colors.black54),
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );

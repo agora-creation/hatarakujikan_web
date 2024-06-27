@@ -33,9 +33,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: "AIzaSyCCEn5twtEVssNBtIH3pxq_W-VNQryOCd8",
-      appId: "1:433017475057:web:87260307fae0432cebfe50",
-      messagingSenderId: "433017475057",
+      authDomain: "hatarakujikan.firebaseapp.com",
       projectId: "hatarakujikan",
+      storageBucket: "hatarakujikan.appspot.com",
+      messagingSenderId: "433017475057",
+      appId: "1:433017475057:web:87260307fae0432cebfe50",
+      measurementId: "G-E0W5WH5047",
     ),
   );
   await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
