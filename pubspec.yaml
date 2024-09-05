@@ -29,7 +29,7 @@ dependencies:
   flutter_admin_scaffold: ^1.2.0
   data_table_2: ^2.5.15
   csv: ^5.0.1
-  pdf: ^3.0.0
+  pdf: ^3.11.1
   universal_html: ^2.0.8
   multiple_stream_builder: ^2.0.0
   google_maps_flutter: ^2.5.3
