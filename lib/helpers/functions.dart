@@ -7,7 +7,7 @@ import 'package:hatarakujikan_web/helpers/date_machine_util.dart';
 import 'package:hatarakujikan_web/helpers/define.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:month_year_picker2/month_year_picker2.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void nextScreen(BuildContext context, Widget widget) {
@@ -284,13 +284,16 @@ Future<DateTime?> customMonthPicker({
   required DateTime init,
 }) async {
   DateTime? _ret;
-  DateTime? _selected = await showMonthYearPicker(
+  await showMonthPicker(
     context: context,
     initialDate: init,
     firstDate: kMonthFirstDate,
     lastDate: kMonthLastDate,
-  );
-  if (_selected != null) _ret = _selected;
+  ).then((value) {
+    if (value != null) {
+      _ret = value;
+    }
+  });
   return _ret;
 }
 

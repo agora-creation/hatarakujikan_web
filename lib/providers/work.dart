@@ -30,6 +30,8 @@ class WorkProvider with ChangeNotifier {
       List<Map> _breaks = [];
       for (BreaksModel _breaksModel in breaks) {
         String _breaksId = randomString(20);
+        if (_breaksModel.startedAt.millisecondsSinceEpoch >
+            _breaksModel.endedAt.millisecondsSinceEpoch) return false;
         _breaks.add({
           'id': _breaksId,
           'startedAt': _breaksModel.startedAt,
@@ -100,6 +102,8 @@ class WorkProvider with ChangeNotifier {
       List<Map> _breaks = [];
       for (BreaksModel _breaksModel in breaks) {
         String _breaksId = randomString(20);
+        if (_breaksModel.startedAt.millisecondsSinceEpoch >
+            _breaksModel.endedAt.millisecondsSinceEpoch) return false;
         _breaks.add({
           'id': _breaksId,
           'startedAt': _breaksModel.startedAt,
