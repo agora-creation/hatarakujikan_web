@@ -330,6 +330,13 @@ class _PDFDialogState extends State<PDFDialog> {
                         label: '出力する',
                         color: Colors.blue,
                         onPressed: () async {
+                          if (!isRetired) {
+                            if (checkedUsers.isEmpty) {
+                              customSnackBar(context, 'スタッフを一名以上選択してください');
+                              Navigator.pop(context);
+                              return;
+                            }
+                          }
                           setState(() => isLoading = true);
                           await PDFFile.download(
                             positionProvider: widget.positionProvider,
