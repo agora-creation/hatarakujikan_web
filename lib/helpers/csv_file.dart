@@ -109,7 +109,7 @@ Future _model01({
       int workDays = cnt.length;
       List<String> _row = [];
       _row.add(number);
-      _row.add(name);
+      _row.add(name.trim());
       _row.add('$workDays');
       if (_position.name == '正社員') {
         _row.add(time);
@@ -330,6 +330,7 @@ void _dl({
   String text = bom + rows.join('\n');
   text = text.replaceAll('[', '');
   text = text.replaceAll(']', '');
+  text = text.replaceAll(' ', '');
   final bytes = utf8.encode(text);
   final blob = Blob([bytes]);
   final url = Url.createObjectUrlFromBlob(blob);
