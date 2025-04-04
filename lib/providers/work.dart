@@ -43,20 +43,6 @@ class WorkProvider with ChangeNotifier {
         });
       }
       String _id = _workService.id();
-      _workService.create({
-        'id': _id,
-        'groupId': work.groupId,
-        'userId': work.userId,
-        'startedAt': work.startedAt,
-        'startedLat': work.startedLat,
-        'startedLon': work.startedLon,
-        'endedAt': work.endedAt,
-        'endedLat': work.endedLat,
-        'endedLon': work.endedLon,
-        'breaks': _breaks,
-        'state': work.state,
-        'createdAt': DateTime.now(),
-      });
       String _logId = _logService.id();
       String t = '勤怠データを記録しました';
       if (memo != '') {
@@ -79,6 +65,21 @@ class WorkProvider with ChangeNotifier {
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });
+      _workService.create({
+        'id': _id,
+        'groupId': work.groupId,
+        'userId': work.userId,
+        'startedAt': work.startedAt,
+        'startedLat': work.startedLat,
+        'startedLon': work.startedLon,
+        'endedAt': work.endedAt,
+        'endedLat': work.endedLat,
+        'endedLon': work.endedLon,
+        'breaks': _breaks,
+        'state': work.state,
+        'createdAt': DateTime.now(),
+      });
+
       return true;
     } catch (e) {
       print(e.toString());
@@ -114,14 +115,6 @@ class WorkProvider with ChangeNotifier {
           'endedLon': _breaksModel.endedLon,
         });
       }
-      _workService.update({
-        'id': work.id,
-        'userId': work.userId,
-        'startedAt': work.startedAt,
-        'endedAt': work.endedAt,
-        'breaks': _breaks,
-        'state': work.state,
-      });
       String _logId = _logService.id();
       String t = '勤怠データを修正しました';
       if (memo != '') {
@@ -144,6 +137,14 @@ class WorkProvider with ChangeNotifier {
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });
+      _workService.update({
+        'id': work.id,
+        'userId': work.userId,
+        'startedAt': work.startedAt,
+        'endedAt': work.endedAt,
+        'breaks': _breaks,
+        'state': work.state,
+      });
       return true;
     } catch (e) {
       print(e.toString());
@@ -159,7 +160,6 @@ class WorkProvider with ChangeNotifier {
     UserModel? _user = await _userService.select(id: work.userId);
     if (_user == null) return false;
     try {
-      _workService.delete({'id': work.id});
       String _logId = _logService.id();
       String t = '勤怠データを削除しました';
       if (memo != '') {
@@ -182,6 +182,7 @@ class WorkProvider with ChangeNotifier {
         'details': d.trim(),
         'createdAt': DateTime.now(),
       });
+      _workService.delete({'id': work.id});
       return true;
     } catch (e) {
       print(e.toString());
