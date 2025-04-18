@@ -9,6 +9,7 @@ import 'package:hatarakujikan_web/models/log.dart';
 import 'package:hatarakujikan_web/providers/group.dart';
 import 'package:hatarakujikan_web/providers/log.dart';
 import 'package:hatarakujikan_web/screens/login.dart';
+import 'package:hatarakujikan_web/screens/users.dart';
 import 'package:hatarakujikan_web/widgets/custom_text_button.dart';
 import 'package:hatarakujikan_web/widgets/log_list_tile.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,13 @@ class CustomAdminScaffold extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.directions_run),
+            onPressed: () => overlayScreen(
+              context,
+              UsersScreen(groupProvider: groupProvider),
+            ),
+          ),
           IconButton(
             icon: Icon(Icons.list_alt),
             onPressed: () {
